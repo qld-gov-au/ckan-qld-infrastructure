@@ -9,7 +9,8 @@ Copyright 2016 Datashades
 **Contents**
 
 * Datashades.VPCs.json: [Optional] Creates dev,uat and production VPCs for OpsWorks stack 
-* Datashades-OpsWorks-NFS-CKAN-Stack.json: [Required] Creates an AWS OpsWorks CKAN Stack using NFS and Solr
+* Datashades-OpsWorks-EFS-CKAN-Stack.json: [Required] Creates an AWS OpsWorks CKAN Stack using NFS and Solr
+* Datashades-OpsWorks-NFS-CKAN-Stack.json: [Depreciated] Creates an AWS OpsWorks CKAN Stack using NFS and Solr
 * Datashades-OpsWorks-CKAN-Stack.json: [Depreciated] Creates AWS OpsWorks CKAN Stack using GFS and SolrCloud
 * Datashades-OpsWorks-CKAN-Instances.json: [Depreciated] Creates initial Instances within AWS OpsWorks GFS based CKAN Stack
 * Datashades-OpsWorks-CKAN-Extensions.json: [Optional] Creates base CKAN extensions Application definitions within AWS OpsWorks CKAN Stack
