@@ -17,14 +17,14 @@ cloudformation_stacks:
       DBPrivileges: "ALL"
       Environment: PROD
       Platform: CKAN
-      PubliclyAccessible: "true"
+      PubliclyAccessible: "false"
       MultiAZ: "true"
       Subnets: PRODCKANDBSubnet
       VPC: CKANVpc-PROD
     tags:
       Environment: PROD
       Service: "CKAN"
-      itoc_monitored: "true"
+      itoc_monitored: "false"
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
@@ -46,7 +46,7 @@ cloudformation_stacks:
       DBPrivileges: "ALL"
       Environment: STAGING
       Platform: CKAN
-      PubliclyAccessible: "true"
+      PubliclyAccessible: "false"
       MultiAZ: "false"
       Subnets: STAGINGCKANDBSubnet
       VPC: CKANVpc-STAGING
@@ -75,14 +75,14 @@ cloudformation_stacks:
       DBPrivileges: "ALL"
       Environment: DEV
       Platform: CKAN
-      PubliclyAccessible: "true"
+      PubliclyAccessible: "false"
       MultiAZ: "false"
       Subnets: DEVCKANDBSubnet
       VPC: CKANVpc-DEV
     tags:
       Environment: DEV
       Service: "CKAN"
-      itoc_monitored: "true"
+      itoc_monitored: "false"
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"

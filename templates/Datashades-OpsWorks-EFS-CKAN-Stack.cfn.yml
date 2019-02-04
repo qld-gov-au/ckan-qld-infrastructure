@@ -191,12 +191,11 @@
     "StackVersion": {
       "Description": "Select a stack version.",
       "Type": "String",
-      "Default": "preprod",
+      "Default": "staging",
       "AllowedValues": [
         "dev",
-        "test",
-        "uat",
-        "preprod",
+        "training",
+        "staging",
         "prod"
       ]
     },
@@ -263,35 +262,33 @@
     "ServicesEC2Size": {
       "Description": "Select EC2 Instance Size.",
       "Type": "String",
-      "Default": "t2.small",
+      "Default": "t3.small",
       "AllowedValues": [
-        "t2.small",
-        "t2.medium",
-        "t2.large",
-        "m3.medium",
-        "m3.large",
-        "m4.large",
-        "m4.xlarge",
-        "m4.2xlarge",
-        "m4.4xlarge",
+        "t3.small",
+        "t3.medium",
+        "t3.large",
+        "m5.large",
+        "m5.xlarge",
+        "m5.2xlarge",
+        "m5.4xlarge",
         "m4.10xlarge"
+        "m5.12xlarge"
       ]
     },
     "WebEC2Size": {
       "Description": "Select EC2 Instance Size.",
       "Type": "String",
-      "Default": "t2.medium",
+      "Default": "t3.medium",
       "AllowedValues": [
-        "t2.small",
-        "t2.medium",
-        "t2.large",
-        "m3.medium",
-        "m3.large",
-        "m4.large",
-        "m4.xlarge",
-        "m4.2xlarge",
-        "m4.4xlarge",
+        "t3.small",
+        "t3.medium",
+        "t3.large",
+        "m5.large",
+        "m5.xlarge",
+        "m5.2xlarge",
+        "m5.4xlarge",
         "m4.10xlarge"
+        "m5.12xlarge"
       ]
     },
     "DefaultEC2Key": {
