@@ -1,0 +1,288 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  BambooAgentIp:
+    Description: CIDR of the local Bamboo agent
+    Type: String
+  BambooAgentIp2:
+    Description: CIDR of the local Bamboo agent
+    Type: String
+  VPC:
+    Type: String
+    Description: Name of the VPC
+  Environment:
+    Type: String
+    Description: Platforms environment
+  Platform:
+    Type: String
+    Description: Name of the platform ie GI, Services, Static
+Resources:
+  CloudfrontHTTP:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cloudfront Ranges HTTP Security Group
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      SecurityGroupIngress:
+        # IPv4 Entries
+{% for entry in aws_ipv4_json %}
+{% if entry.service == "CLOUDFRONT" %}
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: {{ entry.ip_prefix }}
+{% endif %}
+{% endfor %}
+        # IPv6 Entries
+{% for entry in aws_ipv6_json %}
+{% if entry.service == "CLOUDFRONT" %}
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIpv6: {{ entry.ipv6_prefix }}
+{% endif %}
+{% endfor %}
+      Tags:
+        - Key: Name
+          Value: cloudfront-http
+        - Key: AutoUpdate
+          Value: true
+        - Key: Protocol
+          Value: http
+  CloudfrontHTTPS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cloudfront Ranges HTTPS Security Group
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      SecurityGroupIngress:
+        # IPv4 Entries
+{% for entry in aws_ipv4_json %}
+{% if entry.service == "CLOUDFRONT" %}
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: {{ entry.ip_prefix }}
+{% endif %}
+{% endfor %}
+        # IPv6 Entries
+{% for entry in aws_ipv6_json %}
+{% if entry.service == "CLOUDFRONT" %}
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIpv6: {{ entry.ipv6_prefix }}
+{% endif %}
+{% endfor %}
+      Tags:
+        - Key: Name
+          Value: cloudfront-https
+        - Key: AutoUpdate
+          Value: true
+        - Key: Protocol
+          Value: https
+
+  Management:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Monitoring & Management group
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      SecurityGroupIngress:
+      # Itoc OpenVPN server in osssio ops
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 54.153.232.134/32
+      # AnsibleRundeck Server (osssio-ops)
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 52.64.173.92/32
+      # BastionOpenVpn Server primary (osssio-ops)
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 52.65.228.39/32
+      # Local Bamboo Agent
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !Ref BambooAgentIp
+      # Local Bamboo Agent 2
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !Ref BambooAgentIp2
+      # OSSSIO OPS Range
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 8443
+        CidrIp: 10.10.0.0/16
+
+
+  AppLoadBalancer:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: WebAsg
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        SourceSecurityGroupId: !Ref WebAsg
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        SourceSecurityGroupId: !Ref WebAsg
+
+  AppAsg:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: AppLoadBalancer
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        SourceSecurityGroupId: !Ref AppLoadBalancer
+
+  WebLoadBalancer:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      GroupDescription: allow connections from specified CIDR ranges
+
+  WebAsg:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: WebLoadBalancer
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        SourceSecurityGroupId: !Ref WebLoadBalancer
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        SourceSecurityGroupId: !Ref WebLoadBalancer
+
+  Database:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn: AppAsg
+    Properties:
+      GroupDescription: Security group for RDS DB Instance.
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 5432
+        ToPort: 5432
+        SourceSecurityGroupId: !Ref AppAsg
+      - IpProtocol: tcp
+        FromPort: 5432
+        ToPort: 5432
+        CidrIp: !Ref BambooAgentIp
+      - IpProtocol: tcp
+        FromPort: 5432
+        ToPort: 5432
+        CidrIp: !Ref BambooAgentIp2
+
+
+
+Outputs:
+  ManagementSG:
+    Description: Shared services management group
+    Value: !Ref Management
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "ManagementSG"
+  WebAsgSG:
+    Description: Web auto-scaling group security group
+    Value: !Ref WebAsg
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "WebAsgSG"
+
+  WebLoadBalancerSG:
+    Description: Web load balancer security group
+    Value: !Ref WebLoadBalancer
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "WebLoadBalancerSG"
+
+  AppAsgSG:
+    Description: Application auto-scaling group security group
+    Value: !Ref AppAsg
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "AppAsgSG"
+
+  AppLoadBalancerSG:
+    Description: App load balancer security group
+    Value: !Ref AppLoadBalancer
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "AppLoadBalancerSG"
+
+  DatabaseSG:
+    Description: Database security group
+    Value: !Ref Database
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "DatabaseSG"
+
+  CloudfrontHTTPSG:
+    Description: Cloudfront HTTP Security Group
+    Value: !Ref CloudfrontHTTP
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "CloudfrontHTTPSG"
+
+  CloudfrontHTTPSSG:
+    Description: Cloudfront HTTPS Security Group
+    Value: !Ref CloudfrontHTTPS
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "CloudfrontHTTPSSG"
+
