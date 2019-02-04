@@ -34,8 +34,9 @@
             "AdminUserGroup",
             "AdminPubKeyBucket",
             "StackVPC",
-            "PrimarySubnet",
-            "SecondarySubnet",
+            "WebSubnets",
+            "AppSubnets",
+            "DbSubnets",
             "AdminSG"
           ]
         },
@@ -124,11 +125,14 @@
         "StackVPC": {
           "default": "What VPC should OpsWorks stack instances belong to?"
         },
-        "PrimarySubnet": {
-          "default": "Which Subnet in the selected VPC should primary instances be provisioned in?"
+        "WebSubnets": {
+          "default": "What base name are the web layer subnet IDs exported under?"
         },
-        "SecondarySubnet": {
-          "default": "Which Subnet in the selected VPC should seconardary/failover instances be provisioned in?"
+        "AppSubnets": {
+          "default": "What base name are the application layer subnet IDs exported under?"
+        },
+        "DbSubnets": {
+          "default": "What base name are the data layer subnet IDs exported under?"
         },
         "AdminSG": {
           "default": "Which Security Group in the selected VPC contains SysAdmin user inbound rules?"
@@ -336,13 +340,17 @@
       "Description": "Existing VPC ID.",
       "Type": "AWS::EC2::VPC::Id"
     },
-    "PrimarySubnet": {
-      "Type": "AWS::EC2::Subnet::Id",
-      "Description": "Select an existing subnet residing in the selected VPC."
+    "WebSubnets": {
+      "Type": "String",
+      "Description": "The base name for the exported web layer subnet IDs, eg if the exports are 'PRODMyApplicationWebSubnetA' and 'PRODMyApplicationWebSubnetB', then this would be 'PRODMyApplicationWebSubnet'"
     },
-    "SecondarySubnet": {
-      "Type": "AWS::EC2::Subnet::Id",
-      "Description": "Select an existing subnet residing in the selected VPC."
+    "AppSubnets": {
+      "Type": "String",
+      "Description": "The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'"
+    },
+    "DbSubnets": {
+      "Type": "String",
+      "Description": "The base name for the exported data layer subnet IDs, eg if the exports are 'PRODMyApplicationDbSubnetA' and 'PRODMyApplicationDbSubnetB', then this would be 'PRODMyApplicationDbSubnet'"
     },
     "AdminSG": {
       "Description": "Select existing security group",
@@ -577,7 +585,9 @@
           "Ref": "DefaultEC2Key"
         },
         "DefaultSubnetId": {
-          "Ref": "PrimarySubnet"
+          "Fn::ImportValue": {
+            "Fn::Sub": "${AppSubnets}A"
+          }
         },
         "Name": {
           "Fn::Join": [
@@ -838,10 +848,14 @@
             "Ref": "OpsWorksWebLayer"
           },
           "PrimarySubnet": {
-            "Ref": "PrimarySubnet"
+            "Fn::ImportValue": {
+              "Fn::Sub": "${AppSubnets}A"
+            }
           },
           "SecondarySubnet": {
-            "Ref": "SecondarySubnet"
+            "Fn::ImportValue": {
+              "Fn::Sub": "${AppSubnets}B"
+            }
           }
         }
       }
@@ -898,7 +912,9 @@
           "Ref": "SharedFileSystem"
         },
         "SubnetId": {
-          "Ref": "PrimarySubnet"
+          "Fn::ImportValue": {
+            "Fn::Sub": "${DbSubnets}A"
+          }
         },
         "SecurityGroups": [
           {
@@ -914,7 +930,9 @@
           "Ref": "SharedFileSystem"
         },
         "SubnetId": {
-          "Ref": "SecondarySubnet"
+          "Fn::ImportValue": {
+            "Fn::Sub": "${DbSubnets}B"
+          }
         },
         "SecurityGroups": [
           {
@@ -1027,10 +1045,14 @@
         ],
         "Subnets": [
           {
-            "Ref": "PrimarySubnet"
+            "Fn::ImportValue": {
+              "Fn::Sub": "${WebSubnets}A"
+            }
           },
           {
-            "Ref": "SecondarySubnet"
+            "Fn::ImportValue": {
+              "Fn::Sub": "${WebSubnets}B"
+            }
           }
         ]
       }

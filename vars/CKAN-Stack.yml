@@ -12,6 +12,9 @@ cloudformation_stacks:
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
       PGDBPassword: "{{ lookup('aws_ssm', 'CKAN_PROD_MASTER_DBPASS', region='ap-southeast-2') }}"
+      WebSubnets: PRODCKANWebSubnet
+      AppSubnets: PRODCKANAppSubnet
+      DbSubnets: PRODCKANDbSubnet
     tags:
       Environment: PROD
       Service: "CKAN"
@@ -32,6 +35,9 @@ cloudformation_stacks:
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
       PGDBPassword: "{{ lookup('aws_ssm', 'CKAN_STAGING_MASTER_DBPASS', region='ap-southeast-2') }}"
+      WebSubnets: STAGINGCKANWebSubnet
+      AppSubnets: STAGINGCKANAppSubnet
+      DbSubnets: STAGINGCKANDbSubnet
     tags:
       Environment: STAGING
       Service: "CKAN"
@@ -52,6 +58,9 @@ cloudformation_stacks:
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
       PGDBPassword: "{{ lookup('aws_ssm', 'CKAN_TRAINING_MASTER_DBPASS', region='ap-southeast-2') }}"
+      WebSubnets: TRAININGCKANWebSubnet
+      AppSubnets: TRAININGCKANAppSubnet
+      DbSubnets: TRAININGCKANDbSubnet
     tags:
       Environment: TRAINING
       Service: "CKAN"
@@ -72,6 +81,9 @@ cloudformation_stacks:
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
       DefaultEC2Key: osssio-global-ckan
       PGDBPassword: "{{ lookup('aws_ssm', 'CKAN_DEV_MASTER_DBPASS', region='ap-southeast-2') }}"
+      WebSubnets: DEVCKANWebSubnet
+      AppSubnets: DEVCKANAppSubnet
+      DbSubnets: DEVCKANDbSubnet
     tags:
       Environment: DEV
       Service: "CKAN"
