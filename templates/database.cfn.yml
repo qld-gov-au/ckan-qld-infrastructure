@@ -129,28 +129,15 @@ Resources:
       BackupRetentionPeriod: "20"
       CopyTagsToSnapshot: true
       VPCSecurityGroups:
-        - Fn::ImportValue:
-            Fn::Join:
-              - ""
-              - - !Ref Environment
-                - !Ref Platform
-                - "DatabaseSG"
+        - Fn::ImportValue: !Sub "${Environment}${Platform}DatabaseSG"
 
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: Subnets available for the RDS DB Instance
       SubnetIds:
-        - Fn::ImportValue:
-            Fn::Join:
-              - ""
-              - - Ref: Subnets
-                - "A"
-        - Fn::ImportValue:
-            Fn::Join:
-              - ""
-              - - Ref: Subnets
-                - "B"
+        - Fn::ImportValue: !Sub "${Subnets}A"
+        - Fn::ImportValue: !Sub "${Subnets}B"
 
   DBHostCNAME:
     Type: AWS::Route53::RecordSet
@@ -158,24 +145,14 @@ Resources:
     Properties:
       Type: CNAME
       TTL: 60
-      Name: {
-        - Fn::Join:
-          - ""
-          - - Ref: StackVersion
-            - pg.
-            - Ref: StackTLD
-      HostedZoneName:
-        - Fn::Join:
-          - ""
-          - - Ref: StackTLD
-            - .
+      Name: !Sub "${StackVersion}pg.${StackTLD}"
+      HostedZoneName: !Sub "${StackTLD}."
       ResourceRecords:
-        - Fn::GetAtt:
+        Fn::GetAtt:
           - PostgresRDS
           - Endpoint.Address
 
   Outputs:
     RDSInstance:
-      Value:
-        - Ref: PostgresRDS
+      Value: !Ref PostgresRDS
       Description: Postgres RDS Instance Id
