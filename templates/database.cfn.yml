@@ -91,15 +91,6 @@ Parameters:
   VPC:
     Description: Vpc export name. Check your VPC cloudformation outputs.
     Type: String
-  StackVersion:
-    Description: Select a stack version.
-    Type: String
-    Default: staging
-    AllowedValues:
-      - dev
-      - training
-      - staging
-      - prod
   StackTLD:
     Description: Route53 hosted TLD for stack
     Type: String
@@ -145,7 +136,7 @@ Resources:
     Properties:
       Type: CNAME
       TTL: 60
-      Name: !Sub "${StackVersion}pg.${StackTLD}"
+      Name: !Sub "${Environment}pg.${StackTLD}"
       HostedZoneName: !Sub "${StackTLD}."
       ResourceRecords:
         Fn::GetAtt:

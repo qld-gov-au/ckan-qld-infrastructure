@@ -7,13 +7,13 @@ cloudformation_stacks:
     template: "templates/database.yml"
     template_parameters:
       DBAllocatedStorage: "100"
-      DBClass: db.m4.large
+      DBClass: db.m5.large
       DBEngine: postgres
       DBEngineVersion: 10.6
       DBName: ckan
       StorageEncrypted: "True"
-      DBPassword: "{{ lookup('aws_ssm', 'CKAN_PROD_MASTER_DBPASS', region='ap-southeast-2') }}"
-      DBUsername: "{{ lookup('aws_ssm', 'CKAN_PROD_MASTER_DBUSER', region='ap-southeast-2') }}"
+      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/master_password', region='ap-southeast-2') }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/master_user', region='ap-southeast-2') }}"
       DBPrivileges: "ALL"
       Environment: PROD
       Platform: CKAN
@@ -21,6 +21,7 @@ cloudformation_stacks:
       MultiAZ: "true"
       Subnets: PRODCKANDBSubnet
       VPC: CKANVpc-PROD
+      StackTLD: TODO
     tags:
       Environment: PROD
       Service: "CKAN"
@@ -36,13 +37,13 @@ cloudformation_stacks:
     template: "templates/database.yml"
     template_parameters:
       DBAllocatedStorage: '50'
-      DBClass: db.t2.large
+      DBClass: db.t3.large
       DBEngine: postgres
       DBEngineVersion: 10.6
       DBName: ckan
       StorageEncrypted: "True"
-      DBPassword: "{{ lookup('aws_ssm', 'CKAN_STAGING_MASTER_DBPASS', region='ap-southeast-2') }}"
-      DBUsername: "{{ lookup('aws_ssm', 'CKAN_STAGING_MASTER_DBUSER', region='ap-southeast-2') }}"
+      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/master_password', region='ap-southeast-2') }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/master_user', region='ap-southeast-2') }}"
       DBPrivileges: "ALL"
       Environment: STAGING
       Platform: CKAN
@@ -50,6 +51,7 @@ cloudformation_stacks:
       MultiAZ: "false"
       Subnets: STAGINGCKANDBSubnet
       VPC: CKANVpc-STAGING
+      StackTLD: TODO
     tags:
       Environment: STAGING
       Service: "CKAN"
@@ -58,6 +60,37 @@ cloudformation_stacks:
       Owner: "Development and Delivery"
       Version: "1.0"
 
+  - name: CKAN-TRAINING-RDS
+    state: present
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/database.yml"
+    template_parameters:
+      DBAllocatedStorage: "100"
+      DBClass: db.t3.medium
+      DBEngine: postgres
+      DBEngineVersion: 10.6
+      DBName: ckan
+      StorageEncrypted: "False"
+      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/master_password', region='ap-southeast-2') }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/master_user', region='ap-southeast-2') }}"
+      DBPrivileges: "ALL"
+      Environment: TRAINING
+      Platform: CKAN
+      PubliclyAccessible: "false"
+      MultiAZ: "false"
+      Subnets: TRAININGCKANDBSubnet
+      VPC: CKANVpc-TRAINING
+      StackTLD: TODO
+    tags:
+      Environment: TRAINING
+      Service: "CKAN"
+      itoc_monitored: "false"
+      Division: "Qld Online"
+      Owner: "Development and Delivery"
+      Version: "1.0"
+      PowerManaged: "Yes"
+
   - name: CKAN-DEV-RDS
     state: present
     region: ap-southeast-2
@@ -65,13 +98,13 @@ cloudformation_stacks:
     template: "templates/database.yml"
     template_parameters:
       DBAllocatedStorage: "100"
-      DBClass: db.t2.medium
+      DBClass: db.t3.medium
       DBEngine: postgres
       DBEngineVersion: 10.6
       DBName: ckan
       StorageEncrypted: "False"
-      DBPassword: "{{ lookup('aws_ssm', 'CKAN_DEV_MASTER_DBPASS', region='ap-southeast-2') }}"
-      DBUsername: "{{ lookup('aws_ssm', 'CKAN_DEV_MASTER_DBUSER', region='ap-southeast-2') }}"
+      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/master_password', region='ap-southeast-2') }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/master_user', region='ap-southeast-2') }}"
       DBPrivileges: "ALL"
       Environment: DEV
       Platform: CKAN
@@ -79,6 +112,7 @@ cloudformation_stacks:
       MultiAZ: "false"
       Subnets: DEVCKANDBSubnet
       VPC: CKANVpc-DEV
+      StackTLD: ckandevtrail.devpit140cs.qgov.net.au
     tags:
       Environment: DEV
       Service: "CKAN"
