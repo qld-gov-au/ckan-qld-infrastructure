@@ -1,7 +1,7 @@
 ---
 cloudformation_stacks:
   - name: CKAN-PROD-SECURITY-GROUPS
-    state: present
+    state: "{{ State | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/security_groups.cfn.yml"
@@ -20,7 +20,7 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: CKAN-STAGING-SECURITY-GROUPS
-    state: present
+    state: "{{ State | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/security_groups.cfn.yml"
@@ -39,7 +39,7 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: CKAN-TRAINING-SECURITY-GROUPS
-    state: present
+    state: "{{ State | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/security_groups.cfn.yml"
@@ -58,7 +58,7 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: CKAN-DEV-SECURITY-GROUPS
-    state: present
+    state: "{{ State | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/security_groups.cfn.yml"
