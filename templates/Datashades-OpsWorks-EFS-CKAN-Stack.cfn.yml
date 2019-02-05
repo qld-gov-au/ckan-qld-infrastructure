@@ -20,7 +20,8 @@
           },
           "Parameters": [
             "CreateServiceRole",
-            "StackVersion",
+            "ApplicationName",
+            "Environment",
             "StackTLD",
             "CreateTLD",
             "CreateELB",
@@ -86,7 +87,10 @@
         "CookbookRevision": {
           "default": "What repository branch should the Custom Cookbook use?"
         },
-        "StackVersion": {
+        "ApplicationName": {
+          "default": "Name of the application (ie. GI or Services, etc)"
+        },
+        "Environment": {
           "default": "What version is this OpsWorks stack?"
         },
         "CreateTLD": {
@@ -192,15 +196,20 @@
       "Default": "https://github.com/ckan/ckan/archive/ckan-2.5.4.zip",
       "Type": "String"
     },
-    "StackVersion": {
+    "ApplicationName": {
+      "Description": "Name of the application (ie. GI or Services, etc)",
+      "Default": "CKAN",
+      "Type": "String"
+    },
+    "Environment": {
       "Description": "Select a stack version.",
       "Type": "String",
-      "Default": "staging",
+      "Default": "STAGING",
       "AllowedValues": [
-        "dev",
-        "training",
-        "staging",
-        "prod"
+        "DEV",
+        "TRAINING",
+        "STAGING",
+        "PROD"
       ]
     },
     "StackTLD": {
@@ -423,7 +432,7 @@
       "Fn::Equals": [
         "prod",
         {
-          "Ref": "StackVersion"
+          "Ref": "Environment"
         }
       ]
     }
@@ -570,7 +579,7 @@
               "Ref": "StackTLD"
             },
             "version": {
-              "Ref": "StackVersion"
+              "Ref": "Environment"
             }
           }
         },
@@ -594,7 +603,7 @@
             "_",
             [
               {
-                "Ref": "StackVersion"
+                "Ref": "Environment"
               },
               "ckan"
             ]
@@ -737,7 +746,7 @@
               ".",
               [
                 {
-                  "Ref": "StackVersion"
+                  "Ref": "Environment"
                 },
                 {
                   "Ref": "StackTLD"
@@ -760,7 +769,7 @@
             [
               "ckan",
               {
-                "Ref": "StackVersion"
+                "Ref": "Environment"
               }
             ]
           ]
@@ -771,7 +780,7 @@
             [
               "ckan",
               {
-                "Ref": "StackVersion"
+                "Ref": "Environment"
               }
             ]
           ]
@@ -887,7 +896,7 @@
             "-",
             [
               {
-                "Ref": "StackVersion"
+                "Ref": "Environment"
               },
               "CKANELB"
             ]
@@ -940,7 +949,7 @@
             "-",
             [
               {
-                "Ref": "StackVersion"
+                "Ref": "Environment"
               },
               "CKANELB"
             ]
@@ -962,7 +971,7 @@
             ".",
             [
               {
-                "Ref": "StackVersion"
+                "Ref": "Environment"
               },
               {
                 "Ref": "StackTLD"
@@ -1004,36 +1013,66 @@
         "Ref": "OpsWorksStack"
       },
       "Description": "OpsWorks Stack Id"
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksStack"
+        }
+      }
     },
     "RedisLayer": {
       "Value": {
         "Ref": "OpsWorksRedisLayer"
       },
       "Description": "Redis Layer Id"
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksRedisLayer"
+        }
+      }
     },
     "SolrLayer": {
       "Value": {
         "Ref": "OpsWorksSolrLayer"
       },
       "Description": "SolrCloud Layer Id"
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksSolrLayer"
+        }
+      }
     },
     "WebLayer": {
       "Value": {
         "Ref": "OpsWorksWebLayer"
       },
       "Description": "Web Layer Id"
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksWebLayer"
+        }
+      }
     },
     "CKANApp": {
       "Value": {
         "Ref": "OpwxAppCKAN"
       },
       "Description": "CKAN Application Id"
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksCKANApplication"
+        }
+      }
     },
     "SolrApp": {
       "Value": {
         "Ref": "OpwxAppSolr"
       },
       "Description": "SolrCloud Application Id"
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksSolrApplication"
+        }
+      }
     }
   }
 }

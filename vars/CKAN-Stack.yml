@@ -7,7 +7,6 @@ cloudformation_stacks:
     template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: PROD
-      StackVersion: prod
       StackTLD: TODO
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
@@ -30,7 +29,6 @@ cloudformation_stacks:
     template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: STAGING
-      StackVersion: staging
       StackTLD: TODO
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
@@ -53,7 +51,6 @@ cloudformation_stacks:
     template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: TRAINING
-      StackVersion: training
       StackTLD: TODO
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
@@ -76,7 +73,6 @@ cloudformation_stacks:
     template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: DEV
-      StackVersion: dev
       StackTLD: ckandevtrail.devpit140cs.qgov.net.au
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
       DefaultEC2Key: osssio-global-ckan
