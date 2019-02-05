@@ -3,6 +3,6 @@
   hosts: local
   connection: local
   vars_files:
-    - vars/efs.yml
+    - vars/OpenData-Stack.yml
   roles:
     - ansible_cloudformation

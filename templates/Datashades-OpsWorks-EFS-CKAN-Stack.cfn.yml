@@ -148,7 +148,6 @@ Parameters:
     Type: String
   ApplicationName:
     Description: Name of the application (ie. GI or Services, etc)
-    Default: CKAN
     Type: String
   Environment:
     Description: Select a stack version.

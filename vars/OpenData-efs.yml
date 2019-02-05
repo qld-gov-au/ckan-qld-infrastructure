@@ -1,12 +1,13 @@
 ---
 cloudformation_stacks:
-  - name: CKAN-PROD-EFS-stack
+  - name: OpenData-PROD-EFS-stack
     state: present
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
     template_parameters:
       Environment: PROD
+      ApplicationName: OpenData
       StackTLD: TODO
       StackVPC: CKANVpc-PROD
       DbSubnets: PRODCKANDbSubnet
@@ -19,13 +20,14 @@ cloudformation_stacks:
       Owner: "Development and Delivery"
       Version: "1.0"
 
-  - name: CKAN-STAGING-EFS-stack
+  - name: OpenData-STAGING-EFS-stack
     state: present
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
     template_parameters:
       Environment: STAGING
+      ApplicationName: OpenData
       StackTLD: TODO
       StackVPC: CKANVpc-STAGING
       DbSubnets: STAGINGCKANDbSubnet
@@ -38,13 +40,14 @@ cloudformation_stacks:
       Owner: "Development and Delivery"
       Version: "1.0"
 
-  - name: CKAN-TRAINING-OpsWorks-EFS-stack
+  - name: OpenData-TRAINING-OpsWorks-EFS-stack
     state: present
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
     template_parameters:
       Environment: TRAINING
+      ApplicationName: OpenData
       StackTLD: TODO
       StackVPC: CKANVpc-TRAINING
       DbSubnets: TRAININGCKANDbSubnet
@@ -57,14 +60,15 @@ cloudformation_stacks:
       Owner: "Development and Delivery"
       Version: "1.0"
 
-  - name: CKAN-DEV-OpsWorks-EFS-stack
+  - name: OpenData-DEV-OpsWorks-EFS-stack
     state: present
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
     template_parameters:
       Environment: DEV
-      StackTLD: ckandevtrail.devpit140cs.qgov.net.au
+      ApplicationName: OpenData
+      StackTLD: opendatadevtrail.devpit140cs.qgov.net.au
       StackVPC: CKANVpc-DEV
       DbSubnets: DEVCKANDbSubnet
       AdminSG: DEVCKANManagementSG

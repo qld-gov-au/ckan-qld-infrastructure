@@ -1,6 +1,6 @@
 ---
 cloudformation_stacks:
-  - name: CKAN-PROD-RDS
+  - name: OpenData-PROD-RDS
     state: present
     region: ap-southeast-2
     disable_rollback: true
@@ -10,13 +10,13 @@ cloudformation_stacks:
       DBClass: db.m5.large
       DBEngine: postgres
       DBEngineVersion: 10.6
-      DBName: ckan
+      DBName: opendata
       StorageEncrypted: "True"
-      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/master_password', region='ap-southeast-2') }}"
-      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/master_user', region='ap-southeast-2') }}"
+      DBPassword: "{{ lookup('aws_ssm', '/config/OpenData/PROD/db/master_password', region='ap-southeast-2') }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/OpenData/PROD/db/master_user', region='ap-southeast-2') }}"
       DBPrivileges: "ALL"
       Environment: PROD
-      Platform: CKAN
+      Platform: OpenData
       PubliclyAccessible: "false"
       MultiAZ: "true"
       Subnets: PRODCKANDBSubnet
@@ -24,13 +24,13 @@ cloudformation_stacks:
       StackTLD: TODO
     tags:
       Environment: PROD
-      Service: "CKAN"
+      Service: Open Data
       itoc_monitored: "false"
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
 
-  - name: CKAN-STAGING-RDS
+  - name: OpenData-STAGING-RDS
     state: present
     region: ap-southeast-2
     disable_rollback: true
@@ -40,13 +40,13 @@ cloudformation_stacks:
       DBClass: db.t3.large
       DBEngine: postgres
       DBEngineVersion: 10.6
-      DBName: ckan
+      DBName: opendata
       StorageEncrypted: "True"
-      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/master_password', region='ap-southeast-2') }}"
-      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/master_user', region='ap-southeast-2') }}"
+      DBPassword: "{{ lookup('aws_ssm', '/config/OpenData/STAGING/db/master_password', region='ap-southeast-2') }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/OpenData/STAGING/db/master_user', region='ap-southeast-2') }}"
       DBPrivileges: "ALL"
       Environment: STAGING
-      Platform: CKAN
+      Platform: OpenData
       PubliclyAccessible: "false"
       MultiAZ: "false"
       Subnets: STAGINGCKANDBSubnet
@@ -54,13 +54,13 @@ cloudformation_stacks:
       StackTLD: TODO
     tags:
       Environment: STAGING
-      Service: "CKAN"
+      Service: Open Data
       itoc_monitored: 'false'
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
 
-  - name: CKAN-TRAINING-RDS
+  - name: OpenData-TRAINING-RDS
     state: present
     region: ap-southeast-2
     disable_rollback: true
@@ -70,13 +70,13 @@ cloudformation_stacks:
       DBClass: db.t3.medium
       DBEngine: postgres
       DBEngineVersion: 10.6
-      DBName: ckan
+      DBName: opendata
       StorageEncrypted: "False"
-      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/master_password', region='ap-southeast-2') }}"
-      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/master_user', region='ap-southeast-2') }}"
+      DBPassword: "{{ lookup('aws_ssm', '/config/OpenData/TRAINING/db/master_password', region='ap-southeast-2') }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/OpenData/TRAINING/db/master_user', region='ap-southeast-2') }}"
       DBPrivileges: "ALL"
       Environment: TRAINING
-      Platform: CKAN
+      Platform: OpenData
       PubliclyAccessible: "false"
       MultiAZ: "false"
       Subnets: TRAININGCKANDBSubnet
@@ -84,14 +84,14 @@ cloudformation_stacks:
       StackTLD: TODO
     tags:
       Environment: TRAINING
-      Service: "CKAN"
+      Service: Open Data
       itoc_monitored: "false"
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
       PowerManaged: "Yes"
 
-  - name: CKAN-DEV-RDS
+  - name: OpenData-DEV-RDS
     state: present
     region: ap-southeast-2
     disable_rollback: true
@@ -101,21 +101,21 @@ cloudformation_stacks:
       DBClass: db.t3.medium
       DBEngine: postgres
       DBEngineVersion: 10.6
-      DBName: ckan
+      DBName: opendata
       StorageEncrypted: "False"
-      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/master_password', region='ap-southeast-2') }}"
-      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/master_user', region='ap-southeast-2') }}"
+      DBPassword: "{{ lookup('aws_ssm', '/config/OpenData/DEV/db/master_password', region='ap-southeast-2') }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/OpenData/DEV/db/master_user', region='ap-southeast-2') }}"
       DBPrivileges: "ALL"
       Environment: DEV
-      Platform: CKAN
+      Platform: OpenData
       PubliclyAccessible: "false"
       MultiAZ: "false"
       Subnets: DEVCKANDBSubnet
       VPC: CKANVpc-DEV
-      StackTLD: ckandevtrail.devpit140cs.qgov.net.au
+      StackTLD: opendatadevtrail.devpit140cs.qgov.net.au
     tags:
       Environment: DEV
-      Service: "CKAN"
+      Service: Open Data
       itoc_monitored: "false"
       Division: "Qld Online"
       Owner: "Development and Delivery"

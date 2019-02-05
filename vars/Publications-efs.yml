@@ -1,0 +1,82 @@
+---
+cloudformation_stacks:
+  - name: Publications-PROD-EFS-stack
+    state: present
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/efs.cfn.yml"
+    template_parameters:
+      Environment: PROD
+      ApplicationName: Publications
+      StackTLD: TODO
+      StackVPC: CKANVpc-PROD
+      DbSubnets: PRODCKANDbSubnet
+      AdminSG: PRODCKANManagementSG
+    tags:
+      Environment: PROD
+      Service: "CKAN"
+      itoc_monitored: "false"
+      Division: "Qld Online"
+      Owner: "Development and Delivery"
+      Version: "1.0"
+
+  - name: Publications-STAGING-EFS-stack
+    state: present
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/efs.cfn.yml"
+    template_parameters:
+      Environment: STAGING
+      ApplicationName: Publications
+      StackTLD: TODO
+      StackVPC: CKANVpc-STAGING
+      DbSubnets: STAGINGCKANDbSubnet
+      AdminSG: STAGINGCKANManagementSG
+    tags:
+      Environment: STAGING
+      Service: "CKAN"
+      itoc_monitored: 'false'
+      Division: "Qld Online"
+      Owner: "Development and Delivery"
+      Version: "1.0"
+
+  - name: Publications-TRAINING-OpsWorks-EFS-stack
+    state: present
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/efs.cfn.yml"
+    template_parameters:
+      Environment: TRAINING
+      ApplicationName: Publications
+      StackTLD: TODO
+      StackVPC: CKANVpc-TRAINING
+      DbSubnets: TRAININGCKANDbSubnet
+      AdminSG: TRAININGCKANManagementSG
+    tags:
+      Environment: TRAINING
+      Service: "CKAN"
+      itoc_monitored: 'false'
+      Division: "Qld Online"
+      Owner: "Development and Delivery"
+      Version: "1.0"
+
+  - name: Publications-DEV-OpsWorks-EFS-stack
+    state: present
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/efs.cfn.yml"
+    template_parameters:
+      Environment: DEV
+      ApplicationName: Publications
+      StackTLD: publicationsdevtrail.devpit140cs.qgov.net.au
+      StackVPC: CKANVpc-DEV
+      DbSubnets: DEVCKANDbSubnet
+      AdminSG: DEVCKANManagementSG
+    tags:
+      Environment: DEV
+      Service: "CKAN"
+      itoc_monitored: "false
+      Division: "Qld Online"
+      Owner: "Development and Delivery"
+      Version: "1.0"
+      PowerManaged: "Yes"

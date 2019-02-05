@@ -3,6 +3,6 @@
   hosts: local
   connection: local
   vars_files:
-    - vars/CKAN-Stack.yml
+    - vars/Publications-database.yml
   roles:
     - ansible_cloudformation

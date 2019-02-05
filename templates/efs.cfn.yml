@@ -37,7 +37,6 @@ Outputs:
 Parameters:
   ApplicationName:
     Description: Name of the application (ie. GI or Services, etc)
-    Default: CKAN
     Type: String
   Environment:
     Description: Stack environment eg DEV, TRAINING
