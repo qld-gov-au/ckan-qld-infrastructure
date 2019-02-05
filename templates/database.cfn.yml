@@ -16,6 +16,10 @@ Outputs:
       Fn::GetAtt:
         - Database
         - Endpoint.Address
+  RDSInstance:
+    Value: !Ref PostgresRDS
+    Description: Postgres RDS Instance Id
+
 Parameters:
   DBAllocatedStorage:
     ConstraintDescription: must be between 5 and 1024Gb.
@@ -79,6 +83,12 @@ Parameters:
   Environment:
     Description: Database environment
     Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
   PubliclyAccessible:
     Description: Boolean to set RDS availability
     Type: String
@@ -143,7 +153,3 @@ Resources:
           - PostgresRDS
           - Endpoint.Address
 
-  Outputs:
-    RDSInstance:
-      Value: !Ref PostgresRDS
-      Description: Postgres RDS Instance Id
