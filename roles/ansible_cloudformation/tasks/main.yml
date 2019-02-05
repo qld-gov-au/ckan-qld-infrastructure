@@ -1,0 +1,50 @@
+---
+  
+- name: Create Update or Delete stack with params
+  cloudformation:
+    stack_name: "{{ item.name }}"
+    profile: "{{ item.profile }}"
+    state: "{{ item.state }}"
+    region: "{{ item.region }}"
+    disable_rollback: "{{ item.disable_rollback }}"
+    template: "{{ item.template }}"
+    template_parameters: "{{ item.template_parameters }}"
+    tags: "{{ item.tags }}"
+  when: item.template_parameters is defined and item.template_parameters.Environment == Environment and item.profile is defined
+  with_items: "{{ cloudformation_stacks }}"
+
+- name: Create Update or Delete stack with params no profile
+  cloudformation:
+    stack_name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    region: "{{ item.region }}"
+    disable_rollback: "{{ item.disable_rollback }}"
+    template: "{{ item.template }}"
+    template_parameters: "{{ item.template_parameters }}"
+    tags: "{{ item.tags }}"
+  when: item.template_parameters is defined and item.template_parameters.Environment == Environment and item.profile is undefined
+  with_items: "{{ cloudformation_stacks }}"
+
+- name: Create Update or Delete stack without params
+  cloudformation:
+    stack_name: "{{ item.name }}"
+    profile: "{{ item.profile }}"
+    state: "{{ item.state }}"
+    region: "{{ item.region }}"
+    disable_rollback: "{{ item.disable_rollback }}"
+    template: "{{ item.template }}"
+    tags: "{{ item.tags }}"
+  when: item.template_parameters is undefined and item.profile is defined
+  with_items: "{{ cloudformation_stacks }}"
+
+- name: Create Update or Delete stack without params or profile
+  cloudformation:
+    stack_name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    region: "{{ item.region }}"
+    disable_rollback: "{{ item.disable_rollback }}"
+    template: "{{ item.template }}"
+    tags: "{{ item.tags }}"
+  when: item.template_parameters is undefined and item.profile is undefined
+  with_items: "{{ cloudformation_stacks }}"
+
