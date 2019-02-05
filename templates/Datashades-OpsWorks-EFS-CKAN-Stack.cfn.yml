@@ -1,1078 +1,655 @@
-{
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Creates an OpsWorks EFS based CKAN Stack.\n",
-  "Metadata": {
-    "AWS::CloudFormation::Interface": {
-      "ParameterGroups": [
-        {
-          "Label": {
-            "default": "OpsWorks Custom Cookbook"
-          },
-          "Parameters": [
-            "CookbookURL",
-            "CookbookSSHKey",
-            "CookbookRevision"
-          ]
-        },
-        {
-          "Label": {
-            "default": "OpsWorks Stack Details"
-          },
-          "Parameters": [
-            "CreateServiceRole",
-            "ApplicationName",
-            "Environment",
-            "StackTLD",
-            "CreateTLD",
-            "CreateELB",
-            "CreateInstances",
-            "InstancesTemplate",
-            "CreateExtensions",
-            "ExtensionsTemplate",
-            "ServicesEC2Size",
-            "WebEC2Size",
-            "DefaultEC2Key",
-            "AdminUserGroup",
-            "AdminPubKeyBucket",
-            "StackVPC",
-            "WebSubnets",
-            "AppSubnets",
-            "DbSubnets",
-            "AdminSG"
-          ]
-        },
-        {
-          "Label": {
-            "default": "CKAN Options"
-          },
-          "Parameters": [
-            "PGDBPassword",
-            "CKANAdminPW",
-            "CKANAdminEmail"
-          ]
-        },
-        {
-          "Label": {
-            "default": "Application Sources"
-          },
-          "Parameters": [
-            "SolrSource",
-            "CKANSource"
-          ]
-        },
-        {
-          "Label": {
-            "default": "Optional Monitoring"
-          },
-          "Parameters": [
-            "IcingaMaster",
-            "IcingaPW",
-            "SentryURL"
-          ]
-        }
-      ],
-      "ParameterLabels": {
-        "CookbookURL": {
-          "default": "What is the URL for the OpsWorks Custom Cookbook repository?"
-        },
-        "SolrSource": {
-          "default": "Provide the URL for Apache Solr source archive:"
-        },
-        "CKANSource": {
-          "default": "Provide the URL for CKAN source archive:"
-        },
-        "CookbookSSHKey": {
-          "default": "Paste the private key for the Cookbook repository."
-        },
-        "CookbookRevision": {
-          "default": "What repository branch should the Custom Cookbook use?"
-        },
-        "ApplicationName": {
-          "default": "Name of the application (ie. GI or Services, etc)"
-        },
-        "Environment": {
-          "default": "What version is this OpsWorks stack?"
-        },
-        "CreateTLD": {
-          "default": "Do you need the Route53 Hosted Zone for the TLD created?"
-        },
-        "CreateServiceRole": {
-          "default": "Do you need an OpsWorks Service Role created?"
-        },
-        "CreateInstances": {
-          "default": "Do you want to instances provisioned with this stack?"
-        },
-        "InstancesTemplate": {
-          "default": "Where is the CloudFormation Template for your Instances?"
-        },
-        "CreateExtensions": {
-          "default": "Do you want to provision CKAN extensions with this stack?"
-        },
-        "ExtensionsTemplate": {
-          "default": "Where is the CloudFormation Template for your CKAN Extensions?"
-        },
-        "CreateELB": {
-          "default": "Do you want to provision an Elastic Load Balancer with this stack?"
-        },
-        "StackTLD": {
-          "default": "What TLD hosted on Route53 is this stack using for internal DNS?"
-        },
-        "DefaultEC2Key": {
-          "default": "What EC2 key pair should all instances in the OpsWorks stack use for SSH access?"
-        },
-        "AdminUserGroup": {
-          "default": "What group should Bastion Host Admins belong to?"
-        },
-        "AdminPubKeyBucket": {
-          "default": "Where is the S3 bucket for Bastion Host Admin's public keys?"
-        },
-        "StackVPC": {
-          "default": "What VPC should OpsWorks stack instances belong to?"
-        },
-        "WebSubnets": {
-          "default": "What base name are the web layer subnet IDs exported under?"
-        },
-        "AppSubnets": {
-          "default": "What base name are the application layer subnet IDs exported under?"
-        },
-        "DbSubnets": {
-          "default": "What base name are the data layer subnet IDs exported under?"
-        },
-        "AdminSG": {
-          "default": "Which Security Group in the selected VPC contains SysAdmin user inbound rules?"
-        },
-        "ServicesEC2Size": {
-          "default": "What instance size do you want to use for Service Instances?"
-        },
-        "WebEC2Size": {
-          "default": "What instance size do you want to use for Web nodes?"
-        },
-        "PGDBPassword": {
-          "default": "Enter a password for Postgres DB access."
-        },
-        "CKANAdminPW": {
-          "default": "Enter a password for your CKAN Admin user."
-        },
-        "CKANAdminEmail": {
-          "default": "Enter the email address for your CKAN Admin user."
-        },
-        "IcingaMaster": {
-          "default": "What is the URL of the Master Node for your Icinga2 Monitoring?"
-        },
-        "SentryURL": {
-          "default": "What is the client URL for your Sentry Monitoring?"
-        },
-        "IcingaPW": {
-          "default": "What is the API Password to request tickets from your Icinga2 Monitoring Master Node?"
-        }
-      }
-    }
-  },
-  "Parameters": {
-    "CookbookURL": {
-      "Default": "https://github.com/DataShades/opswx-ckan-cookbook.git",
-      "Description": "Repository URL. Must be SSH URL for private repos with private key.\n",
-      "Type": "String"
-    },
-    "CookbookSSHKey": {
-      "Description": "Change SSH key newlines to commas.",
-      "Type": "CommaDelimitedList",
-      "NoEcho": "true"
-    },
-    "CookbookRevision": {
-      "Default": "v1.2.0",
-      "Description": "Branch name in repository to checkout.",
-      "Type": "String",
-      "MinLength": "1",
-      "MaxLength": "64"
-    },
-    "SolrSource": {
-      "Description": "URL for zip archive.",
-      "Default": "http://apache.mirror.digitalpacific.com.au/lucene/solr/5.5.4/solr-5.5.4.zip",
-      "Type": "String"
-    },
-    "CKANSource": {
-      "Description": "URL for zip archive.",
-      "Default": "https://github.com/ckan/ckan/archive/ckan-2.5.4.zip",
-      "Type": "String"
-    },
-    "ApplicationName": {
-      "Description": "Name of the application (ie. GI or Services, etc)",
-      "Default": "CKAN",
-      "Type": "String"
-    },
-    "Environment": {
-      "Description": "Select a stack version.",
-      "Type": "String",
-      "Default": "STAGING",
-      "AllowedValues": [
-        "DEV",
-        "TRAINING",
-        "STAGING",
-        "PROD"
-      ]
-    },
-    "StackTLD": {
-      "Description": "Route53 hosted TLD for stack",
-      "Type": "String",
-      "MinLength": "6",
-      "MaxLength": "254"
-    },
-    "CreateTLD": {
-      "Type": "String",
-      "Default": "no",
-      "AllowedValues": [
-        "yes",
-        "no"
-      ]
-    },
-    "CreateServiceRole": {
-      "Description": "Required if OpsWorks stacks have never been created in this account.",
-      "Type": "String",
-      "Default": "no",
-      "AllowedValues": [
-        "yes",
-        "no"
-      ]
-    },
-    "CreateInstances": {
-      "Description": "Recommended",
-      "Type": "String",
-      "Default": "yes",
-      "AllowedValues": [
-        "yes",
-        "no"
-      ]
-    },
-    "InstancesTemplate": {
-      "Description": "Valid S3 Bucket Location",
-      "Type": "String",
-      "Default": "https://s3-ap-southeast-2.amazonaws.com/link-opsworks/Datashades-OpsWorks-CKAN-EFS-Instances.json"
-    },
-    "CreateExtensions": {
-      "Description": "Optional.",
-      "Type": "String",
-      "Default": "no",
-      "AllowedValues": [
-        "yes",
-        "no"
-      ]
-    },
-    "ExtensionsTemplate": {
-      "Description": "Valid S3 Bucket Location",
-      "Type": "String",
-      "Default": "https://s3-ap-southeast-2.amazonaws.com/link-opsworks/Datashades-OpsWorks-CKAN-Extensions.json"
-    },
-    "CreateELB": {
-      "Description": "Recommended",
-      "Type": "String",
-      "Default": "yes",
-      "AllowedValues": [
-        "yes",
-        "no"
-      ]
-    },
-    "ServicesEC2Size": {
-      "Description": "Select EC2 Instance Size.",
-      "Type": "String",
-      "Default": "t3.small",
-      "AllowedValues": [
-        "t3.small",
-        "t3.medium",
-        "t3.large",
-        "m5.large",
-        "m5.xlarge",
-        "m5.2xlarge",
-        "m5.4xlarge",
-        "m4.10xlarge"
-        "m5.12xlarge"
-      ]
-    },
-    "WebEC2Size": {
-      "Description": "Select EC2 Instance Size.",
-      "Type": "String",
-      "Default": "t3.medium",
-      "AllowedValues": [
-        "t3.small",
-        "t3.medium",
-        "t3.large",
-        "m5.large",
-        "m5.xlarge",
-        "m5.2xlarge",
-        "m5.4xlarge",
-        "m4.10xlarge"
-        "m5.12xlarge"
-      ]
-    },
-    "DefaultEC2Key": {
-      "Description": "Select an existing SSH key",
-      "Type": "AWS::EC2::KeyPair::KeyName"
-    },
-    "AdminUserGroup": {
-      "Description": "Valid Linux group name",
-      "Type": "String",
-      "Default": "link"
-    },
-    "IcingaMaster": {
-      "Description": "Valid DNS Hostname",
-      "Type": "String",
-      "Default": "monitoring.links.com.au"
-    },
-    "IcingaPW": {
-      "NoEcho": "true",
-      "Description": "Icinga2 issued API Key",
-      "Type": "String"
-    },
-    "SentryURL": {
-      "Description": "Valid Sentry Client URL",
-      "Type": "String"
-    },
-    "CKANAdminPW": {
-      "NoEcho": "true",
-      "Description": "Password must be at least 8 alphanumeric characters upto a maximum of 64 characters in length.",
-      "Type": "String",
-      "MinLength": "8",
-      "MaxLength": "64",
-      "AllowedPattern": "[a-zA-Z0-9]*",
-      "ConstraintDescription": "Must be 8 - 64 alphanumeric characters."
-    },
-    "CKANAdminEmail": {
-      "Description": "Valid Email Address",
-      "Type": "String"
-    },
-    "AdminPubKeyBucket": {
-      "Description": "S3 Bucket URL",
-      "Type": "String",
-      "Default": "s3://link-opsworks/keys/"
-    },
-    "StackVPC": {
-      "Description": "Existing VPC ID.",
-      "Type": "AWS::EC2::VPC::Id"
-    },
-    "WebSubnets": {
-      "Type": "String",
-      "Description": "The base name for the exported web layer subnet IDs, eg if the exports are 'PRODMyApplicationWebSubnetA' and 'PRODMyApplicationWebSubnetB', then this would be 'PRODMyApplicationWebSubnet'"
-    },
-    "AppSubnets": {
-      "Type": "String",
-      "Description": "The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'"
-    },
-    "DbSubnets": {
-      "Type": "String",
-      "Description": "The base name for the exported data layer subnet IDs, eg if the exports are 'PRODMyApplicationDbSubnetA' and 'PRODMyApplicationDbSubnetB', then this would be 'PRODMyApplicationDbSubnet'"
-    },
-    "AdminSG": {
-      "Description": "Select existing security group",
-      "Type": "AWS::EC2::SecurityGroup::Id"
-    },
-    "PGDBPassword": {
-      "NoEcho": "true",
-      "Description": "Password must be at least 8 alphanumeric characters upto a maximum of 64 characters in length.",
-      "Type": "String",
-      "MinLength": "8",
-      "MaxLength": "64",
-      "AllowedPattern": "[a-zA-Z0-9]*",
-      "ConstraintDescription": "Must be 8 - 64 alphanumeric characters."
-    }
-  },
-  "Conditions": {
-    "CreateHostedZone": {
-      "Fn::Equals": [
-        "yes",
-        {
-          "Ref": "CreateTLD"
-        }
-      ]
-    },
-    "ProvisionServiceRole": {
-      "Fn::Equals": [
-        "yes",
-        {
-          "Ref": "CreateServiceRole"
-        }
-      ]
-    },
-    "ProvisionInstances": {
-      "Fn::Equals": [
-        "yes",
-        {
-          "Ref": "CreateInstances"
-        }
-      ]
-    },
-    "ProvisionExtensions": {
-      "Fn::Equals": [
-        "yes",
-        {
-          "Ref": "CreateExtensions"
-        }
-      ]
-    },
-    "ProvisionELB": {
-      "Fn::And": [
-        {
-          "Fn::Equals": [
-            "yes",
-            {
-              "Ref": "CreateELB"
-            }
-          ]
-        },
-        {
-          "Fn::Equals": [
-            "yes",
-            {
-              "Ref": "CreateInstances"
-            }
-          ]
-        }
-      ]
-    },
-    "UseMultiAZ": {
-      "Fn::Equals": [
-        "prod",
-        {
-          "Ref": "Environment"
-        }
-      ]
-    }
-  },
-  "Resources": {
-    "OpsWorksServiceRole": {
-      "Condition": "ProvisionServiceRole",
-      "Type": "AWS::IAM::Role",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "opsworks.amazonaws.com"
-              },
-              "Action": "sts:AssumeRole"
-            }
-          ]
-        },
-        "Policies": [
-          {
-            "PolicyName": "aws-opsworks-service-policy",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Action": [
-                    "ec2:*",
-                    "iam:PassRole",
-                    "cloudwatch:GetMetricStatistics",
-                    "cloudwatch:DescribeAlarms",
-                    "ecs:*",
-                    "elasticloadbalancing:*",
-                    "rds:*"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": [
-                    "*"
-                  ]
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
-    "InstanceRole": {
-      "Type": "AWS::IAM::Role",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "ec2.amazonaws.com"
-              },
-              "Action": "sts:AssumeRole"
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/PowerUserAccess"
-        ]
-      }
-    },
-    "InstanceRoleProfile": {
-      "DeletionPolicy": "Retain",
-      "Type": "AWS::IAM::InstanceProfile",
-      "Properties": {
-        "Path": "/",
-        "Roles": [
-          {
-            "Ref": "InstanceRole"
-          }
-        ]
-      }
-    },
-    "OpsWorksStack": {
-      "Type": "AWS::OpsWorks::Stack",
-      "Properties": {
-        "AgentVersion": "LATEST",
-        "ConfigurationManager": {
-          "Name": "Chef",
-          "Version": "12"
-        },
-        "CustomCookbooksSource": {
-          "Revision": {
-            "Ref": "CookbookRevision"
-          },
-          "Type": "git",
-          "SshKey": {
-            "Fn::Join": [
-              "\n",
-              {
-                "Ref": "CookbookSSHKey"
-              }
-            ]
-          },
-          "Url": {
-            "Ref": "CookbookURL"
-          }
-        },
-        "CustomJson": {
-          "datashades": {
-            "ckan_web": {
-              "adminpw": {
-                "Ref": "CKANAdminPW"
-              },
-              "adminemail": {
-                "Ref": "CKANAdminEmail"
-              },
-              "endpoint": "/",
-              "sentryurl": {
-                "Ref": "SentryURL"
-              }
-            },
-            "icinga": {
-              "password": {
-                "Ref": "IcingaPW"
-              },
-              "master": {
-                "Ref": "IcingaMaster"
-              }
-            },
-            "jumpbox": {
-              "bucket": {
-                "Ref": "AdminPubKeyBucket"
-              },
-              "usergroup": {
-                "Ref": "AdminUserGroup"
-              }
-            },
-            "postgres": {
-              "password": {
-                "Ref": "PGDBPassword"
-              }
-            },
-            "tld": {
-              "Ref": "StackTLD"
-            },
-            "version": {
-              "Ref": "Environment"
-            }
-          }
-        },
-        "DefaultInstanceProfileArn": {
-          "Fn::GetAtt": [
-            "InstanceRoleProfile",
-            "Arn"
-          ]
-        },
-        "DefaultOs": "Amazon Linux 2016.09",
-        "DefaultSshKeyName": {
-          "Ref": "DefaultEC2Key"
-        },
-        "DefaultSubnetId": {
-          "Fn::ImportValue": {
-            "Fn::Sub": "${AppSubnets}A"
-          }
-        },
-        "Name": {
-          "Fn::Join": [
-            "_",
-            [
-              {
-                "Ref": "Environment"
-              },
-              "ckan"
-            ]
-          ]
-        },
-        "ServiceRoleArn": {
-          "Fn::If": [
-            "ProvisionServiceRole",
-            {
-              "Fn::GetAtt": [
-                "OpsWorksServiceRole",
-                "Arn"
-              ]
-            },
-            {
-              "Fn::Join": [
-                "",
-                [
-                  "arn:aws:iam::",
-                  {
-                    "Ref": "AWS::AccountId"
-                  },
-                  ":role/aws-opsworks-service-role"
-                ]
-              ]
-            }
-          ]
-        },
-        "UseCustomCookbooks": true,
-        "VpcId": {
-          "Ref": "StackVPC"
-        }
-      }
-    },
-    "OpsWorksRedisLayer": {
-      "Type": "AWS::OpsWorks::Layer",
-      "Properties": {
-        "AutoAssignElasticIps": false,
-        "AutoAssignPublicIps": true,
-        "CustomRecipes": {
-          "Shutdown": [
-            "datashades::redis-shutdown"
-          ],
-          "Setup": [
-            "datashades::redis-setup"
-          ],
-          "Configure": [
-            "datashades::redis-configure"
-          ],
-          "Deploy": [
-            "datashades::redis-deploy"
-          ]
-        },
-        "CustomSecurityGroupIds": [
-          {
-            "Ref": "AdminSG"
-          }
-        ],
-        "EnableAutoHealing": true,
-        "InstallUpdatesOnBoot": true,
-        "Name": "CKAN-REDIS",
-        "Shortname": "ckan-redis",
-        "StackId": {
-          "Ref": "OpsWorksStack"
-        },
-        "Type": "custom"
-      }
-    },
-    "OpsWorksSolrLayer": {
-      "Type": "AWS::OpsWorks::Layer",
-      "Properties": {
-        "CustomRecipes": {
-          "Setup": [
-            "datashades::solr-setup"
-          ],
-          "Deploy": [
-            "datashades::solr-deploy"
-          ],
-          "Configure": [
-            "datashades::solr-configure"
-          ],
-          "Shutdown": [
-            "datashades::solr-shutdown"
-          ]
-        },
-        "AutoAssignElasticIps": false,
-        "AutoAssignPublicIps": true,
-        "CustomSecurityGroupIds": [
-          {
-            "Ref": "AdminSG"
-          }
-        ],
-        "EnableAutoHealing": true,
-        "InstallUpdatesOnBoot": true,
-        "Name": "CKAN-Solr",
-        "Shortname": "ckan-solr",
-        "StackId": {
-          "Ref": "OpsWorksStack"
-        },
-        "Type": "custom"
-      }
-    },
-    "OpsWorksWebLayer": {
-      "Type": "AWS::OpsWorks::Layer",
-      "Properties": {
-        "AutoAssignElasticIps": false,
-        "AutoAssignPublicIps": true,
-        "CustomRecipes": {
-          "Setup": [
-            "datashades::ckanweb-setup"
-          ],
-          "Deploy": [
-            "datashades::ckanweb-deploy"
-          ],
-          "Configure": [
-            "datashades::ckanweb-configure"
-          ]
-        },
-        "CustomSecurityGroupIds": [
-          {
-            "Ref": "AdminSG"
-          }
-        ],
-        "EnableAutoHealing": true,
-        "InstallUpdatesOnBoot": true,
-        "Name": "CKAN-Web",
-        "Shortname": "ckan-web",
-        "StackId": {
-          "Ref": "OpsWorksStack"
-        },
-        "Type": "custom"
-      }
-    },
-    "OpwxAppCKAN": {
-      "Type": "AWS::OpsWorks::App",
-      "Properties": {
-        "Domains": [
-          {
-            "Fn::Join": [
-              ".",
-              [
-                {
-                  "Ref": "Environment"
-                },
-                {
-                  "Ref": "StackTLD"
-                }
-              ]
-            ]
-          }
-        ],
-        "AppSource": {
-          "Type": "archive",
-          "Url": {
-            "Ref": "CKANSource"
-          }
-        },
-        "Description": "CKAN 2.5",
-        "EnableSsl": false,
-        "Name": {
-          "Fn::Join": [
-            "_",
-            [
-              "ckan",
-              {
-                "Ref": "Environment"
-              }
-            ]
-          ]
-        },
-        "Shortname": {
-          "Fn::Join": [
-            "_",
-            [
-              "ckan",
-              {
-                "Ref": "Environment"
-              }
-            ]
-          ]
-        },
-        "StackId": {
-          "Ref": "OpsWorksStack"
-        },
-        "Type": "other"
-      }
-    },
-    "OpwxAppSolr": {
-      "Type": "AWS::OpsWorks::App",
-      "Properties": {
-        "AppSource": {
-          "Type": "archive",
-          "Url": {
-            "Ref": "SolrSource"
-          }
-        },
-        "Description": "Apache Solr 5.5.2",
-        "EnableSsl": false,
-        "Name": "solr-5.5",
-        "Shortname": "solr-5.5",
-        "StackId": {
-          "Ref": "OpsWorksStack"
-        },
-        "Type": "other"
-      }
-    },
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Creates an OpsWorks EFS based CKAN Stack.\n"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: OpsWorks Custom Cookbook
+        Parameters:
+          - CookbookURL
+          - CookbookSSHKey
+          - CookbookRevision
 
-    "HostedZone": {
-      "Type": "AWS::Route53::HostedZone",
-      "Condition": "CreateHostedZone",
-      "Properties": {
-        "HostedZoneConfig": {
-          "Comment": "TLD for OpsWorks Stack"
-        },
-        "Name": {
-          "Ref": "StackTLD"
-        }
-      }
-    },
+      -
+        Label:
+          default: OpsWorks Stack Details
+        Parameters:
+          - CreateServiceRole
+          - ApplicationName
+          - Environment
+          - StackTLD
+          - CreateTLD
+          - CreateELB
+          - CreateInstances
+          - InstancesTemplate
+          - CreateExtensions
+          - ExtensionsTemplate
+          - ServicesEC2Size
+          - WebEC2Size
+          - DefaultEC2Key
+          - AdminUserGroup
+          - AdminPubKeyBucket
+          - StackVPC
+          - WebSubnets
+          - AppSubnets
+          - DbSubnets
+          - AdminSG
 
-    "EC2Instances": {
-      "DependsOn": [
-        "OpsWorksStack"
-      ],
-      "Type": "AWS::CloudFormation::Stack",
-      "Condition": "ProvisionInstances",
-      "Properties": {
-        "TemplateURL": {
-          "Ref": "InstancesTemplate"
-        },
-        "Parameters": {
-          "ServicesEC2Size": {
-            "Ref": "ServicesEC2Size"
-          },
-          "OpsWorksStackID": {
-            "Ref": "OpsWorksStack"
-          },
-          "WebEC2Size": {
-            "Ref": "WebEC2Size"
-          },
-          "DefaultEC2Key": {
-            "Ref": "DefaultEC2Key"
-          },
-          "RedisLayerID": {
-            "Ref": "OpsWorksRedisLayer"
-          },
-          "SolrLayerID": {
-            "Ref": "OpsWorksSolrLayer"
-          },
-          "WebLayerID": {
-            "Ref": "OpsWorksWebLayer"
-          },
-          "PrimarySubnet": {
-            "Fn::ImportValue": {
-              "Fn::Sub": "${AppSubnets}A"
-            }
-          },
-          "SecondarySubnet": {
-            "Fn::ImportValue": {
-              "Fn::Sub": "${AppSubnets}B"
-            }
-          }
-        }
-      }
-    },
+      -
+        Label:
+          default: CKAN Options
+        Parameters:
+          - PGDBPassword
+          - CKANAdminPW
+          - CKANAdminEmail
 
-    "CKANExtensions": {
-      "DependsOn": [
-        "OpsWorksStack"
-      ],
-      "Type": "AWS::CloudFormation::Stack",
-      "Condition": "ProvisionExtensions",
-      "Properties": {
-        "TemplateURL": {
-          "Ref": "ExtensionsTemplate"
-        },
-        "Parameters": {
-          "OpsWorksStack": {
-            "Ref": "OpsWorksStack"
-          }
-        }
-      }
-    },
-    "CKANELB": {
-      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
-      "Condition": "ProvisionELB",
-      "Properties": {
-        "LoadBalancerName": {
-          "Fn::Join": [
-            "-",
-            [
-              {
-                "Ref": "Environment"
-              },
-              "CKANELB"
-            ]
-          ]
-        },
-        "HealthCheck": {
-          "Target": "HTTP:80/",
-          "HealthyThreshold": "2",
-          "UnhealthyThreshold": "6",
-          "Interval": "30",
-          "Timeout": "20"
-        },
-        "Listeners": [
-          {
-            "InstancePort": "80",
-            "LoadBalancerPort": "80",
-            "Protocol": "HTTP"
-          }
-        ],
-        "Scheme": "internet-facing",
-        "SecurityGroups": [
-          {
-            "Ref": "AdminSG"
-          }
-        ],
-        "Subnets": [
-          {
-            "Fn::ImportValue": {
-              "Fn::Sub": "${WebSubnets}A"
-            }
-          },
-          {
-            "Fn::ImportValue": {
-              "Fn::Sub": "${WebSubnets}B"
-            }
-          }
-        ]
-      }
-    },
-    "ELBAttachment": {
-      "DependsOn": [
-        "OpsWorksStack",
-        "CKANELB"
-      ],
-      "Condition": "ProvisionELB",
-      "Type": "AWS::OpsWorks::ElasticLoadBalancerAttachment",
-      "Properties": {
-        "ElasticLoadBalancerName": {
-          "Fn::Join": [
-            "-",
-            [
-              {
-                "Ref": "Environment"
-              },
-              "CKANELB"
-            ]
-          ]
-        },
-        "LayerId": {
-          "Ref": "OpsWorksWebLayer"
-        }
-      }
-    },
-    "WebELBCNAME": {
-      "Condition": "ProvisionELB",
-      "Type": "AWS::Route53::RecordSet",
-      "DependsOn": "CKANELB",
-      "Properties": {
-        "Type": "A",
-        "Name": {
-          "Fn::Join": [
-            ".",
-            [
-              {
-                "Ref": "Environment"
-              },
-              {
-                "Ref": "StackTLD"
-              }
-            ]
-          ]
-        },
-        "HostedZoneName": {
-          "Fn::Join": [
-            "",
-            [
-              {
-                "Ref": "StackTLD"
-              },
-              "."
-            ]
-          ]
-        },
-        "AliasTarget": {
-          "HostedZoneId": {
-            "Fn::GetAtt": [
-              "CKANELB",
-              "CanonicalHostedZoneNameID"
-            ]
-          },
-          "DNSName": {
-            "Fn::GetAtt": [
-              "CKANELB",
-              "DNSName"
-            ]
-          }
-        }
-      }
-    }
-  },
-  "Outputs": {
-    "StackID": {
-      "Value": {
-        "Ref": "OpsWorksStack"
-      },
-      "Description": "OpsWorks Stack Id"
-      "Export": {
-        "Name": {
-          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksStack"
-        }
-      }
-    },
-    "RedisLayer": {
-      "Value": {
-        "Ref": "OpsWorksRedisLayer"
-      },
-      "Description": "Redis Layer Id"
-      "Export": {
-        "Name": {
-          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksRedisLayer"
-        }
-      }
-    },
-    "SolrLayer": {
-      "Value": {
-        "Ref": "OpsWorksSolrLayer"
-      },
-      "Description": "SolrCloud Layer Id"
-      "Export": {
-        "Name": {
-          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksSolrLayer"
-        }
-      }
-    },
-    "WebLayer": {
-      "Value": {
-        "Ref": "OpsWorksWebLayer"
-      },
-      "Description": "Web Layer Id"
-      "Export": {
-        "Name": {
-          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksWebLayer"
-        }
-      }
-    },
-    "CKANApp": {
-      "Value": {
-        "Ref": "OpwxAppCKAN"
-      },
-      "Description": "CKAN Application Id"
-      "Export": {
-        "Name": {
-          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksCKANApplication"
-        }
-      }
-    },
-    "SolrApp": {
-      "Value": {
-        "Ref": "OpwxAppSolr"
-      },
-      "Description": "SolrCloud Application Id"
-      "Export": {
-        "Name": {
-          "Fn::Sub": "${Environment}${ApplicationName}OpsWorksSolrApplication"
-        }
-      }
-    }
-  }
-}
+      -
+        Label:
+          default: Application Sources
+        Parameters:
+          - SolrSource
+          - CKANSource
+
+      -
+        Label:
+          default: Optional Monitoring
+        Parameters:
+          - IcingaMaster
+          - IcingaPW
+          - SentryURL
+
+    ParameterLabels:
+      CookbookURL:
+        default: What is the URL for the OpsWorks Custom Cookbook repository?
+      SolrSource:
+        default: Provide the URL for Apache Solr source archive:
+      CKANSource:
+        default: Provide the URL for CKAN source archive:
+      CookbookSSHKey:
+        default: Paste the private key for the Cookbook repository.
+      CookbookRevision:
+        default: What repository branch should the Custom Cookbook use?
+      ApplicationName:
+        default: Name of the application (ie. GI or Services, etc)
+      Environment:
+        default: What version is this OpsWorks stack?
+      CreateTLD:
+        default: Do you need the Route53 Hosted Zone for the TLD created?
+      CreateServiceRole:
+        default: Do you need an OpsWorks Service Role created?
+      CreateInstances:
+        default: Do you want to instances provisioned with this stack?
+      InstancesTemplate:
+        default: Where is the CloudFormation Template for your Instances?
+      CreateExtensions:
+        default: Do you want to provision CKAN extensions with this stack?
+      ExtensionsTemplate:
+        default: Where is the CloudFormation Template for your CKAN Extensions?
+      CreateELB:
+        default: Do you want to provision an Elastic Load Balancer with this stack?
+      StackTLD:
+        default: What TLD hosted on Route53 is this stack using for internal DNS?
+      DefaultEC2Key:
+        default: What EC2 key pair should all instances in the OpsWorks stack use for SSH access?
+      AdminUserGroup:
+        default: What group should Bastion Host Admins belong to?
+      AdminPubKeyBucket:
+        default: Where is the S3 bucket for Bastion Host Admin's public keys?
+      StackVPC:
+        default: What VPC should OpsWorks stack instances belong to?
+      WebSubnets:
+        default: What base name are the web layer subnet IDs exported under?
+      AppSubnets:
+        default: What base name are the application layer subnet IDs exported under?
+      DbSubnets:
+        default: What base name are the data layer subnet IDs exported under?
+      AdminSG:
+        default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
+      ServicesEC2Size:
+        default: What instance size do you want to use for Service Instances?
+      WebEC2Size:
+        default: What instance size do you want to use for Web nodes?
+      PGDBPassword:
+        default: Enter a password for Postgres DB access.
+      CKANAdminPW:
+        default: Enter a password for your CKAN Admin user.
+      CKANAdminEmail:
+        default: Enter the email address for your CKAN Admin user.
+      IcingaMaster:
+        default: What is the URL of the Master Node for your Icinga2 Monitoring?
+      SentryURL:
+        default: What is the client URL for your Sentry Monitoring?
+      IcingaPW:
+        default: What is the API Password to request tickets from your Icinga2 Monitoring Master Node?
+
+Parameters:
+  CookbookURL:
+    Default: https://github.com/DataShades/opswx-ckan-cookbook.git
+    Description: "Repository URL. Must be SSH URL for private repos with private key."
+    Type: String
+  CookbookSSHKey:
+    Description: Change SSH key newlines to commas.
+    Type: CommaDelimitedList
+    NoEcho: true
+  CookbookRevision:
+    Default: v1.2.0
+    Description: Branch name in repository to checkout.
+    Type: String
+    MinLength: 1
+    MaxLength: 64
+  SolrSource:
+    Description: URL for zip archive.
+    Default: http://apache.mirror.digitalpacific.com.au/lucene/solr/5.5.4/solr-5.5.4.zip
+    Type: String
+  CKANSource:
+    Description: URL for zip archive.
+    Default: https://github.com/ckan/ckan/archive/ckan-2.5.4.zip
+    Type: String
+  ApplicationName:
+    Description: Name of the application (ie. GI or Services, etc)
+    Default: CKAN
+    Type: String
+  Environment:
+    Description: Select a stack version.
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  StackTLD:
+    Description: Route53 hosted TLD for stack
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  CreateTLD:
+    Type: String
+    Default: no
+    AllowedValues:
+      - yes
+      - no
+  CreateServiceRole:
+    Description: Required if OpsWorks stacks have never been created in this account.
+    Type: String
+    Default: no
+    AllowedValues:
+      - yes
+      - no
+  CreateInstances:
+    Description: Recommended
+    Type: String
+    Default: yes
+    AllowedValues:
+      - yes
+      - no
+  InstancesTemplate:
+    Description: Valid S3 Bucket Location
+    Type: String
+    Default: https://s3-ap-southeast-2.amazonaws.com/link-opsworks/Datashades-OpsWorks-CKAN-EFS-Instances.json
+  CreateExtensions:
+    Description: Optional.
+    Type: String
+    Default: no
+    AllowedValues:
+      - yes
+      - no
+  ExtensionsTemplate:
+    Description: Valid S3 Bucket Location
+    Type: String
+    Default: https://s3-ap-southeast-2.amazonaws.com/link-opsworks/Datashades-OpsWorks-CKAN-Extensions.json
+  CreateELB:
+    Description: Recommended
+    Type: String
+    Default: yes
+    AllowedValues:
+      - yes
+      - no
+  ServicesEC2Size:
+    Description: Select EC2 Instance Size.
+    Type: String
+    Default: t3.small
+    AllowedValues:
+      - t3.small
+      - t3.medium
+      - t3.large
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m4.10xlarge
+      - m5.12xlarge
+  WebEC2Size:
+    Description: Select EC2 Instance Size.
+    Type: String
+    Default: t3.medium
+    AllowedValues:
+      - t3.small
+      - t3.medium
+      - t3.large
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m4.10xlarge
+      - m5.12xlarge
+  DefaultEC2Key:
+    Description: Select an existing SSH key
+    Type: AWS::EC2::KeyPair::KeyName
+  AdminUserGroup:
+    Description: Valid Linux group name
+    Type: String
+    Default: link
+  IcingaMaster:
+    Description: Valid DNS Hostname
+    Type: String
+    Default: monitoring.links.com.au
+  IcingaPW:
+    NoEcho: true
+    Description: Icinga2 issued API Key
+    Type: String
+  SentryURL:
+    Description: Valid Sentry Client URL
+    Type: String
+  CKANAdminPW:
+    NoEcho: true
+    Description: Password must be at least 8 alphanumeric characters upto a maximum of 64 characters in length.
+    Type: String
+    MinLength: 8
+    MaxLength: 64
+    AllowedPattern: [a-zA-Z0-9]*
+    ConstraintDescription: Must be 8 - 64 alphanumeric characters.
+  CKANAdminEmail:
+    Description: Valid Email Address
+    Type: String
+  AdminPubKeyBucket:
+    Description: S3 Bucket URL
+    Type: String
+    Default: s3://link-opsworks/keys/
+  StackVPC:
+    Description: Existing VPC ID.
+    Type: AWS::EC2::VPC::Id
+  WebSubnets:
+    Type: String
+    Description: The base name for the exported web layer subnet IDs, eg if the exports are 'PRODMyApplicationWebSubnetA' and 'PRODMyApplicationWebSubnetB', then this would be 'PRODMyApplicationWebSubnet'
+  AppSubnets:
+    Type: String
+    Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'
+  DbSubnets:
+    Type: String
+    Description: The base name for the exported data layer subnet IDs, eg if the exports are 'PRODMyApplicationDbSubnetA' and 'PRODMyApplicationDbSubnetB', then this would be 'PRODMyApplicationDbSubnet'
+  AdminSG:
+    Description: Select existing security group
+    Type: AWS::EC2::SecurityGroup::Id
+  PGDBPassword:
+    NoEcho: true
+    Description: Password must be at least 8 alphanumeric characters upto a maximum of 64 characters in length.
+    Type: String
+    MinLength: 8
+    MaxLength: 64
+    AllowedPattern: "[a-zA-Z0-9]*"
+    ConstraintDescription: Must be 8 - 64 alphanumeric characters.
+
+Conditions:
+  CreateHostedZone:
+    Fn::Equals:
+      - yes
+      - !Ref CreateTLD
+  ProvisionServiceRole:
+    Fn::Equals:
+      - yes
+      - !Ref CreateServiceRole
+  ProvisionInstances:
+    Fn::Equals:
+      - yes
+      - !Ref CreateInstances
+  ProvisionExtensions:
+    Fn::Equals:
+      - yes
+      - !Ref CreateExtensions
+  ProvisionELB:
+    Fn::And:
+      - Fn::Equals:
+          - yes
+          - !Ref CreateELB
+      - Fn::Equals:
+          - yes
+          - !Ref CreateInstances
+  UseMultiAZ:
+    Fn::Equals:
+      - prod
+      - !Ref Environment
+
+Resources:
+  OpsWorksServiceRole:
+    Condition: ProvisionServiceRole
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service: opsworks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        -
+          PolicyName: "aws-opsworks-service-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Action:
+                  - "ec2:*"
+                  - iam:PassRole
+                  - cloudwatch:GetMetricStatistics
+                  - cloudwatch:DescribeAlarms
+                  - "ecs:*"
+                  - "elasticloadbalancing:*"
+                  - "rds:*"
+                Effect: Allow
+                Resource: "*"
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/PowerUserAccess
+
+  InstanceRoleProfile:
+    DeletionPolicy: Retain
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref InstanceRole
+
+  OpsWorksStack:
+    Type: AWS::OpsWorks::Stack
+    Properties:
+      AgentVersion: LATEST
+      ConfigurationManager:
+        Name: Chef
+        Version: 12
+      CustomCookbooksSource:
+        Revision: !Ref CookbookRevision
+        Type: git
+        SshKey: !Sub "${CookbookSSHKey}\n"
+        Url: !Ref CookbookURL
+      CustomJson:
+        datashades:
+          ckan_web:
+            adminpw: !Ref CKANAdminPW
+            adminemail: !Ref CKANAdminEmail
+            endpoint: /
+            sentryurl: !Ref SentryURL
+          icinga:
+            password: !Ref IcingaPW
+            master: !Ref IcingaMaster
+          jumpbox:
+            bucket: !Ref AdminPubKeyBucket
+            usergroup: !Ref AdminUserGroup
+          postgres:
+            password: !Ref PGDBPassword
+          tld: !Ref StackTLD
+          version: !Ref Environment
+      DefaultInstanceProfileArn:
+        Fn::GetAtt:
+          - InstanceRoleProfile
+          - Arn
+      DefaultOs: "Amazon Linux 2016.09"
+      DefaultSshKeyName: !Ref DefaultEC2Key
+      DefaultSubnetId:
+        Fn::ImportValue:
+          !Sub "${AppSubnets}A"
+      Name: !Sub "${Environment}_ckan"
+      ServiceRoleArn:
+        Fn::If:
+          - ProvisionServiceRole
+          - Fn::GetAtt:
+            - OpsWorksServiceRole
+            - Arn
+          - Fn::Join:
+              - ""
+              - - "arn:aws:iam::"
+                - !Ref "AWS::AccountId"
+                - ":role/aws-opsworks-service-role"
+      UseCustomCookbooks: true
+      VpcId: !Ref StackVPC
+
+  OpsWorksRedisLayer:
+    Type: AWS::OpsWorks::Layer
+    Properties:
+      AutoAssignElasticIps: false
+      AutoAssignPublicIps: true
+      CustomRecipes:
+        Shutdown:
+          - "datashades::redis-shutdown"
+        Setup:
+          - "datashades::redis-setup"
+        Configure:
+          - "datashades::redis-configure"
+        Deploy:
+          - "datashades::redis-deploy"
+      CustomSecurityGroupIds:
+        - !Ref AdminSG
+      EnableAutoHealing: true
+      InstallUpdatesOnBoot: true
+      Name: "CKAN-REDIS"
+      Shortname: "ckan-redis"
+      StackId: !Ref OpsWorksStack
+      Type: custom
+
+  OpsWorksSolrLayer:
+    Type: AWS::OpsWorks::Layer
+    Properties:
+      CustomRecipes:
+        Setup:
+          - "datashades::solr-setup"
+        Deploy:
+          - "datashades::solr-deploy"
+        Configure:
+          - "datashades::solr-configure"
+        Shutdown:
+          - "datashades::solr-shutdown"
+      AutoAssignElasticIps: false
+      AutoAssignPublicIps: true
+      CustomSecurityGroupIds:
+        - !Ref AdminSG
+      EnableAutoHealing: true
+      InstallUpdatesOnBoot: true
+      Name: "CKAN-Solr"
+      Shortname: "ckan-solr"
+      StackId: !Ref OpsWorksStack
+      Type: custom
+
+  OpsWorksWebLayer:
+    Type: AWS::OpsWorks::Layer
+    Properties:
+      AutoAssignElasticIps: false
+      AutoAssignPublicIps: true
+      CustomRecipes:
+        Setup:
+          - "datashades::ckanweb-setup"
+        Deploy:
+          - "datashades::ckanweb-deploy"
+        Configure:
+          - "datashades::ckanweb-configure"
+      CustomSecurityGroupIds:
+        - !Ref AdminSG
+      EnableAutoHealing: true
+      InstallUpdatesOnBoot: true
+      Name: "CKAN-Web"
+      Shortname: "ckan-web"
+      StackId: !Ref OpsWorksStack
+      Type: custom
+
+  OpwxAppCKAN:
+    Type: AWS::OpsWorks::App
+    Properties:
+      Domains:
+        - !Sub "${Environment}.${StackTLD}"
+      AppSource:
+        Type: archive
+        Url: !Ref CKANSource
+      Description: "CKAN 2.5"
+      EnableSsl: false
+      Name: !Sub "ckan_${Environment}"
+      Shortname: !Sub "ckan_${Environment}"
+      StackId: !Ref OpsWorksStack
+      Type: other
+
+  OpwxAppSolr:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: archive
+        Url: !Ref SolrSource
+      Description: "Apache Solr 5.5.2"
+      EnableSsl: false
+      Name: "solr-5.5"
+      Shortname: "solr-5.5"
+      StackId: !Ref OpsWorksStack
+      Type: other
+
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Condition: CreateHostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: TLD for OpsWorks Stack
+      Name: !Ref StackTLD
+
+  EC2Instances:
+    DependsOn:
+      - OpsWorksStack
+    Type: AWS::CloudFormation::Stack
+    Condition: ProvisionInstances
+    Properties:
+      TemplateURL: !Ref InstancesTemplate
+      Parameters:
+        ServicesEC2Size: !Ref ServicesEC2Size
+        OpsWorksStackID: !Ref OpsWorksStack
+        WebEC2Size: !Ref WebEC2Size
+        DefaultEC2Key: !Ref DefaultEC2Key
+        RedisLayerID: !Ref OpsWorksRedisLayer
+        SolrLayerID: !Ref OpsWorksSolrLayer
+        WebLayerID: !Ref OpsWorksWebLayer
+        PrimarySubnet:
+          Fn::ImportValue:
+            Fn::Sub: "${AppSubnets}A"
+        SecondarySubnet:
+          Fn::ImportValue:
+            Fn::Sub: "${AppSubnets}B"
+
+  CKANExtensions:
+    DependsOn:
+      - OpsWorksStack
+    Type: AWS::CloudFormation::Stack
+    Condition: ProvisionExtensions
+    Properties:
+      TemplateURL: !Ref ExtensionsTemplate
+      Parameters:
+        OpsWorksStack: !Ref OpsWorksStack
+
+  CKANELB:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Condition: ProvisionELB
+    Properties:
+      LoadBalancerName: !Sub "${Environment}-CKANELB"
+      HealthCheck:
+        Target: "HTTP:80/"
+        HealthyThreshold: 2
+        UnhealthyThreshold: 6
+        Interval: 30
+        Timeout: 20
+      Listeners:
+        -
+          InstancePort: 80
+          LoadBalancerPort: 80
+          Protocol: HTTP
+      Scheme: "internet-facing"
+      SecurityGroups:
+        - !Ref AdminSG
+      Subnets:
+        - Fn::ImportValue:
+            !Sub "${WebSubnets}A"
+        - Fn::ImportValue:
+            !Sub "${WebSubnets}B"
+
+  ELBAttachment:
+    DependsOn:
+      - OpsWorksStack
+      - CKANELB
+    Condition: ProvisionELB
+    Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
+    Properties:
+      ElasticLoadBalancerName: !Sub "${Environment}-CKANELB"
+      LayerId: !Ref OpsWorksWebLayer
+
+  WebELBCNAME:
+    Condition: ProvisionELB
+    Type: AWS::Route53::RecordSet
+    DependsOn: CKANELB
+    Properties:
+      Type: A
+      Name: !Sub "${Environment}.${StackTLD}"
+      HostedZoneName: !Sub "${StackTLD}."
+      AliasTarget:
+        HostedZoneId:
+          Fn::GetAtt:
+            - CKANELB
+            - CanonicalHostedZoneNameID
+        DNSName:
+          Fn::GetAtt:
+            - CKANELB
+            - DNSName
+
+Outputs:
+  StackID:
+    Value: !Ref OpsWorksStack
+    Description: OpsWorks Stack Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksStack"
+  RedisLayer:
+    Value: !Ref OpsWorksRedisLayer
+    Description: Redis Layer Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksRedisLayer"
+
+  SolrLayer:
+    Value: !Ref OpsWorksSolrLayer
+    Description: SolrCloud Layer Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrLayer"
+
+  WebLayer:
+    Value: !Ref OpsWorksWebLayer
+    Description: Web Layer Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksWebLayer"
+
+  CKANApp:
+    Value: !Ref OpwxAppCKAN
+    Description: CKAN Application Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksCKANApplication"
+
+  SolrApp:
+    Value: !Ref OpwxAppSolr
+    Description: SolrCloud Application Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrApplication"
+
