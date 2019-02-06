@@ -27,7 +27,7 @@ Copyright 2016 Datashades
 
 The Datashades-OpsWorks-EFS-CKAN-Stack template has been split, with RDS and EFS setup moving to separate templates. Also, there is a new VPC template, based on work done in Get Involved. These multiple templates are handled by 'build.sh', which runs them via Ansible playbooks.
 
-The RDS setup expects the master credentials to already exist in Secrets Manager at '/config/CKAN/[DEV|TRAINING|STAGING|PROD]/db/master_user' and '/config/CKAN/[DEV|TRAINING|STAGING|PROD]/db/master_password'.
+The RDS setup expects the master credentials to already exist in the Systems Manager Parameter Store at '/config/CKAN/[DEV|TRAINING|STAGING|PROD]/db/master_user' and '/config/CKAN/[DEV|TRAINING|STAGING|PROD]/db/master_password'.
 
 **2017 Update**
 
