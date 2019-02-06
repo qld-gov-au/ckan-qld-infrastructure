@@ -112,7 +112,7 @@ cloudformation_stacks:
       MultiAZ: "false"
       Subnets: DEVCKANDBSubnet
       VPC: CKANVpc-DEV
-      StackTLD: ckandevtrail.devpit140cs.qgov.net.au
+      StackTLD: internal.ckan.devpit140cs.qgov.net.au
     tags:
       Environment: DEV
       Service: CKAN
