@@ -1,16 +1,16 @@
 ---
 cloudformation_stacks:
-  - name: OpenData-PROD-EFS-stack
-    state: present
+  - name: CKAN-PROD-EFS-stack
+    state: "{{ State | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
     template_parameters:
       Environment: PROD
-      ApplicationName: OpenData
+      ApplicationName: CKAN
       StackTLD: TODO
       StackVPC: CKANVpc-PROD
-      DbSubnets: PRODCKANDbSubnet
+      DbSubnets: PRODCKANDBSubnet
       AdminSG: PRODCKANManagementSG
     tags:
       Environment: PROD
@@ -20,17 +20,17 @@ cloudformation_stacks:
       Owner: "Development and Delivery"
       Version: "1.0"
 
-  - name: OpenData-STAGING-EFS-stack
-    state: present
+  - name: CKAN-STAGING-EFS-stack
+    state: "{{ State | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
     template_parameters:
       Environment: STAGING
-      ApplicationName: OpenData
+      ApplicationName: CKAN
       StackTLD: TODO
       StackVPC: CKANVpc-STAGING
-      DbSubnets: STAGINGCKANDbSubnet
+      DbSubnets: STAGINGCKANDBSubnet
       AdminSG: STAGINGCKANManagementSG
     tags:
       Environment: STAGING
@@ -40,17 +40,17 @@ cloudformation_stacks:
       Owner: "Development and Delivery"
       Version: "1.0"
 
-  - name: OpenData-TRAINING-OpsWorks-EFS-stack
-    state: present
+  - name: CKAN-TRAINING-EFS-stack
+    state: "{{ State | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
     template_parameters:
       Environment: TRAINING
-      ApplicationName: OpenData
+      ApplicationName: CKAN
       StackTLD: TODO
       StackVPC: CKANVpc-TRAINING
-      DbSubnets: TRAININGCKANDbSubnet
+      DbSubnets: TRAININGCKANDBSubnet
       AdminSG: TRAININGCKANManagementSG
     tags:
       Environment: TRAINING
@@ -60,22 +60,22 @@ cloudformation_stacks:
       Owner: "Development and Delivery"
       Version: "1.0"
 
-  - name: OpenData-DEV-OpsWorks-EFS-stack
-    state: present
+  - name: CKAN-DEV-EFS-stack
+    state: "{{ State | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
     template_parameters:
       Environment: DEV
-      ApplicationName: OpenData
-      StackTLD: opendatadevtrail.devpit140cs.qgov.net.au
+      ApplicationName: CKAN
+      StackTLD: internal.ckan.devpit140cs.qgov.net.au
       StackVPC: CKANVpc-DEV
-      DbSubnets: DEVCKANDbSubnet
+      DbSubnets: DEVCKANDBSubnet
       AdminSG: DEVCKANManagementSG
     tags:
       Environment: DEV
       Service: "CKAN"
-      itoc_monitored: "false
+      itoc_monitored: "false"
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
