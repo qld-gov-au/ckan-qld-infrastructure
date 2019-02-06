@@ -1,0 +1,65 @@
+---
+
+#note that rds version my upgrade and then pg_dump will fail.
+#update ansible playbook host with newer version of postgress http://www.hackthesec.co.in/2016/01/how-to-install-postgresql-95-on.html
+#CentOS/RHEL 7
+# rpm -Uvh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.5-2.noarch.rpm
+# yum install postgresql95
+#or
+#amazon os CostOS 6
+# sudo yum localinstall https://download.postgresql.org/pub/repos/yum/9.5/redhat/rhel-6-x86_64/pgdg-ami201503-95-9.5-2.noarch.rpm
+# sudo yum -y install postgresql95 postgresql95-devel postgresql95-contrib postgresql95-plpython
+
+#- name: Install Postgres-python dependencies
+#  yum:
+#    name: "{{ item }}"
+#    state: present
+#  with_items:
+#    - postgresql-devel
+#    - python-devel
+#    - gzip
+#    - bzip2
+#    - xz
+
+#- easy_install:
+#    name: psycopg2
+
+- name: Create Database
+  postgresql_db:
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBMasterUser }}"
+    login_password: "{{ DBMasterPass }}"
+    port: "{{ DBPort }}"
+    name: "{{ DBName }}"
+    state: "{{ state }}"
+  when: state is defined and state == "present"
+  run_once: true
+
+- name: Ensure default roles exist
+  postgresql_user:
+    db: "{{ DBName }}"
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBMasterUser }}"
+    login_password: "{{ DBMasterPass }}"
+    port: "{{ DBPort }}"
+    name: "postgres"
+    no_password_changes: yes
+    state: "{{ state }}"
+    priv: "{{ template_parameters.DBPrivileges }}"
+  when: state is defined
+  run_once: true
+
+- name: Create Database users
+  postgresql_user:
+    db: "{{ DBName }}"
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBMasterUser }}"
+    login_password: "{{ DBMasterPass }}"
+    port: "{{ DBPort }}"
+    name: "{{ DBUser }}"
+    password: "{{ DBPass }}"
+    no_password_changes: yes
+    state: "{{ state }}"
+    priv: "{{ template_parameters.DBPrivileges }}"
+  when: state is defined
+  run_once: true

@@ -1,7 +1,7 @@
 ---
 cloudformation_stacks:
   - name: CKAN-PROD-EFS-stack
-    state: "{{ State | default('present')}}"
+    state: "{{ state | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
@@ -21,7 +21,7 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: CKAN-STAGING-EFS-stack
-    state: "{{ State | default('present')}}"
+    state: "{{ state | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
@@ -41,7 +41,7 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: CKAN-TRAINING-EFS-stack
-    state: "{{ State | default('present')}}"
+    state: "{{ state | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
@@ -61,7 +61,7 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: CKAN-DEV-EFS-stack
-    state: "{{ State | default('present')}}"
+    state: "{{ state | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
     template: "templates/efs.cfn.yml"
