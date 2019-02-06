@@ -1,8 +1,0 @@
----
-- name: Cloudformation Playbook
-  hosts: local
-  connection: local
-  vars_files:
-    - vars/OpenData-database.yml
-  roles:
-    - ansible_cloudformation
