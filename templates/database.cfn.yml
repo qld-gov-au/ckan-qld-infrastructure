@@ -17,8 +17,8 @@ Outputs:
         - Database
         - Endpoint.Address
   RDSInstance:
-    Value: !Ref PostgresRDS
-    Description: Postgres RDS Instance Id
+    Value: !Ref Database
+    Description: RDS Instance Id
 
 Parameters:
   DBAllocatedStorage:
