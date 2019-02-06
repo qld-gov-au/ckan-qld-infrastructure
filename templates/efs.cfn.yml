@@ -68,25 +68,27 @@ Resources:
     Properties:
       PerformanceMode: generalPurpose
       FileSystemTags:
-        Key: Name
-        Value:
-          Fn::Join:
-            - "-"
-            - - !Ref Environment
-              - !Ref AWS::StackName
-              - "efs"
+        -
+          Key: Name
+          Value:
+            Fn::Join:
+              - "-"
+              - - !Ref Environment
+                - !Ref AWS::StackName
+                - "efs"
 
   MountTargetSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      VpcId: !ImportValue StackVPC
+      VpcId:
+        Fn::ImportValue: !Ref StackVPC
       GroupDescription: Security group for mount target
       SecurityGroupIngress:
         IpProtocol: tcp
         FromPort: 2049
         ToPort: 2049
         SourceSecurityGroupId:
-          Fn::ImportValue: AdminSG
+          Fn::ImportValue: !Ref AdminSG
 
   MountTargetA:
     Type: AWS::EFS::MountTarget
