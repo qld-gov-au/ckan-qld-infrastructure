@@ -4,7 +4,7 @@ cloudformation_stacks:
     state: "{{ state | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
-    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: PROD
       ApplicationName: OpenData
@@ -30,7 +30,7 @@ cloudformation_stacks:
     state: "{{ state | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
-    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: STAGING
       ApplicationName: OpenData
@@ -56,7 +56,7 @@ cloudformation_stacks:
     state: "{{ state | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
-    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: TRAINING
       ApplicationName: OpenData
@@ -82,7 +82,7 @@ cloudformation_stacks:
     state: "{{ state | default('present')}}"
     region: ap-southeast-2
     disable_rollback: true
-    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: DEV
       ApplicationName: OpenData
