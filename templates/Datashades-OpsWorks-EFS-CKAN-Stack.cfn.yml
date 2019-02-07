@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: "Creates an OpsWorks EFS based CKAN Stack.\n"
+Description: "Creates an OpsWorks CKAN Stack.\n"
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -8,7 +8,7 @@ Metadata:
           default: OpsWorks Custom Cookbook
         Parameters:
           - CookbookURL
-          - CookbookSSHKey
+          #- CookbookSSHKey
           - CookbookRevision
 
       -
@@ -22,11 +22,8 @@ Metadata:
           - CreateTLD
           - CreateELB
           - CreateInstances
-          - InstancesTemplate
           - CreateExtensions
           - ExtensionsTemplate
-          - ServicesEC2Size
-          - WebEC2Size
           - DefaultEC2Key
           - AdminUserGroup
           - AdminPubKeyBucket
@@ -51,23 +48,15 @@ Metadata:
           - SolrSource
           - CKANSource
 
-      -
-        Label:
-          default: Optional Monitoring
-        Parameters:
-          - IcingaMaster
-          - IcingaPW
-          - SentryURL
-
     ParameterLabels:
       CookbookURL:
         default: What is the URL for the OpsWorks Custom Cookbook repository?
       SolrSource:
-        default: Provide the URL for Apache Solr source archive:
+        default: Provide the URL for Apache Solr source archive.
       CKANSource:
-        default: Provide the URL for CKAN source archive:
-      CookbookSSHKey:
-        default: Paste the private key for the Cookbook repository.
+        default: Provide the URL for CKAN source archive.
+      #CookbookSSHKey:
+        #default: Paste the private key for the Cookbook repository.
       CookbookRevision:
         default: What repository branch should the Custom Cookbook use?
       ApplicationName:
@@ -80,8 +69,6 @@ Metadata:
         default: Do you need an OpsWorks Service Role created?
       CreateInstances:
         default: Do you want to instances provisioned with this stack?
-      InstancesTemplate:
-        default: Where is the CloudFormation Template for your Instances?
       CreateExtensions:
         default: Do you want to provision CKAN extensions with this stack?
       ExtensionsTemplate:
@@ -106,32 +93,22 @@ Metadata:
         default: What base name are the data layer subnet IDs exported under?
       AdminSG:
         default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
-      ServicesEC2Size:
-        default: What instance size do you want to use for Service Instances?
-      WebEC2Size:
-        default: What instance size do you want to use for Web nodes?
       PGDBPassword:
         default: Enter a password for Postgres DB access.
       CKANAdminPW:
         default: Enter a password for your CKAN Admin user.
       CKANAdminEmail:
         default: Enter the email address for your CKAN Admin user.
-      IcingaMaster:
-        default: What is the URL of the Master Node for your Icinga2 Monitoring?
-      SentryURL:
-        default: What is the client URL for your Sentry Monitoring?
-      IcingaPW:
-        default: What is the API Password to request tickets from your Icinga2 Monitoring Master Node?
 
 Parameters:
   CookbookURL:
     Default: https://github.com/DataShades/opswx-ckan-cookbook.git
     Description: "Repository URL. Must be SSH URL for private repos with private key."
     Type: String
-  CookbookSSHKey:
-    Description: Change SSH key newlines to commas.
-    Type: CommaDelimitedList
-    NoEcho: true
+  #CookbookSSHKey:
+    #Description: Change SSH key newlines to commas.
+    #Type: CommaDelimitedList
+    #NoEcho: true
   CookbookRevision:
     Default: v1.2.0
     Description: Branch name in repository to checkout.
@@ -165,35 +142,31 @@ Parameters:
     MaxLength: 254
   CreateTLD:
     Type: String
-    Default: no
+    Default: "no"
     AllowedValues:
-      - yes
-      - no
+      - "yes"
+      - "no"
   CreateServiceRole:
     Description: Required if OpsWorks stacks have never been created in this account.
     Type: String
-    Default: no
+    Default: "no"
     AllowedValues:
-      - yes
-      - no
+      - "yes"
+      - "no"
   CreateInstances:
     Description: Recommended
     Type: String
-    Default: yes
+    Default: "yes"
     AllowedValues:
-      - yes
-      - no
-  InstancesTemplate:
-    Description: Valid S3 Bucket Location
-    Type: String
-    Default: https://s3-ap-southeast-2.amazonaws.com/link-opsworks/Datashades-OpsWorks-CKAN-EFS-Instances.json
+      - "yes"
+      - "no"
   CreateExtensions:
     Description: Optional.
     Type: String
-    Default: no
+    Default: "no"
     AllowedValues:
-      - yes
-      - no
+      - "yes"
+      - "no"
   ExtensionsTemplate:
     Description: Valid S3 Bucket Location
     Type: String
@@ -201,38 +174,10 @@ Parameters:
   CreateELB:
     Description: Recommended
     Type: String
-    Default: yes
+    Default: "yes"
     AllowedValues:
-      - yes
-      - no
-  ServicesEC2Size:
-    Description: Select EC2 Instance Size.
-    Type: String
-    Default: t3.small
-    AllowedValues:
-      - t3.small
-      - t3.medium
-      - t3.large
-      - m5.large
-      - m5.xlarge
-      - m5.2xlarge
-      - m5.4xlarge
-      - m4.10xlarge
-      - m5.12xlarge
-  WebEC2Size:
-    Description: Select EC2 Instance Size.
-    Type: String
-    Default: t3.medium
-    AllowedValues:
-      - t3.small
-      - t3.medium
-      - t3.large
-      - m5.large
-      - m5.xlarge
-      - m5.2xlarge
-      - m5.4xlarge
-      - m4.10xlarge
-      - m5.12xlarge
+      - "yes"
+      - "no"
   DefaultEC2Key:
     Description: Select an existing SSH key
     Type: AWS::EC2::KeyPair::KeyName
@@ -240,25 +185,14 @@ Parameters:
     Description: Valid Linux group name
     Type: String
     Default: link
-  IcingaMaster:
-    Description: Valid DNS Hostname
-    Type: String
-    Default: monitoring.links.com.au
-  IcingaPW:
-    NoEcho: true
-    Description: Icinga2 issued API Key
-    Type: String
-  SentryURL:
-    Description: Valid Sentry Client URL
-    Type: String
   CKANAdminPW:
     NoEcho: true
-    Description: Password must be at least 8 alphanumeric characters upto a maximum of 64 characters in length.
+    Description: Password must be at least 8 characters up to a maximum of 64 characters in length.
     Type: String
     MinLength: 8
     MaxLength: 64
-    AllowedPattern: [a-zA-Z0-9]*
-    ConstraintDescription: Must be 8 - 64 alphanumeric characters.
+    AllowedPattern: "[-a-zA-Z0-9_!@#$%^&*()|]*"
+    ConstraintDescription: Must be 8 - 64 characters.
   CKANAdminEmail:
     Description: Valid Email Address
     Type: String
@@ -267,8 +201,8 @@ Parameters:
     Type: String
     Default: s3://link-opsworks/keys/
   StackVPC:
-    Description: Existing VPC ID.
-    Type: AWS::EC2::VPC::Id
+    Description: The exported name of the existing VPC ID.
+    Type: String
   WebSubnets:
     Type: String
     Description: The base name for the exported web layer subnet IDs, eg if the exports are 'PRODMyApplicationWebSubnetA' and 'PRODMyApplicationWebSubnetB', then this would be 'PRODMyApplicationWebSubnet'
@@ -279,11 +213,11 @@ Parameters:
     Type: String
     Description: The base name for the exported data layer subnet IDs, eg if the exports are 'PRODMyApplicationDbSubnetA' and 'PRODMyApplicationDbSubnetB', then this would be 'PRODMyApplicationDbSubnet'
   AdminSG:
-    Description: Select existing security group
-    Type: AWS::EC2::SecurityGroup::Id
+    Description: The exported name of the security group ID containing sysadmin inbound rules
+    Type: String
   PGDBPassword:
     NoEcho: true
-    Description: Password must be at least 8 alphanumeric characters upto a maximum of 64 characters in length.
+    Description: Password must be at least 8 alphanumeric characters up to a maximum of 64 characters in length.
     Type: String
     MinLength: 8
     MaxLength: 64
@@ -293,27 +227,23 @@ Parameters:
 Conditions:
   CreateHostedZone:
     Fn::Equals:
-      - yes
+      - "yes"
       - !Ref CreateTLD
   ProvisionServiceRole:
     Fn::Equals:
-      - yes
+      - "yes"
       - !Ref CreateServiceRole
-  ProvisionInstances:
-    Fn::Equals:
-      - yes
-      - !Ref CreateInstances
   ProvisionExtensions:
     Fn::Equals:
-      - yes
+      - "yes"
       - !Ref CreateExtensions
   ProvisionELB:
     Fn::And:
       - Fn::Equals:
-          - yes
+          - "yes"
           - !Ref CreateELB
       - Fn::Equals:
-          - yes
+          - "yes"
           - !Ref CreateInstances
   UseMultiAZ:
     Fn::Equals:
@@ -385,7 +315,7 @@ Resources:
       CustomCookbooksSource:
         Revision: !Ref CookbookRevision
         Type: git
-        SshKey: !Sub "${CookbookSSHKey}\n"
+        # SshKey: !Sub "${CookbookSSHKey}\n"
         Url: !Ref CookbookURL
       CustomJson:
         datashades:
@@ -393,10 +323,6 @@ Resources:
             adminpw: !Ref CKANAdminPW
             adminemail: !Ref CKANAdminEmail
             endpoint: /
-            sentryurl: !Ref SentryURL
-          icinga:
-            password: !Ref IcingaPW
-            master: !Ref IcingaMaster
           jumpbox:
             bucket: !Ref AdminPubKeyBucket
             usergroup: !Ref AdminUserGroup
@@ -426,7 +352,8 @@ Resources:
                 - !Ref "AWS::AccountId"
                 - ":role/aws-opsworks-service-role"
       UseCustomCookbooks: true
-      VpcId: !Ref StackVPC
+      VpcId:
+        Fn::ImportValue: !Ref StackVPC
 
   OpsWorksRedisLayer:
     Type: AWS::OpsWorks::Layer
@@ -443,7 +370,7 @@ Resources:
         Deploy:
           - "datashades::redis-deploy"
       CustomSecurityGroupIds:
-        - !Ref AdminSG
+        - Fn::ImportValue: !Ref AdminSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
       Name: "CKAN-REDIS"
@@ -466,7 +393,7 @@ Resources:
       AutoAssignElasticIps: false
       AutoAssignPublicIps: true
       CustomSecurityGroupIds:
-        - !Ref AdminSG
+        - Fn::ImportValue: !Ref AdminSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
       Name: "CKAN-Solr"
@@ -487,7 +414,7 @@ Resources:
         Configure:
           - "datashades::ckanweb-configure"
       CustomSecurityGroupIds:
-        - !Ref AdminSG
+        - Fn::ImportValue: !Ref AdminSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
       Name: "CKAN-Web"
@@ -531,28 +458,6 @@ Resources:
         Comment: TLD for OpsWorks Stack
       Name: !Ref StackTLD
 
-  EC2Instances:
-    DependsOn:
-      - OpsWorksStack
-    Type: AWS::CloudFormation::Stack
-    Condition: ProvisionInstances
-    Properties:
-      TemplateURL: !Ref InstancesTemplate
-      Parameters:
-        ServicesEC2Size: !Ref ServicesEC2Size
-        OpsWorksStackID: !Ref OpsWorksStack
-        WebEC2Size: !Ref WebEC2Size
-        DefaultEC2Key: !Ref DefaultEC2Key
-        RedisLayerID: !Ref OpsWorksRedisLayer
-        SolrLayerID: !Ref OpsWorksSolrLayer
-        WebLayerID: !Ref OpsWorksWebLayer
-        PrimarySubnet:
-          Fn::ImportValue:
-            Fn::Sub: "${AppSubnets}A"
-        SecondarySubnet:
-          Fn::ImportValue:
-            Fn::Sub: "${AppSubnets}B"
-
   CKANExtensions:
     DependsOn:
       - OpsWorksStack
@@ -581,7 +486,7 @@ Resources:
           Protocol: HTTP
       Scheme: "internet-facing"
       SecurityGroups:
-        - !Ref AdminSG
+        - Fn::ImportValue: !Ref AdminSG
       Subnets:
         - Fn::ImportValue:
             !Sub "${WebSubnets}A"
