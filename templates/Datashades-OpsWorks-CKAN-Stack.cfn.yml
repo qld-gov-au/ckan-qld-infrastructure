@@ -119,7 +119,7 @@ Parameters:
     #Type: CommaDelimitedList
     #NoEcho: true
   CookbookRevision:
-    Default: v1.2.0
+    Default: QOL-4415_CKAN-2-7-3
     Description: Branch name in repository to checkout.
     Type: String
     MinLength: 1
