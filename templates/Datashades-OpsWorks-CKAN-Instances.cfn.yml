@@ -1,8 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Creates instances for OpsWorks CKAN NFS Stack.
-
-'
+Description: 'Creates instances for OpsWorks CKAN NFS Stack.\n'
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -19,8 +17,7 @@ Metadata:
           - DefaultEC2Key
           - ServicesEC2Size
           - WebEC2Size
-          - PrimarySubnet
-          - SecondarySubnet
+          - Subnets
     ParameterLabels:
       ServicesEC2Size:
         default: What instance size do you want to use for Service Instances?
@@ -36,108 +33,103 @@ Metadata:
         default: What is the Redis Layer ID of the stack?
       WebLayerID:
         default: What is the Web Layer ID of the stack?
-      DrupalWebLayerID:
-        default: What is the Drupal Web Layer ID of the stack?
-      DrupalDBLayerID:
-        default: What is the Drupal DB Layer ID of the stack?
-      PrimarySubnet:
-        default: Which Subnet in the selected VPC should primary instances be provisioned
-          in?
-      SecondarySubnet:
-        default: Which Subnet in the selected VPC should seconardary/failover instances
-          be provisioned in?
+      Subnets:
+        default: What base name are the application layer subnet IDs exported under?
 Parameters:
+  Environment:
+    Description: Select a stack version.
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
   ServicesEC2Size:
     Description: Select EC2 Instance Size.
     Type: String
-    Default: t2.small
+    Default: t3.small
     AllowedValues:
-      - t2.small
-      - t2.medium
-      - t2.large
+      - t3.small
+      - t3.medium
+      - t3.large
       - m3.medium
-      - m3.large
-      - m4.large
-      - m4.xlarge
-      - m4.2xlarge
-      - m4.4xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
       - m4.10xlarge
+      - m5.12xlarge
   WebEC2Size:
     Description: Select EC2 Instance Size.
     Type: String
-    Default: t2.medium
+    Default: t3.medium
     AllowedValues:
-      - t2.small
-      - t2.medium
-      - t2.large
+      - t3.small
+      - t3.medium
+      - t3.large
       - m3.medium
-      - m3.large
-      - m4.large
-      - m4.xlarge
-      - m4.2xlarge
-      - m4.4xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
       - m4.10xlarge
+      - m5.12xlarge
   DefaultEC2Key:
     Description: Select an existing SSH key
     Type: AWS::EC2::KeyPair::KeyName
   OpsWorksStackID:
-    Description: Enter an OpsWorks Stack ID.
+    Description: The exported name of the OpsWorks Stack ID.
     Type: String
   SolrLayerID:
-    Description: Enter an OpsWorks Stack Layer ID.
+    Description: The exported name of the OpsWorks Solr Stack Layer ID.
     Type: String
   RedisLayerID:
-    Description: Enter an OpsWorks Stack Layer ID.
+    Description: The exported name of the OpsWorks Redis Stack Layer ID.
     Type: String
   WebLayerID:
-    Description: Enter an OpsWorks Stack Layer ID.
+    Description: The exported name of the OpsWorks Web Stack Layer ID.
     Type: String
-  PrimarySubnet:
-    Type: AWS::EC2::Subnet::Id
-    Description: Select an existing subnet residing in the selected VPC.
-  SecondarySubnet:
-    Type: AWS::EC2::Subnet::Id
-    Description: Select an existing subnet residing in the selected VPC.
+  AppSubnets:
+    Type: String
+    Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'
+
 Resources:
   OpswxEC2Services1:
     Type: AWS::OpsWorks::Instance
     Properties:
       SubnetId:
-        Ref: PrimarySubnet
+        Fn::ImportValue: !Sub "${AppSubnets}A"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
-      InstanceType:
-        Ref: ServicesEC2Size
+      InstanceType: !Ref ServicesEC2Size
       LayerIds:
-        - Ref: RedisLayerID
-        - Ref: SolrLayerID
-      SshKeyName:
-        Ref: DefaultEC2Key
+        - Fn::ImportValue: !Ref RedisLayerID
+        - Fn::ImportValue: !Ref SolrLayerID
+      SshKeyName: !Ref DefaultEC2Key
       StackId:
-        Ref: OpsWorksStackID
+        Fn::ImportValue: !Ref OpsWorksStackID
+
   OpswxEC2Web1:
     Type: AWS::OpsWorks::Instance
     DependsOn:
       - OpswxEC2Services1
     Properties:
       SubnetId:
-        Ref: SecondarySubnet
+        Fn::ImportValue: !Sub "${AppSubnets}A"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
-      InstanceType:
-        Ref: WebEC2Size
+      InstanceType: !Ref WebEC2Size
       LayerIds:
-        - Ref: WebLayerID
-      SshKeyName:
-        Ref: DefaultEC2Key
+        - Fn::ImportValue: !Ref WebLayerID
+      SshKeyName: !Ref DefaultEC2Key
       StackId:
-        Ref: OpsWorksStackID
+        Fn::ImportValue: !Ref OpsWorksStackID
+
 Outputs:
   ServiceInstance:
-    Value:
-      Ref: OpswxEC2Services1
+    Value: !Ref OpswxEC2Services1
     Description: Services Node Instance Id
   WebInstance:
-    Value:
-      Ref: OpswxEC2Web1
+    Value: !Ref OpswxEC2Web1
     Description: Web Node Instance Id

@@ -12,3 +12,4 @@ ansible-playbook -i inventory/hosts "database.yml" --extra-vars "$ANSIBLE_EXTRA_
 ansible-playbook -i inventory/hosts "efs.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 # ansible-playbook -i inventory/hosts "OpenData-database.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 ansible-playbook -i inventory/hosts "OpenData-CKAN-Stack.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
+ansible-playbook -i inventory/hosts "OpenData-CKAN-instances.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
