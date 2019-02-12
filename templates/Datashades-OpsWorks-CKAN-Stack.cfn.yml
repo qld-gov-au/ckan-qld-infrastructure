@@ -32,6 +32,7 @@ Metadata:
           - AppSubnets
           - DbSubnets
           - AdminSG
+          - AppLBSG
           - AppSG
           - DatabaseSG
 
@@ -96,6 +97,8 @@ Metadata:
         default: What base name are the data layer subnet IDs exported under?
       AdminSG:
         default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
+      AppLBSG:
+        default: Which Security Group in the selected VPC should be attached to the application load balancer?
       AppSG:
         default: Which Security Group in the selected VPC should be attached to the application layer?
       DatabaseSG:
@@ -223,6 +226,9 @@ Parameters:
     Description: The base name for the exported data layer subnet IDs, eg if the exports are 'PRODMyApplicationDbSubnetA' and 'PRODMyApplicationDbSubnetB', then this would be 'PRODMyApplicationDbSubnet'
   AdminSG:
     Description: The exported name of the security group ID containing sysadmin inbound rules
+    Type: String
+  AppLBSG:
+    Description: The exported name of the security group ID to attach to the application load balancer.
     Type: String
   AppSG:
     Description: The exported name of the security group ID to attach to applications.
@@ -371,10 +377,10 @@ Resources:
             - OpsWorksServiceRole
             - Arn
           - Fn::Join:
-              - ""
-              - - "arn:aws:iam::"
-                - !Ref "AWS::AccountId"
-                - ":role/aws-opsworks-service-role"
+            - ""
+            - - "arn:aws:iam::"
+              - !Ref "AWS::AccountId"
+              - ":role/aws-opsworks-service-role"
       UseCustomCookbooks: true
       VpcId:
         Fn::ImportValue: !Ref StackVPC
@@ -514,6 +520,8 @@ Resources:
       Scheme: "internet-facing"
       SecurityGroups:
         - Fn::ImportValue: !Ref AdminSG
+        - Fn::ImportValue: !Ref AppLBSG
+        - AWS-OpsWorks-WebApp
       Subnets:
         - Fn::ImportValue:
             !Sub "${WebSubnets}A"

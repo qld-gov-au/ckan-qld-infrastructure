@@ -17,6 +17,7 @@ cloudformation_stacks:
       AppSubnets: PRODCKANAppSubnet
       DbSubnets: PRODCKANDbSubnet
       AdminSG: PRODCKANManagementSG
+      AppLBSG: PRODCKANAppLoadBalancerSG
       AppSG: PRODCKANAppAsgSG
       DatabaseSG: PRODCKANDatabaseSG
       CreateServiceRole: "yes"
@@ -46,6 +47,7 @@ cloudformation_stacks:
       AppSubnets: STAGINGCKANAppSubnet
       DbSubnets: STAGINGCKANDbSubnet
       AdminSG: STAGINGCKANManagementSG
+      AppLBSG: STAGINGCKANAppLoadBalancerSG
       AppSG: STAGINGCKANAppAsgSG
       DatabaseSG: STAGINGCKANDatabaseSG
       CreateServiceRole: "yes"
@@ -75,6 +77,7 @@ cloudformation_stacks:
       AppSubnets: TRAININGCKANAppSubnet
       DbSubnets: TRAININGCKANDbSubnet
       AdminSG: TRAININGCKANManagementSG
+      AppLBSG: TRAININGCKANAppLoadBalancerSG
       AppSG: TRAININGCKANAppAsgSG
       DatabaseSG: TRAININGCKANDatabaseSG
       CreateServiceRole: "yes"
@@ -107,6 +110,7 @@ cloudformation_stacks:
       AppSubnets: DEVCKANAppSubnet
       DbSubnets: DEVCKANDbSubnet
       AdminSG: DEVCKANManagementSG
+      AppLBSG: DEVCKANAppLoadBalancerSG
       AppSG: DEVCKANAppAsgSG
       DatabaseSG: DEVCKANDatabaseSG
       CreateServiceRole: "yes"
