@@ -17,6 +17,8 @@ cloudformation_stacks:
       AppSubnets: PRODCKANAppSubnet
       DbSubnets: PRODCKANDbSubnet
       AdminSG: PRODCKANManagementSG
+      AppSG: PRODCKANAppAsgSG
+      DatabaseSG: PRODCKANDatabaseSG
       CreateServiceRole: "yes"
     tags:
       Environment: PROD
@@ -25,6 +27,7 @@ cloudformation_stacks:
       Division: Qld Online
       Owner: Development and Delivery
       Version: "1.0"
+      PowerManaged: "No"
 
   - name: OpenData-STAGING-OpsWorks-stack
     state: "{{ state | default('present')}}"
@@ -43,6 +46,8 @@ cloudformation_stacks:
       AppSubnets: STAGINGCKANAppSubnet
       DbSubnets: STAGINGCKANDbSubnet
       AdminSG: STAGINGCKANManagementSG
+      AppSG: STAGINGCKANAppAsgSG
+      DatabaseSG: STAGINGCKANDatabaseSG
       CreateServiceRole: "yes"
     tags:
       Environment: STAGING
@@ -51,6 +56,7 @@ cloudformation_stacks:
       Division: Qld Online
       Owner: Development and Delivery
       Version: "1.0"
+      PowerManaged: "No"
 
   - name: OpenData-TRAINING-OpsWorks-stack
     state: "{{ state | default('present')}}"
@@ -69,6 +75,8 @@ cloudformation_stacks:
       AppSubnets: TRAININGCKANAppSubnet
       DbSubnets: TRAININGCKANDbSubnet
       AdminSG: TRAININGCKANManagementSG
+      AppSG: TRAININGCKANAppAsgSG
+      DatabaseSG: TRAININGCKANDatabaseSG
       CreateServiceRole: "yes"
     tags:
       Environment: TRAINING
@@ -77,6 +85,7 @@ cloudformation_stacks:
       Division: Qld Online
       Owner: Development and Delivery
       Version: "1.0"
+      PowerManaged: "Yes"
 
   - name: OpenData-DEV-OpsWorks-stack
     state: "{{ state | default('present')}}"
@@ -92,11 +101,14 @@ cloudformation_stacks:
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/DEV/app/opendata/admin_email', region='ap-southeast-2') }}"
       CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/DEV/app/opendata/admin_password', region='ap-southeast-2') }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/opendata_user', region='ap-southeast-2') }}"
       PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/opendata_password', region='ap-southeast-2') }}"
       WebSubnets: DEVCKANWebSubnet
       AppSubnets: DEVCKANAppSubnet
       DbSubnets: DEVCKANDbSubnet
       AdminSG: DEVCKANManagementSG
+      AppSG: DEVCKANAppAsgSG
+      DatabaseSG: DEVCKANDatabaseSG
       CreateServiceRole: "yes"
     tags:
       Environment: DEV
@@ -105,4 +117,4 @@ cloudformation_stacks:
       Division: Qld Online
       Owner: Development and Delivery
       Version: "1.0"
-      PowerManaged: Yes
+      PowerManaged: "Yes"

@@ -32,11 +32,14 @@ Metadata:
           - AppSubnets
           - DbSubnets
           - AdminSG
+          - AppSG
+          - DatabaseSG
 
       -
         Label:
           default: CKAN Options
         Parameters:
+          - PGDBUser
           - PGDBPassword
           - CKANAdminPW
           - CKANAdminEmail
@@ -93,6 +96,12 @@ Metadata:
         default: What base name are the data layer subnet IDs exported under?
       AdminSG:
         default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
+      AppSG:
+        default: Which Security Group in the selected VPC should be attached to the application layer?
+      DatabaseSG:
+        default: Which Security Group in the selected VPC should be attached to the database layer?
+      PGDBUser:
+        default: Account name for (non-superuser) Postgres DB access.
       PGDBPassword:
         default: Enter a password for Postgres DB access.
       CKANAdminPW:
@@ -215,6 +224,15 @@ Parameters:
   AdminSG:
     Description: The exported name of the security group ID containing sysadmin inbound rules
     Type: String
+  AppSG:
+    Description: The exported name of the security group ID to attach to applications.
+    Type: String
+  DatabaseSG:
+    Description: The exported name of the security group ID to attach to the database layer.
+    Type: String
+  PGDBUser:
+    Description: Account name for (non-superuser) Postgres DB access.
+    Type: String
   PGDBPassword:
     NoEcho: true
     Description: Password must be at least 8 alphanumeric characters up to a maximum of 64 characters in length.
@@ -247,7 +265,7 @@ Conditions:
           - !Ref CreateInstances
   UseMultiAZ:
     Fn::Equals:
-      - prod
+      - PROD
       - !Ref Environment
 
 Resources:
@@ -322,6 +340,10 @@ Resources:
           ckan_web:
             adminpw: !Ref CKANAdminPW
             adminemail: !Ref CKANAdminEmail
+            dbuser: !Ref PGDBUser
+            dbname: !Ref ApplicationName
+            dsuser: !Sub "${PGDBUser}_datastore"
+            dsname: !Sub "${ApplicationName}_datastore"
             endpoint: /
           jumpbox:
             bucket: !Ref AdminPubKeyBucket
@@ -334,7 +356,7 @@ Resources:
         Fn::GetAtt:
           - InstanceRoleProfile
           - Arn
-      DefaultOs: "Amazon Linux 2016.09"
+      DefaultOs: "Amazon Linux 2018.03"
       DefaultSshKeyName: !Ref DefaultEC2Key
       DefaultSubnetId:
         Fn::ImportValue:
@@ -371,6 +393,7 @@ Resources:
           - "datashades::redis-deploy"
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
+        - Fn::ImportValue: !Ref DatabaseSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
       Name: "CKAN-REDIS"
@@ -394,6 +417,7 @@ Resources:
       AutoAssignPublicIps: true
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
+        - Fn::ImportValue: !Ref DatabaseSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
       Name: "CKAN-Solr"
@@ -415,6 +439,7 @@ Resources:
           - "datashades::ckanweb-configure"
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
+        - Fn::ImportValue: !Ref AppSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
       Name: "CKAN-Web"
