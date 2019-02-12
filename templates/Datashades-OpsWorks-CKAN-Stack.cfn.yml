@@ -350,6 +350,8 @@ Resources:
             usergroup: !Ref AdminUserGroup
           postgres:
             password: !Ref PGDBPassword
+          redis:
+            url: !Sub "${Environment}redis.${StackTLD}"
           tld: !Ref StackTLD
           version: !Ref Environment
       DefaultInstanceProfileArn:
