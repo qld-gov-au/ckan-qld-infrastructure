@@ -111,7 +111,7 @@ Metadata:
 
 Parameters:
   CookbookURL:
-    Default: https://github.com/DataShades/opswx-ckan-cookbook.git
+    Default: https://github.com/qld-gov-au/opswx-ckan-cookbook.git
     Description: "Repository URL. Must be SSH URL for private repos with private key."
     Type: String
   #CookbookSSHKey:
@@ -126,11 +126,11 @@ Parameters:
     MaxLength: 64
   SolrSource:
     Description: URL for zip archive.
-    Default: http://apache.mirror.digitalpacific.com.au/lucene/solr/5.5.4/solr-5.5.4.zip
+    Default: http://apache.mirror.digitalpacific.com.au/lucene/solr/5.5.5/solr-5.5.5.zip
     Type: String
   CKANSource:
     Description: URL for zip archive.
-    Default: https://github.com/ckan/ckan/archive/ckan-2.5.4.zip
+    Default: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
     Type: String
   ApplicationName:
     Description: Name of the application (ie. GI or Services, etc)
@@ -468,7 +468,7 @@ Resources:
       AppSource:
         Type: archive
         Url: !Ref SolrSource
-      Description: "Apache Solr 5.5.2"
+      Description: "Apache Solr 5.5.5"
       EnableSsl: false
       Name: "solr-5.5"
       Shortname: "solr-5.5"
