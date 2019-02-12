@@ -120,7 +120,6 @@ Resources:
         ToPort: 8443
         CidrIp: 10.10.0.0/16
 
-
   AppLoadBalancer:
     Type: AWS::EC2::SecurityGroup
     DependsOn: WebAsg
@@ -129,14 +128,10 @@ Resources:
         Fn::ImportValue: !Ref VPC
       GroupDescription: allow connections from specified CIDR ranges
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 8080
-        ToPort: 8080
-        SourceSecurityGroupId: !Ref WebAsg
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        SourceSecurityGroupId: !Ref WebAsg
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref WebAsg
 
   AppAsg:
     Type: AWS::EC2::SecurityGroup
@@ -146,10 +141,10 @@ Resources:
         Fn::ImportValue: !Ref VPC
       GroupDescription: allow connections from specified CIDR ranges
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 8080
-        ToPort: 8080
-        SourceSecurityGroupId: !Ref AppLoadBalancer
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref AppLoadBalancer
 
   WebLoadBalancer:
     Type: AWS::EC2::SecurityGroup
@@ -188,6 +183,10 @@ Resources:
         ToPort: 5432
         SourceSecurityGroupId: !Ref AppAsg
       - IpProtocol: tcp
+        FromPort: 8983
+        ToPort: 8983
+        SourceSecurityGroupId: !Ref AppAsg
+      - IpProtocol: tcp
         FromPort: 5432
         ToPort: 5432
         CidrIp: !Ref BambooAgentIp
@@ -195,8 +194,6 @@ Resources:
         FromPort: 5432
         ToPort: 5432
         CidrIp: !Ref BambooAgentIp2
-
-
 
 Outputs:
   ManagementSG:
