@@ -18,6 +18,7 @@ cloudformation_stacks:
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
+      PowerManaged: "No"
 
   - name: CKAN-STAGING-Cache
     state: "{{ state | default('present')}}"
@@ -35,6 +36,7 @@ cloudformation_stacks:
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
+      PowerManaged: "No"
 
   - name: CKAN-TRAINING-Cache
     state: "{{ state | default('present')}}"

@@ -19,6 +19,7 @@ cloudformation_stacks:
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
+      PowerManaged: "No"
 
   - name: CKAN-STAGING-EFS-stack
     state: "{{ state | default('present')}}"
@@ -39,6 +40,7 @@ cloudformation_stacks:
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
+      PowerManaged: "No"
 
   - name: CKAN-TRAINING-EFS-stack
     state: "{{ state | default('present')}}"
@@ -59,6 +61,7 @@ cloudformation_stacks:
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
+      PowerManaged: "Yes"
 
   - name: CKAN-DEV-EFS-stack
     state: "{{ state | default('present')}}"
@@ -68,7 +71,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: DEV
       ApplicationName: CKAN
-      StackTLD: internal.ckan.devpit140cs.qgov.net.au
+      StackTLD: dev.ckan.devpit140cs.qgov.net.au
       StackVPC: CKANVpc-DEV
       DbSubnets: DEVCKANDBSubnet
       AdminSG: DEVCKANManagementSG

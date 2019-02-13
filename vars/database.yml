@@ -29,6 +29,7 @@ cloudformation_stacks:
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
+      PowerManaged: "No"
 
   - name: CKAN-STAGING-RDS
     state: "{{ state | default('present')}}"
@@ -59,6 +60,7 @@ cloudformation_stacks:
       Division: "Qld Online"
       Owner: "Development and Delivery"
       Version: "1.0"
+      PowerManaged: "No"
 
   - name: CKAN-TRAINING-RDS
     state: "{{ state | default('present')}}"
