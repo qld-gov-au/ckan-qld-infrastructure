@@ -1,5 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates security groups to allow communication between CKAN layers.
 Parameters:
   BambooAgentIp:
     Description: CIDR of the local Bamboo agent
@@ -180,11 +181,15 @@ Resources:
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 5432
-        ToPort: 5432
+        ToPort: 5432 # PostgreSQL
         SourceSecurityGroupId: !Ref AppAsg
       - IpProtocol: tcp
         FromPort: 8983
-        ToPort: 8983
+        ToPort: 8983 # Solr
+        SourceSecurityGroupId: !Ref AppAsg
+      - IpProtocol: tcp
+        FromPort: 6379
+        ToPort: 6379 # Redis
         SourceSecurityGroupId: !Ref AppAsg
       - IpProtocol: tcp
         FromPort: 5432
