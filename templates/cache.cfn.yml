@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Redis cache cluster within the database subnet
+Outputs:
+  CacheClusterAddress:
+    Description: The DNS address of the configuration endpoint for the Redis cache cluster.
+    Value:
+      Fn::GetAtt:
+        - CacheCluster
+        - RedisEndpoint.Address
+    Export:
+      Name: !Sub "${Environment}${Platform}CacheClusterAddress"
+
+Parameters:
+  CacheNodeType:
+    Description: Select instance size for Redis cache.
+    Type: String
+    Default: cache.t2.micro
+    AllowedValues:
+      - cache.t2.micro
+      - cache.t2.small
+      - cache.t2.medium
+      - cache.m5.large
+      - cache.r5.large
+  NumCacheNodes:
+    Description: The number of cache nodes that the cluster should have. NB This directly affects cost.
+    Type: Number
+    Default: 1
+  AZMode:
+    Description: Single or multi availability zone deployment
+    Type: String
+    Default: single-az
+    AllowedValues:
+      - single-az
+      - cross-az
+  Environment:
+    Description: Environment eg DEV, PROD
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  Platform:
+    Description: Name of the platform ie GI, Services, Static
+    Type: String
+  Subnets:
+    Description: Subnet export name minus the zone. (example- WebSubnet)
+    Type: String
+
+Resources:
+  CacheSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      CacheSubnetGroupName: !Sub "${Environment}${Platform}CacheSubnets"
+      Description: Subnets available for the cache cluster
+      SubnetIds:
+        - Fn::ImportValue: !Sub "${Subnets}A"
+        - Fn::ImportValue: !Sub "${Subnets}B"
+
+  CacheCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      AZMode: !Ref AZMode
+      CacheNodeType: !Ref CacheNodeType
+      CacheSubnetGroupName: !Ref CacheSubnetGroup
+      Engine: redis
+      NumCacheNodes: !Ref NumCacheNodes
+      VpcSecurityGroupIds:
+        - Fn::ImportValue: !Sub "${Environment}${Platform}DatabaseSG"
