@@ -12,7 +12,10 @@ cloudformation_stacks:
       StackVPC: CKANVpc-PROD
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/OpenData/PROD/db/master_password', region='ap-southeast-2') }}"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/PROD/app/opendata/admin_email', region='ap-southeast-2') }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/PROD/app/opendata/admin_password', region='ap-southeast-2') }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/opendata_user', region='ap-southeast-2') }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/opendata_password', region='ap-southeast-2') }}"
       WebSubnets: PRODCKANWebSubnet
       AppSubnets: PRODCKANAppSubnet
       DbSubnets: PRODCKANDbSubnet
@@ -42,7 +45,10 @@ cloudformation_stacks:
       StackVPC: CKANVpc-STAGING
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/OpenData/STAGING/db/master_password', region='ap-southeast-2') }}"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/app/opendata/admin_email', region='ap-southeast-2') }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/app/opendata/admin_password', region='ap-southeast-2') }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/opendata_user', region='ap-southeast-2') }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/opendata_password', region='ap-southeast-2') }}"
       WebSubnets: STAGINGCKANWebSubnet
       AppSubnets: STAGINGCKANAppSubnet
       DbSubnets: STAGINGCKANDbSubnet
@@ -72,7 +78,10 @@ cloudformation_stacks:
       StackVPC: CKANVpc-TRAINING
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/OpenData/TRAINING/db/master_password', region='ap-southeast-2') }}"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/app/opendata/admin_email', region='ap-southeast-2') }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/app/opendata/admin_password', region='ap-southeast-2') }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/opendata_user', region='ap-southeast-2') }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/opendata_password', region='ap-southeast-2') }}"
       WebSubnets: TRAININGCKANWebSubnet
       AppSubnets: TRAININGCKANAppSubnet
       DbSubnets: TRAININGCKANDbSubnet
