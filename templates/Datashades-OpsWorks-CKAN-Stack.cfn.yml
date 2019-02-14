@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: "Creates an OpsWorks CKAN Stack.\n"
+Description: "Creates an OpsWorks CKAN Stack."
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -17,6 +17,7 @@ Metadata:
         Parameters:
           - CreateServiceRole
           - ApplicationName
+          - ApplicationId
           - Environment
           - StackTLD
           - CreateTLD
@@ -65,6 +66,8 @@ Metadata:
         default: What repository branch should the Custom Cookbook use?
       ApplicationName:
         default: Name of the application (ie. GI or Services, etc)
+      ApplicationId:
+        default: All-lowercase identifier for the application (eg 'gi', 'services', etc)
       Environment:
         default: What version is this OpsWorks stack?
       CreateTLD:
@@ -138,6 +141,11 @@ Parameters:
   ApplicationName:
     Description: Name of the application (ie. GI or Services, etc)
     Type: String
+  ApplicationId:
+    Description: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+    Type: String
+    ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
+    AllowedPattern: '[-_a-z0-9]*'
   Environment:
     Description: Select a stack version.
     Type: String
@@ -360,6 +368,7 @@ Resources:
             url: !Sub "${Environment}redis.${StackTLD}"
           tld: !Ref StackTLD
           version: !Ref Environment
+          app_id: !Ref ApplicationId
       DefaultInstanceProfileArn:
         Fn::GetAtt:
           - InstanceRoleProfile
@@ -369,7 +378,7 @@ Resources:
       DefaultSubnetId:
         Fn::ImportValue:
           !Sub "${AppSubnets}A"
-      Name: !Sub "${Environment}_ckan"
+      Name: !Sub "${ApplicationName}_${Environment}"
       ServiceRoleArn:
         Fn::If:
           - ProvisionServiceRole
@@ -404,8 +413,8 @@ Resources:
         - Fn::ImportValue: !Ref DatabaseSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
-      Name: "CKAN-REDIS"
-      Shortname: "ckan-redis"
+      Name: !Sub "${ApplicationName}-REDIS"
+      Shortname: !Sub "${ApplicationId}-redis"
       StackId: !Ref OpsWorksStack
       Type: custom
 
@@ -428,8 +437,8 @@ Resources:
         - Fn::ImportValue: !Ref DatabaseSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
-      Name: "CKAN-Solr"
-      Shortname: "ckan-solr"
+      Name: !Sub "${ApplicationName}-Solr"
+      Shortname: !Sub "${ApplicationId}-solr"
       StackId: !Ref OpsWorksStack
       Type: custom
 
@@ -450,8 +459,8 @@ Resources:
         - Fn::ImportValue: !Ref AppSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
-      Name: "CKAN-Web"
-      Shortname: "ckan-web"
+      Name: !Sub "${ApplicationName}-Web"
+      Shortname: !Sub "${ApplicationId}-web"
       StackId: !Ref OpsWorksStack
       Type: custom
 
@@ -459,14 +468,14 @@ Resources:
     Type: AWS::OpsWorks::App
     Properties:
       Domains:
-        - !Sub "${Environment}.${StackTLD}"
+        - !Sub "${ApplicationId}.${StackTLD}"
       AppSource:
         Type: archive
         Url: !Ref CKANSource
-      Description: "CKAN 2.5"
+      Description: "CKAN 2.7"
       EnableSsl: false
-      Name: !Sub "ckan_${Environment}"
-      Shortname: !Sub "ckan_${Environment}"
+      Name: !Sub "${ApplicationName}"
+      Shortname: !Sub "${ApplicationId}"
       StackId: !Ref OpsWorksStack
       Type: other
 
@@ -505,7 +514,7 @@ Resources:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Condition: ProvisionELB
     Properties:
-      LoadBalancerName: !Sub "${Environment}-CKANELB"
+      LoadBalancerName: !Sub "${Environment}-${ApplicationName}ELB"
       HealthCheck:
         Target: "HTTP:80/"
         HealthyThreshold: 2
@@ -521,7 +530,6 @@ Resources:
       SecurityGroups:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppLBSG
-        - AWS-OpsWorks-WebApp
       Subnets:
         - Fn::ImportValue:
             !Sub "${WebSubnets}A"
@@ -535,7 +543,7 @@ Resources:
     Condition: ProvisionELB
     Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
     Properties:
-      ElasticLoadBalancerName: !Sub "${Environment}-CKANELB"
+      ElasticLoadBalancerName: !Ref CKANELB
       LayerId: !Ref OpsWorksWebLayer
 
   WebELBCNAME:
@@ -544,7 +552,7 @@ Resources:
     DependsOn: CKANELB
     Properties:
       Type: A
-      Name: !Sub "${Environment}.${StackTLD}"
+      Name: !Sub "${ApplicationId}.${StackTLD}"
       HostedZoneName: !Sub "${StackTLD}."
       AliasTarget:
         HostedZoneId:
