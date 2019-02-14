@@ -21,6 +21,8 @@ Metadata:
           - Environment
           - StackTLD
           - CreateTLD
+          - CacheAddress
+          - CachePort
           - CreateELB
           - CreateInstances
           - CreateExtensions
@@ -84,6 +86,10 @@ Metadata:
         default: Do you want to provision an Elastic Load Balancer with this stack?
       StackTLD:
         default: What TLD hosted on Route53 is this stack using for internal DNS?
+      CacheAddress:
+        default: What is the address of the Redis cache?
+      CachePort:
+        default: What is the listening port of the Redis cache?
       DefaultEC2Key:
         default: What EC2 key pair should all instances in the OpsWorks stack use for SSH access?
       AdminUserGroup:
@@ -198,6 +204,14 @@ Parameters:
     AllowedValues:
       - "yes"
       - "no"
+  CacheAddress:
+    Description: The exported name of the address for the Redis cache.
+    Type: String
+    Default: localhost
+  CachePort:
+    Description: The listen port for the Redis cache.
+    Type: String
+    Default: 6379
   DefaultEC2Key:
     Description: Select an existing SSH key
     Type: AWS::EC2::KeyPair::KeyName
@@ -365,7 +379,9 @@ Resources:
           postgres:
             password: !Ref PGDBPassword
           redis:
-            url: !Sub "${Environment}redis.${StackTLD}"
+            hostname:
+              Fn::ImportValue: !Ref CacheAddress
+            port: !Ref CachePort
           tld: !Ref StackTLD
           version: !Ref Environment
           app_id: !Ref ApplicationId
