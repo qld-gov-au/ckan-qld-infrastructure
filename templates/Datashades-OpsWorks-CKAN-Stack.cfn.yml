@@ -300,7 +300,6 @@ Resources:
   OpsWorksServiceRole:
     Condition: ProvisionServiceRole
     Type: AWS::IAM::Role
-    DeletionPolicy: Retain
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -330,7 +329,6 @@ Resources:
 
   InstanceRole:
     Type: AWS::IAM::Role
-    DeletionPolicy: Retain
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -344,7 +342,6 @@ Resources:
         - arn:aws:iam::aws:policy/PowerUserAccess
 
   InstanceRoleProfile:
-    DeletionPolicy: Retain
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
