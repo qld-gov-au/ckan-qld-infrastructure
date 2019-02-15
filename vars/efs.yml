@@ -50,7 +50,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: TRAINING
       ApplicationName: CKAN
-      StackTLD: TODO
+      StackTLD: training.ckan.test-services.qld.gov.au
       StackVPC: CKANVpc-TRAINING
       DbSubnets: TRAININGCKANDBSubnet
       AdminSG: TRAININGCKANManagementSG

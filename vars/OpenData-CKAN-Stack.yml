@@ -82,7 +82,7 @@ cloudformation_stacks:
       Environment: TRAINING
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
-      StackTLD: TODO
+      StackTLD: training.ckan.test-services.qld.gov.au
       CacheAddress: TRAININGCKANCacheClusterAddress
       StackVPC: CKANVpc-TRAINING
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
