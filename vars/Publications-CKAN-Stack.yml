@@ -1,94 +1,145 @@
 ---
+titlecase_name: Publications
+lowercase_name: publications # Unfortunately CloudFormation doesn't provide a 'lowercase' function
+region: ap-southeast-2
+
 cloudformation_stacks:
-  - name: Publications-PROD-OpsWorks-EFS-stack
-    state: present
-    region: ap-southeast-2
+  - name: "{{ titlecase_name }}-PROD-OpsWorks-stack"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: PROD
-      ApplicationName: Publications
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
       StackTLD: TODO
+      CacheAddress: PRDCKANCacheClusterAddress
+      StackVPC: CKANVpc-PROD
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/Publications/PROD/db/master_password', region='ap-southeast-2') }}"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/PROD/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/PROD/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/' + lowercase_name + '_password', region=region) }}"
       WebSubnets: PRODCKANWebSubnet
       AppSubnets: PRODCKANAppSubnet
       DbSubnets: PRODCKANDbSubnet
+      AdminSG: PRODCKANManagementSG
+      AppLBSG: PRODCKANAppLoadBalancerSG
+      AppSG: PRODCKANAppAsgSG
+      DatabaseSG: PRODCKANDatabaseSG
+      CreateServiceRole: "yes"
     tags:
       Environment: PROD
-      Service: Publications
-      itoc_monitored: "false"
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Service: "{{ titlecase_name }}"
+      itoc_monitored: false
+      Division: Qld Online
+      Owner: Development and Delivery
       Version: "1.0"
+      PowerManaged: "No"
 
-  - name: Publications-STAGING-OpsWorks-EFS-stack
-    state: present
-    region: ap-southeast-2
+  - name: "{{ titlecase_name }}-STAGING-OpsWorks-stack"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: STAGING
-      ApplicationName: Publications
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
       StackTLD: TODO
+      CacheAddress: STAGINGCKANCacheClusterAddress
+      StackVPC: CKANVpc-STAGING
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/Publications/STAGING/db/master_password', region='ap-southeast-2') }}"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/' + lowercase_name + '_password', region=region) }}"
       WebSubnets: STAGINGCKANWebSubnet
       AppSubnets: STAGINGCKANAppSubnet
       DbSubnets: STAGINGCKANDbSubnet
+      AdminSG: STAGINGCKANManagementSG
+      AppLBSG: STAGINGCKANAppLoadBalancerSG
+      AppSG: STAGINGCKANAppAsgSG
+      DatabaseSG: STAGINGCKANDatabaseSG
+      CreateServiceRole: "yes"
     tags:
       Environment: STAGING
-      Service: Publications
-      itoc_monitored: 'false'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Service: "{{ titlecase_name }}"
+      itoc_monitored: false
+      Division: Qld Online
+      Owner: Development and Delivery
       Version: "1.0"
+      PowerManaged: "No"
 
-  - name: Publications-TRAINING-OpsWorks-EFS-stack
-    state: present
-    region: ap-southeast-2
+  - name: "{{ titlecase_name }}-TRAINING-OpsWorks-stack"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: TRAINING
-      ApplicationName: Publications
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
       StackTLD: TODO
+      CacheAddress: TRAININGCKANCacheClusterAddress
+      StackVPC: CKANVpc-TRAINING
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/Publications/TRAINING/db/master_password', region='ap-southeast-2') }}"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/' + lowercase_name + '_password', region=region) }}"
       WebSubnets: TRAININGCKANWebSubnet
       AppSubnets: TRAININGCKANAppSubnet
       DbSubnets: TRAININGCKANDbSubnet
+      AdminSG: TRAININGCKANManagementSG
+      AppLBSG: TRAININGCKANAppLoadBalancerSG
+      AppSG: TRAININGCKANAppAsgSG
+      DatabaseSG: TRAININGCKANDatabaseSG
+      CreateServiceRole: "yes"
     tags:
       Environment: TRAINING
-      Service: Publications
-      itoc_monitored: 'false'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Service: "{{ titlecase_name }}"
+      itoc_monitored: false
+      Division: Qld Online
+      Owner: Development and Delivery
       Version: "1.0"
+      PowerManaged: "Yes"
 
-  - name: Publications-DEV-OpsWorks-EFS-stack
-    state: present
-    region: ap-southeast-2
+  - name: "{{ titlecase_name }}-DEV-OpsWorks-stack"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
     template_parameters:
       Environment: DEV
-      ApplicationName: Publications
-      StackTLD: publicationsdevtrail.devpit140cs.qgov.net.au
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
+      StackTLD: dev.ckan.devpit140cs.qgov.net.au
+      CacheAddress: DEVCKANCacheClusterAddress
+      StackVPC: CKANVpc-DEV
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
       DefaultEC2Key: osssio-global-ckan
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/Publications/DEV/db/master_password', region='ap-southeast-2') }}"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/DEV/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/DEV/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/' + lowercase_name + '_password', region=region) }}"
       WebSubnets: DEVCKANWebSubnet
       AppSubnets: DEVCKANAppSubnet
       DbSubnets: DEVCKANDbSubnet
+      AdminSG: DEVCKANManagementSG
+      AppLBSG: DEVCKANAppLoadBalancerSG
+      AppSG: DEVCKANAppAsgSG
+      DatabaseSG: DEVCKANDatabaseSG
+      CreateServiceRole: "yes"
     tags:
       Environment: DEV
-      Service: Publications
-      itoc_monitored: "false
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Service: "{{ titlecase_name }}"
+      itoc_monitored: false
+      Division: Qld Online
+      Owner: Development and Delivery
       Version: "1.0"
       PowerManaged: "Yes"
