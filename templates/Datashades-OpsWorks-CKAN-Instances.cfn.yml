@@ -9,7 +9,6 @@ Metadata:
         Parameters:
           - OpsWorksStackID
           - SolrLayerID
-          - RedisLayerID
           - WebLayerID
       - Label:
           default: Stack Instance Details
@@ -29,8 +28,6 @@ Metadata:
         default: What OpsWorks stack do you want to provision instances into?
       SolrLayerID:
         default: What is the Solr Layer ID of the stack?
-      RedisLayerID:
-        default: What is the Redis Layer ID of the stack?
       WebLayerID:
         default: What is the Web Layer ID of the stack?
       Subnets:
@@ -84,9 +81,6 @@ Parameters:
   SolrLayerID:
     Description: The exported name of the OpsWorks Solr Stack Layer ID.
     Type: String
-  RedisLayerID:
-    Description: The exported name of the OpsWorks Redis Stack Layer ID.
-    Type: String
   WebLayerID:
     Description: The exported name of the OpsWorks Web Stack Layer ID.
     Type: String
@@ -104,7 +98,6 @@ Resources:
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
       LayerIds:
-        - Fn::ImportValue: !Ref RedisLayerID
         - Fn::ImportValue: !Ref SolrLayerID
       SshKeyName: !Ref DefaultEC2Key
       StackId:
