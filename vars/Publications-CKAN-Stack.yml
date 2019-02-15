@@ -1,0 +1,94 @@
+---
+cloudformation_stacks:
+  - name: Publications-PROD-OpsWorks-EFS-stack
+    state: present
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template_parameters:
+      Environment: PROD
+      ApplicationName: Publications
+      StackTLD: TODO
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+      DefaultEC2Key: osssio-global-ckan
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/Publications/PROD/db/master_password', region='ap-southeast-2') }}"
+      WebSubnets: PRODCKANWebSubnet
+      AppSubnets: PRODCKANAppSubnet
+      DbSubnets: PRODCKANDbSubnet
+    tags:
+      Environment: PROD
+      Service: Publications
+      itoc_monitored: "false"
+      Division: "Qld Online"
+      Owner: "Development and Delivery"
+      Version: "1.0"
+
+  - name: Publications-STAGING-OpsWorks-EFS-stack
+    state: present
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template_parameters:
+      Environment: STAGING
+      ApplicationName: Publications
+      StackTLD: TODO
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+      DefaultEC2Key: osssio-global-ckan
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/Publications/STAGING/db/master_password', region='ap-southeast-2') }}"
+      WebSubnets: STAGINGCKANWebSubnet
+      AppSubnets: STAGINGCKANAppSubnet
+      DbSubnets: STAGINGCKANDbSubnet
+    tags:
+      Environment: STAGING
+      Service: Publications
+      itoc_monitored: 'false'
+      Division: "Qld Online"
+      Owner: "Development and Delivery"
+      Version: "1.0"
+
+  - name: Publications-TRAINING-OpsWorks-EFS-stack
+    state: present
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template_parameters:
+      Environment: TRAINING
+      ApplicationName: Publications
+      StackTLD: TODO
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+      DefaultEC2Key: osssio-global-ckan
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/Publications/TRAINING/db/master_password', region='ap-southeast-2') }}"
+      WebSubnets: TRAININGCKANWebSubnet
+      AppSubnets: TRAININGCKANAppSubnet
+      DbSubnets: TRAININGCKANDbSubnet
+    tags:
+      Environment: TRAINING
+      Service: Publications
+      itoc_monitored: 'false'
+      Division: "Qld Online"
+      Owner: "Development and Delivery"
+      Version: "1.0"
+
+  - name: Publications-DEV-OpsWorks-EFS-stack
+    state: present
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/Datashades-OpsWorks-EFS-CKAN-Stack.cfn.yml"
+    template_parameters:
+      Environment: DEV
+      ApplicationName: Publications
+      StackTLD: publicationsdevtrail.devpit140cs.qgov.net.au
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
+      DefaultEC2Key: osssio-global-ckan
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/Publications/DEV/db/master_password', region='ap-southeast-2') }}"
+      WebSubnets: DEVCKANWebSubnet
+      AppSubnets: DEVCKANAppSubnet
+      DbSubnets: DEVCKANDbSubnet
+    tags:
+      Environment: DEV
+      Service: Publications
+      itoc_monitored: "false
+      Division: "Qld Online"
+      Owner: "Development and Delivery"
+      Version: "1.0"
+      PowerManaged: "Yes"

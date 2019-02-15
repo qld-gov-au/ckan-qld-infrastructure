@@ -1,0 +1,144 @@
+---
+titlecase_name: OpenData
+lowercase_name: opendata # Unfortunately CloudFormation doesn't provide a 'lowercase' function
+
+cloudformation_stacks:
+  - name: "{{ titlecase_name }}-PROD-OpsWorks-stack"
+    state: "{{ state | default('present')}}"
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
+    template_parameters:
+      Environment: PROD
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
+      StackTLD: TODO
+      CacheAddress: PRDCKANCacheClusterAddress
+      StackVPC: CKANVpc-PROD
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+      DefaultEC2Key: osssio-global-ckan
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/PROD/app/' + lowercase_name + '/admin_email', region='ap-southeast-2') }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/PROD/app/' + lowercase_name + '/admin_password', region='ap-southeast-2') }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/' + lowercase_name + '_user', region='ap-southeast-2') }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/' + lowercase_name + '_password', region='ap-southeast-2') }}"
+      WebSubnets: PRODCKANWebSubnet
+      AppSubnets: PRODCKANAppSubnet
+      DbSubnets: PRODCKANDbSubnet
+      AdminSG: PRODCKANManagementSG
+      AppLBSG: PRODCKANAppLoadBalancerSG
+      AppSG: PRODCKANAppAsgSG
+      DatabaseSG: PRODCKANDatabaseSG
+      CreateServiceRole: "yes"
+    tags:
+      Environment: PROD
+      Service: "{{ titlecase_name }}"
+      itoc_monitored: false
+      Division: Qld Online
+      Owner: Development and Delivery
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: "{{ titlecase_name }}-STAGING-OpsWorks-stack"
+    state: "{{ state | default('present')}}"
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
+    template_parameters:
+      Environment: STAGING
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
+      StackTLD: TODO
+      CacheAddress: STAGINGCKANCacheClusterAddress
+      StackVPC: CKANVpc-STAGING
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+      DefaultEC2Key: osssio-global-ckan
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/app/' + lowercase_name + '/admin_email', region='ap-southeast-2') }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/app/' + lowercase_name + '/admin_password', region='ap-southeast-2') }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/' + lowercase_name + '_user', region='ap-southeast-2') }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/' + lowercase_name + '_password', region='ap-southeast-2') }}"
+      WebSubnets: STAGINGCKANWebSubnet
+      AppSubnets: STAGINGCKANAppSubnet
+      DbSubnets: STAGINGCKANDbSubnet
+      AdminSG: STAGINGCKANManagementSG
+      AppLBSG: STAGINGCKANAppLoadBalancerSG
+      AppSG: STAGINGCKANAppAsgSG
+      DatabaseSG: STAGINGCKANDatabaseSG
+      CreateServiceRole: "yes"
+    tags:
+      Environment: STAGING
+      Service: "{{ titlecase_name }}"
+      itoc_monitored: false
+      Division: Qld Online
+      Owner: Development and Delivery
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: "{{ titlecase_name }}-TRAINING-OpsWorks-stack"
+    state: "{{ state | default('present')}}"
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
+    template_parameters:
+      Environment: TRAINING
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
+      StackTLD: TODO
+      CacheAddress: TRAININGCKANCacheClusterAddress
+      StackVPC: CKANVpc-TRAINING
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+      DefaultEC2Key: osssio-global-ckan
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/app/' + lowercase_name + '/admin_email', region='ap-southeast-2') }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/app/' + lowercase_name + '/admin_password', region='ap-southeast-2') }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/' + lowercase_name + '_user', region='ap-southeast-2') }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/' + lowercase_name + '_password', region='ap-southeast-2') }}"
+      WebSubnets: TRAININGCKANWebSubnet
+      AppSubnets: TRAININGCKANAppSubnet
+      DbSubnets: TRAININGCKANDbSubnet
+      AdminSG: TRAININGCKANManagementSG
+      AppLBSG: TRAININGCKANAppLoadBalancerSG
+      AppSG: TRAININGCKANAppAsgSG
+      DatabaseSG: TRAININGCKANDatabaseSG
+      CreateServiceRole: "yes"
+    tags:
+      Environment: TRAINING
+      Service: "{{ titlecase_name }}"
+      itoc_monitored: false
+      Division: Qld Online
+      Owner: Development and Delivery
+      Version: "1.0"
+      PowerManaged: "Yes"
+
+  - name: "{{ titlecase_name }}-DEV-OpsWorks-stack"
+    state: "{{ state | default('present')}}"
+    region: ap-southeast-2
+    disable_rollback: true
+    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
+    template_parameters:
+      Environment: DEV
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
+      StackTLD: dev.ckan.devpit140cs.qgov.net.au
+      CacheAddress: DEVCKANCacheClusterAddress
+      StackVPC: CKANVpc-DEV
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
+      DefaultEC2Key: osssio-global-ckan
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/DEV/app/' + lowercase_name + '/admin_email', region='ap-southeast-2') }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/DEV/app/' + lowercase_name + '/admin_password', region='ap-southeast-2') }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/' + lowercase_name + '_user', region='ap-southeast-2') }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/' + lowercase_name + '_password', region='ap-southeast-2') }}"
+      WebSubnets: DEVCKANWebSubnet
+      AppSubnets: DEVCKANAppSubnet
+      DbSubnets: DEVCKANDbSubnet
+      AdminSG: DEVCKANManagementSG
+      AppLBSG: DEVCKANAppLoadBalancerSG
+      AppSG: DEVCKANAppAsgSG
+      DatabaseSG: DEVCKANDatabaseSG
+      CreateServiceRole: "yes"
+    tags:
+      Environment: DEV
+      Service: "{{ titlecase_name }}"
+      itoc_monitored: false
+      Division: Qld Online
+      Owner: Development and Delivery
+      Version: "1.0"
+      PowerManaged: "Yes"

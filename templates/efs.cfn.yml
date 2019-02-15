@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates an EFS filesystem stack to support CKAN.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: EFS Stack Details
+        Parameters:
+          - ApplicationName
+          - Environment
+          - StackTLD
+          - StackVPC
+          - DbSubnets
+          - AdminSG
+    ParameterLabels:
+      ApplicationName:
+        default: Name of the application (ie. GI or Services, etc)
+      Environment:
+        default: Stack environment eg DEV, TRAINING
+      StackTLD:
+        default: What TLD hosted on Route53 is this stack using for internal DNS?
+      StackVPC:
+        default: What VPC should OpsWorks stack instances belong to?
+      DbSubnets:
+        default: What base name are the data layer subnet IDs exported under?
+      AdminSG:
+        default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
+
+Outputs:
+  FileSystem:
+    Value: !Ref SharedFileSystem
+    Description: Filesystem ID
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}-FileSystem"
+
+Parameters:
+  ApplicationName:
+    Description: Name of the application (ie. GI or Services, etc)
+    Type: String
+  Environment:
+    Description: Stack environment eg DEV, TRAINING
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  StackTLD:
+    Description: Route53 hosted TLD for stack
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  StackVPC:
+    Description: The exported name for the existing VPC ID.
+    Type: String
+  DbSubnets:
+    Type: String
+    Description: The base name for the exported data layer subnet IDs, eg if the exports are 'PRODMyApplicationDbSubnetA' and 'PRODMyApplicationDbSubnetB', then this would be 'PRODMyApplicationDbSubnet'
+  AdminSG:
+    Description: The exported name of the security group ID containing sysadmin inbound rules
+    Type: String
+
+Resources:
+  SharedFileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      PerformanceMode: generalPurpose
+      FileSystemTags:
+        -
+          Key: Name
+          Value:
+            Fn::Join:
+              - "-"
+              - - !Ref Environment
+                - !Ref AWS::StackName
+                - "efs"
+
+  MountTargetSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref StackVPC
+      GroupDescription: Security group for mount target
+      SecurityGroupIngress:
+        IpProtocol: tcp
+        FromPort: 2049
+        ToPort: 2049
+        SourceSecurityGroupId:
+          Fn::ImportValue: !Ref AdminSG
+
+  MountTargetA:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref SharedFileSystem
+      SubnetId:
+        Fn::ImportValue: !Sub "${DbSubnets}A"
+      SecurityGroups:
+        - !Ref MountTargetSecurityGroup
+
+  MountTargetB:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref SharedFileSystem
+      SubnetId:
+        Fn::ImportValue: !Sub "${DbSubnets}B"
+      SecurityGroups:
+        - !Ref MountTargetSecurityGroup
+
+  EFSCNAME:
+    Type: AWS::Route53::RecordSet
+    DependsOn: SharedFileSystem
+    Properties:
+      Type: CNAME
+      TTL: 60
+      Name: !Sub "${Environment}efs.${StackTLD}"
+      HostedZoneName: !Sub "${StackTLD}."
+      ResourceRecords:
+        - Fn::Join:
+          - "."
+          - - !Ref SharedFileSystem
+            - "efs"
+            - !Ref AWS::Region
+            - amazonaws.com

@@ -1,0 +1,43 @@
+---
+- name: Configure RDS Database Playbook
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/database.yml
+  pre_tasks:
+
+    - name: Identify database (RDS) cloudformation stack
+      set_fact:
+        cf_stack: "{{ item }}"
+        state: "{{ item.state }}"
+        Region: "{{ item.region }}"
+      when: item.template_parameters.Environment == Environment
+      with_items: "{{ cloudformation_stacks }}"
+
+    - name: Describe database (RDS) cloudformation stack
+      cloudformation_facts:
+        region: "{{ cf_stack.region }}"
+        stack_name: "{{ cf_stack.name }}"
+        stack_resources: true
+      register: database
+
+    - name: Set parameter store keys for lookup
+      set_fact:
+        MasterUserKey: "/config/CKAN/{{ Environment }}/db/master_user"
+        MasterPassKey: "/config/CKAN/{{ Environment }}/db/master_password"
+        UserKey: "/config/CKAN/{{ Environment }}/db/opendata_user"
+        PassKey: "/config/CKAN/{{ Environment }}/db/opendata_password"
+
+    - name: Set variable (facts) dependencies
+      set_fact:
+        DBEndpoint: "{{ database.ansible_facts.cloudformation[cf_stack.name].stack_outputs.DBEndpoint }}"
+        DBMasterPass: "{{ lookup('aws_ssm', MasterPassKey, region=Region) }}"
+        DBMasterUser: "{{ lookup('aws_ssm', MasterUserKey, region=Region) }}"
+        DBName: "opendata"
+        DBPass: "{{ lookup('aws_ssm', PassKey, region=Region) }}"
+        DBPort: "{{ database.ansible_facts.cloudformation[cf_stack.name].stack_outputs.DBPort }}"
+        DBUser: "{{ lookup('aws_ssm', UserKey, region=Region) }}"
+
+  roles:
+    - ansible-linux-postgres
+

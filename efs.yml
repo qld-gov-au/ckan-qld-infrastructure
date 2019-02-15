@@ -1,0 +1,8 @@
+---
+- name: Cloudformation Playbook
+  hosts: local
+  connection: local
+  vars_files:
+    - vars/efs.yml
+  roles:
+    - ansible_cloudformation
