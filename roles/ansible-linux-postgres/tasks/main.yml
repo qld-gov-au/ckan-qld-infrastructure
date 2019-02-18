@@ -33,6 +33,7 @@
     port: "{{ DBPort }}"
     name: "{{ DBUser }}"
     password: "{{ DBPass }}"
+    encrypted: yes
     no_password_changes: yes
     state: "{{ state }}"
     priv: "{{ template_parameters.DBPrivileges }}"
