@@ -11,5 +11,6 @@ ansible-playbook -i inventory/hosts "security_groups.yml" --extra-vars "$ANSIBLE
 ansible-playbook -i inventory/hosts "database.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 ansible-playbook -i inventory/hosts "efs.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 ansible-playbook -i inventory/hosts "cache.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
+ansible-playbook -i inventory/hosts "OpenData-database-config.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 ansible-playbook -i inventory/hosts "OpenData-CKAN-Stack.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 ansible-playbook -i inventory/hosts "OpenData-CKAN-instances.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
