@@ -501,7 +501,7 @@ Resources:
       Description: "Apache Solr 5.5.5"
       EnableSsl: false
       Name: !Sub "${ApplicationName}-${Environment}-solr-5.5"
-      Shortname: "${ApplicationId}-${Environment}-solr-5.5"
+      Shortname: !Sub "${ApplicationId}-${Environment}-solr-5.5"
       StackId: !Ref OpsWorksStack
       Type: other
 
