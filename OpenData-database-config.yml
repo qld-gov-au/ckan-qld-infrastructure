@@ -1,4 +1,6 @@
 ---
+lowercase_name: opendata
+
 - name: Configure RDS Database Playbook
   hosts: localhost
   connection: local
@@ -25,15 +27,15 @@
       set_fact:
         MasterUserKey: "/config/CKAN/{{ Environment }}/db/master_user"
         MasterPassKey: "/config/CKAN/{{ Environment }}/db/master_password"
-        UserKey: "/config/CKAN/{{ Environment }}/db/opendata_user"
-        PassKey: "/config/CKAN/{{ Environment }}/db/opendata_password"
+        UserKey: "/config/CKAN/{{ Environment }}/db/{{ lowercase_name }}_user"
+        PassKey: "/config/CKAN/{{ Environment }}/db/{{ lowercase_name }}_password"
 
     - name: Set variable (facts) dependencies
       set_fact:
         DBEndpoint: "{{ database.ansible_facts.cloudformation[cf_stack.name].stack_outputs.DBEndpoint }}"
         DBMasterPass: "{{ lookup('aws_ssm', MasterPassKey, region=Region) }}"
         DBMasterUser: "{{ lookup('aws_ssm', MasterUserKey, region=Region) }}"
-        DBName: "opendata"
+        DBName: "{{ lowercase_name }}"
         DBPass: "{{ lookup('aws_ssm', PassKey, region=Region) }}"
         DBPort: "{{ database.ansible_facts.cloudformation[cf_stack.name].stack_outputs.DBPort }}"
         DBUser: "{{ lookup('aws_ssm', UserKey, region=Region) }}"

@@ -24,32 +24,7 @@
 #- easy_install:
 #    name: psycopg2
 
-- name: Create Database
-  postgresql_db:
-    login_host: "{{ DBEndpoint }}"
-    login_user: "{{ DBMasterUser }}"
-    login_password: "{{ DBMasterPass }}"
-    port: "{{ DBPort }}"
-    name: "{{ DBName }}"
-    state: "{{ state }}"
-  when: state is defined and state == "present"
-  run_once: true
-
-- name: Ensure default roles exist
-  postgresql_user:
-    db: "{{ DBName }}"
-    login_host: "{{ DBEndpoint }}"
-    login_user: "{{ DBMasterUser }}"
-    login_password: "{{ DBMasterPass }}"
-    port: "{{ DBPort }}"
-    name: "postgres"
-    no_password_changes: yes
-    state: "{{ state }}"
-    priv: "{{ template_parameters.DBPrivileges }}"
-  when: state is defined
-  run_once: true
-
-- name: Create Database users
+- name: Create Database owner
   postgresql_user:
     db: "{{ DBName }}"
     login_host: "{{ DBEndpoint }}"
@@ -61,5 +36,17 @@
     no_password_changes: yes
     state: "{{ state }}"
     priv: "{{ template_parameters.DBPrivileges }}"
+    role_attr_flags: "CREATEDB,LOGIN"
   when: state is defined
+  run_once: true
+
+- name: Create Database
+  postgresql_db:
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBUser }}"
+    login_password: "{{ DBPass }}"
+    port: "{{ DBPort }}"
+    name: "{{ DBName }}"
+    state: "{{ state }}"
+  when: state is defined and state == "present"
   run_once: true
