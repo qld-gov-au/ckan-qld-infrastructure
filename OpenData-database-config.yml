@@ -1,6 +1,4 @@
 ---
-lowercase_name: opendata
-
 - name: Configure RDS Database Playbook
   hosts: localhost
   connection: local
@@ -35,7 +33,7 @@ lowercase_name: opendata
         DBEndpoint: "{{ database.ansible_facts.cloudformation[cf_stack.name].stack_outputs.DBEndpoint }}"
         DBMasterPass: "{{ lookup('aws_ssm', MasterPassKey, region=Region) }}"
         DBMasterUser: "{{ lookup('aws_ssm', MasterUserKey, region=Region) }}"
-        DBName: "{{ lowercase_name }}"
+        DBName: "{{ titlecase_name }}"
         DBPass: "{{ lookup('aws_ssm', PassKey, region=Region) }}"
         DBPort: "{{ database.ansible_facts.cloudformation[cf_stack.name].stack_outputs.DBPort }}"
         DBUser: "{{ lookup('aws_ssm', UserKey, region=Region) }}"
