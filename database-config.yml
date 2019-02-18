@@ -11,6 +11,7 @@
         cf_stack: "{{ item }}"
         state: "{{ item.state }}"
         Region: "{{ item.region }}"
+        template_parameters: "{{ item.template_parameters }}"
       when: item.template_parameters.Environment == Environment
       with_items: "{{ cloudformation_stacks }}"
 
