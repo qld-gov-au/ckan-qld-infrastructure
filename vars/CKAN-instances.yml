@@ -1,7 +1,4 @@
 ---
-titlecase_name: OpenData
-lowercase_name: opendata # Unfortunately CloudFormation doesn't provide a 'lowercase' function
-region: ap-southeast-2
 template: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml"
 
 cloudformation_stacks:
