@@ -8,6 +8,7 @@ cloudformation_stacks:
     template_parameters:
       BambooAgentIp: "13.210.53.223/32" #Green
       BambooAgentIp2: "13.211.7.108/32" #Blue
+      BambooAgentSecurityGroup: sg-0d7f802e57ee52ab6
       Environment: PROD
       Platform: CKAN
       VPC: CKANVpc-PROD
@@ -27,6 +28,7 @@ cloudformation_stacks:
     template_parameters:
       BambooAgentIp: "13.210.53.223/32" #Green
       BambooAgentIp2: "13.211.7.108/32" #Blue
+      BambooAgentSecurityGroup: sg-0d7f802e57ee52ab6
       Environment: STAGING
       Platform: CKAN
       VPC: CKANVpc-STAGING
@@ -46,6 +48,7 @@ cloudformation_stacks:
     template_parameters:
       BambooAgentIp: "13.210.53.223/32" #Green
       BambooAgentIp2: "13.211.7.108/32" #Blue
+      BambooAgentSecurityGroup: sg-0d7f802e57ee52ab6
       Environment: TRAINING
       Platform: CKAN
       VPC: CKANVpc-TRAINING
@@ -65,6 +68,7 @@ cloudformation_stacks:
     template_parameters:
       BambooAgentIp: "13.210.53.223/32" #Green
       BambooAgentIp2: "13.211.7.108/32" #Blue
+      BambooAgentSecurityGroup: sg-0d7f802e57ee52ab6
       Environment: DEV
       Platform: CKAN
       VPC: CKANVpc-DEV
