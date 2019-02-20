@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Creates instances for OpsWorks CKAN NFS Stack.\n'
+Description: 'Creates instances for OpsWorks CKAN NFS Stack.'
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

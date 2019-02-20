@@ -15,4 +15,5 @@ ansible-playbook -i inventory/hosts "database-config.yml" --extra-vars "$ANSIBLE
 ansible-playbook -i inventory/hosts "efs.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 ansible-playbook -i inventory/hosts "cache.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 ansible-playbook -i inventory/hosts "CKAN-Stack.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
+ansible-playbook -i inventory/hosts "CKAN-extensions.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 ansible-playbook -i inventory/hosts "CKAN-instances.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
