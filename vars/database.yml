@@ -49,7 +49,7 @@ cloudformation_stacks:
       Environment: STAGING
       Platform: CKAN
       PubliclyAccessible: "false"
-      MultiAZ: "false"
+      MultiAZ: "true"
       Subnets: STAGINGCKANDBSubnet
       VPC: CKANVpc-STAGING
       StackTLD: ckan.staging-services.qld.gov.au
