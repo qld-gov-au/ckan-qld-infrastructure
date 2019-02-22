@@ -29,7 +29,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: STAGING
       ApplicationName: CKAN
-      StackTLD: TODO
+      StackTLD: ckan.staging-services.qld.gov.au
       StackVPC: CKANVpc-STAGING
       DbSubnets: STAGINGCKANDBSubnet
       AdminSG: STAGINGCKANManagementSG

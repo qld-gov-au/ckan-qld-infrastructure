@@ -46,7 +46,7 @@ cloudformation_stacks:
       Environment: STAGING
       NatGateways: 'true'
       VPCNamePrefix: CKAN
-      VPCPrefix: '10.41'
+      VPCPrefix: '10.42'
       VPCPeeringEnabled: "{{ VPCPeeringEnabled | default('false') }} "
       VPCPeeringID: "{{ VPCPeeringID| default('') }}"
       VPCPeeringCidr: "{{ opsVpcCidr }}"

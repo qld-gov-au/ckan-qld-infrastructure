@@ -114,7 +114,7 @@
         state: present
         tags:
           Name: "{{ ApplicationName }} {{ VpcId }} to Opps {{ opsVpcID }}"
-          Environment: PROD
+          Environment: "{{ Environment }}"
           Service: "{{ ApplicationName }}"
       register: vpc_peer
 
@@ -135,5 +135,5 @@
         state: accept
         tags:
           Name: "{{ ApplicationName }} {{ VpcId }} to Opps {{ opsVpcID }}"
-          Environment: PROD
+          Environment: "{{ Environment }}"
           Service: "{{ ApplicationName }}"

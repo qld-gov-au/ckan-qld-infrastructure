@@ -46,7 +46,7 @@ cloudformation_stacks:
       Environment: STAGING
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
-      StackTLD: TODO
+      StackTLD: ckan.staging-services.qld.gov.au
       CacheAddress: STAGINGCKANCacheClusterAddress
       StackVPC: CKANVpc-STAGING
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
