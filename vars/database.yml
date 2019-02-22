@@ -6,7 +6,7 @@ cloudformation_stacks:
     disable_rollback: true
     template: "templates/database.cfn.yml"
     template_parameters:
-      DBAllocatedStorage: "100"
+      DBAllocatedStorage: "600"
       DBClass: db.m5.large
       DBEngine: postgres
       DBEngineVersion: 10.6
@@ -37,7 +37,7 @@ cloudformation_stacks:
     disable_rollback: true
     template: "templates/database.cfn.yml"
     template_parameters:
-      DBAllocatedStorage: '50'
+      DBAllocatedStorage: '300'
       DBClass: db.t3.large
       DBEngine: postgres
       DBEngineVersion: 10.6
