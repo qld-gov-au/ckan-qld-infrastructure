@@ -11,7 +11,7 @@ cloudformation_stacks:
       Environment: PROD
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
-      StackTLD: TODO
+      StackTLD: ckan.services.qld.gov.au
       CacheAddress: PRDCKANCacheClusterAddress
       StackVPC: CKANVpc-PROD
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip

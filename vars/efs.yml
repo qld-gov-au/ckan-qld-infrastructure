@@ -8,7 +8,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: PROD
       ApplicationName: CKAN
-      StackTLD: TODO
+      StackTLD: ckan.services.qld.gov.au
       StackVPC: CKANVpc-PROD
       DbSubnets: PRODCKANDBSubnet
       AdminSG: PRODCKANManagementSG

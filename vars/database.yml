@@ -21,7 +21,7 @@ cloudformation_stacks:
       MultiAZ: "true"
       Subnets: PRODCKANDBSubnet
       VPC: CKANVpc-PROD
-      StackTLD: TODO
+      StackTLD: ckan.services.qld.gov.au
     tags:
       Environment: PROD
       Service: CKAN
