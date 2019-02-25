@@ -327,32 +327,26 @@ Resources:
                 Effect: Allow
                 Resource: "*"
 
-  EmailSendingPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      Description: Allows the principal to send mail via Amazon SES.
-      ManagedPolicyName: SendSESMail
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action: ses:SendRawEmail
-            Resource: "*"
-
   InstanceRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
-          -
-            Effect: Allow
+          - Effect: Allow
             Principal:
               Service: ec2.amazonaws.com
             Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ApplicationName}-${Environment}-SendMail"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: ses:SendRawEmail
+                Resource: "*"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/PowerUserAccess
-        - !Ref EmailSendingPolicy
 
   InstanceRoleProfile:
     Type: AWS::IAM::InstanceProfile
