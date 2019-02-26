@@ -1,29 +1,33 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Outputs:
-  GIWebSubnetA:
+  WebSubnetA:
     Value: !Ref WebSubnetA
     Export:
        Name: !Sub "${Environment}${ApplicationName}WebSubnetA"
-  GIWebSubnetB:
+  WebSubnetB:
     Value: !Ref WebSubnetB
     Export:
        Name: !Sub "${Environment}${ApplicationName}WebSubnetB"
-  GIAppSubnetA:
+  AppSubnetA:
     Value: !Ref AppSubnetA
     Export:
        Name: !Sub "${Environment}${ApplicationName}AppSubnetA"
-  GIAppSubnetB:
+  AppSubnetB:
     Value: !Ref AppSubnetB
     Export:
        Name: !Sub "${Environment}${ApplicationName}AppSubnetB"
-  GIDBSubnetA:
+  DBSubnetA:
     Value: !Ref DataSubnetA
     Export:
        Name: !Sub "${Environment}${ApplicationName}DBSubnetA"
-  GIDBSubnetB:
+  DBSubnetB:
     Value: !Ref DataSubnetB
     Export:
        Name: !Sub "${Environment}${ApplicationName}DBSubnetB"
+  DBSubnetC:
+    Value: !Ref DataSubnetC
+    Export:
+       Name: !Sub "${Environment}${ApplicationName}DBSubnetC"
   VPCId:
     Value: !Ref VPC
     Export:

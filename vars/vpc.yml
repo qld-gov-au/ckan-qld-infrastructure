@@ -13,7 +13,7 @@ cloudformation_stacks:
     template: "templates/3_tier_vpc.yml"
     template_parameters:
       ApplicationName: "CKAN"
-      AZCount: '2'
+      AZCount: '3'
       BambooAgentIp: "13.210.53.223/32" #Green
       BambooAgentIp2: "13.211.7.108/32" #Blue
       Environment: PROD
@@ -40,7 +40,7 @@ cloudformation_stacks:
     template: "templates/3_tier_vpc.yml"
     template_parameters:
       ApplicationName: "CKAN"
-      AZCount: '2'
+      AZCount: '3'
       BambooAgentIp: "13.210.53.223/32" #Green
       BambooAgentIp2: "13.211.7.108/32" #Blue
       Environment: STAGING
@@ -67,7 +67,7 @@ cloudformation_stacks:
     template: "templates/3_tier_vpc.yml"
     template_parameters:
       ApplicationName: "CKAN"
-      AZCount: '2'
+      AZCount: '3'
       BambooAgentIp: "13.210.53.223/32" #Green
       BambooAgentIp2: "13.211.7.108/32" #Blue
       Environment: TRAINING
@@ -94,7 +94,7 @@ cloudformation_stacks:
     template: "templates/3_tier_vpc.yml"
     template_parameters:
       ApplicationName: "CKAN"
-      AZCount: '2'
+      AZCount: '3'
       BambooAgentIp: "13.210.53.223/32" #Green
       BambooAgentIp2: "13.211.7.108/32" #Blue
       Environment: DEV
