@@ -59,7 +59,7 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: "CKAN-TRAINING-VPC"
-    index: 1
+    index: 2
     # VPC stacks cannot be properly torn down via Ansible
     state: present
     region: ap-southeast-2
@@ -86,7 +86,7 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: "CKAN-DEV-VPC"
-    index: 2
+    index: 3
     # VPC stacks cannot be properly torn down via Ansible
     state: present
     region: ap-southeast-2
