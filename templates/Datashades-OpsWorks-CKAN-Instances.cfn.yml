@@ -26,6 +26,8 @@ Metadata:
         default: What EC2 key pair should these instances use for SSH access?
       OpsWorksStackID:
         default: What OpsWorks stack do you want to provision instances into?
+      DataPusherLayerID:
+        default: What is the DataPusher Layer ID of the stack?
       SolrLayerID:
         default: What is the Solr Layer ID of the stack?
       WebLayerID:
@@ -78,6 +80,9 @@ Parameters:
   OpsWorksStackID:
     Description: The exported name of the OpsWorks Stack ID.
     Type: String
+  DataPusherLayerID:
+    Description: The exported name of the OpsWorks DataPusher Stack Layer ID.
+    Type: String
   SolrLayerID:
     Description: The exported name of the OpsWorks Solr Stack Layer ID.
     Type: String
@@ -98,6 +103,7 @@ Resources:
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
       LayerIds:
+        - Fn::ImportValue: !Ref DataPusherLayerID
         - Fn::ImportValue: !Ref SolrLayerID
       SshKeyName: !Ref DefaultEC2Key
       StackId:

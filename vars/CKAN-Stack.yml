@@ -1,5 +1,6 @@
 ---
 template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
+enable_datastore: "{{ enable_datastore | default('no') }}"
 
 cloudformation_stacks:
   - name: "{{ titlecase_name }}-PROD-OpsWorks-stack"
@@ -28,6 +29,7 @@ cloudformation_stacks:
       AppSG: PRODCKANAppAsgSG
       DatabaseSG: PRODCKANDatabaseSG
       CreateServiceRole: "yes"
+      EnableDataStore: "{{ enable_datastore }}"
     tags:
       Environment: PROD
       Service: "{{ titlecase_name }}"
@@ -63,6 +65,7 @@ cloudformation_stacks:
       AppSG: STAGINGCKANAppAsgSG
       DatabaseSG: STAGINGCKANDatabaseSG
       CreateServiceRole: "yes"
+      EnableDataStore: "{{ enable_datastore }}"
     tags:
       Environment: STAGING
       Service: "{{ titlecase_name }}"
@@ -98,6 +101,7 @@ cloudformation_stacks:
       AppSG: TRAININGCKANAppAsgSG
       DatabaseSG: TRAININGCKANDatabaseSG
       CreateServiceRole: "yes"
+      EnableDataStore: "{{ enable_datastore }}"
     tags:
       Environment: TRAINING
       Service: "{{ titlecase_name }}"
@@ -133,6 +137,7 @@ cloudformation_stacks:
       AppSG: DEVCKANAppAsgSG
       DatabaseSG: DEVCKANDatabaseSG
       CreateServiceRole: "yes"
+      EnableDataStore: "{{ enable_datastore }}"
     tags:
       Environment: DEV
       Service: "{{ titlecase_name }}"

@@ -10,6 +10,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: PROD
       OpsWorksStackID: "PROD{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "PROD{{ titlecase_name }}OpsWorksDataPusherLayer"
       SolrLayerID: "PROD{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "PROD{{ titlecase_name }}OpsWorksWebLayer"
       DefaultEC2Key: osssio-global-ckan
@@ -31,6 +32,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: STAGING
       OpsWorksStackID: "STAGING{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "STAGING{{ titlecase_name }}OpsWorksDataPusherLayer"
       SolrLayerID: "STAGING{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "STAGING{{ titlecase_name }}OpsWorksWebLayer"
       DefaultEC2Key: osssio-global-ckan
@@ -52,6 +54,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: TRAINING
       OpsWorksStackID: "TRAINING{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "TRAINING{{ titlecase_name }}OpsWorksDataPusherLayer"
       SolrLayerID: "TRAINING{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "TRAINING{{ titlecase_name }}OpsWorksWebLayer"
       DefaultEC2Key: osssio-global-ckan
@@ -73,6 +76,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: DEV
       OpsWorksStackID: "DEV{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "DEV{{ titlecase_name }}OpsWorksDataPusherLayer"
       SolrLayerID: "DEV{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "DEV{{ titlecase_name }}OpsWorksWebLayer"
       DefaultEC2Key: osssio-global-ckan

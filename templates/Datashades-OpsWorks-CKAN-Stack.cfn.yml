@@ -25,6 +25,7 @@ Metadata:
           - CachePort
           - CreateELB
           - CreateInstances
+          - EnableDataStore
           - CreateExtensions
           - ExtensionsTemplate
           - DefaultEC2Key
@@ -52,12 +53,15 @@ Metadata:
         Label:
           default: Application Sources
         Parameters:
+          - DataPusherURL
           - SolrSource
           - CKANSource
 
     ParameterLabels:
       CookbookURL:
         default: What is the URL for the OpsWorks Custom Cookbook repository?
+      DataPusherURL:
+        default: What is the URL for the CKAN DataPusher repository?
       SolrSource:
         default: Provide the URL for Apache Solr source archive.
       CKANSource:
@@ -78,6 +82,8 @@ Metadata:
         default: Do you need an OpsWorks Service Role created?
       CreateInstances:
         default: Do you want to instances provisioned with this stack?
+      EnableDataStore:
+        default: Do you want to set up DataStore support?
       CreateExtensions:
         default: Do you want to provision CKAN extensions with this stack?
       ExtensionsTemplate:
@@ -136,6 +142,14 @@ Parameters:
     Type: String
     MinLength: 1
     MaxLength: 64
+  DataPusherURL:
+    Description: Repository URL for CKAN DataPusher
+    Default: https://github.com/ckan/datapusher.git
+    Type: String
+  DataPusherRevision:
+    Description: Branch/tag name in repository to checkout.
+    Default: "0.0.14"
+    Type: String
   SolrSource:
     Description: URL for zip archive.
     Default: http://apache.mirror.digitalpacific.com.au/lucene/solr/5.5.5/solr-5.5.5.zip
@@ -183,6 +197,13 @@ Parameters:
     Description: Recommended
     Type: String
     Default: "yes"
+    AllowedValues:
+      - "yes"
+      - "no"
+  EnableDataStore:
+    Description: Whether or not to support the DataStore.
+    Type: String
+    Default: "no"
     AllowedValues:
       - "yes"
       - "no"
@@ -376,6 +397,7 @@ Resources:
             dbname: !Ref ApplicationName
             dsuser: !Sub "${PGDBUser}_datastore"
             dsname: !Sub "${ApplicationName}_datastore"
+            dsenable: !Ref EnableDataStore
             endpoint: /
           jumpbox:
             bucket: !Ref AdminPubKeyBucket
@@ -414,27 +436,27 @@ Resources:
       VpcId:
         Fn::ImportValue: !Ref StackVPC
 
-  OpsWorksRedisLayer:
+  OpsWorksDataPusherLayer:
     Type: AWS::OpsWorks::Layer
     Properties:
       AutoAssignElasticIps: false
       AutoAssignPublicIps: true
       CustomRecipes:
         Shutdown:
-          - "datashades::redis-shutdown"
+          - "datashades::datapusher-shutdown"
         Setup:
-          - "datashades::redis-setup"
+          - "datashades::datapusher-setup"
         Configure:
-          - "datashades::redis-configure"
+          - "datashades::datapusher-configure"
         Deploy:
-          - "datashades::redis-deploy"
+          - "datashades::datapusher-deploy"
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref DatabaseSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
-      Name: !Sub "${ApplicationName}-REDIS"
-      Shortname: !Sub "${ApplicationId}-redis"
+      Name: !Sub "${ApplicationName}-DataPusher"
+      Shortname: !Sub "${ApplicationId}-datapusher"
       StackId: !Ref OpsWorksStack
       Type: custom
 
@@ -496,6 +518,20 @@ Resources:
       EnableSsl: false
       Name: !Sub "${ApplicationName}-${Environment}"
       Shortname: !Sub "${ApplicationId}-${Environment}"
+      StackId: !Ref OpsWorksStack
+      Type: other
+
+  OpwxAppDataPusher:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: git
+        Url: !Ref DataPusherURL
+        Revision: !Ref DataPusherRevision
+      Description: "CKAN DataPusher"
+      EnableSsl: false
+      Name: !Sub "${ApplicationName}-${Environment}-DataPusher"
+      Shortname: !Sub "${ApplicationId}-${Environment}-datapusher"
       StackId: !Ref OpsWorksStack
       Type: other
 
@@ -590,11 +626,12 @@ Outputs:
     Description: OpsWorks Stack Id
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksStack"
-  RedisLayer:
-    Value: !Ref OpsWorksRedisLayer
-    Description: Redis Layer Id
+
+  DataPusherLayer:
+    Value: !Ref OpsWorksDataPusherLayer
+    Description: DataPusher Layer Id
     Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksRedisLayer"
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksDataPusherLayer"
 
   SolrLayer:
     Value: !Ref OpsWorksSolrLayer
