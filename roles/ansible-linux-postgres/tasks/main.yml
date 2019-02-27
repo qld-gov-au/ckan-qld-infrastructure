@@ -41,6 +41,19 @@
   when: state is defined
   run_once: true
 
+- name: Grant database owner role to DBA
+  postgresql_privs:
+    db: "postgres"
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBMasterUser }}"
+    login_password: "{{ DBMasterPass }}"
+    port: "{{ DBPort }}"
+    roles: "{{ DBMasterUser }}"
+    objs: "{{ DBUser }}"
+    type: "group"
+  when: state is defined
+  run_once: true
+
 - name: Create Database
   postgresql_db:
     login_host: "{{ DBEndpoint }}"
