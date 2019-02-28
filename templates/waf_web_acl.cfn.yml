@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  Environment:
+    Description: Platform environment
+    Type: String
+  Platform:
+    Description: Name of the platform ie GI, Services, Static
+    Type: String
+Resources:
+  WebACL:
+    Type: "AWS::WAF::WebACL"
+    Properties:
+      Name: !Sub "${Environment} ${Platform} Web ACL to block traffic based on defined rules. "
+      DefaultAction:
+        Type: "ALLOW"
+      MetricName: "WafWebACL"
+      Rules:
+        - Priority: 1
+          Action:
+            Type: "BLOCK"
+          RuleId:
+            Ref: "XSSRule"
+
+  DetectXSS:
+    Type: "AWS::WAF::XssMatchSet"
+    Properties:
+      Name: !Sub "${Environment} ${Platform} XssMatchSet"
+      XssMatchTuples:
+        -
+          FieldToMatch:
+            Type: "URI"
+          TextTransformation: "NONE"
+        -
+          FieldToMatch:
+            Type: "QUERY_STRING"
+          TextTransformation: "NONE"
+
+  XSSRule:
+    Type: "AWS::WAF::Rule"
+    Properties:
+      Name: !Sub "${Environment} ${Platform} XSSRule"
+      MetricName: "XSSRule"
+      Predicates:
+        -
+          DataId:
+            Ref: "DetectXSS"
+          Negated: false
+          Type: "XssMatch"
+
+Outputs:
+  WebACLId:
+    Value:
+      Ref: WebACL
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "WebACLId"
