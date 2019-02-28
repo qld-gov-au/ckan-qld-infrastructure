@@ -42,3 +42,11 @@
   roles:
     - ansible-linux-postgres
 
+  tasks:
+    - name: Prepare DataStore permissions script
+      template:
+        src: datastore-set-permissions.sql.j2
+        dest: templates/datastore-set-permissions.sql
+
+    - name: Set DataStore permissions
+      shell: "psql 'postgresql://{{ DBMasterUser }}:{{ DBMasterPass }}@{{ DBEndpoint }}:{{ DBPort }}/{{ DBName }}' -f templates/datastore-set-permissions.sql"
