@@ -1,7 +1,7 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: |-
-  Creates OpWorks Applications for CKAN Stack extensions.
+  Creates OpsWorks Applications for CKAN Stack extensions.
   Current extension list:
   Queensland Government extension
   Trak
@@ -73,6 +73,22 @@ Resources:
       EnableSsl: false
       Name: !Sub "ckanext-trak-${Environment}"
       Shortname: ckanext-trak
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStack
+      Type: other
+
+  # this is temporary
+  CKANExtShowcase:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: git
+        Revision: master
+        Url: https://github.com/ckan/ckanext-showcase.git
+      Description: CKAN Showcase Extension
+      EnableSsl: false
+      Name: !Sub "ckanext-showcase-${Environment}"
+      Shortname: ckanext-showcase
       StackId:
         Fn::ImportValue: !Ref OpsWorksStack
       Type: other
