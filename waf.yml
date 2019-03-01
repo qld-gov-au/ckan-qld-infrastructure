@@ -1,0 +1,8 @@
+---
+- name: Cloudformation Playbook
+  hosts: local
+  connection: local
+  vars_files:
+    - vars/waf_web_acl.var.yml
+  roles:
+    - ansible_cloudformation

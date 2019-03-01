@@ -1,16 +1,14 @@
 ---
 template: "templates/waf_web_acl.cfn.yml"
-state: "{{ state | default('present')}}"
 
 cloudformation_stacks:
   - name: "CKAN-PROD-WAF"
-    state: "{{ state }}"
+    state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: 'true'
     template: "{{ template }}"
     template_parameters:
       Environment: PROD
-      Platform: CKAN
     tags:
       Environment: PROD
       Service: "CKAN"
@@ -20,13 +18,12 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: "CKAN-STAGING-WAF"
-    state: "{{ state }}"
+    state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: 'true'
     template: "{{ template }}"
     template_parameters:
       Environment: STAGING
-      Platform: CKAN
     tags:
       Environment: STAGING
       Service: "CKAN"
@@ -36,13 +33,12 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: "CKAN-TRAINING-WAF"
-    state: "{{ state }}"
+    state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: 'true'
     template: "{{ template }}"
     template_parameters:
       Environment: TRAINING
-      Platform: CKAN
     tags:
       Environment: TRAINING
       Service: "CKAN"
@@ -52,13 +48,12 @@ cloudformation_stacks:
       Version: "1.0"
 
   - name: "CKAN-DEV-WAF"
-    state: "{{ state }}"
+    state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: 'true'
     template: "{{ template }}"
     template_parameters:
       Environment: DEV
-      Platform: CKAN
     tags:
       Environment: DEV
       Service: "CKAN"

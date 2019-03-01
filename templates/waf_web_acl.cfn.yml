@@ -6,6 +6,7 @@ Parameters:
   Platform:
     Description: Name of the platform ie GI, Services, Static
     Type: String
+    Default: CKAN
 Resources:
   WebACL:
     Type: "AWS::WAF::WebACL"
