@@ -1,0 +1,13 @@
+---
+cloudformation_stacks:
+  - name: "CKAN-CLOUDFRONT-LOGGING-BUCKET"
+    state: present
+    region: "{{ region }}"
+    disable_rollback: 'true'
+    template: "templates/cloudfront-logging-bucket.cfn.yml"
+    tags:
+      Service: "CKAN"
+      itoc_monitored: 'true'
+      Division: "Qld Online"
+      Owner: "Development and Delivery"
+      Version: "1.0"
