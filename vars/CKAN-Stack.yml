@@ -1,6 +1,5 @@
 ---
 template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
-enable_datastore: "{{ enable_datastore | default('no') }}"
 
 cloudformation_stacks:
   - name: "{{ titlecase_name }}-PROD-OpsWorks-stack"
@@ -13,25 +12,26 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       StackTLD: ckan.services.qld.gov.au
-      CacheAddress: PRDCKANCacheClusterAddress
-      StackVPC: CKANVpc-PROD
+      CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
+      StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
-      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/PROD/app/' + lowercase_name + '/admin_email', region=region) }}"
-      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/PROD/app/' + lowercase_name + '/admin_password', region=region) }}"
-      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/' + lowercase_name + '_user', region=region) }}"
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/PROD/db/' + lowercase_name + '_password', region=region) }}"
-      WebSubnets: PRODCKANWebSubnet
-      AppSubnets: PRODCKANAppSubnet
-      DbSubnets: PRODCKANDbSubnet
-      AdminSG: PRODCKANManagementSG
-      AppLBSG: PRODCKANAppLoadBalancerSG
-      AppSG: PRODCKANAppAsgSG
-      DatabaseSG: PRODCKANDatabaseSG
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_password', region=region) }}"
+      WebSubnets: "{{ Environment }}CKANWebSubnet"
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
+      DbSubnets: "{{ Environment }}CKANDbSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
+      AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
+      CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+      AppSG: "{{ Environment }}CKANAppAsgSG"
+      DatabaseSG: "{{ Environment }}CKANDatabaseSG"
       CreateServiceRole: "yes"
-      EnableDataStore: "{{ enable_datastore }}"
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
-      Environment: PROD
+      Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
       itoc_monitored: false
       Division: Qld Online
@@ -49,25 +49,26 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       StackTLD: ckan.staging-services.qld.gov.au
-      CacheAddress: STAGINGCKANCacheClusterAddress
-      StackVPC: CKANVpc-STAGING
+      CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
+      StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
-      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/app/' + lowercase_name + '/admin_email', region=region) }}"
-      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/app/' + lowercase_name + '/admin_password', region=region) }}"
-      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/' + lowercase_name + '_user', region=region) }}"
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/STAGING/db/' + lowercase_name + '_password', region=region) }}"
-      WebSubnets: STAGINGCKANWebSubnet
-      AppSubnets: STAGINGCKANAppSubnet
-      DbSubnets: STAGINGCKANDbSubnet
-      AdminSG: STAGINGCKANManagementSG
-      AppLBSG: STAGINGCKANAppLoadBalancerSG
-      AppSG: STAGINGCKANAppAsgSG
-      DatabaseSG: STAGINGCKANDatabaseSG
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_password', region=region) }}"
+      WebSubnets: "{{ Environment }}CKANWebSubnet"
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
+      DbSubnets: "{{ Environment }}CKANDbSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
+      AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
+      CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+      AppSG: "{{ Environment }}CKANAppAsgSG"
+      DatabaseSG: "{{ Environment }}CKANDatabaseSG"
       CreateServiceRole: "yes"
-      EnableDataStore: "{{ enable_datastore }}"
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
-      Environment: STAGING
+      Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
       itoc_monitored: false
       Division: Qld Online
@@ -85,25 +86,26 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       StackTLD: training.ckan.devpit140cs.qgov.net.au
-      CacheAddress: TRAININGCKANCacheClusterAddress
-      StackVPC: CKANVpc-TRAINING
+      CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
+      StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
-      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/app/' + lowercase_name + '/admin_email', region=region) }}"
-      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/app/' + lowercase_name + '/admin_password', region=region) }}"
-      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/' + lowercase_name + '_user', region=region) }}"
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/TRAINING/db/' + lowercase_name + '_password', region=region) }}"
-      WebSubnets: TRAININGCKANWebSubnet
-      AppSubnets: TRAININGCKANAppSubnet
-      DbSubnets: TRAININGCKANDbSubnet
-      AdminSG: TRAININGCKANManagementSG
-      AppLBSG: TRAININGCKANAppLoadBalancerSG
-      AppSG: TRAININGCKANAppAsgSG
-      DatabaseSG: TRAININGCKANDatabaseSG
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_password', region=region) }}"
+      WebSubnets: "{{ Environment }}CKANWebSubnet"
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
+      DbSubnets: "{{ Environment }}CKANDbSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
+      AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
+      CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+      AppSG: "{{ Environment }}CKANAppAsgSG"
+      DatabaseSG: "{{ Environment }}CKANDatabaseSG"
       CreateServiceRole: "yes"
-      EnableDataStore: "{{ enable_datastore }}"
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
-      Environment: TRAINING
+      Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
       itoc_monitored: false
       Division: Qld Online
@@ -121,25 +123,26 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       StackTLD: dev.ckan.devpit140cs.qgov.net.au
-      CacheAddress: DEVCKANCacheClusterAddress
-      StackVPC: CKANVpc-DEV
+      CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
+      StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
       DefaultEC2Key: osssio-global-ckan
-      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/DEV/app/' + lowercase_name + '/admin_email', region=region) }}"
-      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/DEV/app/' + lowercase_name + '/admin_password', region=region) }}"
-      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/' + lowercase_name + '_user', region=region) }}"
-      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/DEV/db/' + lowercase_name + '_password', region=region) }}"
-      WebSubnets: DEVCKANWebSubnet
-      AppSubnets: DEVCKANAppSubnet
-      DbSubnets: DEVCKANDbSubnet
-      AdminSG: DEVCKANManagementSG
-      AppLBSG: DEVCKANAppLoadBalancerSG
-      AppSG: DEVCKANAppAsgSG
-      DatabaseSG: DEVCKANDatabaseSG
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_password', region=region) }}"
+      WebSubnets: "{{ Environment }}CKANWebSubnet"
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
+      DbSubnets: "{{ Environment }}CKANDbSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
+      AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
+      CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+      AppSG: "{{ Environment }}CKANAppAsgSG"
+      DatabaseSG: "{{ Environment }}CKANDatabaseSG"
       CreateServiceRole: "yes"
-      EnableDataStore: "{{ enable_datastore }}"
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
-      Environment: DEV
+      Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
       itoc_monitored: false
       Division: Qld Online
