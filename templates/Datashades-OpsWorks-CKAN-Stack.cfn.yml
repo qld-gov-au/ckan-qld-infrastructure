@@ -37,6 +37,7 @@ Metadata:
           - DbSubnets
           - AdminSG
           - AppLBSG
+          - CloudFrontSG
           - AppSG
           - DatabaseSG
 
@@ -114,6 +115,8 @@ Metadata:
         default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
       AppLBSG:
         default: Which Security Group in the selected VPC should be attached to the application load balancer?
+      CloudFrontSG:
+        default: Which Security Group in the selected VPC permits access from CloudFront?
       AppSG:
         default: Which Security Group in the selected VPC should be attached to the application layer?
       DatabaseSG:
@@ -272,6 +275,9 @@ Parameters:
     Type: String
   AppLBSG:
     Description: The exported name of the security group ID to attach to the application load balancer.
+    Type: String
+  CloudFrontSG:
+    Description: The exported name of the security group ID for resources that should be accessed by CloudFront.
     Type: String
   AppSG:
     Description: The exported name of the security group ID to attach to applications.
@@ -586,6 +592,7 @@ Resources:
       SecurityGroups:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppLBSG
+        - Fn::ImportValue: !Ref CloudFrontSG
       Subnets:
         - Fn::ImportValue:
             !Sub "${WebSubnets}A"
@@ -657,3 +664,8 @@ Outputs:
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrApplication"
 
+  WebELBDomainName:
+    Condition: ProvisionELB
+    Value: !Ref WebELBCNAME
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebElbNiceDNSName"
