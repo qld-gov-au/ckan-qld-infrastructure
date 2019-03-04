@@ -28,6 +28,7 @@ cloudformation_stacks:
       CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
       AppSG: "{{ Environment }}CKANAppAsgSG"
       DatabaseSG: "{{ Environment }}CKANDatabaseSG"
+      ACMCertificateARN: "arn:aws:acm:us-east-1:265326298602:certificate/4e998cee-fb84-466f-89f4-8d87b7db83fd"
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
@@ -65,6 +66,7 @@ cloudformation_stacks:
       CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
       AppSG: "{{ Environment }}CKANAppAsgSG"
       DatabaseSG: "{{ Environment }}CKANDatabaseSG"
+      ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/c11bea3d-07d0-49df-9e44-1e81f048f576"
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
@@ -102,6 +104,7 @@ cloudformation_stacks:
       CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
       AppSG: "{{ Environment }}CKANAppAsgSG"
       DatabaseSG: "{{ Environment }}CKANDatabaseSG"
+      ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/f280a938-d6bb-4056-9a54-a94543bff03a"
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
@@ -139,6 +142,7 @@ cloudformation_stacks:
       CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
       AppSG: "{{ Environment }}CKANAppAsgSG"
       DatabaseSG: "{{ Environment }}CKANDatabaseSG"
+      ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/db8fbe61-7690-4953-9eaa-c3b30814d9e8"
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:

@@ -40,6 +40,7 @@ Metadata:
           - CloudFrontSG
           - AppSG
           - DatabaseSG
+          - ACMCertificateARN
 
       -
         Label:
@@ -121,6 +122,8 @@ Metadata:
         default: Which Security Group in the selected VPC should be attached to the application layer?
       DatabaseSG:
         default: Which Security Group in the selected VPC should be attached to the database layer?
+      ACMCertificateARN:
+        default: Which certificate should be used by the application load balancer?
       PGDBUser:
         default: Account name for (non-superuser) Postgres DB access.
       PGDBPassword:
@@ -284,6 +287,9 @@ Parameters:
     Type: String
   DatabaseSG:
     Description: The exported name of the security group ID to attach to the database layer.
+    Type: String
+  ACMCertificateARN:
+    Description: ARN for certificate to be used by the application load balancer.
     Type: String
   PGDBUser:
     Description: Account name for (non-superuser) Postgres DB access.
@@ -584,10 +590,13 @@ Resources:
         Interval: 30
         Timeout: 20
       Listeners:
-        -
+        - LoadBalancerPort: 80
           InstancePort: 80
-          LoadBalancerPort: 80
           Protocol: HTTP
+        - LoadBalancerPort: 443
+          InstancePort: 80
+          Protocol: HTTPS
+          SSLCertificateId: !Ref ACMCertificateARN
       Scheme: "internet-facing"
       SecurityGroups:
         - Fn::ImportValue: !Ref AdminSG
