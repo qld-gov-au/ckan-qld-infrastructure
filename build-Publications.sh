@@ -3,22 +3,27 @@
 
 ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS region=ap-southeast-2 Environment=$bamboo_deploy_environment titlecase_name=Publications lowercase_name=publications"
 
+function run-playbook {
+  ansible-playbook -i inventory/hosts "$1.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
+}
+
 if [ $# -ge 1 ]; then
   # run custom playbook
-  PLAYBOOK=$1.yml
-  ansible-playbook -i inventory/hosts "$PLAYBOOK" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
+  run-playbook "$1"
 else
   #ensure we die if any function fails
   set -e
 
-  ansible-playbook -i inventory/hosts "vpc.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
-  ansible-playbook -i inventory/hosts "security_groups.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
-  ansible-playbook -i inventory/hosts "database.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
-  ansible-playbook -i inventory/hosts "database-config.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
-  ansible-playbook -i inventory/hosts "efs.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
-  ansible-playbook -i inventory/hosts "cache.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
-  ansible-playbook -i inventory/hosts "CKAN-Stack.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
-  ansible-playbook -i inventory/hosts "CKAN-extensions.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
-  ansible-playbook -i inventory/hosts "CKAN-instances.yml" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
+  run-playbook "vpc"
+  run-playbook "security_groups"
+  run-playbook "database"
+  run-playbook "database-config"
+  run-playbook "efs"
+  run-playbook "cache"
+  run-playbook "waf"
+  run-playbook "CKAN-Stack"
+  run-playbook "CKAN-extensions"
+  run-playbook "CKAN-instances"
+  run-playbook "cloudfront"
 fi
 

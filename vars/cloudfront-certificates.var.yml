@@ -1,60 +1,45 @@
 ---
+#North Virginia cert required for Cloudfront
 NonProdOpenDataCertificateArn: "arn:aws:acm:us-east-1:265326298602:certificate/40d5f634-d3b8-4142-aede-8f6b74f3bbae"
 NonProdPublicationsCertificateArn: "arn:aws:acm:us-east-1:265326298602:certificate/a0bce356-b363-4d2d-9e16-2225687e3d18"
 
-cloudformation_stacks:
-  - name: "OpenData-PROD-CLOUDFRONT"
-    profile: opendata
-    #North Virginia cert required for Cloudfront
+certificate_arns:
+  - profile: opendata
+    Environment: PROD
     ACMCertificateARN: "arn:aws:acm:us-east-1:265326298602:certificate/4e998cee-fb84-466f-89f4-8d87b7db83fd"
-    template_parameters:
-      Environment: PROD
+    Domain: data.qld.gov.au
 
-  - name: "OpenData-STAGING-CLOUDFRONT"
-    profile: opendata
-    #North Virginia cert required for Cloudfront
+  - profile: opendata
+    Environment: STAGING
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
-    template_parameters:
-      Environment: STAGING
+    Domain: staging.data.qld.gov.au
 
-  - name: "OpenData-TRAINING-CLOUDFRONT"
-    profile: opendata
-    #North Virginia cert required for Cloudfront
+  - profile: opendata
+    Environment: TRAINING
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
-    template_parameters:
-      Environment: TRAINING
+    Domain: training.data.qld.gov.au
 
-  - name: "OpenData-DEV-CLOUDFRONT"
-    profile: opendata
-    #North Virginia cert required for Cloudfront
+  - profile: opendata
+    Environment: DEV
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
-    template_parameters:
-      Environment: DEV
+    Domain: dev.data.qld.gov.au
 
-  - name: "Publications-PROD-CLOUDFRONT"
-    profile: publications
-    #North Virginia cert required for Cloudfront
+  - profile: publications
+    Environment: PROD
     ACMCertificateARN: "arn:aws:acm:us-east-1:265326298602:certificate/8140117c-35ee-4c5e-a54a-255f6bf0b9b5"
-    template_parameters:
-      Environment: PROD
+    Domain: publications.qld.gov.au
 
-  - name: "{{ titlecase_name }}-STAGING-CLOUDFRONT"
-    profile: opendata
-    #North Virginia cert required for Cloudfront
-    ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
-    template_parameters:
-      Environment: STAGING
+  - profile: publications
+    Environment: STAGING
+    ACMCertificateARN: "{{ NonProdPublicationsCertificateArn }}"
+    Domain: staging.publications.qld.gov.au
 
-  - name: "{{ titlecase_name }}-TRAINING-CLOUDFRONT"
-    profile: opendata
-    #North Virginia cert required for Cloudfront
-    ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
-    template_parameters:
-      Environment: TRAINING
+  - profile: publications
+    Environment: TRAINING
+    ACMCertificateARN: "{{ NonProdPublicationsCertificateArn }}"
+    Domain: training.publications.qld.gov.au
 
-  - name: "{{ titlecase_name }}-DEV-CLOUDFRONT"
-    profile: opendata
-    #North Virginia cert required for Cloudfront
-    ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
-    template_parameters:
-      Environment: DEV
+  - profile: publications
+    Environment: DEV
+    ACMCertificateARN: "{{ NonProdPublicationsCertificateArn }}"
+    Domain: dev.publications.qld.gov.au
