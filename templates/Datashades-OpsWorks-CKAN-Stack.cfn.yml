@@ -48,6 +48,7 @@ Metadata:
         Parameters:
           - PGDBUser
           - PGDBPassword
+          - BeakerSecret
           - CKANAdminPW
           - CKANAdminEmail
 
@@ -128,6 +129,8 @@ Metadata:
         default: Account name for (non-superuser) Postgres DB access.
       PGDBPassword:
         default: Enter a password for Postgres DB access.
+      BeakerSecret:
+        default: Enter the secret key used to hash login cookies.
       CKANAdminPW:
         default: Enter a password for your CKAN Admin user.
       CKANAdminEmail:
@@ -302,6 +305,12 @@ Parameters:
     MaxLength: 64
     AllowedPattern: "[a-zA-Z0-9]*"
     ConstraintDescription: Must be 8 - 64 alphanumeric characters.
+  BeakerSecret:
+    NoEcho: true
+    Description: Secret key used by CKAN to hash login cookies.
+    Type: String
+    MinLength: 32
+    ConstraintDescription: Must be at least 32 characters.
 
 Conditions:
   CreateHostedZone:
@@ -405,6 +414,7 @@ Resources:
           ckan_web:
             adminpw: !Ref CKANAdminPW
             adminemail: !Ref CKANAdminEmail
+            beaker_secret: !Ref BeakerSecret
             dbuser: !Ref PGDBUser
             dbname: !Ref ApplicationName
             dsuser: !Sub "${PGDBUser}_datastore"
