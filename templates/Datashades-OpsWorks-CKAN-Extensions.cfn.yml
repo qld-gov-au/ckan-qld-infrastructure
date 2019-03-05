@@ -39,7 +39,7 @@ Parameters:
     Type: String
   TrakExtensionSource:
     Description: URL for Trak extension.
-    Default: https://github.com/XVTSolutions/ckanext-trak.git
+    Default: https://github.com/qld-gov-au/ckanext-trak.git
     Type: String
   TrakExtensionRevision:
     Description: Trak extension repository branch to check out.
