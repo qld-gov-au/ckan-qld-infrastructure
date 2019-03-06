@@ -89,6 +89,7 @@ cloudformation_stacks:
       Environment: TRAINING
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
+      WebEC2Size: t3.small
       StackTLD: training.ckan.devpit140cs.qgov.net.au
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
@@ -128,6 +129,7 @@ cloudformation_stacks:
       Environment: DEV
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
+      WebEC2Size: t3.small
       StackTLD: dev.ckan.devpit140cs.qgov.net.au
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
