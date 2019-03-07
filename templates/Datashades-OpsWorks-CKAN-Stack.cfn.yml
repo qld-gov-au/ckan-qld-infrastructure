@@ -20,6 +20,7 @@ Metadata:
           - ApplicationId
           - Environment
           - StackTLD
+          - PublicTLD
           - CreateTLD
           - CacheAddress
           - CachePort
@@ -95,6 +96,8 @@ Metadata:
         default: Do you want to provision an Elastic Load Balancer with this stack?
       StackTLD:
         default: What TLD hosted on Route53 is this stack using for internal DNS?
+      PublicTLD:
+        default: What TLD hosted on Route53 is this stack using for public DNS?
       CacheAddress:
         default: What is the address of the Redis cache?
       CachePort:
@@ -185,6 +188,11 @@ Parameters:
       - STAGING
       - PROD
   StackTLD:
+    Description: Route53 hosted TLD for stack
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  PublicTLD:
     Description: Route53 hosted TLD for stack
     Type: String
     MinLength: 6
@@ -431,6 +439,7 @@ Resources:
               Fn::ImportValue: !Ref CacheAddress
             port: !Ref CachePort
           tld: !Ref StackTLD
+          public_tld: !Ref PublicTLD
           version: !Ref Environment
           app_id: !Ref ApplicationId
       DefaultInstanceProfileArn:

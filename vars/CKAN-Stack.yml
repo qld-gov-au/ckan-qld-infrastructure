@@ -12,6 +12,7 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       StackTLD: ckan.services.qld.gov.au
+      PublicTLD: "{{ Domain }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
@@ -50,6 +51,7 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       StackTLD: ckan.staging-services.qld.gov.au
+      PublicTLD: "{{ Domain }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
@@ -88,6 +90,7 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       StackTLD: training.ckan.devpit140cs.qgov.net.au
+      PublicTLD: "{{ Domain }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
@@ -126,6 +129,7 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       StackTLD: dev.ckan.devpit140cs.qgov.net.au
+      PublicTLD: "{{ Domain }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
