@@ -142,7 +142,6 @@ Resources:
 
   DBHostCNAME:
     Type: AWS::Route53::RecordSet
-    DependsOn: Database
     Properties:
       Type: CNAME
       TTL: 60

@@ -9,18 +9,17 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: PROD
-      OpsWorksStackID: "PROD{{ titlecase_name }}OpsWorksStack"
-      DataPusherLayerID: "PROD{{ titlecase_name }}OpsWorksDataPusherLayer"
-      SolrLayerID: "PROD{{ titlecase_name }}OpsWorksSolrLayer"
-      WebLayerID: "PROD{{ titlecase_name }}OpsWorksWebLayer"
+      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
+      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
+      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       DefaultEC2Key: osssio-global-ckan
-      AppSubnets: PRODCKANAppSubnet
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
     tags:
-      Environment: PROD
+      Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
 
@@ -31,18 +30,17 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: STAGING
-      OpsWorksStackID: "STAGING{{ titlecase_name }}OpsWorksStack"
-      DataPusherLayerID: "STAGING{{ titlecase_name }}OpsWorksDataPusherLayer"
-      SolrLayerID: "STAGING{{ titlecase_name }}OpsWorksSolrLayer"
-      WebLayerID: "STAGING{{ titlecase_name }}OpsWorksWebLayer"
+      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
+      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
+      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       DefaultEC2Key: osssio-global-ckan
-      AppSubnets: STAGINGCKANAppSubnet
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
     tags:
-      Environment: STAGING
+      Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
 
@@ -53,18 +51,18 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: TRAINING
-      OpsWorksStackID: "TRAINING{{ titlecase_name }}OpsWorksStack"
-      DataPusherLayerID: "TRAINING{{ titlecase_name }}OpsWorksDataPusherLayer"
-      SolrLayerID: "TRAINING{{ titlecase_name }}OpsWorksSolrLayer"
-      WebLayerID: "TRAINING{{ titlecase_name }}OpsWorksWebLayer"
+      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
+      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
+      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+      WebEC2Size: t3.small
       DefaultEC2Key: osssio-global-ckan
-      AppSubnets: TRAININGCKANAppSubnet
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
     tags:
-      Environment: TRAINING
+      Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "Yes"
 
@@ -75,17 +73,17 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: DEV
-      OpsWorksStackID: "DEV{{ titlecase_name }}OpsWorksStack"
-      DataPusherLayerID: "DEV{{ titlecase_name }}OpsWorksDataPusherLayer"
-      SolrLayerID: "DEV{{ titlecase_name }}OpsWorksSolrLayer"
-      WebLayerID: "DEV{{ titlecase_name }}OpsWorksWebLayer"
+      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
+      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
+      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+      WebEC2Size: t3.small
       DefaultEC2Key: osssio-global-ckan
-      AppSubnets: DEVCKANAppSubnet
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
     tags:
-      Environment: DEV
+      Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "Yes"

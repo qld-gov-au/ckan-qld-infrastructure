@@ -19,7 +19,6 @@ cloudformation_stacks:
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
-      itoc_monitored: 'true'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"

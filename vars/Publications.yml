@@ -1,0 +1,4 @@
+---
+titlecase_name: Publications
+lowercase_name: "{{ titlecase_name | lower }}"
+enable_datastore: "no"

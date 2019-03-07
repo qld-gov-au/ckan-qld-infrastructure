@@ -127,7 +127,6 @@ Resources:
 
   AppLoadBalancer:
     Type: AWS::EC2::SecurityGroup
-    DependsOn: WebAsg
     Properties:
       VpcId:
         Fn::ImportValue: !Ref VPC
@@ -140,7 +139,6 @@ Resources:
 
   AppAsg:
     Type: AWS::EC2::SecurityGroup
-    DependsOn: AppLoadBalancer
     Properties:
       VpcId:
         Fn::ImportValue: !Ref VPC
@@ -160,7 +158,6 @@ Resources:
 
   WebAsg:
     Type: AWS::EC2::SecurityGroup
-    DependsOn: WebLoadBalancer
     Properties:
       VpcId:
         Fn::ImportValue: !Ref VPC
@@ -177,7 +174,6 @@ Resources:
 
   Database:
     Type: AWS::EC2::SecurityGroup
-    DependsOn: AppAsg
     Properties:
       GroupDescription: Security group for RDS DB Instance.
       VpcId:

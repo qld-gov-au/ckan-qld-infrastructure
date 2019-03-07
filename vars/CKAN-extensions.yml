@@ -13,9 +13,8 @@ cloudformation_stacks:
     tags:
       Environment: PROD
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
 
@@ -30,9 +29,8 @@ cloudformation_stacks:
     tags:
       Environment: STAGING
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
 
@@ -47,9 +45,8 @@ cloudformation_stacks:
     tags:
       Environment: TRAINING
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "Yes"
 
@@ -64,8 +61,7 @@ cloudformation_stacks:
     tags:
       Environment: DEV
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "Yes"

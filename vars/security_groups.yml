@@ -1,81 +1,20 @@
 ---
 cloudformation_stacks:
-  - name: CKAN-PROD-SECURITY-GROUPS
+  - name: "CKAN-{{ Environment }}-SECURITY-GROUPS"
     state: "{{ state | default('present')}}"
-    region: ap-southeast-2
+    region: "{{ region }}"
     disable_rollback: true
     template: "templates/security_groups.cfn.yml"
     template_parameters:
       BambooAgentIp: "13.210.53.223/32" #Green
       BambooAgentIp2: "13.211.7.108/32" #Blue
       BambooAgentSecurityGroup: sg-0d7f802e57ee52ab6
-      Environment: PROD
+      Environment: "{{ Environment }}"
       Platform: CKAN
-      VPC: CKANVpc-PROD
+      VPC: "CKANVpc-{{ Environment }}"
     tags:
-      Environment: Production
-      Service: "Get Involved"
-      itoc_monitored: "true"
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
-      Version: "1.0"
-
-  - name: CKAN-STAGING-SECURITY-GROUPS
-    state: "{{ state | default('present')}}"
-    region: ap-southeast-2
-    disable_rollback: true
-    template: "templates/security_groups.cfn.yml"
-    template_parameters:
-      BambooAgentIp: "13.210.53.223/32" #Green
-      BambooAgentIp2: "13.211.7.108/32" #Blue
-      BambooAgentSecurityGroup: sg-0d7f802e57ee52ab6
-      Environment: STAGING
-      Platform: CKAN
-      VPC: CKANVpc-STAGING
-    tags:
-      Environment: Staging
-      Service: "Get Involved"
-      itoc_monitored: 'false'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
-      Version: "1.0"
-
-  - name: CKAN-TRAINING-SECURITY-GROUPS
-    state: "{{ state | default('present')}}"
-    region: ap-southeast-2
-    disable_rollback: true
-    template: "templates/security_groups.cfn.yml"
-    template_parameters:
-      BambooAgentIp: "13.210.53.223/32" #Green
-      BambooAgentIp2: "13.211.7.108/32" #Blue
-      BambooAgentSecurityGroup: sg-0d7f802e57ee52ab6
-      Environment: TRAINING
-      Platform: CKAN
-      VPC: CKANVpc-TRAINING
-    tags:
-      Environment: Staging
-      Service: "Get Involved"
-      itoc_monitored: 'false'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
-      Version: "1.0"
-
-  - name: CKAN-DEV-SECURITY-GROUPS
-    state: "{{ state | default('present')}}"
-    region: ap-southeast-2
-    disable_rollback: true
-    template: "templates/security_groups.cfn.yml"
-    template_parameters:
-      BambooAgentIp: "13.210.53.223/32" #Green
-      BambooAgentIp2: "13.211.7.108/32" #Blue
-      BambooAgentSecurityGroup: sg-0d7f802e57ee52ab6
-      Environment: DEV
-      Platform: CKAN
-      VPC: CKANVpc-DEV
-    tags:
-      Environment: Testing
-      Service: "Get Involved"
-      itoc_monitored: 'false'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Environment: "{{ Environment }}"
+      Service: "CKAN"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"

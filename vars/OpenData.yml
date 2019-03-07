@@ -1,0 +1,4 @@
+---
+titlecase_name: OpenData
+lowercase_name: "{{ titlecase_name | lower }}"
+enable_datastore: "yes"

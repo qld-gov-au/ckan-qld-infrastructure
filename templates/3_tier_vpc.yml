@@ -542,9 +542,6 @@ Resources:
     Type: AWS::EC2::InternetGateway
   NATGateway:
     Condition: NatGateways
-    DependsOn:
-    - NATGatewayEIP
-    - WebSubnetA
     Properties:
       AllocationId:
         Fn::GetAtt:
@@ -618,7 +615,6 @@ Resources:
     Type: AWS::EC2::NetworkAclEntry
   PrivateNATGatewayRoute:
     Condition: NatGateways
-    DependsOn: NATGateway
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId:

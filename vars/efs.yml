@@ -1,85 +1,83 @@
 ---
+template: "templates/efs.cfn.yml"
+
 cloudformation_stacks:
   - name: CKAN-PROD-EFS-stack
     state: "{{ state | default('present')}}"
-    region: ap-southeast-2
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/efs.cfn.yml"
+    template: "{{ template }}"
     template_parameters:
       Environment: PROD
       ApplicationName: CKAN
       StackTLD: ckan.services.qld.gov.au
-      StackVPC: CKANVpc-PROD
-      DbSubnets: PRODCKANDBSubnet
-      AdminSG: PRODCKANManagementSG
+      StackVPC: "CKANVpc-{{ Environment }}"
+      DbSubnets: "{{ Environment }}CKANDBSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
     tags:
-      Environment: PROD
+      Environment: "{{ Environment }}"
       Service: "CKAN"
-      itoc_monitored: "false"
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
 
   - name: CKAN-STAGING-EFS-stack
     state: "{{ state | default('present')}}"
-    region: ap-southeast-2
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/efs.cfn.yml"
+    template: "{{ template }}"
     template_parameters:
       Environment: STAGING
       ApplicationName: CKAN
       StackTLD: ckan.staging-services.qld.gov.au
-      StackVPC: CKANVpc-STAGING
-      DbSubnets: STAGINGCKANDBSubnet
-      AdminSG: STAGINGCKANManagementSG
+      StackVPC: "CKANVpc-{{ Environment }}"
+      DbSubnets: "{{ Environment }}CKANDBSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
     tags:
-      Environment: STAGING
+      Environment: "{{ Environment }}"
       Service: "CKAN"
-      itoc_monitored: 'false'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
 
   - name: CKAN-TRAINING-EFS-stack
     state: "{{ state | default('present')}}"
-    region: ap-southeast-2
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/efs.cfn.yml"
+    template: "{{ template }}"
     template_parameters:
       Environment: TRAINING
       ApplicationName: CKAN
       StackTLD: training.ckan.devpit140cs.qgov.net.au
-      StackVPC: CKANVpc-TRAINING
-      DbSubnets: TRAININGCKANDBSubnet
-      AdminSG: TRAININGCKANManagementSG
+      StackVPC: "CKANVpc-{{ Environment }}"
+      DbSubnets: "{{ Environment }}CKANDBSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
     tags:
-      Environment: TRAINING
+      Environment: "{{ Environment }}"
       Service: "CKAN"
-      itoc_monitored: 'false'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "Yes"
 
   - name: CKAN-DEV-EFS-stack
     state: "{{ state | default('present')}}"
-    region: ap-southeast-2
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/efs.cfn.yml"
+    template: "{{ template }}"
     template_parameters:
       Environment: DEV
       ApplicationName: CKAN
       StackTLD: dev.ckan.devpit140cs.qgov.net.au
-      StackVPC: CKANVpc-DEV
-      DbSubnets: DEVCKANDBSubnet
-      AdminSG: DEVCKANManagementSG
+      StackVPC: "CKANVpc-{{ Environment }}"
+      DbSubnets: "{{ Environment }}CKANDBSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
     tags:
-      Environment: DEV
+      Environment: "{{ Environment }}"
       Service: "CKAN"
-      itoc_monitored: "false"
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "Yes"

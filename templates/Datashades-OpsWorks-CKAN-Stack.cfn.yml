@@ -579,8 +579,6 @@ Resources:
       Name: !Ref StackTLD
 
   CKANExtensions:
-    DependsOn:
-      - OpsWorksStack
     Type: AWS::CloudFormation::Stack
     Condition: ProvisionExtensions
     Properties:
@@ -619,9 +617,6 @@ Resources:
             !Sub "${WebSubnets}B"
 
   ELBAttachment:
-    DependsOn:
-      - OpsWorksStack
-      - CKANELB
     Condition: ProvisionELB
     Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
     Properties:
@@ -631,7 +626,6 @@ Resources:
   WebELBCNAME:
     Condition: ProvisionELB
     Type: AWS::Route53::RecordSet
-    DependsOn: CKANELB
     Properties:
       Type: A
       Name: !Sub "${ApplicationId}.${StackTLD}"

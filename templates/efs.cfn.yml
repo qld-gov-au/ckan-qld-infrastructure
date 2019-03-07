@@ -110,7 +110,6 @@ Resources:
 
   EFSCNAME:
     Type: AWS::Route53::RecordSet
-    DependsOn: SharedFileSystem
     Properties:
       Type: CNAME
       TTL: 60

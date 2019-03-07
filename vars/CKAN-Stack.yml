@@ -35,9 +35,8 @@ cloudformation_stacks:
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
 
@@ -74,9 +73,8 @@ cloudformation_stacks:
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
 
@@ -89,7 +87,6 @@ cloudformation_stacks:
       Environment: TRAINING
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
-      WebEC2Size: t3.small
       StackTLD: training.ckan.devpit140cs.qgov.net.au
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
@@ -114,9 +111,8 @@ cloudformation_stacks:
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "Yes"
 
@@ -124,12 +120,11 @@ cloudformation_stacks:
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
-    template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
+    template: "{{ template }}"
     template_parameters:
       Environment: DEV
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
-      WebEC2Size: t3.small
       StackTLD: dev.ckan.devpit140cs.qgov.net.au
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
@@ -154,8 +149,7 @@ cloudformation_stacks:
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
-      itoc_monitored: false
-      Division: Qld Online
-      Owner: Development and Delivery
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "Yes"
