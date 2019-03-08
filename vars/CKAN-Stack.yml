@@ -125,7 +125,8 @@ cloudformation_stacks:
       Environment: DEV
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
-      StackTLD: dev.ckan.devpit140cs.qgov.net.au
+      StackTLD: internal.ckan.devpit140cs.qgov.net.au
+      IntermediateTLD: dev.ckan.devpit140cs.qgov.net.au
       PublicTLD: "{{ Domain }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"

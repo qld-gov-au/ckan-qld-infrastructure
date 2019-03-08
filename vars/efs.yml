@@ -70,7 +70,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: DEV
       ApplicationName: CKAN
-      StackTLD: dev.ckan.devpit140cs.qgov.net.au
+      StackTLD: internal.ckan.devpit140cs.qgov.net.au
       StackVPC: "CKANVpc-{{ Environment }}"
       DbSubnets: "{{ Environment }}CKANDBSubnet"
       AdminSG: "{{ Environment }}CKANManagementSG"
