@@ -1,0 +1,24 @@
+---
+template: "templates/cloudfront.cfn.yml"
+
+cloudformation_stacks:
+  - name: "{{ titlecase_name }}-{{ Environment }}-CLOUDFRONT"
+    cloudformation_waf: "CKAN-{{ Environment }}-WAF"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: 'true'
+    template: "{{ template }}"
+    template_parameters:
+      WebOrigin: "{{ Environment }}{{ titlecase_name }}WebElbNiceDNSName"
+      WebACLId: "{{ Environment }}CKANWebACLId"
+      Environment: "{{ Environment }}"
+      Platform: "{{ titlecase_name }}"
+      ACMCertificateARN: "{{ ACMCertificateARN }}"
+      Domain: "{{ Domain }}"
+      LogBucketName: "osssio-ckan-web-logs"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"

@@ -1,72 +1,66 @@
 ---
-template: "templates/cache.cfn.yml"
+template: "templates/Datashades-OpsWorks-CKAN-Extensions.cfn.yml"
 
 cloudformation_stacks:
-  - name: CKAN-PROD-Cache
+  - name: "{{ titlecase_name }}-PROD-OpsWorks-CKANExtensions"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: PROD
-      Platform: CKAN
-      AZMode: "cross-az"
-      NumCacheNodes: 2
-      Subnets: "{{ Environment }}CKANDBSubnet"
+      OpsWorksStack: "PROD{{ titlecase_name }}OpsWorksStack"
     tags:
-      Environment: "{{ Environment }}"
-      Service: CKAN
+      Environment: PROD
+      Service: "{{ titlecase_name }}"
       Division: "{{ Division }}"
       Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
 
-  - name: CKAN-STAGING-Cache
+  - name: "{{ titlecase_name }}-STAGING-OpsWorks-CKANExtensions"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: STAGING
-      Platform: CKAN
-      Subnets: "{{ Environment }}CKANDBSubnet"
+      OpsWorksStack: "STAGING{{ titlecase_name }}OpsWorksStack"
     tags:
-      Environment: "{{ Environment }}"
-      Service: CKAN
+      Environment: STAGING
+      Service: "{{ titlecase_name }}"
       Division: "{{ Division }}"
       Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
 
-  - name: CKAN-TRAINING-Cache
+  - name: "{{ titlecase_name }}-TRAINING-OpsWorks-CKANExtensions"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: TRAINING
-      Platform: CKAN
-      Subnets: "{{ Environment }}CKANDBSubnet"
+      OpsWorksStack: "TRAINING{{ titlecase_name }}OpsWorksStack"
     tags:
-      Environment: "{{ Environment }}"
-      Service: CKAN
+      Environment: TRAINING
+      Service: "{{ titlecase_name }}"
       Division: "{{ Division }}"
       Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "Yes"
 
-  - name: CKAN-DEV-Cache
+  - name: "{{ titlecase_name }}-DEV-OpsWorks-CKANExtensions"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: DEV
-      Platform: CKAN
-      Subnets: "{{ Environment }}CKANDBSubnet"
+      OpsWorksStack: "DEV{{ titlecase_name }}OpsWorksStack"
     tags:
-      Environment: "{{ Environment }}"
-      Service: CKAN
+      Environment: DEV
+      Service: "{{ titlecase_name }}"
       Division: "{{ Division }}"
       Owner: "{{ Owner }}"
       Version: "1.0"

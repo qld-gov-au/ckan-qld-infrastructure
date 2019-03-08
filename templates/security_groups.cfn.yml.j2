@@ -8,6 +8,9 @@ Parameters:
   BambooAgentIp2:
     Description: CIDR of the local Bamboo agent
     Type: String
+  BambooAgentSecurityGroup:
+    Description: Security group containing bamboo agents.
+    Type: String
   VPC:
     Type: String
     Description: Name of the VPC
@@ -17,6 +20,7 @@ Parameters:
   Platform:
     Type: String
     Description: Name of the platform ie GI, Services, Static
+
 Resources:
   CloudfrontHTTP:
     Type: AWS::EC2::SecurityGroup
@@ -123,7 +127,6 @@ Resources:
 
   AppLoadBalancer:
     Type: AWS::EC2::SecurityGroup
-    DependsOn: WebAsg
     Properties:
       VpcId:
         Fn::ImportValue: !Ref VPC
@@ -136,7 +139,6 @@ Resources:
 
   AppAsg:
     Type: AWS::EC2::SecurityGroup
-    DependsOn: AppLoadBalancer
     Properties:
       VpcId:
         Fn::ImportValue: !Ref VPC
@@ -156,7 +158,6 @@ Resources:
 
   WebAsg:
     Type: AWS::EC2::SecurityGroup
-    DependsOn: WebLoadBalancer
     Properties:
       VpcId:
         Fn::ImportValue: !Ref VPC
@@ -173,7 +174,6 @@ Resources:
 
   Database:
     Type: AWS::EC2::SecurityGroup
-    DependsOn: AppAsg
     Properties:
       GroupDescription: Security group for RDS DB Instance.
       VpcId:
@@ -183,22 +183,27 @@ Resources:
         FromPort: 5432
         ToPort: 5432 # PostgreSQL
         SourceSecurityGroupId: !Ref AppAsg
+        Description: Application access to PostgreSQL
       - IpProtocol: tcp
         FromPort: 8983
         ToPort: 8983 # Solr
         SourceSecurityGroupId: !Ref AppAsg
+        Description: Application access to Solr
       - IpProtocol: tcp
         FromPort: 6379
         ToPort: 6379 # Redis
         SourceSecurityGroupId: !Ref AppAsg
+        Description: Application access to Redis
+      - IpProtocol: tcp
+        FromPort: 8800
+        ToPort: 8800
+        SourceSecurityGroupId: !Ref AppAsg
+        Description: Application access to the CKAN DataPusher
       - IpProtocol: tcp
         FromPort: 5432
         ToPort: 5432
-        CidrIp: !Ref BambooAgentIp
-      - IpProtocol: tcp
-        FromPort: 5432
-        ToPort: 5432
-        CidrIp: !Ref BambooAgentIp2
+        SourceSecurityGroupId: !Ref BambooAgentSecurityGroup
+        Description: Bamboo agent access to PostgreSQL
 
 Outputs:
   ManagementSG:

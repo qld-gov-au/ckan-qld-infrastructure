@@ -20,11 +20,13 @@ Metadata:
           - ApplicationId
           - Environment
           - StackTLD
+          - PublicTLD
           - CreateTLD
           - CacheAddress
           - CachePort
           - CreateELB
           - CreateInstances
+          - EnableDataStore
           - CreateExtensions
           - ExtensionsTemplate
           - DefaultEC2Key
@@ -36,8 +38,10 @@ Metadata:
           - DbSubnets
           - AdminSG
           - AppLBSG
+          - CloudFrontSG
           - AppSG
           - DatabaseSG
+          - ACMCertificateARN
 
       -
         Label:
@@ -45,6 +49,7 @@ Metadata:
         Parameters:
           - PGDBUser
           - PGDBPassword
+          - BeakerSecret
           - CKANAdminPW
           - CKANAdminEmail
 
@@ -52,12 +57,15 @@ Metadata:
         Label:
           default: Application Sources
         Parameters:
+          - DataPusherURL
           - SolrSource
           - CKANSource
 
     ParameterLabels:
       CookbookURL:
         default: What is the URL for the OpsWorks Custom Cookbook repository?
+      DataPusherURL:
+        default: What is the URL for the CKAN DataPusher repository?
       SolrSource:
         default: Provide the URL for Apache Solr source archive.
       CKANSource:
@@ -78,6 +86,8 @@ Metadata:
         default: Do you need an OpsWorks Service Role created?
       CreateInstances:
         default: Do you want to instances provisioned with this stack?
+      EnableDataStore:
+        default: Do you want to set up DataStore support?
       CreateExtensions:
         default: Do you want to provision CKAN extensions with this stack?
       ExtensionsTemplate:
@@ -86,6 +96,8 @@ Metadata:
         default: Do you want to provision an Elastic Load Balancer with this stack?
       StackTLD:
         default: What TLD hosted on Route53 is this stack using for internal DNS?
+      PublicTLD:
+        default: What TLD hosted on Route53 is this stack using for public DNS?
       CacheAddress:
         default: What is the address of the Redis cache?
       CachePort:
@@ -108,14 +120,20 @@ Metadata:
         default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
       AppLBSG:
         default: Which Security Group in the selected VPC should be attached to the application load balancer?
+      CloudFrontSG:
+        default: Which Security Group in the selected VPC permits access from CloudFront?
       AppSG:
         default: Which Security Group in the selected VPC should be attached to the application layer?
       DatabaseSG:
         default: Which Security Group in the selected VPC should be attached to the database layer?
+      ACMCertificateARN:
+        default: Which certificate should be used by the application load balancer?
       PGDBUser:
         default: Account name for (non-superuser) Postgres DB access.
       PGDBPassword:
         default: Enter a password for Postgres DB access.
+      BeakerSecret:
+        default: Enter the secret key used to hash login cookies.
       CKANAdminPW:
         default: Enter a password for your CKAN Admin user.
       CKANAdminEmail:
@@ -136,6 +154,14 @@ Parameters:
     Type: String
     MinLength: 1
     MaxLength: 64
+  DataPusherURL:
+    Description: Repository URL for CKAN DataPusher
+    Default: https://github.com/ckan/datapusher.git
+    Type: String
+  DataPusherRevision:
+    Description: Branch/tag name in repository to checkout.
+    Default: "0.0.14"
+    Type: String
   SolrSource:
     Description: URL for zip archive.
     Default: http://apache.mirror.digitalpacific.com.au/lucene/solr/5.5.5/solr-5.5.5.zip
@@ -166,6 +192,11 @@ Parameters:
     Type: String
     MinLength: 6
     MaxLength: 254
+  PublicTLD:
+    Description: Route53 hosted TLD for stack
+    Type: String
+    MinLength: 6
+    MaxLength: 254
   CreateTLD:
     Type: String
     Default: "no"
@@ -183,6 +214,13 @@ Parameters:
     Description: Recommended
     Type: String
     Default: "yes"
+    AllowedValues:
+      - "yes"
+      - "no"
+  EnableDataStore:
+    Description: Whether or not to support the DataStore.
+    Type: String
+    Default: "no"
     AllowedValues:
       - "yes"
       - "no"
@@ -252,11 +290,17 @@ Parameters:
   AppLBSG:
     Description: The exported name of the security group ID to attach to the application load balancer.
     Type: String
+  CloudFrontSG:
+    Description: The exported name of the security group ID for resources that should be accessed by CloudFront.
+    Type: String
   AppSG:
     Description: The exported name of the security group ID to attach to applications.
     Type: String
   DatabaseSG:
     Description: The exported name of the security group ID to attach to the database layer.
+    Type: String
+  ACMCertificateARN:
+    Description: ARN for certificate to be used by the application load balancer.
     Type: String
   PGDBUser:
     Description: Account name for (non-superuser) Postgres DB access.
@@ -269,6 +313,12 @@ Parameters:
     MaxLength: 64
     AllowedPattern: "[a-zA-Z0-9]*"
     ConstraintDescription: Must be 8 - 64 alphanumeric characters.
+  BeakerSecret:
+    NoEcho: true
+    Description: Secret key used by CKAN to hash login cookies.
+    Type: String
+    MinLength: 32
+    ConstraintDescription: Must be at least 32 characters.
 
 Conditions:
   CreateHostedZone:
@@ -300,7 +350,6 @@ Resources:
   OpsWorksServiceRole:
     Condition: ProvisionServiceRole
     Type: AWS::IAM::Role
-    DeletionPolicy: Retain
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -330,21 +379,26 @@ Resources:
 
   InstanceRole:
     Type: AWS::IAM::Role
-    DeletionPolicy: Retain
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
-          -
-            Effect: Allow
+          - Effect: Allow
             Principal:
               Service: ec2.amazonaws.com
             Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ApplicationName}-${Environment}-SendMail"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: ses:SendRawEmail
+                Resource: "*"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/PowerUserAccess
 
   InstanceRoleProfile:
-    DeletionPolicy: Retain
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
@@ -368,10 +422,12 @@ Resources:
           ckan_web:
             adminpw: !Ref CKANAdminPW
             adminemail: !Ref CKANAdminEmail
+            beaker_secret: !Ref BeakerSecret
             dbuser: !Ref PGDBUser
             dbname: !Ref ApplicationName
             dsuser: !Sub "${PGDBUser}_datastore"
             dsname: !Sub "${ApplicationName}_datastore"
+            dsenable: !Ref EnableDataStore
             endpoint: /
           jumpbox:
             bucket: !Ref AdminPubKeyBucket
@@ -383,6 +439,7 @@ Resources:
               Fn::ImportValue: !Ref CacheAddress
             port: !Ref CachePort
           tld: !Ref StackTLD
+          public_tld: !Ref PublicTLD
           version: !Ref Environment
           app_id: !Ref ApplicationId
       DefaultInstanceProfileArn:
@@ -410,27 +467,27 @@ Resources:
       VpcId:
         Fn::ImportValue: !Ref StackVPC
 
-  OpsWorksRedisLayer:
+  OpsWorksDataPusherLayer:
     Type: AWS::OpsWorks::Layer
     Properties:
       AutoAssignElasticIps: false
       AutoAssignPublicIps: true
       CustomRecipes:
         Shutdown:
-          - "datashades::redis-shutdown"
+          - "datashades::datapusher-shutdown"
         Setup:
-          - "datashades::redis-setup"
+          - "datashades::datapusher-setup"
         Configure:
-          - "datashades::redis-configure"
+          - "datashades::datapusher-configure"
         Deploy:
-          - "datashades::redis-deploy"
+          - "datashades::datapusher-deploy"
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref DatabaseSG
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
-      Name: !Sub "${ApplicationName}-REDIS"
-      Shortname: !Sub "${ApplicationId}-redis"
+      Name: !Sub "${ApplicationName}-DataPusher"
+      Shortname: !Sub "${ApplicationId}-datapusher"
       StackId: !Ref OpsWorksStack
       Type: custom
 
@@ -490,8 +547,22 @@ Resources:
         Url: !Ref CKANSource
       Description: "CKAN 2.7"
       EnableSsl: false
-      Name: !Sub "${ApplicationName}"
-      Shortname: !Sub "${ApplicationId}"
+      Name: !Sub "${ApplicationName}-${Environment}"
+      Shortname: !Sub "${ApplicationId}-${Environment}"
+      StackId: !Ref OpsWorksStack
+      Type: other
+
+  OpwxAppDataPusher:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: git
+        Url: !Ref DataPusherURL
+        Revision: !Ref DataPusherRevision
+      Description: "CKAN DataPusher"
+      EnableSsl: false
+      Name: !Sub "${ApplicationName}-${Environment}-DataPusher"
+      Shortname: !Sub "${ApplicationId}-${Environment}-datapusher"
       StackId: !Ref OpsWorksStack
       Type: other
 
@@ -503,8 +574,8 @@ Resources:
         Url: !Ref SolrSource
       Description: "Apache Solr 5.5.5"
       EnableSsl: false
-      Name: "solr-5.5"
-      Shortname: "solr-5.5"
+      Name: !Sub "${ApplicationName}-${Environment}-solr-5.5"
+      Shortname: !Sub "${ApplicationId}-${Environment}-solr-5.5"
       StackId: !Ref OpsWorksStack
       Type: other
 
@@ -517,8 +588,6 @@ Resources:
       Name: !Ref StackTLD
 
   CKANExtensions:
-    DependsOn:
-      - OpsWorksStack
     Type: AWS::CloudFormation::Stack
     Condition: ProvisionExtensions
     Properties:
@@ -538,14 +607,18 @@ Resources:
         Interval: 30
         Timeout: 20
       Listeners:
-        -
+        - LoadBalancerPort: 80
           InstancePort: 80
-          LoadBalancerPort: 80
           Protocol: HTTP
+        - LoadBalancerPort: 443
+          InstancePort: 80
+          Protocol: HTTPS
+          SSLCertificateId: !Ref ACMCertificateARN
       Scheme: "internet-facing"
       SecurityGroups:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppLBSG
+        - Fn::ImportValue: !Ref CloudFrontSG
       Subnets:
         - Fn::ImportValue:
             !Sub "${WebSubnets}A"
@@ -553,9 +626,6 @@ Resources:
             !Sub "${WebSubnets}B"
 
   ELBAttachment:
-    DependsOn:
-      - OpsWorksStack
-      - CKANELB
     Condition: ProvisionELB
     Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
     Properties:
@@ -565,7 +635,6 @@ Resources:
   WebELBCNAME:
     Condition: ProvisionELB
     Type: AWS::Route53::RecordSet
-    DependsOn: CKANELB
     Properties:
       Type: A
       Name: !Sub "${ApplicationId}.${StackTLD}"
@@ -586,11 +655,12 @@ Outputs:
     Description: OpsWorks Stack Id
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksStack"
-  RedisLayer:
-    Value: !Ref OpsWorksRedisLayer
-    Description: Redis Layer Id
+
+  DataPusherLayer:
+    Value: !Ref OpsWorksDataPusherLayer
+    Description: DataPusher Layer Id
     Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksRedisLayer"
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksDataPusherLayer"
 
   SolrLayer:
     Value: !Ref OpsWorksSolrLayer
@@ -616,3 +686,8 @@ Outputs:
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrApplication"
 
+  WebELBDomainName:
+    Condition: ProvisionELB
+    Value: !Ref WebELBCNAME
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebElbNiceDNSName"

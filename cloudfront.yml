@@ -1,0 +1,44 @@
+---
+
+# This playbook is run after CKAN-Stack & WAF cloudformation stacks.
+- name: Cloudformation Playbook
+  hosts: local
+  connection: local
+  vars_files:
+    - vars/cloudfront-certificates.var.yml
+  pre_tasks:
+    - name: Get certificate ARN for environment
+      set_fact:
+        ACMCertificateARN={{ item.ACMCertificateARN }}
+        Domain={{ item.Domain }}
+      when: item.Environment == Environment and item.profile == lowercase_name
+      with_items: "{{ certificate_arns }}"
+
+    - include_vars: vars/cloudfront.var.yml
+  roles:
+    - ansible_cloudformation
+
+  #~ tasks:
+      #~ - name: Get Cloudfront distro facts
+        #~ cloudformation_facts:
+          #~ region: "{{ region }}"
+          #~ stack_name: "{{ name }}"
+          #~ stack_resources: true
+        #~ register: cloudfront_facts
+
+      #~ - name: Set Distribution ID and AwsAccount fact
+        #~ set_fact:
+          #~ DistributionId: "{{ cloudfront_facts.ansible_facts.cloudformation[name].stack_resources.DistributionConfig }}"
+          #~ AwsAccount: "{{ cloudfront_facts.ansible_facts.cloudformation[name].stack_outputs.AwsAccount }}"
+
+      #~ - name: Set Resource ARN fact
+        #~ set_fact:
+          #~ ResourceArn: "arn:aws:cloudfront::{{ AwsAccount }}:distribution/{{ DistributionId }}"
+
+#TODO: make tags work, for not remove
+#      - name: Add tags to Cloudfront distribution
+#        cloudfront_tags:
+#          resource_arn: "{{ ResourceArn }}"
+#          tags: "{{ tags }}"
+#          state: present
+

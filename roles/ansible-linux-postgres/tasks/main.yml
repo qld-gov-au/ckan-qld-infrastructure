@@ -24,42 +24,80 @@
 #- easy_install:
 #    name: psycopg2
 
-- name: Create Database
-  postgresql_db:
-    login_host: "{{ DBEndpoint }}"
-    login_user: "{{ DBMasterUser }}"
-    login_password: "{{ DBMasterPass }}"
-    port: "{{ DBPort }}"
-    name: "{{ DBName }}"
-    state: "{{ state }}"
-  when: state is defined and state == "present"
-  run_once: true
-
-- name: Ensure default roles exist
+- name: Create Database owner
   postgresql_user:
-    db: "{{ DBName }}"
-    login_host: "{{ DBEndpoint }}"
-    login_user: "{{ DBMasterUser }}"
-    login_password: "{{ DBMasterPass }}"
-    port: "{{ DBPort }}"
-    name: "postgres"
-    no_password_changes: yes
-    state: "{{ state }}"
-    priv: "{{ template_parameters.DBPrivileges }}"
-  when: state is defined
-  run_once: true
-
-- name: Create Database users
-  postgresql_user:
-    db: "{{ DBName }}"
+    db: "postgres"
     login_host: "{{ DBEndpoint }}"
     login_user: "{{ DBMasterUser }}"
     login_password: "{{ DBMasterPass }}"
     port: "{{ DBPort }}"
     name: "{{ DBUser }}"
     password: "{{ DBPass }}"
+    encrypted: yes
     no_password_changes: yes
-    state: "{{ state }}"
+    state: "{{ state | default('present') }}"
     priv: "{{ template_parameters.DBPrivileges }}"
-  when: state is defined
+    role_attr_flags: "CREATEDB,LOGIN"
+
+- name: Grant database owner role to DBA
+  postgresql_privs:
+    db: "postgres"
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBMasterUser }}"
+    login_password: "{{ DBMasterPass }}"
+    port: "{{ DBPort }}"
+    roles: "{{ DBMasterUser }}"
+    objs: "{{ DBUser }}"
+    type: "group"
+    state: "{{ state | default('present') }}"
+
+- name: Create Database
+  postgresql_db:
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBUser }}"
+    login_password: "{{ DBPass }}"
+    port: "{{ DBPort }}"
+    name: "{{ DBName }}"
+    state: "{{ state }}"
+  when: state is defined and state == "present"
   run_once: true
+
+- name: Create DataStore Database
+  postgresql_db:
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBUser }}"
+    login_password: "{{ DBPass }}"
+    port: "{{ DBPort }}"
+    name: "{{ DBName }}_datastore"
+    state: "{{ state }}"
+  when: state is defined and state == "present"
+  run_once: true
+
+- name: Create DataStore user
+  postgresql_user:
+    db: "{{ DBName }}_datastore"
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBMasterUser }}"
+    login_password: "{{ DBMasterPass }}"
+    port: "{{ DBPort }}"
+    name: "{{ DBUser }}_datastore"
+    password: "{{ DBPass }}"
+    encrypted: yes
+    no_password_changes: yes
+    state: "{{ state | default('present') }}"
+    priv: "CONNECT"
+    role_attr_flags: "LOGIN"
+
+- name: Grant read-only access to DataStore user
+  postgresql_privs:
+    db: "{{ DBName }}_datastore"
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBMasterUser }}"
+    login_password: "{{ DBMasterPass }}"
+    port: "{{ DBPort }}"
+    roles: "{{ DBUser }}_datastore"
+    schema: "public"
+    objs: "ALL_IN_SCHEMA"
+    type: "table"
+    privs: "SELECT"
+    state: "{{ state | default('present') }}"

@@ -3,6 +3,6 @@
   hosts: local
   connection: local
   vars_files:
-    - vars/OpenData-CKAN-instances.yml
+    - vars/CKAN-extensions.yml
   roles:
     - ansible_cloudformation

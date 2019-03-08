@@ -3,6 +3,6 @@
   hosts: local
   connection: local
   vars_files:
-    - vars/Publications-CKAN-Stack.yml
+    - vars/cloudfront-logging-bucket.var.yml
   roles:
     - ansible_cloudformation

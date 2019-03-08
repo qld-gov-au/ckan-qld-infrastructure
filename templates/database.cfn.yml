@@ -138,10 +138,10 @@ Resources:
       SubnetIds:
         - Fn::ImportValue: !Sub "${Subnets}A"
         - Fn::ImportValue: !Sub "${Subnets}B"
+        - Fn::ImportValue: !Sub "${Subnets}C"
 
   DBHostCNAME:
     Type: AWS::Route53::RecordSet
-    DependsOn: Database
     Properties:
       Type: CNAME
       TTL: 60

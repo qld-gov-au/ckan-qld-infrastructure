@@ -3,19 +3,22 @@ opsAccount: "103119354886"
 opsRole: "VPC-Peering"
 opsVpcID: "vpc-d5ba8bb0"
 opsVpcCidr: "10.10.0.0/16"
+template: "templates/3_tier_vpc.yml"
+bamboo_green: "13.210.53.223/32"
+bamboo_blue: "13.211.7.108/32"
+
 cloudformation_stacks:
   - name: "CKAN-PROD-VPC"
-    index: 0
     # VPC stacks cannot be properly torn down via Ansible
     state: present
-    region: ap-southeast-2
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/3_tier_vpc.yml"
+    template: "{{ template }}"
     template_parameters:
       ApplicationName: "CKAN"
-      AZCount: '2'
-      BambooAgentIp: "13.210.53.223/32" #Green
-      BambooAgentIp2: "13.211.7.108/32" #Blue
+      AZCount: '3'
+      BambooAgentIp: "{{ bamboo_green }}"
+      BambooAgentIp2: "{{ bamboo_blue }}"
       Environment: PROD
       NatGateways: 'true'
       VPCNamePrefix: CKAN
@@ -24,52 +27,48 @@ cloudformation_stacks:
       VPCPeeringID: "{{ VPCPeeringID| default('') }}"
       VPCPeeringCidr: "{{ opsVpcCidr }}"
     tags:
-      Environment: Production
+      Environment: "{{ Environment }}"
       Service: "CKAN"
-      itoc_monitored: "false"
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
 
   - name: "CKAN-STAGING-VPC"
-    index: 1
     # VPC stacks cannot be properly torn down via Ansible
     state: present
-    region: ap-southeast-2
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/3_tier_vpc.yml"
+    template: "{{ template }}"
     template_parameters:
       ApplicationName: "CKAN"
-      AZCount: '2'
-      BambooAgentIp: "13.210.53.223/32" #Green
-      BambooAgentIp2: "13.211.7.108/32" #Blue
+      AZCount: '3'
+      BambooAgentIp: "{{ bamboo_green }}"
+      BambooAgentIp2: "{{ bamboo_blue }}"
       Environment: STAGING
       NatGateways: 'true'
       VPCNamePrefix: CKAN
-      VPCPrefix: '10.41'
+      VPCPrefix: '10.42'
       VPCPeeringEnabled: "{{ VPCPeeringEnabled | default('false') }} "
       VPCPeeringID: "{{ VPCPeeringID| default('') }}"
       VPCPeeringCidr: "{{ opsVpcCidr }}"
     tags:
-      Environment: Staging
+      Environment: "{{ Environment }}"
       Service: "CKAN"
-      itoc_monitored: 'false'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
 
   - name: "CKAN-TRAINING-VPC"
-    index: 1
     # VPC stacks cannot be properly torn down via Ansible
     state: present
-    region: ap-southeast-2
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/3_tier_vpc.yml"
+    template: "{{ template }}"
     template_parameters:
       ApplicationName: "CKAN"
-      AZCount: '2'
-      BambooAgentIp: "13.210.53.223/32" #Green
-      BambooAgentIp2: "13.211.7.108/32" #Blue
+      AZCount: '3'
+      BambooAgentIp: "{{ bamboo_green }}"
+      BambooAgentIp2: "{{ bamboo_blue }}"
       Environment: TRAINING
       NatGateways: 'true'
       VPCNamePrefix: CKAN
@@ -78,25 +77,23 @@ cloudformation_stacks:
       VPCPeeringID: "{{ VPCPeeringID| default('') }}"
       VPCPeeringCidr: "{{ opsVpcCidr }}"
     tags:
-      Environment: Training
+      Environment: "{{ Environment }}"
       Service: "CKAN"
-      itoc_monitored: 'false'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
 
   - name: "CKAN-DEV-VPC"
-    index: 2
     # VPC stacks cannot be properly torn down via Ansible
     state: present
-    region: ap-southeast-2
+    region: "{{ region }}"
     disable_rollback: true
-    template: "templates/3_tier_vpc.yml"
+    template: "{{ template }}"
     template_parameters:
       ApplicationName: "CKAN"
-      AZCount: '2'
-      BambooAgentIp: "13.210.53.223/32" #Green
-      BambooAgentIp2: "13.211.7.108/32" #Blue
+      AZCount: '3'
+      BambooAgentIp: "{{ bamboo_green }}"
+      BambooAgentIp2: "{{ bamboo_blue }}"
       Environment: DEV
       NatGateways: 'true'
       VPCNamePrefix: CKAN
@@ -105,9 +102,8 @@ cloudformation_stacks:
       VPCPeeringID: "{{ VPCPeeringID| default('') }}"
       VPCPeeringCidr: "{{ opsVpcCidr }}"
     tags:
-      Environment: Testing
+      Environment: "{{ Environment }}"
       Service: "CKAN"
-      itoc_monitored: 'false'
-      Division: "Qld Online"
-      Owner: "Development and Delivery"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
       Version: "1.0"
