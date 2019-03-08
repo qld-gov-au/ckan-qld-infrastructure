@@ -35,7 +35,6 @@ Metadata:
           - StackVPC
           - WebSubnets
           - AppSubnets
-          - DbSubnets
           - AdminSG
           - AppLBSG
           - CloudFrontSG
@@ -114,8 +113,6 @@ Metadata:
         default: What base name are the web layer subnet IDs exported under?
       AppSubnets:
         default: What base name are the application layer subnet IDs exported under?
-      DbSubnets:
-        default: What base name are the data layer subnet IDs exported under?
       AdminSG:
         default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
       AppLBSG:
@@ -281,9 +278,6 @@ Parameters:
   AppSubnets:
     Type: String
     Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'
-  DbSubnets:
-    Type: String
-    Description: The base name for the exported data layer subnet IDs, eg if the exports are 'PRODMyApplicationDbSubnetA' and 'PRODMyApplicationDbSubnetB', then this would be 'PRODMyApplicationDbSubnet'
   AdminSG:
     Description: The exported name of the security group ID containing sysadmin inbound rules
     Type: String
@@ -341,10 +335,6 @@ Conditions:
       - Fn::Equals:
           - "yes"
           - !Ref CreateInstances
-  UseMultiAZ:
-    Fn::Equals:
-      - PROD
-      - !Ref Environment
 
 Resources:
   OpsWorksServiceRole:

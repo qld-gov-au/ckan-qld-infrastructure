@@ -7,23 +7,25 @@ Metadata:
       - Label:
           default: OpsWorks Stack Details
         Parameters:
+          - Environment
           - OpsWorksStackID
           - SolrLayerID
           - WebLayerID
+
       - Label:
           default: Stack Instance Details
         Parameters:
-          - DefaultEC2Key
           - ServicesEC2Size
           - WebEC2Size
           - Subnets
+
     ParameterLabels:
+      Environment:
+        default: What version is this OpsWorks stack (eg STAGING)?
       ServicesEC2Size:
         default: What instance size do you want to use for Service Instances?
       WebEC2Size:
         default: What instance size do you want to use for Web Instances?
-      DefaultEC2Key:
-        default: What EC2 key pair should these instances use for SSH access?
       OpsWorksStackID:
         default: What OpsWorks stack do you want to provision instances into?
       DataPusherLayerID:
@@ -74,9 +76,6 @@ Parameters:
       - m5.4xlarge
       - m4.10xlarge
       - m5.12xlarge
-  DefaultEC2Key:
-    Description: Select an existing SSH key
-    Type: AWS::EC2::KeyPair::KeyName
   OpsWorksStackID:
     Description: The exported name of the OpsWorks Stack ID.
     Type: String
@@ -89,23 +88,17 @@ Parameters:
   WebLayerID:
     Description: The exported name of the OpsWorks Web Stack Layer ID.
     Type: String
-  AppSubnets:
-    Type: String
-    Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'
 
 Resources:
   OpswxEC2Services1:
     Type: AWS::OpsWorks::Instance
     Properties:
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}A"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
       LayerIds:
         - Fn::ImportValue: !Ref DataPusherLayerID
         - Fn::ImportValue: !Ref SolrLayerID
-      SshKeyName: !Ref DefaultEC2Key
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
@@ -114,14 +107,11 @@ Resources:
     DependsOn:
       - OpswxEC2Services1
     Properties:
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}A"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
       LayerIds:
         - Fn::ImportValue: !Ref WebLayerID
-      SshKeyName: !Ref DefaultEC2Key
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
