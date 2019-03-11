@@ -6,20 +6,19 @@ ENVIRONMENT="$2"
 ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS Environment=$ENVIRONMENT"
 
 set -x
-if [ $# -ge 4 ]; then
-  VARS_FILE_2="--extra-vars @$4"
-fi
 
 function run-playbook {
-  if [ -z "$VARS_FILE_2" -a $# -ge 2 ]; then
+  if [ ! -z "$2" ]; then
     VARS_FILE_2="--extra-vars @$2"
+  else
+    unset VARS_FILE_2
   fi
   ansible-playbook -i inventory/hosts "$1.yml" --extra-vars "@$VARS_FILE" $VARS_FILE_2 --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 }
 
 if [ $# -ge 3 ]; then
   # run custom playbook
-  run-playbook "$3"
+  run-playbook "$3" "$4"
 else
   #ensure we die if any function fails
   set -e
@@ -30,7 +29,7 @@ else
   run-playbook "database-config"
   run-playbook CloudFormation "vars/efs.yml"
   run-playbook CloudFormation "vars/cache.yml"
-  run-playbook CloudFormation "vars/waf.yml"
+  run-playbook CloudFormation "vars/waf_web_acl.var.yml"
   run-playbook "CKAN-Stack"
   run-playbook CloudFormation "vars/CKAN-extensions.yml"
   run-playbook CloudFormation "vars/CKAN-instances.yml"
