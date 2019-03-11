@@ -5,8 +5,13 @@ VARS_FILE="$1"
 ENVIRONMENT="$2"
 ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS Environment=$ENVIRONMENT"
 
+set -x
+if [ $# -ge 4 ]; then
+  VARS_FILE_2="--extra-vars @$4"
+fi
+
 function run-playbook {
-  ansible-playbook -i inventory/hosts "$1.yml" --extra-vars "@$VARS_FILE" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
+  ansible-playbook -i inventory/hosts "$1.yml" --extra-vars "@$VARS_FILE" $VARS_FILE_2 --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 }
 
 if [ $# -ge 3 ]; then
@@ -18,14 +23,14 @@ else
 
   run-playbook "vpc"
   run-playbook "security_groups"
-  run-playbook "database"
+  run-playbook CloudFormation "vars/database"
   run-playbook "database-config"
-  run-playbook "efs"
-  run-playbook "cache"
-  run-playbook "waf"
+  run-playbook CloudFormation "vars/efs.yml"
+  run-playbook CloudFormation "vars/cache.yml"
+  run-playbook CloudFormation "vars/waf.yml"
   run-playbook "CKAN-Stack"
-  run-playbook "CKAN-extensions"
-  run-playbook "CKAN-instances"
+  run-playbook CloudFormation "vars/CKAN-extensions.yml"
+  run-playbook CloudFormation "vars/CKAN-instances.yml"
   run-playbook "cloudfront"
 fi
 

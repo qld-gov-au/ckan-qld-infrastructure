@@ -2,7 +2,5 @@
 - name: Cloudformation Playbook
   hosts: local
   connection: local
-  vars_files:
-    - vars/database.yml
   roles:
     - ansible_cloudformation
