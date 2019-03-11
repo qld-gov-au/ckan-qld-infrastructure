@@ -11,7 +11,6 @@ cloudformation_stacks:
       Environment: PROD
       Platform: CKAN
       AZMode: "cross-az"
-      NumCacheNodes: 2
       Subnets: "{{ Environment }}CKANDBSubnet"
     tags:
       Environment: "{{ Environment }}"
