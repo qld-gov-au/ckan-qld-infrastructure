@@ -11,6 +11,9 @@ if [ $# -ge 4 ]; then
 fi
 
 function run-playbook {
+  if [ -z "$VARS_FILE_2" -a $# -ge 2 ]; then
+    VARS_FILE_2="--extra-vars @$2"
+  fi
   ansible-playbook -i inventory/hosts "$1.yml" --extra-vars "@$VARS_FILE" $VARS_FILE_2 --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 }
 
@@ -23,7 +26,7 @@ else
 
   run-playbook "vpc"
   run-playbook "security_groups"
-  run-playbook CloudFormation "vars/database"
+  run-playbook CloudFormation "vars/database.yml"
   run-playbook "database-config"
   run-playbook CloudFormation "vars/efs.yml"
   run-playbook CloudFormation "vars/cache.yml"
