@@ -11,7 +11,7 @@ cloudformation_stacks:
       Environment: PROD
       ApplicationName: "CKAN"
       ApplicationId: "ckan"
-      StackTLD: ckan.services.qld.gov.au
+      StackTLD: ckan-internal.services.qld.gov.au
       StackVPC: "CKANVpc-{{ Environment }}"
       DefaultEC2Key: osssio-global-ckan
       AppSubnets: "{{ Environment }}CKANAppSubnet"
@@ -36,7 +36,7 @@ cloudformation_stacks:
       Environment: STAGING
       ApplicationName: "CKAN"
       ApplicationId: "ckan"
-      StackTLD: ckan.staging-services.qld.gov.au
+      StackTLD: ckan-internal.staging-services.qld.gov.au
       StackVPC: "CKANVpc-{{ Environment }}"
       DefaultEC2Key: osssio-global-ckan
       AppSubnets: "{{ Environment }}CKANAppSubnet"
@@ -61,7 +61,7 @@ cloudformation_stacks:
       Environment: TRAINING
       ApplicationName: "CKAN"
       ApplicationId: "ckan"
-      StackTLD: training.ckan.devpit140cs.qgov.net.au
+      StackTLD: ckan-internal.training-services.qld.gov.au
       StackVPC: "CKANVpc-{{ Environment }}"
       DefaultEC2Key: osssio-global-ckan
       AppSubnets: "{{ Environment }}CKANAppSubnet"

@@ -10,7 +10,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: PROD
       ApplicationName: CKAN
-      StackTLD: ckan.services.qld.gov.au
+      StackTLD: ckan-internal.services.qld.gov.au
       StackVPC: "CKANVpc-{{ Environment }}"
       DbSubnets: "{{ Environment }}CKANDBSubnet"
       AdminSG: "{{ Environment }}CKANManagementSG"
@@ -30,7 +30,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: STAGING
       ApplicationName: CKAN
-      StackTLD: ckan.staging-services.qld.gov.au
+      StackTLD: ckan-internal.staging-services.qld.gov.au
       StackVPC: "CKANVpc-{{ Environment }}"
       DbSubnets: "{{ Environment }}CKANDBSubnet"
       AdminSG: "{{ Environment }}CKANManagementSG"
@@ -50,7 +50,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: TRAINING
       ApplicationName: CKAN
-      StackTLD: training.ckan.devpit140cs.qgov.net.au
+      StackTLD: ckan-internal.training-services.qld.gov.au
       StackVPC: "CKANVpc-{{ Environment }}"
       DbSubnets: "{{ Environment }}CKANDBSubnet"
       AdminSG: "{{ Environment }}CKANManagementSG"

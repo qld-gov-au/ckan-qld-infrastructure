@@ -11,7 +11,8 @@ cloudformation_stacks:
       Environment: PROD
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
-      StackTLD: ckan.services.qld.gov.au
+      StackTLD: ckan-internal.services.qld.gov.au
+      IntermediateTLD: ckan.services.qld.gov.au
       PublicTLD: "{{ Domain }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
@@ -49,7 +50,8 @@ cloudformation_stacks:
       Environment: STAGING
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
-      StackTLD: ckan.staging-services.qld.gov.au
+      StackTLD: ckan-internal.staging-services.qld.gov.au
+      IntermediateTLD: ckan.staging-services.qld.gov.au
       PublicTLD: "{{ Domain }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
@@ -87,7 +89,8 @@ cloudformation_stacks:
       Environment: TRAINING
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
-      StackTLD: training.ckan.devpit140cs.qgov.net.au
+      StackTLD: ckan-internal.training-services.qld.gov.au
+      IntermediateTLD: training.ckan.devpit140cs.qgov.net.au
       PublicTLD: "{{ Domain }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
