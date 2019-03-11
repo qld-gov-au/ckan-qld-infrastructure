@@ -1,0 +1,75 @@
+---
+template: "templates/OpsWorks-service-instances.cfn.yml"
+
+cloudformation_stacks:
+  - name: "CKAN-PROD-OpsWorks-service-instances"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: PROD
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      DataPusherLayer: "{{ Environment }}CKANOpsWorksDataPusherLayer"
+      SolrLayer: "{{ Environment }}CKANOpsWorksSolrLayer"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "CKAN"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: "CKAN-STAGING-OpsWorks-service-instances"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: STAGING
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      DataPusherLayer: "{{ Environment }}CKANOpsWorksDataPusherLayer"
+      SolrLayer: "{{ Environment }}CKANOpsWorksSolrLayer"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "CKAN"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: "CKAN-TRAINING-OpsWorks-service-instances"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: TRAINING
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      DataPusherLayer: "{{ Environment }}CKANOpsWorksDataPusherLayer"
+      SolrLayer: "{{ Environment }}CKANOpsWorksSolrLayer"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "CKAN"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "Yes"
+
+  - name: "CKAN-DEV-OpsWorks-service-instances"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: DEV
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      DataPusherLayer: "{{ Environment }}CKANOpsWorksDataPusherLayer"
+      SolrLayer: "{{ Environment }}CKANOpsWorksSolrLayer"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "CKAN"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "Yes"

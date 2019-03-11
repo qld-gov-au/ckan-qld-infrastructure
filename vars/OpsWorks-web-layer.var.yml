@@ -1,0 +1,156 @@
+---
+template: "templates/OpsWorks-web-layer.cfn.yml"
+
+cloudformation_stacks:
+  - name: "{{ titlecase_name }}-PROD-OpsWorks-web-layer"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: PROD
+      ApplicationTitle: "{{ title }}"
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      StackTLD: ckan.services.qld.gov.au
+      IntermediateTLD: internal.ckan.services.qld.gov.au
+      PublicDnsName: "{{ Domain }}"
+      CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_password', region=region) }}"
+      BeakerSecret: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/beaker_secret', region=region) }}"
+      WebSubnets: "{{ Environment }}CKANWebSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
+      AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
+      CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+      AppSG: "{{ Environment }}CKANAppAsgSG"
+      IntermediateCertificateARN: "arn:aws:acm:us-east-1:265326298602:certificate/4e998cee-fb84-466f-89f4-8d87b7db83fd"
+      PublicCertificateARN: "{{ ACMCertificateARN }}"
+      WebACLId: "{{ Environment }}CKANWebACLId"
+      LogBucketName: "osssio-ckan-web-logs"
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: "{{ titlecase_name }}-STAGING-OpsWorks-web-layer"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: STAGING
+      ApplicationTitle: "{{ title }}"
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      StackTLD: ckan.staging-services.qld.gov.au
+      IntermediateTLD: internal.ckan.staging-services.qld.gov.au
+      PublicDnsName: "{{ Domain }}"
+      CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_password', region=region) }}"
+      BeakerSecret: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/beaker_secret', region=region) }}"
+      WebSubnets: "{{ Environment }}CKANWebSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
+      AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
+      CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+      AppSG: "{{ Environment }}CKANAppAsgSG"
+      IntermediateCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/c11bea3d-07d0-49df-9e44-1e81f048f576"
+      PublicCertificateARN: "{{ ACMCertificateARN }}"
+      WebACLId: "{{ Environment }}CKANWebACLId"
+      LogBucketName: "osssio-ckan-web-logs"
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: "{{ titlecase_name }}-TRAINING-OpsWorks-web-layer"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: TRAINING
+      ApplicationTitle: "{{ title }}"
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      StackTLD: training.ckan.devpit140cs.qgov.net.au
+      IntermediateTLD: internal.ckan.training-services.qld.gov.au
+      PublicDnsName: "{{ Domain }}"
+      CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_password', region=region) }}"
+      BeakerSecret: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/beaker_secret', region=region) }}"
+      WebSubnets: "{{ Environment }}CKANWebSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
+      AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
+      CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+      AppSG: "{{ Environment }}CKANAppAsgSG"
+      IntermediateCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/f280a938-d6bb-4056-9a54-a94543bff03a"
+      PublicCertificateARN: "{{ ACMCertificateARN }}"
+      WebACLId: "{{ Environment }}CKANWebACLId"
+      LogBucketName: "osssio-ckan-web-logs"
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "Yes"
+
+  - name: "{{ titlecase_name }}-DEV-OpsWorks-web-layer"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: DEV
+      ApplicationTitle: "{{ title }}"
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      StackTLD: internal.ckan.devpit140cs.qgov.net.au
+      IntermediateTLD: dev.ckan.devpit140cs.qgov.net.au
+      PublicDnsName: "{{ Domain }}"
+      CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
+      CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
+      CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
+      PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_user', region=region) }}"
+      PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + lowercase_name + '_password', region=region) }}"
+      BeakerSecret: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/beaker_secret', region=region) }}"
+      WebSubnets: "{{ Environment }}CKANWebSubnet"
+      AdminSG: "{{ Environment }}CKANManagementSG"
+      AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
+      CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+      AppSG: "{{ Environment }}CKANAppAsgSG"
+      IntermediateCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/db8fbe61-7690-4953-9eaa-c3b30814d9e8"
+      PublicCertificateARN: "{{ ACMCertificateARN }}"
+      LogBucketName: "osssio-ckan-web-logs"
+      WebACLId: "{{ Environment }}CKANWebACLId"
+      LogBucketName: "osssio-ckan-web-logs"
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "Yes"

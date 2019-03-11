@@ -17,7 +17,6 @@ else
   set -e
 
   run-playbook "vpc"
-  run-playbook "vpc-config"
   run-playbook "security_groups"
   run-playbook "database"
   run-playbook "database-config"

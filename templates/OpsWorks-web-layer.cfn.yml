@@ -1,0 +1,398 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Adds a web layer to an OpsWorks CKAN Stack."
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: OpsWorks Stack Details
+        Parameters:
+          - ApplicationTitle
+          - ApplicationName
+          - ApplicationId
+          - Environment
+          - StackTLD
+          - IntermediateTLD
+          - PublicDnsName
+          - CacheAddress
+          - CachePort
+          - EnableDataStore
+          - AdminUserGroup
+          - AdminPubKeyBucket
+          - WebSubnets
+          - AdminSG
+          - AppLBSG
+          - CloudFrontSG
+          - IntermediateCertificateARN
+          - AppSG
+
+      - Label:
+          default: CloudFront distribution details
+        Parameters:
+          - LogBucketName
+          - WebACLId
+          - PublicCertificateARN
+
+      - Label:
+          default: CKAN Options
+        Parameters:
+          - PGDBUser
+          - PGDBPassword
+          - BeakerSecret
+          - CKANAdminPW
+          - CKANAdminEmail
+
+    ParameterLabels:
+      OpsWorksStack:
+        default: What OpsWorks Stack do you want to add the CKAN layer to?
+      ApplicationTitle:
+        default: Publicly visible name of the application
+      ApplicationName:
+        default: Name of the application (ie. GI or Services, etc)
+      ApplicationId:
+        default: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+      Environment:
+        default: What version is this OpsWorks stack (eg STAGING)?
+      EnableDataStore:
+        default: Do you want to set up DataStore support?
+      StackTLD:
+        default: What TLD hosted on Route53 is this stack using for internal DNS?
+      IntermediateTLD:
+        default: What TLD hosted on Route53 is this stack using for support DNS (public, but not advertised)?
+      PublicDnsName:
+        default: What is the public DNS name for the site?
+      CacheAddress:
+        default: What is the address of the Redis cache?
+      CachePort:
+        default: What is the listening port of the Redis cache?
+      AdminUserGroup:
+        default: What group should Bastion Host Admins belong to?
+      AdminPubKeyBucket:
+        default: Where is the S3 bucket for Bastion Host Admin's public keys?
+      WebSubnets:
+        default: What base name are the web layer subnet IDs exported under?
+      AdminSG:
+        default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
+      AppLBSG:
+        default: Which Security Group in the selected VPC should be attached to the application load balancer?
+      CloudFrontSG:
+        default: Which Security Group in the selected VPC permits access from CloudFront?
+      IntermediateCertificateARN:
+        default: Which certificate should be used by the application load balancer?
+      PublicCertificateARN:
+        default: Which certificate should be used by CloudFront?
+      WebACLId:
+        default: Which WAF ACL should protect the application?
+      LogBucketName:
+        default: Which bucket should store CloudFront logs?
+      AppSG:
+        default: Which Security Group in the selected VPC should be attached to the application layer?
+      PGDBUser:
+        default: Account name for (non-superuser) Postgres DB access.
+      PGDBPassword:
+        default: Enter a password for Postgres DB access.
+      BeakerSecret:
+        default: Enter the secret key used to hash login cookies.
+      CKANAdminPW:
+        default: Enter a password for your CKAN Admin user.
+      CKANAdminEmail:
+        default: Enter the email address for your CKAN Admin user.
+
+Parameters:
+  Environment:
+    Description: Select a stack version.
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  OpsWorksStack:
+    Description: The exported name of the OpsWorks Stack ID
+    Type: String
+  ApplicationTitle:
+    Description: Publicly visible name of the application.
+    Type: String
+  ApplicationName:
+    Description: Name of the application (ie. GI or Services, etc)
+    Type: String
+  ApplicationId:
+    Description: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+    Type: String
+    ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
+    AllowedPattern: '[-_a-z0-9]*'
+  StackTLD:
+    Description: Route53 hosted TLD for stack
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  IntermediateTLD:
+    Description: Route53 hosted TLD for support access (public but not advertised)
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  PublicDnsName:
+    Description: Public DNS name
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  EnableDataStore:
+    Description: Whether or not to support the DataStore.
+    Type: String
+    Default: "no"
+    AllowedValues:
+      - "yes"
+      - "no"
+  CacheAddress:
+    Description: The exported name of the address for the Redis cache.
+    Type: String
+    Default: localhost
+  CachePort:
+    Description: The listen port for the Redis cache.
+    Type: String
+    Default: 6379
+  AdminUserGroup:
+    Description: Valid Linux group name
+    Type: String
+    Default: link
+  AdminPubKeyBucket:
+    Description: S3 Bucket URL
+    Type: String
+    Default: s3://link-opsworks/keys/
+  WebSubnets:
+    Type: String
+    Description: The base name for the exported web layer subnet IDs, eg if the exports are 'PRODMyApplicationWebSubnetA' and 'PRODMyApplicationWebSubnetB', then this would be 'PRODMyApplicationWebSubnet'
+  AdminSG:
+    Description: The exported name of the security group ID containing sysadmin inbound rules
+    Type: String
+  AppLBSG:
+    Description: The exported name of the security group ID to attach to the application load balancer.
+    Type: String
+  CloudFrontSG:
+    Description: The exported name of the security group ID for resources that should be accessed by CloudFront.
+    Type: String
+  IntermediateCertificateARN:
+    Description: ARN for certificate to be used by the application load balancer.
+    Type: String
+  PublicCertificateARN:
+    Description: ARN for certificate to be used by CloudFront.
+    Type: String
+  WebACLId:
+    Description: The exported name of the WAF web ACL Id.
+    Type: String
+  LogBucketName:
+    Description: Name of the S3 logging bucket.
+    Type: String
+  AppSG:
+    Description: The exported name of the security group ID to attach to applications.
+    Type: String
+  CKANAdminPW:
+    NoEcho: true
+    Description: Password must be at least 8 characters up to a maximum of 64 characters in length.
+    Type: String
+    MinLength: 8
+    MaxLength: 64
+    AllowedPattern: "[-a-zA-Z0-9_!@#$%^&*()|]*"
+    ConstraintDescription: Must be 8 - 64 characters.
+  CKANAdminEmail:
+    Description: Valid Email Address
+    Type: String
+  BeakerSecret:
+    NoEcho: true
+    Description: Secret key used by CKAN to hash login cookies.
+    Type: String
+    MinLength: 32
+    ConstraintDescription: Must be at least 32 characters.
+  PGDBUser:
+    Description: Account name for (non-superuser) Postgres DB access.
+    Type: String
+  PGDBPassword:
+    NoEcho: true
+    Description: Password must be at least 8 alphanumeric characters up to a maximum of 64 characters in length.
+    Type: String
+    MinLength: 8
+    MaxLength: 64
+    AllowedPattern: "[a-zA-Z0-9]*"
+    ConstraintDescription: Must be 8 - 64 alphanumeric characters.
+
+Resources:
+  OpsWorksWebLayer:
+    Type: AWS::OpsWorks::Layer
+    Properties:
+      AutoAssignElasticIps: false
+      AutoAssignPublicIps: true
+      CustomJson:
+        datashades:
+          ckan_web:
+            adminpw: !Ref CKANAdminPW
+            adminemail: !Ref CKANAdminEmail
+            beaker_secret: !Ref BeakerSecret
+            dbuser: !Ref PGDBUser
+            dbname: !Ref ApplicationName
+            dsuser: !Sub "${PGDBUser}_datastore"
+            dsname: !Sub "${ApplicationName}_datastore"
+            dsenable: !Ref EnableDataStore
+            title: !Ref ApplicationTitle
+            endpoint: /
+          jumpbox:
+            bucket: !Ref AdminPubKeyBucket
+            usergroup: !Ref AdminUserGroup
+          postgres:
+            password: !Ref PGDBPassword
+          redis:
+            hostname:
+              Fn::ImportValue: !Ref CacheAddress
+            port: !Ref CachePort
+          tld: !Ref StackTLD
+          version: !Ref Environment
+          app_id: !Ref ApplicationId
+      CustomRecipes:
+        Setup:
+          - "datashades::ckanweb-setup"
+        Deploy:
+          - "datashades::ckanweb-deploy"
+        Configure:
+          - "datashades::ckanweb-configure"
+      CustomSecurityGroupIds:
+        - Fn::ImportValue: !Ref AdminSG
+        - Fn::ImportValue: !Ref AppSG
+      EnableAutoHealing: true
+      InstallUpdatesOnBoot: true
+      Name: !Sub "${ApplicationName}-Web"
+      Shortname: !Sub "${ApplicationId}-web"
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStack
+      Type: custom
+
+  CKANELB:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      LoadBalancerName: !Sub "${Environment}-${ApplicationName}ELB"
+      HealthCheck:
+        Target: "HTTP:80/"
+        HealthyThreshold: 2
+        UnhealthyThreshold: 6
+        Interval: 30
+        Timeout: 20
+      Listeners:
+        -
+          InstancePort: 80
+          LoadBalancerPort: 80
+          Protocol: HTTP
+        - LoadBalancerPort: 443
+          InstancePort: 80
+          Protocol: HTTPS
+          SSLCertificateId: !Ref IntermediateCertificateARN
+      Scheme: "internet-facing"
+      SecurityGroups:
+        - Fn::ImportValue: !Ref AppLBSG
+        - Fn::ImportValue: !Ref CloudFrontSG
+      Subnets:
+        - Fn::ImportValue:
+            !Sub "${WebSubnets}A"
+        - Fn::ImportValue:
+            !Sub "${WebSubnets}B"
+
+  ELBAttachment:
+    Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
+    Properties:
+      ElasticLoadBalancerName: !Ref CKANELB
+      LayerId: !Ref OpsWorksWebLayer
+
+  WebELBCNAME:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      Name: !Sub "${ApplicationId}elb.${IntermediateTLD}"
+      HostedZoneName: !Sub "${IntermediateTLD}."
+      AliasTarget:
+        HostedZoneId:
+          Fn::GetAtt:
+            - CKANELB
+            - CanonicalHostedZoneNameID
+        DNSName:
+          Fn::GetAtt:
+            - CKANELB
+            - DNSName
+
+  DistributionConfig:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - Ref: PublicDnsName
+          - !Sub "www.${PublicDnsName}"
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          - POST
+          - DELETE
+          - OPTIONS
+          - PUT
+          - PATCH
+          Compress: true
+          ForwardedValues:
+            Cookies:
+              Forward: all
+            QueryString: 'true'
+            Headers:
+             - "*"
+          TargetOriginId: 'WebOrigin'
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: home/index.html
+        Enabled: true
+        Logging:
+          Bucket: !Sub "${LogBucketName}.s3.amazonaws.com"
+          IncludeCookies: true
+          Prefix: !Sub "cloudfront-logs/${ApplicationName}/${Environment}/"
+        Origins:
+          - DomainName: !Ref WebELBCNAME
+            Id: 'WebOrigin'
+            CustomOriginConfig:
+              OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
+        PriceClass: PriceClass_All
+        WebACLId:
+          Fn::ImportValue: !Ref WebACLId
+        HttpVersion: 'http2'
+        #IsIPV6Enabled: 'true'
+        ViewerCertificate:
+          AcmCertificateArn:
+            Ref: PublicCertificateARN
+          SslSupportMethod: sni-only
+        Comment: !Sub "${Environment}-${ApplicationName} ${PublicDnsName}"
+
+Outputs:
+  WebLayer:
+    Value: !Ref OpsWorksWebLayer
+    Description: Web Layer Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksWebLayer"
+
+  WebELBDomainName:
+    Value: !Ref WebELBCNAME
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebElbNiceDNSName"
+
+  CloudfrontAliasDNSName:
+    Value:
+      Fn::GetAtt:
+      - DistributionConfig
+      - DomainName
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref ApplicationName
+            - "CloudfrontAliasDNSName"
+
+  CloudfrontAliasHostedZoneID:
+    Value: "Z2FDTNDATAQYW2" # All CloudFront distributions are in this zone, see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref ApplicationName
+            - "CloudfrontAliasHostedZoneID"
