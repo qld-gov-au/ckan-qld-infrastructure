@@ -30,7 +30,7 @@ cloudformation_stacks:
       CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
       AppSG: "{{ Environment }}CKANAppAsgSG"
       DatabaseSG: "{{ Environment }}CKANDatabaseSG"
-      ACMCertificateARN: "arn:aws:acm:us-east-1:265326298602:certificate/4e998cee-fb84-466f-89f4-8d87b7db83fd"
+      ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/29d2a412-555a-49d9-a20d-cfe598fd2ce1"
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
