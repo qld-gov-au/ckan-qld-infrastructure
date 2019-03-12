@@ -10,7 +10,6 @@ cloudformation_stacks:
     template_parameters:
       Environment: PROD
       Platform: CKAN
-      AZMode: "cross-az"
       Subnets: "{{ Environment }}CKANDBSubnet"
     tags:
       Environment: "{{ Environment }}"
