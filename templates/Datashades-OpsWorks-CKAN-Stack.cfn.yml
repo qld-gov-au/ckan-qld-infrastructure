@@ -469,7 +469,7 @@ Resources:
     Type: AWS::OpsWorks::Layer
     Properties:
       AutoAssignElasticIps: false
-      AutoAssignPublicIps: true
+      AutoAssignPublicIps: false
       CustomRecipes:
         Shutdown:
           - "datashades::datapusher-shutdown"
@@ -502,7 +502,7 @@ Resources:
         Shutdown:
           - "datashades::solr-shutdown"
       AutoAssignElasticIps: false
-      AutoAssignPublicIps: true
+      AutoAssignPublicIps: false
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref DatabaseSG
@@ -517,7 +517,7 @@ Resources:
     Type: AWS::OpsWorks::Layer
     Properties:
       AutoAssignElasticIps: false
-      AutoAssignPublicIps: true
+      AutoAssignPublicIps: false
       CustomRecipes:
         Setup:
           - "datashades::ckanweb-setup"
