@@ -539,7 +539,7 @@ Resources:
     Type: AWS::OpsWorks::App
     Properties:
       Domains:
-        - !Sub "${ApplicationId}.${StackTLD}"
+        - !Sub "${ApplicationId}.${IntermediateTLD}"
       AppSource:
         Type: archive
         Url: !Ref CKANSource
