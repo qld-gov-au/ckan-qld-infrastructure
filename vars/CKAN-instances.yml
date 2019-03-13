@@ -13,8 +13,6 @@ cloudformation_stacks:
       DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
-      DefaultEC2Key: osssio-global-ckan
-      AppSubnets: "{{ Environment }}CKANAppSubnet"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -34,8 +32,6 @@ cloudformation_stacks:
       DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
-      DefaultEC2Key: osssio-global-ckan
-      AppSubnets: "{{ Environment }}CKANAppSubnet"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -56,8 +52,6 @@ cloudformation_stacks:
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       WebEC2Size: t3.small
-      DefaultEC2Key: osssio-global-ckan
-      AppSubnets: "{{ Environment }}CKANAppSubnet"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -78,8 +72,6 @@ cloudformation_stacks:
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       WebEC2Size: t3.small
-      DefaultEC2Key: osssio-global-ckan
-      AppSubnets: "{{ Environment }}CKANAppSubnet"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"

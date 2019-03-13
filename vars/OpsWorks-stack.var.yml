@@ -1,19 +1,24 @@
 ---
-template: "templates/efs.cfn.yml"
+template: "templates/OpsWorks-stack.cfn.yml"
 
 cloudformation_stacks:
-  - name: CKAN-PROD-EFS-stack
+  - name: "CKAN-PROD-OpsWorks-stack"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: PROD
-      ApplicationName: CKAN
+      ApplicationName: "CKAN"
+      ApplicationId: "ckan"
       StackTLD: ckan-internal.services.qld.gov.au
       StackVPC: "CKANVpc-{{ Environment }}"
-      DbSubnets: "{{ Environment }}CKANDBSubnet"
+      DefaultEC2Key: osssio-global-ckan
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
       AdminSG: "{{ Environment }}CKANManagementSG"
+      DatabaseSG: "{{ Environment }}CKANDatabaseSG"
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+      CreateServiceRole: "yes"
     tags:
       Environment: "{{ Environment }}"
       Service: "CKAN"
@@ -22,18 +27,23 @@ cloudformation_stacks:
       Version: "1.0"
       PowerManaged: "No"
 
-  - name: CKAN-STAGING-EFS-stack
+  - name: "CKAN-STAGING-OpsWorks-stack"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: STAGING
-      ApplicationName: CKAN
+      ApplicationName: "CKAN"
+      ApplicationId: "ckan"
       StackTLD: ckan-internal.staging-services.qld.gov.au
       StackVPC: "CKANVpc-{{ Environment }}"
-      DbSubnets: "{{ Environment }}CKANDBSubnet"
+      DefaultEC2Key: osssio-global-ckan
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
       AdminSG: "{{ Environment }}CKANManagementSG"
+      DatabaseSG: "{{ Environment }}CKANDatabaseSG"
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+      CreateServiceRole: "yes"
     tags:
       Environment: "{{ Environment }}"
       Service: "CKAN"
@@ -42,18 +52,23 @@ cloudformation_stacks:
       Version: "1.0"
       PowerManaged: "No"
 
-  - name: CKAN-TRAINING-EFS-stack
+  - name: "CKAN-TRAINING-OpsWorks-stack"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: TRAINING
-      ApplicationName: CKAN
+      ApplicationName: "CKAN"
+      ApplicationId: "ckan"
       StackTLD: ckan-internal.training-services.qld.gov.au
       StackVPC: "CKANVpc-{{ Environment }}"
-      DbSubnets: "{{ Environment }}CKANDBSubnet"
+      DefaultEC2Key: osssio-global-ckan
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
       AdminSG: "{{ Environment }}CKANManagementSG"
+      DatabaseSG: "{{ Environment }}CKANDatabaseSG"
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+      CreateServiceRole: "yes"
     tags:
       Environment: "{{ Environment }}"
       Service: "CKAN"
@@ -62,18 +77,23 @@ cloudformation_stacks:
       Version: "1.0"
       PowerManaged: "Yes"
 
-  - name: CKAN-DEV-EFS-stack
+  - name: "CKAN-DEV-OpsWorks-stack"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: DEV
-      ApplicationName: CKAN
+      ApplicationName: "CKAN"
+      ApplicationId: "ckan"
       StackTLD: internal.ckan.devpit140cs.qgov.net.au
       StackVPC: "CKANVpc-{{ Environment }}"
-      DbSubnets: "{{ Environment }}CKANDBSubnet"
+      DefaultEC2Key: osssio-global-ckan
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
       AdminSG: "{{ Environment }}CKANManagementSG"
+      DatabaseSG: "{{ Environment }}CKANDatabaseSG"
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
+      CreateServiceRole: "yes"
     tags:
       Environment: "{{ Environment }}"
       Service: "CKAN"

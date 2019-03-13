@@ -18,8 +18,10 @@ Metadata:
           - CreateServiceRole
           - ApplicationName
           - ApplicationId
+          - ApplicationTitle
           - Environment
           - StackTLD
+          - IntermediateTLD
           - PublicTLD
           - CreateTLD
           - CacheAddress
@@ -35,7 +37,6 @@ Metadata:
           - StackVPC
           - WebSubnets
           - AppSubnets
-          - DbSubnets
           - AdminSG
           - AppLBSG
           - CloudFrontSG
@@ -78,6 +79,8 @@ Metadata:
         default: Name of the application (ie. GI or Services, etc)
       ApplicationId:
         default: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+      ApplicationTitle:
+        default: Publicly visible title of the application
       Environment:
         default: What version is this OpsWorks stack?
       CreateTLD:
@@ -96,6 +99,8 @@ Metadata:
         default: Do you want to provision an Elastic Load Balancer with this stack?
       StackTLD:
         default: What TLD hosted on Route53 is this stack using for internal DNS?
+      IntermediateTLD:
+        default: What TLD hosted on Route53 is this stack using for support DNS (public, but not advertised)?
       PublicTLD:
         default: What TLD hosted on Route53 is this stack using for public DNS?
       CacheAddress:
@@ -114,8 +119,6 @@ Metadata:
         default: What base name are the web layer subnet IDs exported under?
       AppSubnets:
         default: What base name are the application layer subnet IDs exported under?
-      DbSubnets:
-        default: What base name are the data layer subnet IDs exported under?
       AdminSG:
         default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
       AppLBSG:
@@ -178,6 +181,9 @@ Parameters:
     Type: String
     ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
     AllowedPattern: '[-_a-z0-9]*'
+  ApplicationTitle:
+    Description: Publicly visible title for the application
+    Type: String
   Environment:
     Description: Select a stack version.
     Type: String
@@ -192,8 +198,13 @@ Parameters:
     Type: String
     MinLength: 6
     MaxLength: 254
+  IntermediateTLD:
+    Description: Route53 hosted TLD for support access (public but not advertised)
+    Type: String
+    MinLength: 6
+    MaxLength: 254
   PublicTLD:
-    Description: Route53 hosted TLD for stack
+    Description: Route53 hosted TLD for public access
     Type: String
     MinLength: 6
     MaxLength: 254
@@ -281,9 +292,6 @@ Parameters:
   AppSubnets:
     Type: String
     Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'
-  DbSubnets:
-    Type: String
-    Description: The base name for the exported data layer subnet IDs, eg if the exports are 'PRODMyApplicationDbSubnetA' and 'PRODMyApplicationDbSubnetB', then this would be 'PRODMyApplicationDbSubnet'
   AdminSG:
     Description: The exported name of the security group ID containing sysadmin inbound rules
     Type: String
@@ -341,10 +349,6 @@ Conditions:
       - Fn::Equals:
           - "yes"
           - !Ref CreateInstances
-  UseMultiAZ:
-    Fn::Equals:
-      - PROD
-      - !Ref Environment
 
 Resources:
   OpsWorksServiceRole:
@@ -397,6 +401,7 @@ Resources:
                 Resource: "*"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/PowerUserAccess
+        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
 
   InstanceRoleProfile:
     Type: AWS::IAM::InstanceProfile
@@ -420,6 +425,7 @@ Resources:
       CustomJson:
         datashades:
           ckan_web:
+            title: !Sub "${ApplicationTitle} | Queensland Government"
             adminpw: !Ref CKANAdminPW
             adminemail: !Ref CKANAdminEmail
             beaker_secret: !Ref BeakerSecret
@@ -471,7 +477,7 @@ Resources:
     Type: AWS::OpsWorks::Layer
     Properties:
       AutoAssignElasticIps: false
-      AutoAssignPublicIps: true
+      AutoAssignPublicIps: false
       CustomRecipes:
         Shutdown:
           - "datashades::datapusher-shutdown"
@@ -504,7 +510,7 @@ Resources:
         Shutdown:
           - "datashades::solr-shutdown"
       AutoAssignElasticIps: false
-      AutoAssignPublicIps: true
+      AutoAssignPublicIps: false
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref DatabaseSG
@@ -519,7 +525,7 @@ Resources:
     Type: AWS::OpsWorks::Layer
     Properties:
       AutoAssignElasticIps: false
-      AutoAssignPublicIps: true
+      AutoAssignPublicIps: false
       CustomRecipes:
         Setup:
           - "datashades::ckanweb-setup"
@@ -541,7 +547,7 @@ Resources:
     Type: AWS::OpsWorks::App
     Properties:
       Domains:
-        - !Sub "${ApplicationId}.${StackTLD}"
+        - !Sub "${ApplicationId}.${IntermediateTLD}"
       AppSource:
         Type: archive
         Url: !Ref CKANSource
@@ -637,8 +643,8 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       Type: A
-      Name: !Sub "${ApplicationId}.${StackTLD}"
-      HostedZoneName: !Sub "${StackTLD}."
+      Name: !Sub "${ApplicationId}.${IntermediateTLD}"
+      HostedZoneName: !Sub "${IntermediateTLD}."
       AliasTarget:
         HostedZoneId:
           Fn::GetAtt:

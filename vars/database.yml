@@ -6,7 +6,7 @@ cloudformation_stacks:
     disable_rollback: true
     template: "templates/database.cfn.yml"
     template_parameters:
-      DBAllocatedStorage: "300"
+      DBAllocatedStorage: "600"
       DBClass: db.m5.large
       DBEngine: postgres
       DBEngineVersion: 10.6
@@ -21,7 +21,7 @@ cloudformation_stacks:
       MultiAZ: "true"
       Subnets: "{{ Environment }}CKANDBSubnet"
       VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: ckan.services.qld.gov.au
+      StackTLD: ckan-internal.services.qld.gov.au
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -36,7 +36,7 @@ cloudformation_stacks:
     disable_rollback: true
     template: "templates/database.cfn.yml"
     template_parameters:
-      DBAllocatedStorage: '150'
+      DBAllocatedStorage: '300'
       DBClass: db.t3.large
       DBEngine: postgres
       DBEngineVersion: 10.6
@@ -51,7 +51,7 @@ cloudformation_stacks:
       MultiAZ: "true"
       Subnets: "{{ Environment }}CKANDBSubnet"
       VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: ckan.staging-services.qld.gov.au
+      StackTLD: ckan-internal.staging-services.qld.gov.au
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -81,7 +81,7 @@ cloudformation_stacks:
       MultiAZ: "false"
       Subnets: "{{ Environment }}CKANDBSubnet"
       VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: training.ckan.devpit140cs.qgov.net.au
+      StackTLD: ckan-internal.training-services.qld.gov.au
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -96,7 +96,7 @@ cloudformation_stacks:
     disable_rollback: true
     template: "templates/database.cfn.yml"
     template_parameters:
-      DBAllocatedStorage: "100"
+      DBAllocatedStorage: "200"
       DBClass: db.t3.medium
       DBEngine: postgres
       DBEngineVersion: 10.6
@@ -111,7 +111,7 @@ cloudformation_stacks:
       MultiAZ: "false"
       Subnets: "{{ Environment }}CKANDBSubnet"
       VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: dev.ckan.devpit140cs.qgov.net.au
+      StackTLD: internal.ckan.devpit140cs.qgov.net.au
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN

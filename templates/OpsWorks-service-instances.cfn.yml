@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Creates instances for OpsWorks CKAN NFS Stack.'
+Description: 'Creates instances for OpsWorks CKAN Stack service layer.'
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -8,34 +8,26 @@ Metadata:
           default: OpsWorks Stack Details
         Parameters:
           - Environment
-          - OpsWorksStackID
-          - SolrLayerID
-          - WebLayerID
-
+          - OpsWorksStack
+          - DataPusherLayer
+          - SolrLayer
       - Label:
           default: Stack Instance Details
         Parameters:
           - ServicesEC2Size
-          - WebEC2Size
-          - Subnets
 
     ParameterLabels:
       Environment:
         default: What version is this OpsWorks stack (eg STAGING)?
       ServicesEC2Size:
         default: What instance size do you want to use for Service Instances?
-      WebEC2Size:
-        default: What instance size do you want to use for Web Instances?
-      OpsWorksStackID:
+      OpsWorksStack:
         default: What OpsWorks stack do you want to provision instances into?
-      DataPusherLayerID:
+      DataPusherLayer:
         default: What is the DataPusher Layer ID of the stack?
-      SolrLayerID:
+      SolrLayer:
         default: What is the Solr Layer ID of the stack?
-      WebLayerID:
-        default: What is the Web Layer ID of the stack?
-      Subnets:
-        default: What base name are the application layer subnet IDs exported under?
+
 Parameters:
   Environment:
     Description: Select a stack version.
@@ -61,32 +53,14 @@ Parameters:
       - m5.4xlarge
       - m4.10xlarge
       - m5.12xlarge
-  WebEC2Size:
-    Description: Select EC2 Instance Size.
-    Type: String
-    Default: t3.medium
-    AllowedValues:
-      - t3.small
-      - t3.medium
-      - t3.large
-      - m3.medium
-      - m5.large
-      - m5.xlarge
-      - m5.2xlarge
-      - m5.4xlarge
-      - m4.10xlarge
-      - m5.12xlarge
-  OpsWorksStackID:
+  OpsWorksStack:
     Description: The exported name of the OpsWorks Stack ID.
     Type: String
-  DataPusherLayerID:
+  DataPusherLayer:
     Description: The exported name of the OpsWorks DataPusher Stack Layer ID.
     Type: String
-  SolrLayerID:
+  SolrLayer:
     Description: The exported name of the OpsWorks Solr Stack Layer ID.
-    Type: String
-  WebLayerID:
-    Description: The exported name of the OpsWorks Web Stack Layer ID.
     Type: String
 
 Resources:
@@ -97,28 +71,12 @@ Resources:
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
       LayerIds:
-        - Fn::ImportValue: !Ref DataPusherLayerID
-        - Fn::ImportValue: !Ref SolrLayerID
+        - Fn::ImportValue: !Ref DataPusherLayer
+        - Fn::ImportValue: !Ref SolrLayer
       StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-
-  OpswxEC2Web1:
-    Type: AWS::OpsWorks::Instance
-    DependsOn:
-      - OpswxEC2Services1
-    Properties:
-      RootDeviceType: ebs
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref WebEC2Size
-      LayerIds:
-        - Fn::ImportValue: !Ref WebLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
+        Fn::ImportValue: !Ref OpsWorksStack
 
 Outputs:
   ServiceInstance:
     Value: !Ref OpswxEC2Services1
     Description: Services Node Instance Id
-  WebInstance:
-    Value: !Ref OpswxEC2Web1
-    Description: Web Node Instance Id

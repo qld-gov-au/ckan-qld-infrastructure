@@ -5,28 +5,34 @@ VARS_FILE="$1"
 ENVIRONMENT="$2"
 ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS Environment=$ENVIRONMENT"
 
+set -x
+
 function run-playbook {
-  ansible-playbook -i inventory/hosts "$1.yml" --extra-vars "@$VARS_FILE" --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
+  if [ ! -z "$2" ]; then
+    VARS_FILE_2="--extra-vars @$2"
+  else
+    unset VARS_FILE_2
+  fi
+  ansible-playbook -i inventory/hosts "$1.yml" --extra-vars "@$VARS_FILE" $VARS_FILE_2 --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 }
 
 if [ $# -ge 3 ]; then
   # run custom playbook
-  run-playbook "$3"
+  run-playbook "$3" "$4"
 else
   #ensure we die if any function fails
   set -e
 
   run-playbook "vpc"
-  run-playbook "vpc-config"
   run-playbook "security_groups"
-  run-playbook "database"
+  run-playbook CloudFormation "vars/database.yml"
   run-playbook "database-config"
-  run-playbook "efs"
-  run-playbook "cache"
-  run-playbook "waf"
+  run-playbook CloudFormation "vars/efs.yml"
+  run-playbook CloudFormation "vars/cache.yml"
+  run-playbook CloudFormation "vars/waf_web_acl.var.yml"
   run-playbook "CKAN-Stack"
-  run-playbook "CKAN-extensions"
-  run-playbook "CKAN-instances"
+  run-playbook CloudFormation "vars/CKAN-extensions.yml"
+  run-playbook CloudFormation "vars/CKAN-instances.yml"
   run-playbook "cloudfront"
 fi
 

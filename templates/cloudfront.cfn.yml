@@ -48,7 +48,7 @@ Resources:
              - "*"
           TargetOriginId: 'WebOrigin'
           ViewerProtocolPolicy: redirect-to-https
-        DefaultRootObject: home/index.html
+        DefaultRootObject: /
         Enabled: true
         Logging:
           Bucket: !Sub "${LogBucketName}.s3.amazonaws.com"

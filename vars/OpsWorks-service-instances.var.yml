@@ -1,19 +1,17 @@
 ---
-template: "templates/efs.cfn.yml"
+template: "templates/OpsWorks-service-instances.cfn.yml"
 
 cloudformation_stacks:
-  - name: CKAN-PROD-EFS-stack
+  - name: "CKAN-PROD-OpsWorks-service-instances"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: PROD
-      ApplicationName: CKAN
-      StackTLD: ckan-internal.services.qld.gov.au
-      StackVPC: "CKANVpc-{{ Environment }}"
-      DbSubnets: "{{ Environment }}CKANDBSubnet"
-      AdminSG: "{{ Environment }}CKANManagementSG"
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      DataPusherLayer: "{{ Environment }}CKANOpsWorksDataPusherLayer"
+      SolrLayer: "{{ Environment }}CKANOpsWorksSolrLayer"
     tags:
       Environment: "{{ Environment }}"
       Service: "CKAN"
@@ -22,18 +20,16 @@ cloudformation_stacks:
       Version: "1.0"
       PowerManaged: "No"
 
-  - name: CKAN-STAGING-EFS-stack
+  - name: "CKAN-STAGING-OpsWorks-service-instances"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: STAGING
-      ApplicationName: CKAN
-      StackTLD: ckan-internal.staging-services.qld.gov.au
-      StackVPC: "CKANVpc-{{ Environment }}"
-      DbSubnets: "{{ Environment }}CKANDBSubnet"
-      AdminSG: "{{ Environment }}CKANManagementSG"
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      DataPusherLayer: "{{ Environment }}CKANOpsWorksDataPusherLayer"
+      SolrLayer: "{{ Environment }}CKANOpsWorksSolrLayer"
     tags:
       Environment: "{{ Environment }}"
       Service: "CKAN"
@@ -42,18 +38,16 @@ cloudformation_stacks:
       Version: "1.0"
       PowerManaged: "No"
 
-  - name: CKAN-TRAINING-EFS-stack
+  - name: "CKAN-TRAINING-OpsWorks-service-instances"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: TRAINING
-      ApplicationName: CKAN
-      StackTLD: ckan-internal.training-services.qld.gov.au
-      StackVPC: "CKANVpc-{{ Environment }}"
-      DbSubnets: "{{ Environment }}CKANDBSubnet"
-      AdminSG: "{{ Environment }}CKANManagementSG"
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      DataPusherLayer: "{{ Environment }}CKANOpsWorksDataPusherLayer"
+      SolrLayer: "{{ Environment }}CKANOpsWorksSolrLayer"
     tags:
       Environment: "{{ Environment }}"
       Service: "CKAN"
@@ -62,18 +56,16 @@ cloudformation_stacks:
       Version: "1.0"
       PowerManaged: "Yes"
 
-  - name: CKAN-DEV-EFS-stack
+  - name: "CKAN-DEV-OpsWorks-service-instances"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
       Environment: DEV
-      ApplicationName: CKAN
-      StackTLD: internal.ckan.devpit140cs.qgov.net.au
-      StackVPC: "CKANVpc-{{ Environment }}"
-      DbSubnets: "{{ Environment }}CKANDBSubnet"
-      AdminSG: "{{ Environment }}CKANManagementSG"
+      OpsWorksStack: "{{ Environment }}CKANOpsWorksStack"
+      DataPusherLayer: "{{ Environment }}CKANOpsWorksDataPusherLayer"
+      SolrLayer: "{{ Environment }}CKANOpsWorksSolrLayer"
     tags:
       Environment: "{{ Environment }}"
       Service: "CKAN"

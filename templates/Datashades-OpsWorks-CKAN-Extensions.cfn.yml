@@ -33,17 +33,9 @@ Parameters:
     Description: URL for QGOV CKAN extension.
     Default: https://github.com/qld-gov-au/ckan-ex-qgov.git
     Type: String
-  QgovExtensionRevision:
-    Description: QGOV extension repository branch to check out.
-    Default: QOL-4495-fix-bugs-for-AWS
-    Type: String
   TrakExtensionSource:
     Description: URL for Trak extension.
     Default: https://github.com/qld-gov-au/ckanext-trak.git
-    Type: String
-  TrakExtensionRevision:
-    Description: Trak extension repository branch to check out.
-    Default: master
     Type: String
 
 Resources:
@@ -52,7 +44,6 @@ Resources:
     Properties:
       AppSource:
         Type: git
-        Revision: !Ref QgovExtensionRevision
         Url: !Ref QgovExtensionSource
       Description: CKAN Extension for Queensland Government
       EnableSsl: false
@@ -67,7 +58,6 @@ Resources:
     Properties:
       AppSource:
         Type: git
-        Revision: !Ref TrakExtensionRevision
         Url: !Ref TrakExtensionSource
       Description: CKAN Trak Extension
       EnableSsl: false
@@ -94,11 +84,12 @@ Resources:
       Type: other
 
 Outputs:
-  QGov:
+  QGovApp:
     Value:
       Ref: CKANExtQGOV
     Description: CKAN Queensland Government extension App ID
-  Trak:
+
+  TrakApp:
     Value:
       Ref: CKANExtTrak
     Description: CKAN Trak extension App ID
