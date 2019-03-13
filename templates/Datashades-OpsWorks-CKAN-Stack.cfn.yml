@@ -18,6 +18,7 @@ Metadata:
           - CreateServiceRole
           - ApplicationName
           - ApplicationId
+          - ApplicationTitle
           - Environment
           - StackTLD
           - IntermediateTLD
@@ -78,6 +79,8 @@ Metadata:
         default: Name of the application (ie. GI or Services, etc)
       ApplicationId:
         default: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+      ApplicationTitle:
+        default: Publicly visible title of the application
       Environment:
         default: What version is this OpsWorks stack?
       CreateTLD:
@@ -178,6 +181,9 @@ Parameters:
     Type: String
     ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
     AllowedPattern: '[-_a-z0-9]*'
+  ApplicationTitle:
+    Description: Publicly visible title for the application
+    Type: String
   Environment:
     Description: Select a stack version.
     Type: String
@@ -418,6 +424,7 @@ Resources:
       CustomJson:
         datashades:
           ckan_web:
+            title: !Sub "${ApplicationTitle} | Queensland Government"
             adminpw: !Ref CKANAdminPW
             adminemail: !Ref CKANAdminEmail
             beaker_secret: !Ref BeakerSecret
