@@ -401,6 +401,7 @@ Resources:
                 Resource: "*"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/PowerUserAccess
+        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
 
   InstanceRoleProfile:
     Type: AWS::IAM::InstanceProfile
