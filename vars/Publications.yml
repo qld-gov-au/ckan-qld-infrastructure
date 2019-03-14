@@ -3,3 +3,4 @@ titlecase_name: Publications
 lowercase_name: "{{ titlecase_name | lower }}"
 title: Publications
 enable_datastore: "no"
+public_tld: publications.qld.gov.au
