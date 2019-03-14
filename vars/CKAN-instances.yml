@@ -13,6 +13,7 @@ cloudformation_stacks:
       DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+      WebEC2Count: 2
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -32,6 +33,7 @@ cloudformation_stacks:
       DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+      WebEC2Count: 2
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
