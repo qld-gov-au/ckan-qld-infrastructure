@@ -3,3 +3,4 @@ titlecase_name: OpenData
 lowercase_name: "{{ titlecase_name | lower }}"
 title: Data
 enable_datastore: "yes"
+public_tld: data.qld.gov.au

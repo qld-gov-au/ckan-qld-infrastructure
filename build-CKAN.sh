@@ -30,7 +30,7 @@ else
   run-playbook CloudFormation "vars/efs.yml"
   run-playbook CloudFormation "vars/cache.yml"
   run-playbook CloudFormation "vars/waf_web_acl.var.yml"
-  run-playbook "CKAN-Stack"
+  run-playbook CloudFormation "vars/CKAN-Stack.yml"
   run-playbook CloudFormation "vars/CKAN-extensions.yml"
   run-playbook CloudFormation "vars/CKAN-instances.yml"
   run-playbook "cloudfront"

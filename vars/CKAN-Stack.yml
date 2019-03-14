@@ -14,7 +14,7 @@ cloudformation_stacks:
       ApplicationTitle: "{{ title }}"
       StackTLD: ckan-internal.services.qld.gov.au
       IntermediateTLD: ckan.services.qld.gov.au
-      PublicTLD: "{{ Domain }}"
+      PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
@@ -54,7 +54,7 @@ cloudformation_stacks:
       ApplicationTitle: "{{ title }}"
       StackTLD: ckan-internal.staging-services.qld.gov.au
       IntermediateTLD: ckan.staging-services.qld.gov.au
-      PublicTLD: "{{ Domain }}"
+      PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
@@ -94,7 +94,7 @@ cloudformation_stacks:
       ApplicationTitle: "{{ title }}"
       StackTLD: ckan-internal.training-services.qld.gov.au
       IntermediateTLD: training.ckan.devpit140cs.qgov.net.au
-      PublicTLD: "{{ Domain }}"
+      PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
@@ -134,7 +134,7 @@ cloudformation_stacks:
       ApplicationTitle: "{{ title }}"
       StackTLD: internal.ckan.devpit140cs.qgov.net.au
       IntermediateTLD: dev.ckan.devpit140cs.qgov.net.au
-      PublicTLD: "{{ Domain }}"
+      PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
