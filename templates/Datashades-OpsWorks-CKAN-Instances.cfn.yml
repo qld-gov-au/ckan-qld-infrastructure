@@ -17,6 +17,7 @@ Metadata:
         Parameters:
           - ServicesEC2Size
           - WebEC2Size
+          - WebEC2Count
           - Subnets
 
     ParameterLabels:
@@ -26,6 +27,8 @@ Metadata:
         default: What instance size do you want to use for Service Instances?
       WebEC2Size:
         default: What instance size do you want to use for Web Instances?
+      WebEC2Count:
+        default: How many web instances do you want?
       OpsWorksStackID:
         default: What OpsWorks stack do you want to provision instances into?
       DataPusherLayerID:
@@ -36,6 +39,7 @@ Metadata:
         default: What is the Web Layer ID of the stack?
       Subnets:
         default: What base name are the application layer subnet IDs exported under?
+
 Parameters:
   Environment:
     Description: Select a stack version.
@@ -76,6 +80,12 @@ Parameters:
       - m5.4xlarge
       - m4.10xlarge
       - m5.12xlarge
+  WebEC2Count:
+    Description: The number of EC2 instances to create in the web layer.
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 2
   OpsWorksStackID:
     Description: The exported name of the OpsWorks Stack ID.
     Type: String
@@ -88,6 +98,12 @@ Parameters:
   WebLayerID:
     Description: The exported name of the OpsWorks Web Stack Layer ID.
     Type: String
+
+Conditions:
+  2PlusWebInstances:
+    Fn::Equals:
+      - 2
+      - !Ref WebEC2Count
 
 Resources:
   OpswxEC2Services1:
@@ -103,6 +119,20 @@ Resources:
         Fn::ImportValue: !Ref OpsWorksStackID
 
   OpswxEC2Web1:
+    Type: AWS::OpsWorks::Instance
+    DependsOn:
+      - OpswxEC2Services1
+    Properties:
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref WebEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref WebLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+
+  OpswxEC2Web2:
+    Condition: 2PlusWebInstances
     Type: AWS::OpsWorks::Instance
     DependsOn:
       - OpswxEC2Services1
