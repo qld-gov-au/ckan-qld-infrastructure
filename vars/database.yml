@@ -1,0 +1,121 @@
+---
+cloudformation_stacks:
+  - name: CKAN-PROD-RDS
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "templates/database.cfn.yml"
+    template_parameters:
+      DBAllocatedStorage: "600"
+      DBClass: db.m5.large
+      DBEngine: postgres
+      DBEngineVersion: 10.6
+      DBName: ckan
+      StorageEncrypted: "True"
+      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
+      DBPrivileges: "ALL"
+      Environment: PROD
+      Platform: CKAN
+      PubliclyAccessible: "false"
+      MultiAZ: "true"
+      Subnets: "{{ Environment }}CKANDBSubnet"
+      VPC: "CKANVpc-{{ Environment }}"
+      StackTLD: ckan-internal.services.qld.gov.au
+    tags:
+      Environment: "{{ Environment }}"
+      Service: CKAN
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: CKAN-STAGING-RDS
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "templates/database.cfn.yml"
+    template_parameters:
+      DBAllocatedStorage: '300'
+      DBClass: db.t3.large
+      DBEngine: postgres
+      DBEngineVersion: 10.6
+      DBName: ckan
+      StorageEncrypted: "True"
+      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
+      DBPrivileges: "ALL"
+      Environment: STAGING
+      Platform: CKAN
+      PubliclyAccessible: "false"
+      MultiAZ: "true"
+      Subnets: "{{ Environment }}CKANDBSubnet"
+      VPC: "CKANVpc-{{ Environment }}"
+      StackTLD: ckan-internal.staging-services.qld.gov.au
+    tags:
+      Environment: "{{ Environment }}"
+      Service: CKAN
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: CKAN-TRAINING-RDS
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "templates/database.cfn.yml"
+    template_parameters:
+      DBAllocatedStorage: "100"
+      DBClass: db.t3.medium
+      DBEngine: postgres
+      DBEngineVersion: 10.6
+      DBName: ckan
+      StorageEncrypted: "False"
+      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
+      DBPrivileges: "ALL"
+      Environment: TRAINING
+      Platform: CKAN
+      PubliclyAccessible: "false"
+      MultiAZ: "false"
+      Subnets: "{{ Environment }}CKANDBSubnet"
+      VPC: "CKANVpc-{{ Environment }}"
+      StackTLD: internal.ckan.training-services.qld.gov.au
+    tags:
+      Environment: "{{ Environment }}"
+      Service: CKAN
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "Yes"
+
+  - name: CKAN-DEV-RDS
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "templates/database.cfn.yml"
+    template_parameters:
+      DBAllocatedStorage: "200"
+      DBClass: db.t3.medium
+      DBEngine: postgres
+      DBEngineVersion: 10.6
+      DBName: ckan
+      StorageEncrypted: "False"
+      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
+      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
+      DBPrivileges: "ALL"
+      Environment: DEV
+      Platform: CKAN
+      PubliclyAccessible: "false"
+      MultiAZ: "false"
+      Subnets: "{{ Environment }}CKANDBSubnet"
+      VPC: "CKANVpc-{{ Environment }}"
+      StackTLD: internal.ckan.devpit140cs.qgov.net.au
+    tags:
+      Environment: "{{ Environment }}"
+      Service: CKAN
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "Yes"

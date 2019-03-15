@@ -1,0 +1,647 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Creates an OpsWorks CKAN Stack."
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: OpsWorks Custom Cookbook
+        Parameters:
+          - CookbookURL
+          #- CookbookSSHKey
+          - CookbookRevision
+
+      -
+        Label:
+          default: OpsWorks Stack Details
+        Parameters:
+          - CreateServiceRole
+          - ApplicationName
+          - ApplicationId
+          - ApplicationTitle
+          - Environment
+          - StackTLD
+          - IntermediateTLD
+          - PublicTLD
+          - CacheAddress
+          - CachePort
+          - EnableDataStore
+          - DefaultEC2Key
+          - AdminUserGroup
+          - AdminPubKeyBucket
+          - StackVPC
+          - WebSubnets
+          - AppSubnets
+          - AdminSG
+          - AppLBSG
+          - CloudFrontSG
+          - AppSG
+          - DatabaseSG
+          - ACMCertificateARN
+
+      -
+        Label:
+          default: CKAN Options
+        Parameters:
+          - PGDBUser
+          - PGDBPassword
+          - BeakerSecret
+          - CKANAdminPW
+          - CKANAdminEmail
+
+      -
+        Label:
+          default: Application Sources
+        Parameters:
+          - DataPusherURL
+          - SolrSource
+          - CKANSource
+
+    ParameterLabels:
+      CookbookURL:
+        default: What is the URL for the OpsWorks Custom Cookbook repository?
+      DataPusherURL:
+        default: What is the URL for the CKAN DataPusher repository?
+      SolrSource:
+        default: Provide the URL for Apache Solr source archive.
+      CKANSource:
+        default: Provide the URL for CKAN source archive.
+      #CookbookSSHKey:
+        #default: Paste the private key for the Cookbook repository.
+      CookbookRevision:
+        default: What repository branch should the Custom Cookbook use?
+      ApplicationName:
+        default: Name of the application (ie. GI or Services, etc)
+      ApplicationId:
+        default: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+      ApplicationTitle:
+        default: Publicly visible title of the application
+      Environment:
+        default: What version is this OpsWorks stack (eg STAGING)?
+      CreateServiceRole:
+        default: Do you need an OpsWorks Service Role created?
+      EnableDataStore:
+        default: Do you want to set up DataStore support?
+      StackTLD:
+        default: What TLD hosted on Route53 is this stack using for internal DNS?
+      IntermediateTLD:
+        default: What TLD hosted on Route53 is this stack using for support DNS (public, but not advertised)?
+      PublicTLD:
+        default: What TLD hosted on Route53 is this stack using for public DNS?
+      CacheAddress:
+        default: What is the address of the Redis cache?
+      CachePort:
+        default: What is the listening port of the Redis cache?
+      DefaultEC2Key:
+        default: What EC2 key pair should all instances in the OpsWorks stack use for SSH access?
+      AdminUserGroup:
+        default: What group should Bastion Host Admins belong to?
+      AdminPubKeyBucket:
+        default: Where is the S3 bucket for Bastion Host Admin's public keys?
+      StackVPC:
+        default: What VPC should OpsWorks stack instances belong to?
+      WebSubnets:
+        default: What base name are the web layer subnet IDs exported under?
+      AppSubnets:
+        default: What base name are the application layer subnet IDs exported under?
+      AdminSG:
+        default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
+      AppLBSG:
+        default: Which Security Group in the selected VPC should be attached to the application load balancer?
+      CloudFrontSG:
+        default: Which Security Group in the selected VPC permits access from CloudFront?
+      AppSG:
+        default: Which Security Group in the selected VPC should be attached to the application layer?
+      DatabaseSG:
+        default: Which Security Group in the selected VPC should be attached to the database layer?
+      ACMCertificateARN:
+        default: Which certificate should be used by the application load balancer?
+      PGDBUser:
+        default: Account name for (non-superuser) Postgres DB access.
+      PGDBPassword:
+        default: Enter a password for Postgres DB access.
+      BeakerSecret:
+        default: Enter the secret key used to hash login cookies.
+      CKANAdminPW:
+        default: Enter a password for your CKAN Admin user.
+      CKANAdminEmail:
+        default: Enter the email address for your CKAN Admin user.
+
+Parameters:
+  CookbookURL:
+    Default: https://github.com/qld-gov-au/opswx-ckan-cookbook.git
+    Description: "Repository URL. Must be SSH URL for private repos with private key."
+    Type: String
+  #CookbookSSHKey:
+    #Description: Change SSH key newlines to commas.
+    #Type: CommaDelimitedList
+    #NoEcho: true
+  CookbookRevision:
+    Default: QOL-4415_CKAN-2-7-3
+    Description: Branch name in repository to checkout.
+    Type: String
+    MinLength: 1
+    MaxLength: 64
+  DataPusherURL:
+    Description: Repository URL for CKAN DataPusher
+    Default: https://github.com/ckan/datapusher.git
+    Type: String
+  DataPusherRevision:
+    Description: Branch/tag name in repository to checkout.
+    Default: "0.0.14"
+    Type: String
+  SolrSource:
+    Description: URL for zip archive.
+    Default: http://apache.mirror.digitalpacific.com.au/lucene/solr/5.5.5/solr-5.5.5.zip
+    Type: String
+  CKANSource:
+    Description: URL for zip archive.
+    Default: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+    Type: String
+  ApplicationName:
+    Description: Name of the application (ie. GI or Services, etc)
+    Type: String
+  ApplicationId:
+    Description: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+    Type: String
+    ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
+    AllowedPattern: '[-_a-z0-9]*'
+  ApplicationTitle:
+    Description: Publicly visible title for the application
+    Type: String
+  Environment:
+    Description: Select a stack version.
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  StackTLD:
+    Description: Route53 hosted TLD for stack
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  IntermediateTLD:
+    Description: Route53 hosted TLD for support access (public but not advertised)
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  PublicTLD:
+    Description: Route53 hosted TLD for public access
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  CreateServiceRole:
+    Description: Required if OpsWorks stacks have never been created in this account.
+    Type: String
+    Default: "no"
+    AllowedValues:
+      - "yes"
+      - "no"
+  EnableDataStore:
+    Description: Whether or not to support the DataStore.
+    Type: String
+    Default: "no"
+    AllowedValues:
+      - "yes"
+      - "no"
+  CacheAddress:
+    Description: The exported name of the address for the Redis cache.
+    Type: String
+    Default: localhost
+  CachePort:
+    Description: The listen port for the Redis cache.
+    Type: String
+    Default: 6379
+  DefaultEC2Key:
+    Description: Select an existing SSH key
+    Type: AWS::EC2::KeyPair::KeyName
+  AdminUserGroup:
+    Description: Valid Linux group name
+    Type: String
+    Default: link
+  CKANAdminPW:
+    NoEcho: true
+    Description: Password must be at least 8 characters up to a maximum of 64 characters in length.
+    Type: String
+    MinLength: 8
+    MaxLength: 64
+    AllowedPattern: "[-a-zA-Z0-9_!@#$%^&*()|]*"
+    ConstraintDescription: Must be 8 - 64 characters.
+  CKANAdminEmail:
+    Description: Valid Email Address
+    Type: String
+  AdminPubKeyBucket:
+    Description: S3 Bucket URL
+    Type: String
+    Default: s3://link-opsworks/keys/
+  StackVPC:
+    Description: The exported name of the existing VPC ID.
+    Type: String
+  WebSubnets:
+    Type: String
+    Description: The base name for the exported web layer subnet IDs, eg if the exports are 'PRODMyApplicationWebSubnetA' and 'PRODMyApplicationWebSubnetB', then this would be 'PRODMyApplicationWebSubnet'
+  AppSubnets:
+    Type: String
+    Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'
+  AdminSG:
+    Description: The exported name of the security group ID containing sysadmin inbound rules
+    Type: String
+  AppLBSG:
+    Description: The exported name of the security group ID to attach to the application load balancer.
+    Type: String
+  CloudFrontSG:
+    Description: The exported name of the security group ID for resources that should be accessed by CloudFront.
+    Type: String
+  AppSG:
+    Description: The exported name of the security group ID to attach to applications.
+    Type: String
+  DatabaseSG:
+    Description: The exported name of the security group ID to attach to the database layer.
+    Type: String
+  ACMCertificateARN:
+    Description: ARN for certificate to be used by the application load balancer.
+    Type: String
+  PGDBUser:
+    Description: Account name for (non-superuser) Postgres DB access.
+    Type: String
+  PGDBPassword:
+    NoEcho: true
+    Description: Password must be at least 8 alphanumeric characters up to a maximum of 64 characters in length.
+    Type: String
+    MinLength: 8
+    MaxLength: 64
+    AllowedPattern: "[a-zA-Z0-9]*"
+    ConstraintDescription: Must be 8 - 64 alphanumeric characters.
+  BeakerSecret:
+    NoEcho: true
+    Description: Secret key used by CKAN to hash login cookies.
+    Type: String
+    MinLength: 32
+    ConstraintDescription: Must be at least 32 characters.
+  SSMKey:
+    Type: String
+    Description: KMS key for alias/aws/ssm
+
+Conditions:
+  ProvisionServiceRole:
+    Fn::Equals:
+      - "yes"
+      - !Ref CreateServiceRole
+
+Resources:
+  OpsWorksServiceRole:
+    Condition: ProvisionServiceRole
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service: opsworks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        -
+          PolicyName: "aws-opsworks-service-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Action:
+                  - "ec2:*"
+                  - iam:PassRole
+                  - cloudwatch:GetMetricStatistics
+                  - cloudwatch:DescribeAlarms
+                  - "ecs:*"
+                  - "elasticloadbalancing:*"
+                  - "rds:*"
+                Effect: Allow
+                Resource: "*"
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ApplicationName}-${Environment}-CustomPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: ses:SendRawEmail
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - ssm:DescribeParameters
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameters
+                  - ssm:GetParameter
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource:
+                  - Ref: SSMKey
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - cloudwatch:PutMetricData
+                  - cloudwatch:GetMetricStatistics
+                  - cloudwatch:ListMetrics
+                  - ec2:DescribeTags
+                Resource: "*"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/PowerUserAccess #This needs to be reduce, this is full admin for the account, big no no..
+        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
+
+  InstanceRoleProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref InstanceRole
+
+  OpsWorksStack:
+    Type: AWS::OpsWorks::Stack
+    Properties:
+      AgentVersion: LATEST
+      ConfigurationManager:
+        Name: Chef
+        Version: 12
+      CustomCookbooksSource:
+        Revision: !Ref CookbookRevision
+        Type: git
+        # SshKey: !Sub "${CookbookSSHKey}\n"
+        Url: !Ref CookbookURL
+      CustomJson:
+        datashades:
+          ckan_web:
+            title: !Sub "${ApplicationTitle} | Queensland Government"
+            adminpw: !Ref CKANAdminPW
+            adminemail: !Ref CKANAdminEmail
+            beaker_secret: !Ref BeakerSecret
+            dbuser: !Ref PGDBUser
+            dbname: !Ref ApplicationName
+            dsuser: !Sub "${PGDBUser}_datastore"
+            dsname: !Sub "${ApplicationName}_datastore"
+            dsenable: !Ref EnableDataStore
+            endpoint: /
+          jumpbox:
+            bucket: !Ref AdminPubKeyBucket
+            usergroup: !Ref AdminUserGroup
+          postgres:
+            password: !Ref PGDBPassword
+          redis:
+            hostname:
+              Fn::ImportValue: !Ref CacheAddress
+            port: !Ref CachePort
+          tld: !Ref StackTLD
+          public_tld: !Ref PublicTLD
+          version: !Ref Environment
+          app_id: !Ref ApplicationId
+      DefaultInstanceProfileArn:
+        Fn::GetAtt:
+          - InstanceRoleProfile
+          - Arn
+      DefaultOs: "Amazon Linux 2018.03"
+      DefaultSshKeyName: !Ref DefaultEC2Key
+      DefaultSubnetId:
+        Fn::ImportValue:
+          !Sub "${AppSubnets}A"
+      Name: !Sub "${ApplicationName}_${Environment}"
+      ServiceRoleArn:
+        Fn::If:
+          - ProvisionServiceRole
+          - Fn::GetAtt:
+            - OpsWorksServiceRole
+            - Arn
+          - Fn::Join:
+            - ""
+            - - "arn:aws:iam::"
+              - !Ref "AWS::AccountId"
+              - ":role/aws-opsworks-service-role"
+      UseCustomCookbooks: true
+      VpcId:
+        Fn::ImportValue: !Ref StackVPC
+
+  OpsWorksDataPusherLayer:
+    Type: AWS::OpsWorks::Layer
+    Properties:
+      AutoAssignElasticIps: false
+      AutoAssignPublicIps: false
+      CustomRecipes:
+        Shutdown:
+          - "datashades::datapusher-shutdown"
+        Setup:
+          - "datashades::datapusher-setup"
+        Configure:
+          - "datashades::datapusher-configure"
+        Deploy:
+          - "datashades::datapusher-deploy"
+      CustomSecurityGroupIds:
+        - Fn::ImportValue: !Ref AdminSG
+        - Fn::ImportValue: !Ref DatabaseSG
+      EnableAutoHealing: true
+      InstallUpdatesOnBoot: true
+      Name: !Sub "${ApplicationName}-DataPusher"
+      Shortname: !Sub "${ApplicationId}-datapusher"
+      StackId: !Ref OpsWorksStack
+      Type: custom
+
+  OpsWorksSolrLayer:
+    Type: AWS::OpsWorks::Layer
+    Properties:
+      CustomRecipes:
+        Setup:
+          - "datashades::solr-setup"
+        Deploy:
+          - "datashades::solr-deploy"
+        Configure:
+          - "datashades::solr-configure"
+        Shutdown:
+          - "datashades::solr-shutdown"
+      AutoAssignElasticIps: false
+      AutoAssignPublicIps: false
+      CustomSecurityGroupIds:
+        - Fn::ImportValue: !Ref AdminSG
+        - Fn::ImportValue: !Ref DatabaseSG
+      EnableAutoHealing: true
+      InstallUpdatesOnBoot: true
+      Name: !Sub "${ApplicationName}-Solr"
+      Shortname: !Sub "${ApplicationId}-solr"
+      StackId: !Ref OpsWorksStack
+      Type: custom
+
+  OpsWorksWebLayer:
+    Type: AWS::OpsWorks::Layer
+    Properties:
+      AutoAssignElasticIps: false
+      AutoAssignPublicIps: false
+      CustomRecipes:
+        Setup:
+          - "datashades::ckanweb-setup"
+        Deploy:
+          - "datashades::ckanweb-deploy"
+        Configure:
+          - "datashades::ckanweb-configure"
+      CustomSecurityGroupIds:
+        - Fn::ImportValue: !Ref AdminSG
+        - Fn::ImportValue: !Ref AppSG
+      EnableAutoHealing: true
+      InstallUpdatesOnBoot: true
+      Name: !Sub "${ApplicationName}-Web"
+      Shortname: !Sub "${ApplicationId}-web"
+      StackId: !Ref OpsWorksStack
+      Type: custom
+
+  OpwxAppCKAN:
+    Type: AWS::OpsWorks::App
+    Properties:
+      Domains:
+        - !Sub "${ApplicationId}.${IntermediateTLD}"
+      AppSource:
+        Type: archive
+        Url: !Ref CKANSource
+      Description: "CKAN 2.7"
+      EnableSsl: false
+      Name: !Sub "${ApplicationName}-${Environment}"
+      Shortname: !Sub "${ApplicationId}-${Environment}"
+      StackId: !Ref OpsWorksStack
+      Type: other
+
+  OpwxAppDataPusher:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: git
+        Url: !Ref DataPusherURL
+        Revision: !Ref DataPusherRevision
+      Description: "CKAN DataPusher"
+      EnableSsl: false
+      Name: !Sub "${ApplicationName}-${Environment}-DataPusher"
+      Shortname: !Sub "${ApplicationId}-${Environment}-datapusher"
+      StackId: !Ref OpsWorksStack
+      Type: other
+
+  OpwxAppSolr:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: archive
+        Url: !Ref SolrSource
+      Description: "Apache Solr 5.5.5"
+      EnableSsl: false
+      Name: !Sub "${ApplicationName}-${Environment}-solr-5.5"
+      Shortname: !Sub "${ApplicationId}-${Environment}-solr-5.5"
+      StackId: !Ref OpsWorksStack
+      Type: other
+
+  CKANELB:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      LoadBalancerName: !Sub "${Environment}-${ApplicationName}ELB"
+      HealthCheck:
+        Target: "HTTP:80/"
+        HealthyThreshold: 2
+        UnhealthyThreshold: 6
+        Interval: 30
+        Timeout: 20
+      Listeners:
+        - LoadBalancerPort: 443
+          InstancePort: 80
+          Protocol: HTTPS
+          SSLCertificateId: !Ref ACMCertificateARN
+          PolicyNames:
+            - sticky-LB-1hour
+      LBCookieStickinessPolicy:
+        - PolicyName: sticky-LB-1hour
+          CookieExpirationPeriod: 3600
+      Scheme: "internet-facing"
+      SecurityGroups:
+        - Fn::ImportValue: !Ref AppLBSG
+        - Fn::ImportValue: !Ref CloudFrontSG
+      Subnets:
+        - Fn::ImportValue:
+            !Sub "${WebSubnets}A"
+        - Fn::ImportValue:
+            !Sub "${WebSubnets}B"
+
+  ELBAttachment:
+    Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
+    Properties:
+      ElasticLoadBalancerName: !Ref CKANELB
+      LayerId: !Ref OpsWorksWebLayer
+
+  WebELBCNAME:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      Name: !Sub "${ApplicationId}.${IntermediateTLD}"
+      HostedZoneName: !Sub "${IntermediateTLD}."
+      AliasTarget:
+        HostedZoneId:
+          Fn::GetAtt:
+            - CKANELB
+            - CanonicalHostedZoneNameID
+        DNSName:
+          Fn::GetAtt:
+            - CKANELB
+            - DNSName
+
+Outputs:
+  StackID:
+    Value: !Ref OpsWorksStack
+    Description: OpsWorks Stack Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksStack"
+
+  DataPusherLayer:
+    Value: !Ref OpsWorksDataPusherLayer
+    Description: DataPusher Layer Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksDataPusherLayer"
+
+  SolrLayer:
+    Value: !Ref OpsWorksSolrLayer
+    Description: SolrCloud Layer Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrLayer"
+
+  WebLayer:
+    Value: !Ref OpsWorksWebLayer
+    Description: Web Layer Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksWebLayer"
+
+  CKANApp:
+    Value: !Ref OpwxAppCKAN
+    Description: CKAN Application Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksCKANApplication"
+
+  SolrApp:
+    Value: !Ref OpwxAppSolr
+    Description: SolrCloud Application Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrApplication"
+
+  WebELBDomainName:
+    Value: !Ref WebELBCNAME
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebElbNiceDNSName"

@@ -1,0 +1,20 @@
+---
+cloudformation_stacks:
+  - name: "CKAN-{{ Environment }}-SECURITY-GROUPS"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "templates/security_groups.cfn.yml"
+    template_parameters:
+      BambooAgentIp: "13.210.53.223/32" #Green
+      BambooAgentIp2: "13.211.7.108/32" #Blue
+      BambooAgentSecurityGroup: sg-0d7f802e57ee52ab6
+      Environment: "{{ Environment }}"
+      Platform: CKAN
+      VPC: "CKANVpc-{{ Environment }}"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "CKAN"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"

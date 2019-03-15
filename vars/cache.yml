@@ -1,0 +1,71 @@
+---
+template: "templates/cache.cfn.yml"
+
+cloudformation_stacks:
+  - name: CKAN-PROD-Cache
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: PROD
+      Platform: CKAN
+      Subnets: "{{ Environment }}CKANDBSubnet"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: CKAN
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: CKAN-STAGING-Cache
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: STAGING
+      Platform: CKAN
+      Subnets: "{{ Environment }}CKANDBSubnet"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: CKAN
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: CKAN-TRAINING-Cache
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: TRAINING
+      Platform: CKAN
+      Subnets: "{{ Environment }}CKANDBSubnet"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: CKAN
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "Yes"
+
+  - name: CKAN-DEV-Cache
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: DEV
+      Platform: CKAN
+      Subnets: "{{ Environment }}CKANDBSubnet"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: CKAN
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "Yes"

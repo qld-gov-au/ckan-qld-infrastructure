@@ -1,0 +1,154 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: RDS within a VPC including subnet and security groups
+Outputs:
+  DBName:
+    Description: Name of database
+    Value: !Ref DBName
+  DBPort:
+    Description: Database port number
+    Value:
+      Fn::GetAtt:
+        - Database
+        - Endpoint.Port
+  DBEndpoint:
+    Description: Database endpoint
+    Value:
+      Fn::GetAtt:
+        - Database
+        - Endpoint.Address
+  RDSInstance:
+    Value: !Ref Database
+    Description: RDS Instance Id
+
+Parameters:
+  DBAllocatedStorage:
+    ConstraintDescription: must be between 5 and 1024Gb.
+    Description: The size of the database (Gb)
+    MaxValue: 1024
+    MinValue: 5
+    Default: 50
+    Type: Number
+  DBClass:
+    AllowedValues:
+    - db.t2.medium
+    - db.t3.medium
+    - db.t2.large
+    - db.t3.large
+    - db.m4.large
+    - db.m5.large
+    ConstraintDescription: must select a valid database instance type.
+    Description: Database instance class
+    Type: String
+  DBName:
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only 1-64 alphanumeric
+      characters.
+    Description: Customer Enquiry Tracking MySQL database
+    MaxLength: '64'
+    MinLength: '1'
+    Type: String
+  DBPassword:
+    AllowedPattern: '[a-zA-Z0-9]*'
+    ConstraintDescription: must contain only 1-41 alphanumeric or underscore characters.
+    Description: The database admin account password
+    MaxLength: '41'
+    MinLength: '1'
+    NoEcho: 'true'
+    Type: String
+  DBUsername:
+    AllowedPattern: '[a-zA-Z_][a-zA-Z0-9_]*'
+    ConstraintDescription: must begin with a letter and contain only 1-32 alphanumeric or underscore characters.
+    Description: The database admin account username
+    MaxLength: '32'
+    MinLength: '1'
+    NoEcho: 'true'
+    Type: String
+    Type: String
+  DBPrivileges:
+    Description: Used only in ansible playbooks, not used in template
+    Type: String
+  DBEngine:
+    Description: Database engine
+    Type: String
+  DBEngineVersion:
+    Description: Database engine version
+    Type: String
+  MultiAZ:
+    Description: Set for multi availability zone deployment
+    Type: String
+  StorageEncrypted:
+    Description: Set for encrypted disk
+    Type: String
+  Environment:
+    Description: Database environment
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  PubliclyAccessible:
+    Description: Boolean to set RDS availability
+    Type: String
+  Platform:
+    Description: Name of the platform ie GI, Services, Static
+    Type: String
+  Subnets:
+    Description: Subnet export name minus the zone. (example- WebSubnet)
+    Type: String
+  VPC:
+    Description: Vpc export name. Check your VPC cloudformation outputs.
+    Type: String
+  StackTLD:
+    Description: Route53 hosted TLD for stack
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+
+Resources:
+  Database:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      MultiAZ: !Ref MultiAZ
+      StorageEncrypted: !Ref StorageEncrypted
+      StorageType: gp2
+      AllocatedStorage: !Ref DBAllocatedStorage
+      DBInstanceClass: !Ref DBClass
+      DBName: !Ref DBName
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      Engine: !Ref DBEngine
+      EngineVersion: !Ref DBEngineVersion
+      MasterUserPassword: !Ref DBPassword
+      MasterUsername: !Ref DBUsername
+      PubliclyAccessible: !Ref PubliclyAccessible
+      PreferredMaintenanceWindow: "sat:17:00-sat:17:30"
+      PreferredBackupWindow: "16:00-16:30"
+      AutoMinorVersionUpgrade: true
+      AllowMajorVersionUpgrade: false
+      BackupRetentionPeriod: "20"
+      CopyTagsToSnapshot: true
+      VPCSecurityGroups:
+        - Fn::ImportValue: !Sub "${Environment}${Platform}DatabaseSG"
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnets available for the RDS DB Instance
+      SubnetIds:
+        - Fn::ImportValue: !Sub "${Subnets}A"
+        - Fn::ImportValue: !Sub "${Subnets}B"
+        - Fn::ImportValue: !Sub "${Subnets}C"
+
+  DBHostCNAME:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: CNAME
+      TTL: 60
+      Name: !Sub "${Environment}pg.${StackTLD}"
+      HostedZoneName: !Sub "${StackTLD}."
+      ResourceRecords:
+        - Fn::GetAtt:
+          - Database
+          - Endpoint.Address
+

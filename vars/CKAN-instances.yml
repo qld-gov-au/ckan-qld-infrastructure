@@ -1,0 +1,83 @@
+---
+template: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml"
+
+cloudformation_stacks:
+  - name: "{{ titlecase_name }}-PROD-OpsWorks-instances"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: PROD
+      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
+      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
+      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+      WebEC2Count: 2
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: "{{ titlecase_name }}-STAGING-OpsWorks-instances"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: STAGING
+      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
+      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
+      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+      WebEC2Count: 2
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"
+
+  - name: "{{ titlecase_name }}-TRAINING-OpsWorks-instances"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: TRAINING
+      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
+      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
+      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+      WebEC2Size: t3.small
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "Yes"
+
+  - name: "{{ titlecase_name }}-DEV-OpsWorks-instances"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: DEV
+      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
+      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
+      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+      WebEC2Size: t3.small
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "Yes"

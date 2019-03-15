@@ -1,0 +1,6 @@
+---
+- name: Cloudformation Playbook
+  hosts: local
+  connection: local
+  roles:
+    - ansible_cloudformation
