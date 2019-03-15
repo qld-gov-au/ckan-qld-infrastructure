@@ -327,6 +327,9 @@ Parameters:
     Type: String
     MinLength: 32
     ConstraintDescription: Must be at least 32 characters.
+  SSMKey:
+    Type: String
+    Description: KMS key for alias/aws/ssm
 
 Conditions:
   CreateHostedZone:
@@ -392,15 +395,41 @@ Resources:
               Service: ec2.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: !Sub "${ApplicationName}-${Environment}-SendMail"
+        - PolicyName: !Sub "${ApplicationName}-${Environment}-CustomPolicy"
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action: ses:SendRawEmail
                 Resource: "*"
+              - Effect: Allow
+                Action:
+                  - ssm:DescribeParameters
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameters
+                  - ssm:GetParameter
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource:
+                  - Ref: SSMKey
+              - Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - cloudwatch:PutMetricData
+                    - cloudwatch:GetMetricStatistics
+                    - cloudwatch:ListMetrics
+                    - ec2:DescribeTags
+                  Resource: "*"
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/PowerUserAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/PowerUserAccess #This needs to be reduce, this is full admin for the account, big no no..
         - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
 
   InstanceRoleProfile:
