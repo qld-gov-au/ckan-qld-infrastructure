@@ -9,7 +9,7 @@
       aws_kms_facts:
         filters:
           alias: "aws/ssm"
-        region: "{{ Region }}"
+        region: "{{ region }}"
       register: ssmKeyFacts
 
     - debug:
