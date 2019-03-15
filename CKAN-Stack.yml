@@ -5,6 +5,20 @@
   vars_files:
     - vars/cloudfront-certificates.var.yml
   pre_tasks:
+    - name: kms alias fact
+      aws_kms_facts:
+        filters:
+          alias: "aws/ssm"
+        region: "{{ Region }}"
+      register: ssmKeyFacts
+
+    - debug:
+        msg: "{{ ssmKeyFacts }}"
+
+    - name: set KMS key from alias
+      set_fact:
+        SSMKey: "{{ ssmKeyFacts['keys'][0].key_arn }}"
+
     - name: Get public domain for environment
       set_fact:
         Domain={{ item.Domain }}
