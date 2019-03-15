@@ -613,13 +613,15 @@ Resources:
         Interval: 30
         Timeout: 20
       Listeners:
-        - LoadBalancerPort: 80
-          InstancePort: 80
-          Protocol: HTTP
         - LoadBalancerPort: 443
           InstancePort: 80
           Protocol: HTTPS
           SSLCertificateId: !Ref ACMCertificateARN
+          PolicyNames:
+            - sticky-LB-1hour
+      LBCookieStickinessPolicy:
+        - PolicyName: sticky-LB-1hour
+          CookieExpirationPeriod: 3600
       Scheme: "internet-facing"
       SecurityGroups:
         - Fn::ImportValue: !Ref AdminSG
