@@ -34,6 +34,7 @@ cloudformation_stacks:
       ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/29d2a412-555a-49d9-a20d-cfe598fd2ce1"
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
+      SSMKey: "{{ SSMKey | default('') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -74,6 +75,7 @@ cloudformation_stacks:
       ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/c11bea3d-07d0-49df-9e44-1e81f048f576"
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
+      SSMKey: "{{ SSMKey | default('') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -114,6 +116,7 @@ cloudformation_stacks:
       ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/f280a938-d6bb-4056-9a54-a94543bff03a"
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
+      SSMKey: "{{ SSMKey | default('') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -154,6 +157,7 @@ cloudformation_stacks:
       ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/db8fbe61-7690-4953-9eaa-c3b30814d9e8"
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
+      SSMKey: "{{ SSMKey | default('') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
