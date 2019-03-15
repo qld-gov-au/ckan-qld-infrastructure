@@ -23,14 +23,9 @@ Metadata:
           - StackTLD
           - IntermediateTLD
           - PublicTLD
-          - CreateTLD
           - CacheAddress
           - CachePort
-          - CreateELB
-          - CreateInstances
           - EnableDataStore
-          - CreateExtensions
-          - ExtensionsTemplate
           - DefaultEC2Key
           - AdminUserGroup
           - AdminPubKeyBucket
@@ -82,21 +77,11 @@ Metadata:
       ApplicationTitle:
         default: Publicly visible title of the application
       Environment:
-        default: What version is this OpsWorks stack?
-      CreateTLD:
-        default: Do you need the Route53 Hosted Zone for the TLD created?
+        default: What version is this OpsWorks stack (eg STAGING)?
       CreateServiceRole:
         default: Do you need an OpsWorks Service Role created?
-      CreateInstances:
-        default: Do you want to instances provisioned with this stack?
       EnableDataStore:
         default: Do you want to set up DataStore support?
-      CreateExtensions:
-        default: Do you want to provision CKAN extensions with this stack?
-      ExtensionsTemplate:
-        default: Where is the CloudFormation Template for your CKAN Extensions?
-      CreateELB:
-        default: Do you want to provision an Elastic Load Balancer with this stack?
       StackTLD:
         default: What TLD hosted on Route53 is this stack using for internal DNS?
       IntermediateTLD:
@@ -208,12 +193,6 @@ Parameters:
     Type: String
     MinLength: 6
     MaxLength: 254
-  CreateTLD:
-    Type: String
-    Default: "no"
-    AllowedValues:
-      - "yes"
-      - "no"
   CreateServiceRole:
     Description: Required if OpsWorks stacks have never been created in this account.
     Type: String
@@ -221,35 +200,10 @@ Parameters:
     AllowedValues:
       - "yes"
       - "no"
-  CreateInstances:
-    Description: Recommended
-    Type: String
-    Default: "yes"
-    AllowedValues:
-      - "yes"
-      - "no"
   EnableDataStore:
     Description: Whether or not to support the DataStore.
     Type: String
     Default: "no"
-    AllowedValues:
-      - "yes"
-      - "no"
-  CreateExtensions:
-    Description: Optional.
-    Type: String
-    Default: "no"
-    AllowedValues:
-      - "yes"
-      - "no"
-  ExtensionsTemplate:
-    Description: Valid S3 Bucket Location
-    Type: String
-    Default: https://s3-ap-southeast-2.amazonaws.com/link-opsworks/Datashades-OpsWorks-CKAN-Extensions.json
-  CreateELB:
-    Description: Recommended
-    Type: String
-    Default: "yes"
     AllowedValues:
       - "yes"
       - "no"
@@ -332,26 +286,10 @@ Parameters:
     Description: KMS key for alias/aws/ssm
 
 Conditions:
-  CreateHostedZone:
-    Fn::Equals:
-      - "yes"
-      - !Ref CreateTLD
   ProvisionServiceRole:
     Fn::Equals:
       - "yes"
       - !Ref CreateServiceRole
-  ProvisionExtensions:
-    Fn::Equals:
-      - "yes"
-      - !Ref CreateExtensions
-  ProvisionELB:
-    Fn::And:
-      - Fn::Equals:
-          - "yes"
-          - !Ref CreateELB
-      - Fn::Equals:
-          - "yes"
-          - !Ref CreateInstances
 
 Resources:
   OpsWorksServiceRole:
@@ -614,25 +552,8 @@ Resources:
       StackId: !Ref OpsWorksStack
       Type: other
 
-  HostedZone:
-    Type: AWS::Route53::HostedZone
-    Condition: CreateHostedZone
-    Properties:
-      HostedZoneConfig:
-        Comment: TLD for OpsWorks Stack
-      Name: !Ref StackTLD
-
-  CKANExtensions:
-    Type: AWS::CloudFormation::Stack
-    Condition: ProvisionExtensions
-    Properties:
-      TemplateURL: !Ref ExtensionsTemplate
-      Parameters:
-        OpsWorksStack: !Ref OpsWorksStack
-
   CKANELB:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
-    Condition: ProvisionELB
     Properties:
       LoadBalancerName: !Sub "${Environment}-${ApplicationName}ELB"
       HealthCheck:
@@ -653,7 +574,6 @@ Resources:
           CookieExpirationPeriod: 3600
       Scheme: "internet-facing"
       SecurityGroups:
-        - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppLBSG
         - Fn::ImportValue: !Ref CloudFrontSG
       Subnets:
@@ -663,14 +583,12 @@ Resources:
             !Sub "${WebSubnets}B"
 
   ELBAttachment:
-    Condition: ProvisionELB
     Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
     Properties:
       ElasticLoadBalancerName: !Ref CKANELB
       LayerId: !Ref OpsWorksWebLayer
 
   WebELBCNAME:
-    Condition: ProvisionELB
     Type: AWS::Route53::RecordSet
     Properties:
       Type: A
@@ -724,7 +642,6 @@ Outputs:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrApplication"
 
   WebELBDomainName:
-    Condition: ProvisionELB
     Value: !Ref WebELBCNAME
     Export:
       Name: !Sub "${Environment}${ApplicationName}WebElbNiceDNSName"
