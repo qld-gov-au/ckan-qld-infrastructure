@@ -358,13 +358,13 @@ Resources:
                 Resource:
                   - Ref: SSMKey
               - Effect: Allow
-                  Action:
-                    - logs:CreateLogGroup
-                    - cloudwatch:PutMetricData
-                    - cloudwatch:GetMetricStatistics
-                    - cloudwatch:ListMetrics
-                    - ec2:DescribeTags
-                  Resource: "*"
+                Action:
+                  - logs:CreateLogGroup
+                  - cloudwatch:PutMetricData
+                  - cloudwatch:GetMetricStatistics
+                  - cloudwatch:ListMetrics
+                  - ec2:DescribeTags
+                Resource: "*"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - arn:aws:iam::aws:policy/PowerUserAccess #This needs to be reduce, this is full admin for the account, big no no..
