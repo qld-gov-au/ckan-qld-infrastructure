@@ -16,6 +16,13 @@ Outputs:
       Fn::GetAtt:
         - Database
         - Endpoint.Address
+
+  RDSDomainName:
+    Description: Database domain name
+    Value: !Ref DBHostCNAME
+    Export:
+      Name: !Sub "${Environment}CKANDatabaseEndpoint"
+
   RDSInstance:
     Value: !Ref Database
     Description: RDS Instance Id
@@ -101,10 +108,11 @@ Parameters:
     Description: Vpc export name. Check your VPC cloudformation outputs.
     Type: String
   StackTLD:
-    Description: Route53 hosted TLD for stack
+    Description: Exported name of the private top-level domain name for the stack
     Type: String
-    MinLength: 6
-    MaxLength: 254
+  StackZone:
+    Description: Exported name of the Route53 hosted zone ID.
+    Type: String
 
 Resources:
   Database:
@@ -145,8 +153,14 @@ Resources:
     Properties:
       Type: CNAME
       TTL: 60
-      Name: !Sub "${Environment}pg.${StackTLD}"
-      HostedZoneName: !Sub "${StackTLD}."
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - "pg."
+            - Fn::ImportValue: !Ref StackTLD
+      HostedZoneId:
+        Fn::ImportValue: !Ref StackZone
       ResourceRecords:
         - Fn::GetAtt:
           - Database

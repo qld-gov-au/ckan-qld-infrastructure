@@ -12,8 +12,8 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       ApplicationTitle: "{{ title }}"
-      StackTLD: ckan-internal.services.qld.gov.au
-      StackHostedZone: Z2TB3QG8Y6H5TB
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
       IntermediateTLD: ckan.services.qld.gov.au
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
@@ -55,8 +55,8 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       ApplicationTitle: "{{ title }}"
-      StackTLD: ckan-internal.staging-services.qld.gov.au
-      StackHostedZone: Z2FS9AICFFEQ08
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
       IntermediateTLD: ckan.staging-services.qld.gov.au
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
@@ -98,8 +98,8 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       ApplicationTitle: "{{ title }}"
-      StackTLD: internal.ckan.training-services.qld.gov.au
-      StackHostedZone: Z39JPP98B6XFHD
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
       IntermediateTLD: training.ckan.devpit140cs.qgov.net.au
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
@@ -141,8 +141,8 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       ApplicationTitle: "{{ title }}"
-      StackTLD: internal.ckan.devpit140cs.qgov.net.au
-      StackHostedZone: Z3NLLTK7HH36WD
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
       IntermediateTLD: dev.ckan.devpit140cs.qgov.net.au
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
