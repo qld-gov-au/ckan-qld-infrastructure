@@ -8,6 +8,7 @@ Metadata:
           default: OpsWorks Custom Cookbook
         Parameters:
           - CookbookURL
+          - CookbookURLType
           #- CookbookSSHKey
           - CookbookRevision
 
@@ -61,6 +62,8 @@ Metadata:
     ParameterLabels:
       CookbookURL:
         default: What is the URL for the OpsWorks Custom Cookbook repository?
+      CookbookURLType:
+        default: What type of archive is the OpsWorks Custom Cookbook?
       DataPusherURL:
         default: What is the URL for the CKAN DataPusher repository?
       SolrSource:
@@ -135,6 +138,13 @@ Parameters:
     Default: https://github.com/qld-gov-au/opswx-ckan-cookbook.git
     Description: "Repository URL. Must be SSH URL for private repos with private key."
     Type: String
+  CookbookURLType:
+    Description: Repository URL type eg git.
+    Type: String
+    Default: git
+    AllowedValues:
+      - git
+      - s3
   #CookbookSSHKey:
     #Description: Change SSH key newlines to commas.
     #Type: CommaDelimitedList
@@ -424,7 +434,7 @@ Resources:
         Version: 12
       CustomCookbooksSource:
         Revision: !Ref CookbookRevision
-        Type: git
+        Type: !Ref CookbookURLType
         # SshKey: !Sub "${CookbookSSHKey}\n"
         Url: !Ref CookbookURL
       CustomJson:
