@@ -96,7 +96,7 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       ApplicationTitle: "{{ title }}"
-      StackTLD: ckan-internal.training-services.qld.gov.au
+      StackTLD: internal.ckan.training-services.qld.gov.au
       StackHostedZone: Z39JPP98B6XFHD
       IntermediateTLD: training.ckan.devpit140cs.qgov.net.au
       PublicTLD: "{{ public_tld }}"
