@@ -21,6 +21,7 @@ Metadata:
           - ApplicationTitle
           - Environment
           - StackTLD
+          - StackHostedZone
           - IntermediateTLD
           - PublicTLD
           - CacheAddress
@@ -84,6 +85,8 @@ Metadata:
         default: Do you want to set up DataStore support?
       StackTLD:
         default: What TLD hosted on Route53 is this stack using for internal DNS?
+      StackHostedZone:
+        default: What hosted zone on Route53 is this stack using for internal DNS?
       IntermediateTLD:
         default: What TLD hosted on Route53 is this stack using for support DNS (public, but not advertised)?
       PublicTLD:
@@ -183,6 +186,11 @@ Parameters:
     Type: String
     MinLength: 6
     MaxLength: 254
+  StackHostedZone:
+    Description: Route53 hosted zone ID for stack
+    Type: String
+    MinLength: 12
+    MaxLength: 32
   IntermediateTLD:
     Description: Route53 hosted TLD for support access (public but not advertised)
     Type: String
@@ -322,6 +330,31 @@ Resources:
                 Effect: Allow
                 Resource: "*"
 
+  SmtpRelayPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Provides access to retrieve SSM parameters related to the AWS SMTP relay, including KMS decryption, and send emails.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: ses:SendRawEmail
+            Resource: "*"
+          - Effect: Allow
+            Action: ssm:DescribeParameters
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:GetParameters
+              - ssm:GetParameter
+              - ssm:GetParametersByPath
+            Resource:
+              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay"
+              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
+          - Effect: Allow
+            Action: kms:Decrypt
+            Resource: !Ref SSMKey
+
   InstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -337,38 +370,18 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              - Effect: Allow
-                Action: ses:SendRawEmail
-                Resource: "*"
+              # allow the service layer to update internal DNS
               - Effect: Allow
                 Action:
-                  - ssm:DescribeParameters
-                Resource: "*"
-              - Effect: Allow
-                Action:
-                  - ssm:GetParameters
-                  - ssm:GetParameter
-                  - ssm:GetParametersByPath
-                Resource:
-                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay"
-                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
-              - Effect: Allow
-                Action:
-                  - kms:Decrypt
-                Resource:
-                  - Ref: SSMKey
-              - Effect: Allow
-                Action:
-                  - logs:CreateLogGroup
-                  - cloudwatch:PutMetricData
-                  - cloudwatch:GetMetricStatistics
-                  - cloudwatch:ListMetrics
-                  - ec2:DescribeTags
-                Resource: "*"
+                  - route53:ChangeResourceRecordSets
+                Resource: !Sub "arn:aws:route53:::hostedzone/${StackHostedZone}"
       ManagedPolicyArns:
+        - !Ref SmtpRelayPolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
-        - arn:aws:iam::aws:policy/PowerUserAccess #This needs to be reduce, this is full admin for the account, big no no..
         - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
+        - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
 
   InstanceRoleProfile:
     Type: AWS::IAM::InstanceProfile
@@ -376,6 +389,31 @@ Resources:
       Path: /
       Roles:
         - !Ref InstanceRole
+
+  WebInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref SmtpRelayPolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
+        - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
+
+  WebInstanceRoleProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref WebInstanceRole
 
   OpsWorksStack:
     Type: AWS::OpsWorks::Stack
@@ -503,6 +541,10 @@ Resources:
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppSG
+      CustomInstanceProfileArn:
+        Fn::GetAtt:
+          - WebInstanceRoleProfile
+          - Arn
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
       Name: !Sub "${ApplicationName}-Web"
