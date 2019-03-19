@@ -548,6 +548,8 @@ Resources:
           - "datashades::ckanweb-deploy"
         Configure:
           - "datashades::ckanweb-configure"
+        Shutdown:
+          - "datashades::ckanweb-shutdown"
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppSG
