@@ -12,11 +12,13 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       ApplicationTitle: "{{ title }}"
-      StackTLD: ckan-internal.services.qld.gov.au
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
       IntermediateTLD: ckan.services.qld.gov.au
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
+      CookbookRevision: QOL-4415_CKAN-2-7-3
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
@@ -53,11 +55,13 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       ApplicationTitle: "{{ title }}"
-      StackTLD: ckan-internal.staging-services.qld.gov.au
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
       IntermediateTLD: ckan.staging-services.qld.gov.au
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
+      CookbookRevision: QOL-4415_CKAN-2-7-3
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
@@ -94,11 +98,13 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       ApplicationTitle: "{{ title }}"
-      StackTLD: internal.ckan.training-services.qld.gov.au
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
       IntermediateTLD: training.ckan.devpit140cs.qgov.net.au
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
+      CookbookRevision: QOL-4415_CKAN-2-7-3
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
@@ -135,11 +141,13 @@ cloudformation_stacks:
       ApplicationName: "{{ titlecase_name }}"
       ApplicationId: "{{ lowercase_name }}"
       ApplicationTitle: "{{ title }}"
-      StackTLD: internal.ckan.devpit140cs.qgov.net.au
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
       IntermediateTLD: dev.ckan.devpit140cs.qgov.net.au
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
+      CookbookRevision: QOL-4415_CKAN-2-7-3
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
