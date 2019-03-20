@@ -21,7 +21,8 @@ cloudformation_stacks:
       MultiAZ: "true"
       Subnets: "{{ Environment }}CKANDBSubnet"
       VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: ckan-internal.services.qld.gov.au
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -51,7 +52,8 @@ cloudformation_stacks:
       MultiAZ: "true"
       Subnets: "{{ Environment }}CKANDBSubnet"
       VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: ckan-internal.staging-services.qld.gov.au
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -81,7 +83,8 @@ cloudformation_stacks:
       MultiAZ: "false"
       Subnets: "{{ Environment }}CKANDBSubnet"
       VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: internal.ckan.training-services.qld.gov.au
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -111,7 +114,8 @@ cloudformation_stacks:
       MultiAZ: "false"
       Subnets: "{{ Environment }}CKANDBSubnet"
       VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: internal.ckan.devpit140cs.qgov.net.au
+      StackTLD: "{{ Environment }}CKANPrivateTLD"
+      StackZone: "{{ Environment }}CKANPrivateHostedZone"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN

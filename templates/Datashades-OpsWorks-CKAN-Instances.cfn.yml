@@ -18,7 +18,7 @@ Metadata:
           - ServicesEC2Size
           - WebEC2Size
           - WebEC2Count
-          - Subnets
+          - AppSubnets
 
     ParameterLabels:
       Environment:
@@ -37,7 +37,7 @@ Metadata:
         default: What is the Solr Layer ID of the stack?
       WebLayerID:
         default: What is the Web Layer ID of the stack?
-      Subnets:
+      AppSubnets:
         default: What base name are the application layer subnet IDs exported under?
 
 Parameters:
@@ -98,6 +98,10 @@ Parameters:
   WebLayerID:
     Description: The exported name of the OpsWorks Web Stack Layer ID.
     Type: String
+  AppSubnets:
+    Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'. Only needed for HA configurations.
+    Type: String
+    Default: none
 
 Conditions:
   2PlusWebInstances:
@@ -140,6 +144,8 @@ Resources:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
+      SubnetId:
+        Fn::ImportValue: !Sub "${AppSubnets}B"
       LayerIds:
         - Fn::ImportValue: !Ref WebLayerID
       StackId:

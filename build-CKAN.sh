@@ -25,6 +25,7 @@ else
 
   run-playbook "vpc"
   run-playbook "security_groups"
+  run-playbook CloudFormation "vars/hosted-zone.var.yml"
   run-playbook CloudFormation "vars/database.yml"
   run-playbook "database-config"
   run-playbook CloudFormation "vars/efs.yml"

@@ -1,8 +1,0 @@
----
-- name: Cloudformation Playbook
-  hosts: local
-  connection: local
-  vars_files:
-    - vars/Publications-CKAN-instances.yml
-  roles:
-    - ansible_cloudformation

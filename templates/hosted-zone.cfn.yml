@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Creates a private hosted zone to hold an OpsWorks CKAN Stack."
+
+Parameters:
+  Environment:
+    Description: Select a stack version.
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  Region:
+    Description: The AWS region eg ap-southeast-2
+    Type: String
+    Default: ap-southeast-2
+  VPC:
+    Description: Exported name of the VPC ID.
+    Type: String
+
+Resources:
+  HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Sub "${Environment}.ckan.internal"
+      VPCs:
+        - VPCId:
+            Fn::ImportValue: !Ref VPC
+          VPCRegion: !Ref Region
+      HostedZoneConfig:
+        Comment: !Sub "Internal resources for the ${Environment} Open Data and Publications environments"
+
+Outputs:
+  ZoneID:
+    Value: !Ref HostedZone
+    Description: Route53 hosted zone ID
+    Export:
+      Name: !Sub "${Environment}CKANPrivateHostedZone"
+
+  ZoneTLD:
+    Value: !Sub "${Environment}.ckan.internal"
+    Description: Top-level domain name of the hosted zone
+    Export:
+      Name: !Sub "${Environment}CKANPrivateTLD"

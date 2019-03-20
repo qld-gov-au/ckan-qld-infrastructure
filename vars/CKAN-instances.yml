@@ -14,6 +14,7 @@ cloudformation_stacks:
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       WebEC2Count: 2
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -34,6 +35,7 @@ cloudformation_stacks:
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       WebEC2Count: 2
+      AppSubnets: "{{ Environment }}CKANAppSubnet"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"

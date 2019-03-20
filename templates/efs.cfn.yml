@@ -1,31 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Creates an EFS filesystem stack to support CKAN.
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      -
-        Label:
-          default: EFS Stack Details
-        Parameters:
-          - ApplicationName
-          - Environment
-          - StackTLD
-          - StackVPC
-          - DbSubnets
-          - AdminSG
-    ParameterLabels:
-      ApplicationName:
-        default: Name of the application (ie. GI or Services, etc)
-      Environment:
-        default: Stack environment eg DEV, TRAINING
-      StackTLD:
-        default: What TLD hosted on Route53 is this stack using for internal DNS?
-      StackVPC:
-        default: What VPC should OpsWorks stack instances belong to?
-      DbSubnets:
-        default: What base name are the data layer subnet IDs exported under?
-      AdminSG:
-        default: Which Security Group in the selected VPC contains SysAdmin user inbound rules?
 
 Outputs:
   FileSystem:
@@ -48,10 +22,11 @@ Parameters:
       - STAGING
       - PROD
   StackTLD:
-    Description: Route53 hosted TLD for stack
+    Description: Exported name of the private top-level domain name for the stack
     Type: String
-    MinLength: 6
-    MaxLength: 254
+  StackZone:
+    Description: Exported name of the Route53 hosted zone ID.
+    Type: String
   StackVPC:
     Description: The exported name for the existing VPC ID.
     Type: String
@@ -113,8 +88,14 @@ Resources:
     Properties:
       Type: CNAME
       TTL: 60
-      Name: !Sub "${Environment}efs.${StackTLD}"
-      HostedZoneName: !Sub "${StackTLD}."
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - "efs."
+            - Fn::ImportValue: !Ref StackTLD
+      HostedZoneId:
+        Fn::ImportValue: !Ref StackZone
       ResourceRecords:
         - Fn::Join:
           - "."
