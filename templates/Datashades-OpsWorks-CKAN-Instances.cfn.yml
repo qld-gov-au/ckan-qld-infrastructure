@@ -145,7 +145,7 @@ Resources:
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
       SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}B"
+        Fn::ImportValue: !Sub "${AppSubnets}C"
       LayerIds:
         - Fn::ImportValue: !Ref WebLayerID
       StackId:
