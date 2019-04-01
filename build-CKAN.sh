@@ -13,7 +13,11 @@ function run-playbook {
   else
     unset VARS_FILE_2
   fi
-  ansible-playbook -i inventory/hosts "$1.yml" --extra-vars "@$VARS_FILE" $VARS_FILE_2 --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
+  PLAYBOOK="$1"
+  if [ ! -e "$PLAYBOOK" ]; then
+    PLAYBOOK="$PLAYBOOK.yml"
+  fi
+  ansible-playbook -i inventory/hosts "$PLAYBOOK" --extra-vars "@$VARS_FILE" $VARS_FILE_2 --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 }
 
 if [ $# -ge 3 ]; then
