@@ -16,6 +16,10 @@ Outputs:
     Value: !Ref AppSubnetB
     Export:
        Name: !Sub "${Environment}${ApplicationName}AppSubnetB"
+  AppSubnetC:
+    Value: !Ref AppSubnetC
+    Export:
+       Name: !Sub "${Environment}${ApplicationName}AppSubnetC"
   DBSubnetA:
     Value: !Ref DataSubnetA
     Export:
