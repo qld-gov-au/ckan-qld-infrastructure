@@ -504,6 +504,8 @@ Resources:
             !Sub "${WebSubnets}A"
         - Fn::ImportValue:
             !Sub "${WebSubnets}B"
+        - Fn::ImportValue:
+            !Sub "${WebSubnets}C"
 
   ELBAttachment:
     Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
