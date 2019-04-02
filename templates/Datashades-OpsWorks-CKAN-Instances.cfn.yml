@@ -55,6 +55,7 @@ Parameters:
     Type: String
     Default: t3.small
     AllowedValues:
+      - t3.micro
       - t3.small
       - t3.medium
       - t3.large
@@ -70,6 +71,7 @@ Parameters:
     Type: String
     Default: t3.medium
     AllowedValues:
+      - t3.micro
       - t3.small
       - t3.medium
       - t3.large
