@@ -55,6 +55,7 @@ Parameters:
     Type: String
     Default: t3.small
     AllowedValues:
+      - t3.micro
       - t3.small
       - t3.medium
       - t3.large
@@ -70,6 +71,7 @@ Parameters:
     Type: String
     Default: t3.medium
     AllowedValues:
+      - t3.micro
       - t3.small
       - t3.medium
       - t3.large
@@ -139,13 +141,13 @@ Resources:
     Condition: 2PlusWebInstances
     Type: AWS::OpsWorks::Instance
     DependsOn:
-      - OpswxEC2Services1
+      - OpswxEC2Web1 # if we try to start both at once, OpsWorks can get confused and give them the same name, which breaks things
     Properties:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
       SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}B"
+        Fn::ImportValue: !Sub "${AppSubnets}C"
       LayerIds:
         - Fn::ImportValue: !Ref WebLayerID
       StackId:

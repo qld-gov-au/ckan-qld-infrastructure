@@ -83,6 +83,15 @@ Resources:
       SecurityGroups:
         - !Ref MountTargetSecurityGroup
 
+  MountTargetC:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref SharedFileSystem
+      SubnetId:
+        Fn::ImportValue: !Sub "${DbSubnets}C"
+      SecurityGroups:
+        - !Ref MountTargetSecurityGroup
+
   EFSCNAME:
     Type: AWS::Route53::RecordSet
     Properties:

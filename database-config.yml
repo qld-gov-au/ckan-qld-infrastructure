@@ -49,4 +49,4 @@
         dest: templates/datastore-set-permissions.sql
 
     - name: Set DataStore permissions
-      shell: "psql 'postgresql://{{ DBMasterUser }}:{{ DBMasterPass }}@{{ DBEndpoint }}:{{ DBPort }}/{{ DBName }}' -f templates/datastore-set-permissions.sql"
+      shell: "psql 'postgresql://{{ DBMasterUser }}:{{ DBMasterPass }}@{{ DBEndpoint }}:{{ DBPort }}/{{ DBName }}_datastore' -f templates/datastore-set-permissions.sql"
