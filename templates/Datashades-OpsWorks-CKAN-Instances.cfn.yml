@@ -82,6 +82,13 @@ Parameters:
       - m5.4xlarge
       - m4.10xlarge
       - m5.12xlarge
+  EnableDataStore:
+    Description: Whether or not to support the DataStore.
+    Type: String
+    Default: "yes"
+    AllowedValues:
+      - "yes"
+      - "no"
   WebEC2Count:
     Description: The number of EC2 instances to create in the web layer.
     Type: Number
@@ -110,6 +117,10 @@ Conditions:
     Fn::Equals:
       - 2
       - !Ref WebEC2Count
+  ProvisionDataPusher:
+    Fn::Equals:
+      - "yes"
+      - !Ref EnableDataStore
 
 Resources:
   OpswxEC2Services1:
@@ -121,6 +132,18 @@ Resources:
       LayerIds:
         - Fn::ImportValue: !Ref DataPusherLayerID
         - Fn::ImportValue: !Ref SolrLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+
+  OpswxEC2Services2:
+    Condition: ProvisionDataPusher
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref ServicesEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref DataPusherLayerID
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
