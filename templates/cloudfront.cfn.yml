@@ -30,6 +30,14 @@ Resources:
         Aliases:
           - Ref: Domain
           - !Sub "www.${Domain}"
+        CacheBehaviors:
+          - PathPattern: /assets/*
+            Compress: true
+            ForwardedValues:
+              QueryString: true
+            TargetOriginId: 'WebOrigin'
+            MinTTL: 1800
+            ViewerProtocolPolicy: redirect-to-https
         DefaultCacheBehavior:
           AllowedMethods:
           - GET
