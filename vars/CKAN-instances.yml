@@ -35,6 +35,7 @@ cloudformation_stacks:
       DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+      WebEC2Size: t3.small
       WebEC2Count: 2
       AppSubnets: "{{ Environment }}CKANAppSubnet"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
