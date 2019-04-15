@@ -5,7 +5,7 @@ Parameters:
     Type: String
   Domain:
     Description: Domain pointing to EC2 load balancer
-    Type: String
+    Type: CommaDelimitedList
   WebOrigin:
     Description: Platform ELB
     Type: String
@@ -27,9 +27,7 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
-        Aliases:
-          - Ref: Domain
-          - !Sub "www.${Domain}"
+        Aliases: !Ref Domain
         CacheBehaviors:
           - PathPattern: /assets/*
             Compress: true
@@ -86,7 +84,13 @@ Resources:
           AcmCertificateArn:
             Ref: ACMCertificateARN
           SslSupportMethod: sni-only
-        Comment: !Sub "${Environment}-${Platform} ${Domain}"
+        Comment:
+          Fn::Sub:
+            - "${Environment}-${Platform} ${Domain}"
+            - Domain:
+                Fn::Select:
+                  - 0
+                  - !Ref Domain
 
 Outputs:
   CloudfrontAliasDNSName:
