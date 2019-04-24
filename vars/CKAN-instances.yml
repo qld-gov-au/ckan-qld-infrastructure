@@ -15,6 +15,7 @@ cloudformation_stacks:
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       WebEC2Count: 2
       AppSubnets: "{{ Environment }}CKANAppSubnet"
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -34,8 +35,10 @@ cloudformation_stacks:
       DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+      WebEC2Size: t3.small
       WebEC2Count: 2
       AppSubnets: "{{ Environment }}CKANAppSubnet"
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -56,6 +59,7 @@ cloudformation_stacks:
       SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       WebEC2Size: t3.small
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -77,6 +81,7 @@ cloudformation_stacks:
       WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       ServicesEC2Size: t3.micro
       WebEC2Size: t3.micro
+      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
