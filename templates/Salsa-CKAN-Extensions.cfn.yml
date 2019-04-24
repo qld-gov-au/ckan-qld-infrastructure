@@ -1,0 +1,103 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |-
+  Creates OpsWorks Applications for CKAN Stack extensions developed by Salsa Digital.
+  Current extension list:
+  DataQld
+  DataQldTheme
+  ODICertificates
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: Stack Parameters
+      Parameters:
+      - OpsWorksStack
+    ParameterLabels:
+      OpsWorksStack:
+        default: What OpsWorks Stack do you want to add CKAN Extensions to?
+
+Parameters:
+  Environment:
+    Description: Select a stack version.
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  OpsWorksStack:
+    Description: The exported name of the OpsWorks Stack ID
+    Type: String
+  DataQldExtensionSource:
+    Description: URL for Queensland Government Open Data extension.
+    Default: https://github.com/qld-gov-au/ckanext-data-qld.git
+    Type: String
+  DataQldThemeExtensionSource:
+    Description: URL for Queensland Government Open Data theme extension.
+    Default: https://github.com/qld-gov-au/ckanext-data-qld-theme.git
+    Type: String
+  ODIExtensionSource:
+    Description: URL for ODI Certificates extension
+    Default: https://github.com/qld-gov-au/ckanext-odi-certificates.git
+    Type: String
+
+Resources:
+  CKANExtDataQld:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: git
+        Url: !Ref DataQldExtensionSource
+      Description: CKAN Extension for Queensland Government Open Data
+      EnableSsl: false
+      Name: !Sub "ckanext-data-qld-${Environment}"
+      Shortname: ckanext-data-qld
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStack
+      Type: other
+
+  CKANExtDataQldTheme:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: git
+        Url: !Ref DataQldThemeExtensionSource
+      Description: CKAN Extension for Queensland Government Open Data theme
+      EnableSsl: false
+      Name: !Sub "ckanext-data-qld-theme-${Environment}"
+      Shortname: ckanext-data-qld-theme
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStack
+      Type: other
+
+  CKANExtODICertificates:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: git
+        Url: !Ref ODIExtensionSource
+      Description: CKAN Extension for ODI Certificates
+      EnableSsl: false
+      Name: !Sub "ckanext-odi-certificates-${Environment}"
+      Shortname: ckanext-odi-certificates
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStack
+      Type: other
+
+Outputs:
+  DataQldApp:
+    Value:
+      Ref: CKANExtDataQld
+    Description: CKAN Queensland Government Open Data extension App ID
+
+  DataQldThemeApp:
+    Value:
+      Ref: CKANExtDataQldTheme
+    Description: CKAN Queensland Government Open Data theme extension App ID
+
+  ODICertificatesApp:
+    Value:
+      Ref: CKANExtODICertificates
+    Description: CKAN ODI Certificates extension App ID
