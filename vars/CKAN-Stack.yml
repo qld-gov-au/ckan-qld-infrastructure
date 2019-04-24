@@ -18,7 +18,7 @@ cloudformation_stacks:
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
-      CookbookRevision: QOL-4415_CKAN-2-7-3
+      CookbookRevision: master
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
@@ -61,7 +61,7 @@ cloudformation_stacks:
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
-      CookbookRevision: QOL-4415_CKAN-2-7-3
+      CookbookRevision: master
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
@@ -104,7 +104,7 @@ cloudformation_stacks:
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
-      CookbookRevision: QOL-4415_CKAN-2-7-3
+      CookbookRevision: develop
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
@@ -147,7 +147,7 @@ cloudformation_stacks:
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
-      CookbookRevision: QOL-4415_CKAN-2-7-3
+      CookbookRevision: develop
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
