@@ -39,6 +39,8 @@ else
   run-playbook CloudFormation "vars/CKAN-extensions.yml"
   run-playbook CloudFormation "vars/CKAN-instances.yml"
   run-playbook "cloudfront"
+  run-playbook "opsworks-deployment" "vars/OpsWorks-update-cookbook.var.yml"
   run-playbook "opsworks-deployment" "vars/CKAN-deployment.var.yml"
+  run-playbook "opsworks-deployment" "vars/OpsWorks-configure.var.yml"
 fi
 
