@@ -455,19 +455,6 @@ Resources:
       StackId: !Ref OpsWorksStack
       Type: other
 
-  OpwxAppCKANTheme:
-    Type: AWS::OpsWorks::App
-    Properties:
-      AppSource:
-        Type: !Ref CKANThemeSourceType
-        Url: !Ref CKANThemeSource
-      Description: !Sub "Page templates and public assets for ${ApplicationName}-${Environment}"
-      EnableSsl: false
-      Name: !Sub "${ApplicationName} ${Environment} theme"
-      Shortname: !Sub "${ApplicationId}-theme-${Environment}"
-      StackId: !Ref OpsWorksStack
-      Type: other
-
   OpwxAppDataPusher:
     Type: AWS::OpsWorks::App
     Properties:
