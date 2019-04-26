@@ -7,7 +7,7 @@ ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS Environment=$ENVIRONMENT"
 
 set -x
 
-function run-playbook {
+run-playbook () {
   if [ ! -z "$2" ]; then
     VARS_FILE_2="--extra-vars @$2"
   else
@@ -39,5 +39,6 @@ else
   run-playbook CloudFormation "vars/CKAN-extensions.yml"
   run-playbook CloudFormation "vars/CKAN-instances.yml"
   run-playbook "cloudfront"
+  run-playbook "opsworks-deployment" "vars/CKAN-deployment.var.yml"
 fi
 
