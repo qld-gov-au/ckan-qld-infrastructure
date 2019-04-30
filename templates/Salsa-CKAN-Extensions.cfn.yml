@@ -34,13 +34,25 @@ Parameters:
     Description: URL for Queensland Government Open Data extension.
     Default: https://github.com/qld-gov-au/ckanext-data-qld.git
     Type: String
+  DataQldExtensionRevision:
+    Description: Branch/tag name in repository to checkout.
+    Default: develop
+    Type: String
   DataQldThemeExtensionSource:
     Description: URL for Queensland Government Open Data theme extension.
     Default: https://github.com/qld-gov-au/ckanext-data-qld-theme.git
     Type: String
+  DataQldThemeExtensionRevision:
+    Description: Branch/tag name in repository to checkout.
+    Default: develop
+    Type: String
   ODIExtensionSource:
     Description: URL for ODI Certificates extension
     Default: https://github.com/qld-gov-au/ckanext-odi-certificates.git
+    Type: String
+  ODIExtensionRevision:
+    Description: Branch/tag name in repository to checkout.
+    Default: develop
     Type: String
 
 Resources:
@@ -50,6 +62,7 @@ Resources:
       AppSource:
         Type: git
         Url: !Ref DataQldExtensionSource
+        Revision: !Ref DataQldExtensionRevision
       Description: CKAN Extension for Queensland Government Open Data
       EnableSsl: false
       Name: !Sub "ckanext-data-qld-${Environment}"
@@ -64,6 +77,7 @@ Resources:
       AppSource:
         Type: git
         Url: !Ref DataQldThemeExtensionSource
+        Revision: !Ref DataQldThemeExtensionRevision
       Description: CKAN Extension for Queensland Government Open Data theme
       EnableSsl: false
       Name: !Sub "ckanext-data-qld-theme-${Environment}"
@@ -78,6 +92,7 @@ Resources:
       AppSource:
         Type: git
         Url: !Ref ODIExtensionSource
+        Revision: !Ref ODIExtensionRevision
       Description: CKAN Extension for ODI Certificates
       EnableSsl: false
       Name: !Sub "ckanext-odi-certificates-${Environment}"
