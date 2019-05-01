@@ -53,8 +53,8 @@
     aws opsworks describe-deployments --region us-east-1 --deployment-id {{ deployment_id }} --query "Deployments|[0].Status" --output text
   register: result
   until: result.stdout_lines[0] != 'running'
-  retries: 6
-  delay: 20
+  retries: 30
+  delay: 30
 - fail:
     msg: "Failed to deploy - aborting"
   when: result.stdout_lines[0] != 'successful'
