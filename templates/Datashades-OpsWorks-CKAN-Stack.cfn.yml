@@ -39,6 +39,13 @@ Parameters:
     Description: URL for zip archive.
     Default: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
     Type: String
+  CKANThemeSource:
+    Description: URL for zip archive.
+    Type: String
+  CKANThemeSourceType:
+    Description: Theme source type eg s3.
+    Type: String
+    Default: s3
   ApplicationName:
     Description: Name of the application (ie. GI or Services, etc)
     Type: String
@@ -445,6 +452,19 @@ Resources:
       EnableSsl: false
       Name: !Sub "${ApplicationName}-${Environment}"
       Shortname: !Sub "${ApplicationId}-${Environment}"
+      StackId: !Ref OpsWorksStack
+      Type: other
+
+  OpwxAppCKANTheme:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: !Ref CKANThemeSourceType
+        Url: !Ref CKANThemeSource
+      Description: !Sub "Page templates and public assets for ${ApplicationName}-${Environment}"
+      EnableSsl: false
+      Name: !Sub "${ApplicationName} ${Environment} theme"
+      Shortname: !Sub "${ApplicationId}-theme-${Environment}"
       StackId: !Ref OpsWorksStack
       Type: other
 
