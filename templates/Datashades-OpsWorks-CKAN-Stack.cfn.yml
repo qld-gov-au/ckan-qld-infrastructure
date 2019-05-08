@@ -229,6 +229,17 @@ Resources:
             Action: kms:Decrypt
             Resource: !Ref SSMKey
 
+  EBSTaggingPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Allows EC2 instances to tag their EBS root volumes (eg for automatic backups)
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: ec2:CreateTags
+            Resource: "*"
+
   InstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -254,6 +265,7 @@ Resources:
                     - - "arn:aws:route53:::hostedzone/"
                       - Fn::ImportValue: !Ref StackZone
       ManagedPolicyArns:
+        - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
@@ -279,6 +291,7 @@ Resources:
               Service: ec2.amazonaws.com
             Action: sts:AssumeRole
       ManagedPolicyArns:
+        - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
