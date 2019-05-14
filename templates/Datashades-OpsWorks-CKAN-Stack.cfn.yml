@@ -37,7 +37,7 @@ Parameters:
     Type: String
   CKANSource:
     Description: URL for zip archive.
-    Default: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
+    Default: https://github.com/ckan/ckan/archive/ckan-2.8.2.zip
     Type: String
   ApplicationName:
     Description: Name of the application (ie. GI or Services, etc)
