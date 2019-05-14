@@ -6,6 +6,9 @@ Description: |-
   DataQld
   DataQldTheme
   ODICertificates
+  DCAT
+  Scheming
+  DataRequests
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -51,6 +54,30 @@ Parameters:
     Default: https://github.com/qld-gov-au/ckanext-odi-certificates.git
     Type: String
   ODIExtensionRevision:
+    Description: Branch/tag name in repository to checkout.
+    Default: develop
+    Type: String
+  DCATExtensionSource:
+    Description: URL for DCAT extension
+    Default: https://github.com/qld-gov-au/ckanext-dcat.git
+    Type: String
+  DCATExtensionRevision:
+    Description: Branch/tag name in repository to checkout.
+    Default: develop
+    Type: String
+  SchemingExtensionSource:
+    Description: URL for Scheming extension
+    Default: https://github.com/qld-gov-au/ckanext-scheming.git
+    Type: String
+  SchemingExtensionRevision:
+    Description: Branch/tag name in repository to checkout.
+    Default: develop
+    Type: String
+  DataRequestsExtensionSource:
+    Description: URL for Data Requests extension
+    Default: https://github.com/qld-gov-au/ckanext-datarequests.git
+    Type: String
+  DataRequestsExtensionRevision:
     Description: Branch/tag name in repository to checkout.
     Default: develop
     Type: String
@@ -101,18 +128,47 @@ Resources:
         Fn::ImportValue: !Ref OpsWorksStack
       Type: other
 
-Outputs:
-  DataQldApp:
-    Value:
-      Ref: CKANExtDataQld
-    Description: CKAN Queensland Government Open Data extension App ID
+  CKANExtDCAT:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: git
+        Url: !Ref DCATExtensionSource
+        Revision: !Ref DCATExtensionRevision
+      Description: CKAN Extension for DCAT
+      EnableSsl: false
+      Name: !Sub "ckanext-dcat-${Environment}"
+      Shortname: ckanext-dcat
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStack
+      Type: other
 
-  DataQldThemeApp:
-    Value:
-      Ref: CKANExtDataQldTheme
-    Description: CKAN Queensland Government Open Data theme extension App ID
+  CKANExtScheming:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: git
+        Url: !Ref SchemingExtensionSource
+        Revision: !Ref SchemingExtensionRevision
+      Description: CKAN Extension for Scheming
+      EnableSsl: false
+      Name: !Sub "ckanext-scheming-${Environment}"
+      Shortname: ckanext-scheming
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStack
+      Type: other
 
-  ODICertificatesApp:
-    Value:
-      Ref: CKANExtODICertificates
-    Description: CKAN ODI Certificates extension App ID
+  CKANExtDataRequests:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: git
+        Url: !Ref DataRequestsExtensionSource
+        Revision: !Ref DataRequestsExtensionRevision
+      Description: CKAN Extension for Data Requests
+      EnableSsl: false
+      Name: !Sub "ckanext-datarequests-${Environment}"
+      Shortname: ckanext-datarequests
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStack
+      Type: other
