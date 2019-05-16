@@ -166,6 +166,9 @@ Parameters:
   SSMKey:
     Type: String
     Description: KMS key for alias/aws/ssm
+  GTMContainerId:
+    Description: Google Tag Manager container ID
+    Type: String
 
 Conditions:
   ProvisionServiceRole:
@@ -331,6 +334,8 @@ Resources:
             dsname: !Sub "${ApplicationName}_datastore"
             dsenable: !Ref EnableDataStore
             endpoint: /
+            google:
+              gtm_container_id: !Ref GTMContainerId
           jumpbox:
             bucket: !Ref AdminPubKeyBucket
             usergroup: !Ref AdminUserGroup
