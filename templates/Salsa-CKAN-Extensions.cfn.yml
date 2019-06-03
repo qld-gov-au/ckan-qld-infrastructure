@@ -60,19 +60,19 @@ Parameters:
     Type: String
   DCATExtensionSource:
     Description: URL for DCAT extension
-    Default: https://github.com/qld-gov-au/ckanext-dcat.git
+    Default: https://github.com/ckan/ckanext-dcat.git
     Type: String
   DCATExtensionRevision:
     Description: Branch/tag name in repository to checkout.
-    Default: develop
+    Default: master
     Type: String
   SchemingExtensionSource:
     Description: URL for Scheming extension
-    Default: https://github.com/qld-gov-au/ckanext-scheming.git
+    Default: https://github.com/ckan/ckanext-scheming.git
     Type: String
   SchemingExtensionRevision:
     Description: Branch/tag name in repository to checkout.
-    Default: develop
+    Default: master
     Type: String
   DataRequestsExtensionSource:
     Description: URL for Data Requests extension
