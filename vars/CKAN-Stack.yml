@@ -105,7 +105,7 @@ cloudformation_stacks:
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
-      CookbookRevision: develop
+      CookbookRevision: training
       CKANSource: https://github.com/ckan/ckan/archive/ckan-2.8.2.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
