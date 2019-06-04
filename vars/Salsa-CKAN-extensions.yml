@@ -44,6 +44,7 @@ cloudformation_stacks:
       DataQldThemeExtensionRevision: "training"
       ODIExtensionRevision: "training"
       DataRequestsExtensionRevision: "training"
+      YTPExtensionRevision: "training"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -63,6 +64,7 @@ cloudformation_stacks:
       DataQldThemeExtensionRevision: "develop"
       ODIExtensionRevision: "develop"
       DataRequestsExtensionRevision: "develop"
+      YTPExtensionRevision: "develop"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
