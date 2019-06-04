@@ -130,7 +130,6 @@ Resources:
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
       LayerIds:
-        - Fn::ImportValue: !Ref DataPusherLayerID
         - Fn::ImportValue: !Ref SolrLayerID
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID

@@ -1,5 +1,6 @@
 ---
 template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
+NonProductionGTMId: "GTM-NBSWN3"
 
 cloudformation_stacks:
   - name: "{{ titlecase_name }}-PROD-OpsWorks-stack"
@@ -19,8 +20,6 @@ cloudformation_stacks:
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CookbookRevision: master
-      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
-      CKANThemeSource: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ titlecase_name }}-{{ Environment }}/CKAN-theme.zip"
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
       CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
@@ -38,6 +37,7 @@ cloudformation_stacks:
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
       SSMKey: "{{ SSMKey | default('') }}"
+      GTMContainerId: "GTM-PJBVFG"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -63,8 +63,6 @@ cloudformation_stacks:
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CookbookRevision: master
-      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
-      CKANThemeSource: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ titlecase_name }}-{{ Environment }}/CKAN-theme.zip"
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
       CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
@@ -82,6 +80,7 @@ cloudformation_stacks:
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
       SSMKey: "{{ SSMKey | default('') }}"
+      GTMContainerId: "{{ NonProductionGTMId }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -106,9 +105,8 @@ cloudformation_stacks:
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
-      CookbookRevision: develop
-      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.3.zip
-      CKANThemeSource: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ titlecase_name }}-{{ Environment }}/CKAN-theme.zip"
+      CookbookRevision: training
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.8.2.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
       CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
@@ -126,6 +124,7 @@ cloudformation_stacks:
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
       SSMKey: "{{ SSMKey | default('') }}"
+      GTMContainerId: "{{ NonProductionGTMId }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -151,8 +150,7 @@ cloudformation_stacks:
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CookbookRevision: develop
-      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.7.5.zip
-      CKANThemeSource: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ titlecase_name }}-{{ Environment }}/CKAN-theme.zip"
+      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.8.2.zip
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
       CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
@@ -170,6 +168,7 @@ cloudformation_stacks:
       CreateServiceRole: "yes"
       EnableDataStore: "{{ enable_datastore | default('no') }}"
       SSMKey: "{{ SSMKey | default('') }}"
+      GTMContainerId: "{{ NonProductionGTMId }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
