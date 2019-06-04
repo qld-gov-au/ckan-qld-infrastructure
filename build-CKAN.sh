@@ -39,6 +39,7 @@ else
   run-playbook CloudFormation "vars/waf_web_acl.var.yml"
   run-playbook "CKAN-Stack"
   run-playbook CloudFormation "vars/CKAN-extensions.yml"
+  run-playbook CloudFormation "vars/Salsa-CKAN-extensions.yml"
   run-playbook CloudFormation "vars/CKAN-instances.yml"
   run-playbook "cloudfront"
   run-playbook "opsworks-deployment" "Deployment_Type=update_custom_cookbooks"
