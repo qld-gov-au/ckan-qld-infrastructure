@@ -20,6 +20,7 @@ cloudformation_stacks:
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CookbookRevision: master
+      CKANSource: "{{ CKANSource | default('https://github.com/ckan/ckan/archive/ckan-2.7.3.zip') }}"
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
       CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
@@ -63,6 +64,7 @@ cloudformation_stacks:
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CookbookRevision: master
+      CKANSource: "{{ CKANSource | default('https://github.com/ckan/ckan/archive/ckan-2.7.3.zip') }}"
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
       CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
@@ -106,7 +108,7 @@ cloudformation_stacks:
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
       CookbookRevision: training
-      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.8.2.zip
+      CKANSource: "{{ CKANSource | default('https://github.com/ckan/ckan/archive/ckan-2.8.2.zip') }}"
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
       CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"
@@ -149,8 +151,10 @@ cloudformation_stacks:
       PublicTLD: "{{ public_tld }}"
       CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
       StackVPC: "CKANVpc-{{ Environment }}"
+      CookbookURL: https://s3-ap-southeast-2.amazonaws.com/osssio-ckanpub-test-deploy/opswx-ckan-cookbook.zip
+      CookbookURLType: s3
       CookbookRevision: develop
-      CKANSource: https://github.com/ckan/ckan/archive/ckan-2.8.2.zip
+      CKANSource: "{{ CKANSource | default('https://github.com/ckan/ckan/archive/ckan-2.8.2.zip') }}"
       DefaultEC2Key: osssio-global-ckan
       CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_email', region=region) }}"
       CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + lowercase_name + '/admin_password', region=region) }}"

@@ -2,44 +2,63 @@
 #North Virginia cert required for Cloudfront
 NonProdOpenDataCertificateArn: "arn:aws:acm:us-east-1:265326298602:certificate/40d5f634-d3b8-4142-aede-8f6b74f3bbae"
 NonProdPublicationsCertificateArn: "arn:aws:acm:us-east-1:265326298602:certificate/a0bce356-b363-4d2d-9e16-2225687e3d18"
+legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ titlecase_name }}-{{ Environment }}/CKAN-theme.zip"
+ckan_2_7: "https://github.com/ckan/ckan/archive/ckan-2.7.3.zip"
+ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.2.zip"
 
 certificate_arns:
   - profile: opendata
     Environment: PROD
     ACMCertificateARN: "arn:aws:acm:us-east-1:265326298602:certificate/4e998cee-fb84-466f-89f4-8d87b7db83fd"
     Domain: data.qld.gov.au,www.data.qld.gov.au
+    CKANThemeSource: "{{ legacy_theme }}"
+    CKANSource: "{{ ckan_2_7 }}"
 
   - profile: opendata
     Environment: STAGING
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
     Domain: staging.data.qld.gov.au
+    CKANThemeSource: "{{ legacy_theme }}"
+    CKANSource: "{{ ckan_2_7 }}"
 
   - profile: opendata
     Environment: TRAINING
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
     Domain: training.data.qld.gov.au
+    CKANThemeSource: "none"
+    CKANSource: "{{ ckan_2_8 }}"
 
   - profile: opendata
     Environment: DEV
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
     Domain: dev.data.qld.gov.au
+    CKANThemeSource: "none"
+    CKANSource: "{{ ckan_2_8 }}"
 
   - profile: publications
     Environment: PROD
     ACMCertificateARN: "arn:aws:acm:us-east-1:265326298602:certificate/8140117c-35ee-4c5e-a54a-255f6bf0b9b5"
     Domain: publications.qld.gov.au,www.publications.qld.gov.au
+    CKANThemeSource: "{{ legacy_theme }}"
+    CKANSource: "{{ ckan_2_7 }}"
 
   - profile: publications
     Environment: STAGING
     ACMCertificateARN: "{{ NonProdPublicationsCertificateArn }}"
     Domain: staging.publications.qld.gov.au
+    CKANThemeSource: "{{ legacy_theme }}"
+    CKANSource: "{{ ckan_2_7 }}"
 
   - profile: publications
     Environment: TRAINING
     ACMCertificateARN: "{{ NonProdPublicationsCertificateArn }}"
     Domain: training.publications.qld.gov.au
+    CKANThemeSource: "{{ legacy_theme }}"
+    CKANSource: "{{ ckan_2_7 }}"
 
   - profile: publications
     Environment: DEV
     ACMCertificateARN: "{{ NonProdPublicationsCertificateArn }}"
     Domain: dev.publications.qld.gov.au
+    CKANThemeSource: "{{ legacy_theme }}"
+    CKANSource: "{{ ckan_2_7 }}"
