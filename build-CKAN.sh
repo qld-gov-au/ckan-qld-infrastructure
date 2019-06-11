@@ -22,28 +22,20 @@ run-playbook () {
   ansible-playbook -i inventory/hosts "$PLAYBOOK" --extra-vars "@$VARS_FILE" $VARS_FILE_2 --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 }
 
-if [ $# -ge 3 ]; then
-  # run custom playbook
-  run-playbook "$3" "$4"
-else
-  #ensure we die if any function fails
-  set -e
-
+run-shared-resource-playbooks () {
   run-playbook "vpc"
   run-playbook "security_groups"
   run-playbook CloudFormation "vars/hosted-zone.var.yml"
   run-playbook CloudFormation "vars/database.yml"
-  run-playbook "database-config"
   run-playbook CloudFormation "vars/efs.yml"
   run-playbook CloudFormation "vars/cache.yml"
   run-playbook CloudFormation "vars/waf_web_acl.var.yml"
-  run-playbook "CKAN-Stack"
-  run-playbook CloudFormation "vars/CKAN-extensions.yml"
-  run-playbook CloudFormation "vars/Salsa-CKAN-extensions.yml"
-  run-playbook CloudFormation "vars/CKAN-instances.yml"
-  run-playbook "cloudfront"
-  run-playbook "opsworks-deployment" "Deployment_Type=update_custom_cookbooks"
-  run-playbook "opsworks-deployment" "vars/CKAN-deployment.var.yml"
-  run-playbook "opsworks-deployment" "Deployment_Type=configure"
+}
+
+if [ $# -ge 3 ]; then
+  # run custom playbook
+  run-playbook "$3" "$4"
+else
+  run-all-playbooks
 fi
 
