@@ -1,67 +1,21 @@
 ---
-template: "templates/Datashades-OpsWorks-CKAN-Extensions.cfn.yml"
 
 cloudformation_stacks:
-  - name: "{{ titlecase_name }}-PROD-OpsWorks-CKANExtensions"
+  - name: "{{ titlecase_name }}-{{ Environment }}-OpsWorks-CKANExtensions"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
-    template: "{{ template }}"
+    template: "templates/Datashades-OpsWorks-CKAN-Extensions.cfn.yml"
     template_parameters:
-      Environment: PROD
-      OpsWorksStack: "PROD{{ titlecase_name }}OpsWorksStack"
+      Environment: "{{ Environment }}"
+      ApplicationName: "{{ titlecase_name }}"
+      ApplicationId: "{{ lowercase_name }}"
+      OpsWorksStack: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      CKANThemeSource: "{{ CKANThemeSource }}"
     tags:
-      Environment: PROD
+      Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
       Division: "{{ Division }}"
       Owner: "{{ Owner }}"
       Version: "1.0"
       PowerManaged: "No"
-
-  - name: "{{ titlecase_name }}-STAGING-OpsWorks-CKANExtensions"
-    state: "{{ state | default('present')}}"
-    region: "{{ region }}"
-    disable_rollback: true
-    template: "{{ template }}"
-    template_parameters:
-      Environment: STAGING
-      OpsWorksStack: "STAGING{{ titlecase_name }}OpsWorksStack"
-    tags:
-      Environment: STAGING
-      Service: "{{ titlecase_name }}"
-      Division: "{{ Division }}"
-      Owner: "{{ Owner }}"
-      Version: "1.0"
-      PowerManaged: "No"
-
-  - name: "{{ titlecase_name }}-TRAINING-OpsWorks-CKANExtensions"
-    state: "{{ state | default('present')}}"
-    region: "{{ region }}"
-    disable_rollback: true
-    template: "{{ template }}"
-    template_parameters:
-      Environment: TRAINING
-      OpsWorksStack: "TRAINING{{ titlecase_name }}OpsWorksStack"
-    tags:
-      Environment: TRAINING
-      Service: "{{ titlecase_name }}"
-      Division: "{{ Division }}"
-      Owner: "{{ Owner }}"
-      Version: "1.0"
-      PowerManaged: "Yes"
-
-  - name: "{{ titlecase_name }}-DEV-OpsWorks-CKANExtensions"
-    state: "{{ state | default('present')}}"
-    region: "{{ region }}"
-    disable_rollback: true
-    template: "{{ template }}"
-    template_parameters:
-      Environment: DEV
-      OpsWorksStack: "DEV{{ titlecase_name }}OpsWorksStack"
-    tags:
-      Environment: DEV
-      Service: "{{ titlecase_name }}"
-      Division: "{{ Division }}"
-      Owner: "{{ Owner }}"
-      Version: "1.0"
-      PowerManaged: "Yes"

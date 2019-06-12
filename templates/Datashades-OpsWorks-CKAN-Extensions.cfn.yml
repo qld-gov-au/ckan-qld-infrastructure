@@ -3,18 +3,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: |-
   Creates OpsWorks Applications for CKAN Stack extensions.
   Current extension list:
+  Legacy theme
   Queensland Government extension
-  Trak
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-    - Label:
-        default: Stack Parameters
-      Parameters:
-      - OpsWorksStack
-    ParameterLabels:
-      OpsWorksStack:
-        default: What OpsWorks Stack do you want to add CKAN Extensions to?
 
 Parameters:
   Environment:
@@ -29,16 +19,49 @@ Parameters:
   OpsWorksStack:
     Description: The exported name of the OpsWorks Stack ID
     Type: String
+  ApplicationName:
+    Description: Name of the application (ie. GI or Services, etc)
+    Type: String
+  ApplicationId:
+    Description: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+    Type: String
+    ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
+    AllowedPattern: '[-_a-z0-9]*'
+  CKANThemeSource:
+    Description: URL for zip archive.
+    Type: String
+  CKANThemeSourceType:
+    Description: Theme source type eg s3.
+    Type: String
+    Default: s3
   QgovExtensionSource:
     Description: URL for QGOV CKAN extension.
     Default: https://github.com/qld-gov-au/ckan-ex-qgov.git
     Type: String
-  TrakExtensionSource:
-    Description: URL for Trak extension.
-    Default: https://github.com/qld-gov-au/ckanext-trak.git
-    Type: String
+
+Conditions:
+  DeployLegacyTheme:
+    Fn::Not:
+      - Fn::Equals:
+        - "none"
+        - !Ref CKANThemeSource
 
 Resources:
+  OpwxAppCKANTheme:
+    Condition: DeployLegacyTheme
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: !Ref CKANThemeSourceType
+        Url: !Ref CKANThemeSource
+      Description: !Sub "Page templates and public assets for ${ApplicationName}-${Environment}"
+      EnableSsl: false
+      Name: !Sub "${ApplicationName} ${Environment} theme"
+      Shortname: !Sub "${ApplicationId}-theme-${Environment}"
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStack
+      Type: other
+
   CKANExtQGOV:
     Type: AWS::OpsWorks::App
     Properties:
@@ -52,44 +75,3 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStack
       Type: other
-
-  CKANExtTrak:
-    Type: AWS::OpsWorks::App
-    Properties:
-      AppSource:
-        Type: git
-        Url: !Ref TrakExtensionSource
-      Description: CKAN Trak Extension
-      EnableSsl: false
-      Name: !Sub "ckanext-trak-${Environment}"
-      Shortname: ckanext-trak
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStack
-      Type: other
-
-  # this is temporary
-  CKANExtShowcase:
-    Type: AWS::OpsWorks::App
-    Properties:
-      AppSource:
-        Type: git
-        Revision: master
-        Url: https://github.com/ckan/ckanext-showcase.git
-      Description: CKAN Showcase Extension
-      EnableSsl: false
-      Name: !Sub "ckanext-showcase-${Environment}"
-      Shortname: ckanext-showcase
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStack
-      Type: other
-
-Outputs:
-  QGovApp:
-    Value:
-      Ref: CKANExtQGOV
-    Description: CKAN Queensland Government extension App ID
-
-  TrakApp:
-    Value:
-      Ref: CKANExtTrak
-    Description: CKAN Trak extension App ID
