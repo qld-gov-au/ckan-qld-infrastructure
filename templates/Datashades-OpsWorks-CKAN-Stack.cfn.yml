@@ -33,7 +33,7 @@ Parameters:
     Type: String
   SolrSource:
     Description: URL for zip archive.
-    Default: http://apache.mirror.digitalpacific.com.au/lucene/solr/5.5.5/solr-5.5.5.zip
+    Default: http://archive.apache.org/dist/lucene/solr/5.5.5/solr-5.5.5.zip
     Type: String
   CKANSource:
     Description: URL for zip archive.
