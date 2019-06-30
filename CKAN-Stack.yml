@@ -2,7 +2,15 @@
 - name: Cloudformation Playbook
   hosts: local
   connection: local
+  vars_files:
+    - vars/cloudfront-certificates.var.yml
   pre_tasks:
+    - name: Get CKAN source for environment
+      set_fact:
+        CKANSource={{ item.CKANSource }}
+      when: item.Environment == Environment and item.profile == lowercase_name
+      with_items: "{{ certificate_arns }}"
+
     - name: kms alias fact
       aws_kms_facts:
         filters:

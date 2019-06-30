@@ -2,14 +2,69 @@
 template: "templates/Salsa-CKAN-Extensions.cfn.yml"
 
 cloudformation_stacks:
-  - name: "{{ titlecase_name }}-{{ Environment }}-Salsa-CKANExtensions"
+#  - name: "{{ titlecase_name }}-PROD-Salsa-CKANExtensions"
+#    state: "{{ state | default('present')}}"
+#    region: "{{ region }}"
+#    disable_rollback: true
+#    template: "{{ template }}"
+#    template_parameters:
+#      Environment: "PROD"
+#      OpsWorksStack: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+#    tags:
+#      Environment: "{{ Environment }}"
+#      Service: "{{ titlecase_name }}"
+#      Division: "{{ Division }}"
+#      Owner: "{{ Owner }}"
+#      Version: "1.0"
+
+#  - name: "{{ titlecase_name }}-STAGING-Salsa-CKANExtensions"
+#    state: "{{ state | default('present')}}"
+#    region: "{{ region }}"
+#    disable_rollback: true
+#    template: "{{ template }}"
+#    template_parameters:
+#      Environment: "STAGING"
+#      OpsWorksStack: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+#    tags:
+#      Environment: "{{ Environment }}"
+#      Service: "{{ titlecase_name }}"
+#      Division: "{{ Division }}"
+#      Owner: "{{ Owner }}"
+#      Version: "1.0"
+
+  - name: "{{ titlecase_name }}-TRAINING-Salsa-CKANExtensions"
     state: "{{ state | default('present')}}"
     region: "{{ region }}"
     disable_rollback: true
     template: "{{ template }}"
     template_parameters:
-      Environment: "{{ Environment }}"
+      Environment: "TRAINING"
       OpsWorksStack: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      DataQldExtensionRevision: "training"
+      DataQldThemeExtensionRevision: "training"
+      ODIExtensionRevision: "training"
+      DataRequestsExtensionRevision: "training"
+      YTPExtensionRevision: "training"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+
+  - name: "{{ titlecase_name }}-DEV-Salsa-CKANExtensions"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: "DEV"
+      OpsWorksStack: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+      DataQldExtensionRevision: "develop"
+      DataQldThemeExtensionRevision: "develop"
+      ODIExtensionRevision: "develop"
+      DataRequestsExtensionRevision: "develop"
+      YTPExtensionRevision: "develop"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
