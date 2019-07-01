@@ -19,7 +19,7 @@ certificate_arns:
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
     Domain: staging.data.qld.gov.au
     CKANThemeSource: "{{ legacy_theme }}"
-    CKANSource: "{{ ckan_2_7 }}"
+    CKANSource: "{{ ckan_2_8 }}"
 
   - profile: opendata
     Environment: TRAINING
