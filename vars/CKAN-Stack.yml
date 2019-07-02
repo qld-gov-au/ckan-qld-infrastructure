@@ -27,7 +27,6 @@ shared_template_parameters:
   SSMKey: "{{ SSMKey | default('') }}"
   DefaultEC2Key: osssio-global-ckan
 
-
 cloudformation_stacks:
   - name: "{{ titlecase_name }}-PROD-OpsWorks-stack"
     state: "{{ state | default('present')}}"

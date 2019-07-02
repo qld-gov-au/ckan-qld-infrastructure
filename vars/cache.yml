@@ -1,6 +1,10 @@
 ---
 template: "templates/cache.cfn.yml"
 
+shared_template_parameters:
+  Platform: CKAN
+  Subnets: "{{ Environment }}CKANDBSubnet"
+
 cloudformation_stacks:
   - name: CKAN-PROD-Cache
     state: "{{ state | default('present')}}"
@@ -9,8 +13,6 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: PROD
-      Platform: CKAN
-      Subnets: "{{ Environment }}CKANDBSubnet"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -26,8 +28,6 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: STAGING
-      Platform: CKAN
-      Subnets: "{{ Environment }}CKANDBSubnet"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -43,8 +43,6 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: TRAINING
-      Platform: CKAN
-      Subnets: "{{ Environment }}CKANDBSubnet"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -60,8 +58,6 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: DEV
-      Platform: CKAN
-      Subnets: "{{ Environment }}CKANDBSubnet"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN

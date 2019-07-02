@@ -17,7 +17,7 @@
     - name: Get name and region of stack and set ansible fact
       set_fact:
         CFStackName: "{{ CFStack.name }}"
-        ApplicationName: "{{ CFStack.template_parameters.ApplicationName }}"
+        ApplicationName: "{{ shared_template_parameters.ApplicationName }}"
 
     - name: Get current web frontend stack facts
       cloudformation_facts:

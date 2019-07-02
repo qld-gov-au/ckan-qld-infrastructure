@@ -1,6 +1,14 @@
 ---
 template: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml"
 
+shared_template_parameters:
+  OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+  DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
+  SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
+  WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
+  AppSubnets: "{{ Environment }}CKANAppSubnet"
+  EnableDataStore: "{{ enable_datastore | default('no') }}"
+
 cloudformation_stacks:
   - name: "{{ titlecase_name }}-PROD-OpsWorks-instances"
     state: "{{ state | default('present')}}"
@@ -9,13 +17,7 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: PROD
-      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
-      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
-      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
-      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       WebEC2Count: 2
-      AppSubnets: "{{ Environment }}CKANAppSubnet"
-      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -31,14 +33,8 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: STAGING
-      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
-      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
-      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
-      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       WebEC2Size: t3.small
       WebEC2Count: 2
-      AppSubnets: "{{ Environment }}CKANAppSubnet"
-      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -54,12 +50,7 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: TRAINING
-      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
-      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
-      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
-      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       WebEC2Size: t3.small
-      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"
@@ -75,13 +66,8 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: DEV
-      OpsWorksStackID: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
-      DataPusherLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksDataPusherLayer"
-      SolrLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksSolrLayer"
-      WebLayerID: "{{ Environment }}{{ titlecase_name }}OpsWorksWebLayer"
       ServicesEC2Size: t3.micro
       WebEC2Size: t3.micro
-      EnableDataStore: "{{ enable_datastore | default('no') }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "{{ titlecase_name }}"

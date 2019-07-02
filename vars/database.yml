@@ -1,4 +1,18 @@
 ---
+shared_template_parameters:
+  DBEngine: postgres
+  DBEngineVersion: 10.6
+  DBName: ckan
+  DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
+  DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
+  DBPrivileges: "ALL"
+  PubliclyAccessible: "false"
+  Platform: CKAN
+  Subnets: "{{ Environment }}CKANDBSubnet"
+  VPC: "CKANVpc-{{ Environment }}"
+  StackTLD: "{{ Environment }}CKANPrivateTLD"
+  StackZone: "{{ Environment }}CKANPrivateHostedZone"
+
 cloudformation_stacks:
   - name: CKAN-PROD-RDS
     state: "{{ state | default('present')}}"
@@ -8,21 +22,9 @@ cloudformation_stacks:
     template_parameters:
       DBAllocatedStorage: "600"
       DBClass: db.m5.large
-      DBEngine: postgres
-      DBEngineVersion: 10.6
-      DBName: ckan
       StorageEncrypted: "True"
-      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
-      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
-      DBPrivileges: "ALL"
       Environment: PROD
-      Platform: CKAN
-      PubliclyAccessible: "false"
       MultiAZ: "true"
-      Subnets: "{{ Environment }}CKANDBSubnet"
-      VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: "{{ Environment }}CKANPrivateTLD"
-      StackZone: "{{ Environment }}CKANPrivateHostedZone"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -39,21 +41,9 @@ cloudformation_stacks:
     template_parameters:
       DBAllocatedStorage: '300'
       DBClass: db.t3.large
-      DBEngine: postgres
-      DBEngineVersion: 10.6
-      DBName: ckan
       StorageEncrypted: "True"
-      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
-      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
-      DBPrivileges: "ALL"
       Environment: STAGING
-      Platform: CKAN
-      PubliclyAccessible: "false"
       MultiAZ: "true"
-      Subnets: "{{ Environment }}CKANDBSubnet"
-      VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: "{{ Environment }}CKANPrivateTLD"
-      StackZone: "{{ Environment }}CKANPrivateHostedZone"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -70,21 +60,9 @@ cloudformation_stacks:
     template_parameters:
       DBAllocatedStorage: "100"
       DBClass: db.t3.medium
-      DBEngine: postgres
-      DBEngineVersion: 10.6
-      DBName: ckan
       StorageEncrypted: "False"
-      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
-      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
-      DBPrivileges: "ALL"
       Environment: TRAINING
-      Platform: CKAN
-      PubliclyAccessible: "false"
       MultiAZ: "false"
-      Subnets: "{{ Environment }}CKANDBSubnet"
-      VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: "{{ Environment }}CKANPrivateTLD"
-      StackZone: "{{ Environment }}CKANPrivateHostedZone"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
@@ -101,21 +79,9 @@ cloudformation_stacks:
     template_parameters:
       DBAllocatedStorage: "200"
       DBClass: db.t3.medium
-      DBEngine: postgres
-      DBEngineVersion: 10.6
-      DBName: ckan
       StorageEncrypted: "False"
-      DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
-      DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
-      DBPrivileges: "ALL"
       Environment: DEV
-      Platform: CKAN
-      PubliclyAccessible: "false"
       MultiAZ: "false"
-      Subnets: "{{ Environment }}CKANDBSubnet"
-      VPC: "CKANVpc-{{ Environment }}"
-      StackTLD: "{{ Environment }}CKANPrivateTLD"
-      StackZone: "{{ Environment }}CKANPrivateHostedZone"
     tags:
       Environment: "{{ Environment }}"
       Service: CKAN
