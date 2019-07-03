@@ -1,43 +1,31 @@
 ---
-- name: Identify CloudFormation stack with params
-  set_fact:
-    cf_stack={{ item }}
-  when: item.template_parameters is defined and item.template_parameters.Environment == Environment and item.profile is defined
-  with_items: "{{ cloudformation_stacks }}"
 
-- name: Identify CloudFormation stack with params no profile
+- name: Ensure common_stack exists even if empty
   set_fact:
-    cf_stack={{ item }}
-  when: item.template_parameters is defined and item.template_parameters.Environment == Environment and item.profile is undefined
-  with_items: "{{ cloudformation_stacks }}"
+    common_stack:
+      template_parameters: {}
+      tags: {}
+  when: common_stack is undefined
 
-- name: Identify CloudFormation stack without params
-  set_fact:
-    cf_stack={{ item }}
-  when: item.template_parameters is undefined and item.profile is defined
-  with_items: "{{ cloudformation_stacks }}"
-
-- name: Identify CloudFormation stack without params or profile
-  set_fact:
-    cf_stack={{ item }}
-  when: item.template_parameters is undefined and item.profile is undefined
-  with_items: "{{ cloudformation_stacks }}"
-
-- name: Apply common parameters
-  set_fact:
-    item={{ (common_stack | default({})) | combine(cf_stack) }}
-    template_parameters={{ ((common_stack | default({})).template_parameters | default({})) | combine(cf_stack.template_parameters | default({})) }}
-    tags={{ ((common_stack | default({})).tags | default({})) | combine(cf_stack.tags | default({})) }}
-  when: cf_stack is defined
-
+# The individual stacks effectively inherit and override the common stack.
+#
+# - For simple values, we first check the individual stack, then use the
+# 'default' filter to get the common value if not provided.
+# - For dictionary values, we first get the common dict, then use the
+# 'combine' filter to override with values from the individual stack.
+#
+# The net effect is that the common and individual stacks have the same
+# structure, but any values in the individual stacks take priority.
 - name: Run CloudFormation stack
   cloudformation:
-    stack_name: "{{ item.name }}"
-    profile: "{{ item.profile | default('') }}"
-    state: "{{ item.state }}"
-    region: "{{ item.region }}"
-    disable_rollback: "{{ item.disable_rollback }}"
-    template: "{{ item.template }}"
-    template_parameters: "{{ template_parameters }}"
-    tags: "{{ tags }}"
-  when: item is defined
+    stack_name: "{{ item.name | default(common_stack.name) }}"
+    # 'profile' is optional so we default to empty string
+    profile: "{{ item.profile | default(common_stack.profile | default('')) }}"
+    state: "{{ item.state | default(common_stack.state) }}"
+    region: "{{ item.region | default(common_stack.region) }}"
+    disable_rollback: "{{ item.disable_rollback | default(common_stack.disable_rollback) }}"
+    template: "{{ item.template | default(common_stack.template) }}"
+    template_parameters: "{{ common_stack.template_parameters | combine(item.template_parameters | default({})) }}"
+    tags: "{{ common_stack.tags | combine(item.tags | default({})) }}"
+  when: item.template_parameters is undefined or item.template_parameters.Environment == Environment
+  with_items: "{{ cloudformation_stacks }}"
