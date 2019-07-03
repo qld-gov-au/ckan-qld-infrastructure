@@ -1,12 +1,5 @@
 ---
 
-- name: Ensure common_stack exists even if empty
-  set_fact:
-    common_stack:
-      template_parameters: {}
-      tags: {}
-  when: common_stack is undefined
-
 # The individual stacks effectively inherit and override the common stack.
 #
 # - For simple values, we first check the individual stack, then use the
