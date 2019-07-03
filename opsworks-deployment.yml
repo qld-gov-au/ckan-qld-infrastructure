@@ -8,14 +8,13 @@
 
     - name: Identify CloudFormation stack
       set_fact:
-        cf_stack: "{{ item }}"
         Stack_Name: "{{ item.name }}"
       when: item.template_parameters.Environment == Environment
       with_items: "{{ cloudformation_stacks }}"
 
     - name: Get CloudFormation stack ID
       cloudformation_facts:
-        region: "{{ cf_stack.region }}"
+        region: "{{ region }}"
         stack_name: "{{ Stack_Name }}"
         stack_resources: true
       register: cf_facts

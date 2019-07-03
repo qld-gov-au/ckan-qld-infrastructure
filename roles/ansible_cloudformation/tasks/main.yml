@@ -1,50 +1,43 @@
 ---
-
-- name: Create Update or Delete stack with params
-  cloudformation:
-    stack_name: "{{ item.name }}"
-    profile: "{{ item.profile }}"
-    state: "{{ item.state }}"
-    region: "{{ item.region }}"
-    disable_rollback: "{{ item.disable_rollback }}"
-    template: "{{ item.template }}"
-    template_parameters: "{{ item.template_parameters | combine(shared_template_parameters | default({})) }}"
-    tags: "{{ item.tags }}"
+- name: Identify CloudFormation stack with params
+  set_fact:
+    cf_stack={{ item }}
   when: item.template_parameters is defined and item.template_parameters.Environment == Environment and item.profile is defined
   with_items: "{{ cloudformation_stacks }}"
 
-- name: Create Update or Delete stack with params no profile
-  cloudformation:
-    stack_name: "{{ item.name }}"
-    state: "{{ item.state }}"
-    region: "{{ item.region }}"
-    disable_rollback: "{{ item.disable_rollback }}"
-    template: "{{ item.template }}"
-    template_parameters: "{{ item.template_parameters |combine(shared_template_parameters | default({})) }}"
-    tags: "{{ item.tags }}"
+- name: Identify CloudFormation stack with params no profile
+  set_fact:
+    cf_stack={{ item }}
   when: item.template_parameters is defined and item.template_parameters.Environment == Environment and item.profile is undefined
   with_items: "{{ cloudformation_stacks }}"
 
-- name: Create Update or Delete stack without params
-  cloudformation:
-    stack_name: "{{ item.name }}"
-    profile: "{{ item.profile }}"
-    state: "{{ item.state }}"
-    region: "{{ item.region }}"
-    disable_rollback: "{{ item.disable_rollback }}"
-    template: "{{ item.template }}"
-    tags: "{{ item.tags }}"
+- name: Identify CloudFormation stack without params
+  set_fact:
+    cf_stack={{ item }}
   when: item.template_parameters is undefined and item.profile is defined
   with_items: "{{ cloudformation_stacks }}"
 
-- name: Create Update or Delete stack without params or profile
+- name: Identify CloudFormation stack without params or profile
+  set_fact:
+    cf_stack={{ item }}
+  when: item.template_parameters is undefined and item.profile is undefined
+  with_items: "{{ cloudformation_stacks }}"
+
+- name: Apply common parameters
+  set_fact:
+    item={{ (common_stack | default({})) | combine(cf_stack) }}
+    template_parameters={{ ((common_stack | default({})).template_parameters | default({})) | combine(cf_stack.template_parameters | default({})) }}
+    tags={{ ((common_stack | default({})).tags | default({})) | combine(cf_stack.tags | default({})) }}
+  when: cf_stack is defined
+
+- name: Run CloudFormation stack
   cloudformation:
     stack_name: "{{ item.name }}"
+    profile: "{{ item.profile | default('') }}"
     state: "{{ item.state }}"
     region: "{{ item.region }}"
     disable_rollback: "{{ item.disable_rollback }}"
     template: "{{ item.template }}"
-    tags: "{{ item.tags }}"
-  when: item.template_parameters is undefined and item.profile is undefined
-  with_items: "{{ cloudformation_stacks }}"
-
+    template_parameters: "{{ template_parameters }}"
+    tags: "{{ tags }}"
+  when: item is defined

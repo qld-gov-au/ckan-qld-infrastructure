@@ -2,83 +2,47 @@
 opsAccount: "103119354886"
 opsRole: "VPC-Peering"
 opsVpcID: "vpc-d5ba8bb0"
-opsVpcCidr: "10.10.0.0/16"
-template: "templates/3_tier_vpc.yml"
-bamboo_green: "13.210.53.223/32"
-bamboo_blue: "13.211.7.108/32"
 
-shared_template_parameters:
-  ApplicationName: "CKAN"
-  AZCount: '3'
-  BambooAgentIp: "{{ bamboo_green }}"
-  BambooAgentIp2: "{{ bamboo_blue }}"
-  NatGateways: 'true'
-  VPCNamePrefix: CKAN
-  VPCPeeringEnabled: "{{ VPCPeeringEnabled | default('false') }} "
-  VPCPeeringID: "{{ VPCPeeringID| default('') }}"
-  VPCPeeringCidr: "{{ opsVpcCidr }}"
+common_stack:
+  # VPC stacks cannot be properly torn down via Ansible
+  state: present
+  region: "{{ region }}"
+  disable_rollback: true
+  template: "templates/3_tier_vpc.yml"
+  template_parameters:
+    ApplicationName: "CKAN"
+    AZCount: '3'
+    BambooAgentIp: "13.210.53.223/32"
+    BambooAgentIp2: "13.211.7.108/32"
+    NatGateways: 'true'
+    VPCNamePrefix: CKAN
+    VPCPeeringEnabled: "{{ VPCPeeringEnabled | default('false') }} "
+    VPCPeeringID: "{{ VPCPeeringID| default('') }}"
+    VPCPeeringCidr: "10.10.0.0/16"
+  tags:
+    Environment: "{{ Environment }}"
+    Service: "CKAN"
+    Division: "{{ Division }}"
+    Owner: "{{ Owner }}"
+    Version: "1.0"
 
 cloudformation_stacks:
   - name: "CKAN-PROD-VPC"
-    # VPC stacks cannot be properly torn down via Ansible
-    state: present
-    region: "{{ region }}"
-    disable_rollback: true
-    template: "{{ template }}"
     template_parameters:
       Environment: PROD
       VPCPrefix: '10.43'
-    tags:
-      Environment: "{{ Environment }}"
-      Service: "CKAN"
-      Division: "{{ Division }}"
-      Owner: "{{ Owner }}"
-      Version: "1.0"
 
   - name: "CKAN-STAGING-VPC"
-    # VPC stacks cannot be properly torn down via Ansible
-    state: present
-    region: "{{ region }}"
-    disable_rollback: true
-    template: "{{ template }}"
     template_parameters:
       Environment: STAGING
       VPCPrefix: '10.42'
-    tags:
-      Environment: "{{ Environment }}"
-      Service: "CKAN"
-      Division: "{{ Division }}"
-      Owner: "{{ Owner }}"
-      Version: "1.0"
 
   - name: "CKAN-TRAINING-VPC"
-    # VPC stacks cannot be properly torn down via Ansible
-    state: present
-    region: "{{ region }}"
-    disable_rollback: true
-    template: "{{ template }}"
     template_parameters:
       Environment: TRAINING
       VPCPrefix: '10.41'
-    tags:
-      Environment: "{{ Environment }}"
-      Service: "CKAN"
-      Division: "{{ Division }}"
-      Owner: "{{ Owner }}"
-      Version: "1.0"
 
   - name: "CKAN-DEV-VPC"
-    # VPC stacks cannot be properly torn down via Ansible
-    state: present
-    region: "{{ region }}"
-    disable_rollback: true
-    template: "{{ template }}"
     template_parameters:
       Environment: DEV
       VPCPrefix: '10.40'
-    tags:
-      Environment: "{{ Environment }}"
-      Service: "CKAN"
-      Division: "{{ Division }}"
-      Owner: "{{ Owner }}"
-      Version: "1.0"
