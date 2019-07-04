@@ -19,9 +19,9 @@ cloudformation_stacks:
 #    template_parameters:
 #      Environment: "PROD"
 
-#  - name: "{{ titlecase_name }}-STAGING-Salsa-CKANExtensions"
-#    template_parameters:
-#      Environment: "STAGING"
+  - name: "{{ titlecase_name }}-STAGING-Salsa-CKANExtensions"
+    template_parameters:
+      Environment: "STAGING"
 
   - name: "{{ titlecase_name }}-TRAINING-Salsa-CKANExtensions"
     template_parameters:
