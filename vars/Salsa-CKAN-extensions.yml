@@ -17,20 +17,20 @@ cloudformation_stacks:
 #      Owner: "{{ Owner }}"
 #      Version: "1.0"
 
-#  - name: "{{ titlecase_name }}-STAGING-Salsa-CKANExtensions"
-#    state: "{{ state | default('present')}}"
-#    region: "{{ region }}"
-#    disable_rollback: true
-#    template: "{{ template }}"
-#    template_parameters:
-#      Environment: "STAGING"
-#      OpsWorksStack: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
-#    tags:
-#      Environment: "{{ Environment }}"
-#      Service: "{{ titlecase_name }}"
-#      Division: "{{ Division }}"
-#      Owner: "{{ Owner }}"
-#      Version: "1.0"
+  - name: "{{ titlecase_name }}-STAGING-Salsa-CKANExtensions"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "{{ template }}"
+    template_parameters:
+      Environment: "STAGING"
+      OpsWorksStack: "{{ Environment }}{{ titlecase_name }}OpsWorksStack"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ titlecase_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
 
   - name: "{{ titlecase_name }}-TRAINING-Salsa-CKANExtensions"
     state: "{{ state | default('present')}}"
