@@ -17,7 +17,7 @@
     - name: Get name and region of stack and set ansible fact
       set_fact:
         CFStackName: "{{ CFStack.name }}"
-        ApplicationName: "{{ CFStack.template_parameters.ApplicationName }}"
+        ApplicationName: "{{ common_stack.template_parameters.ApplicationName }}"
 
     - name: Get current web frontend stack facts
       cloudformation_facts:
@@ -87,7 +87,7 @@
     #learn what was created
     - name: Describe VPC cloudformation stack
       cloudformation_facts:
-        region: "{{ CFStack.region }}"
+        region: "{{ region }}"
         stack_name: "{{ stack_name }}"
         stack_resources: true
       register: vpc_stack
@@ -100,7 +100,7 @@
     # Setup VPC Peering
     - name: Create cross account VPC peering Connection
       ec2_vpc_peer:
-        region: "{{ CFStack.region }}"
+        region: "{{ region }}"
         vpc_id: "{{ VpcId }}"
         peer_vpc_id: "{{ opsVpcID }}"
         peer_owner_id: "{{ opsAccount }}"
@@ -113,7 +113,7 @@
 
     - name: Get VPC Peering STS Role Key
       sts_assume_role:
-        region: "{{ CFStack.region }}"
+        region: "{{ region }}"
         role_arn: "arn:aws:iam::{{ opsAccount }}:role/{{ opsRole }}"
         role_session_name: "bamboo-vpc-gi"
       register: assumed_role
