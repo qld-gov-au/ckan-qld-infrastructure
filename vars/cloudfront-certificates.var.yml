@@ -12,7 +12,7 @@ certificate_arns:
     ACMCertificateARN: "arn:aws:acm:us-east-1:265326298602:certificate/4e998cee-fb84-466f-89f4-8d87b7db83fd"
     Domain: data.qld.gov.au,www.data.qld.gov.au
     CKANThemeSource: "{{ legacy_theme }}"
-    CKANSource: "{{ ckan_2_7 }}"
+    CKANSource: "{{ ckan_2_8 }}"
 
   - profile: opendata
     Environment: STAGING
