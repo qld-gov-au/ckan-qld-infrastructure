@@ -15,9 +15,9 @@ common_stack:
     Version: "1.0"
 
 cloudformation_stacks:
-#  - name: "{{ titlecase_name }}-PROD-Salsa-CKANExtensions"
-#    template_parameters:
-#      Environment: "PROD"
+  - name: "{{ titlecase_name }}-PROD-Salsa-CKANExtensions"
+    template_parameters:
+      Environment: "PROD"
 
   - name: "{{ titlecase_name }}-STAGING-Salsa-CKANExtensions"
     template_parameters:
