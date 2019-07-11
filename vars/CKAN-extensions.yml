@@ -32,7 +32,7 @@ cloudformation_stacks:
   - name: "{{ titlecase_name }}-TRAINING-OpsWorks-CKANExtensions"
     template_parameters:
       Environment: "TRAINING"
-      QgovExtensionRevision: develop
+      QgovExtensionRevision: training
 
   - name: "{{ titlecase_name }}-DEV-OpsWorks-CKANExtensions"
     template_parameters:
