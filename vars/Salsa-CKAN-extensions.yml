@@ -21,11 +21,11 @@ cloudformation_stacks:
       DCATExtensionRevision: v0.0.9
       SchemingExtensionRevision: release-1.2.0
       ValidationExtensionRevision: v0.0.7
-      DataQldExtensionRevision: "2019-07-11_CHG-5124"
+      DataQldExtensionRevision: "1.0.0"
       DataQldThemeExtensionRevision: "master"
-      ODIExtensionRevision: "2019-07-11_CHG-5124"
-      DataRequestsExtensionRevision: "2019-07-11_CHG-5124"
-      YTPExtensionRevision: "2019-07-11_CHG-5124"
+      ODIExtensionRevision: "1.0.0"
+      DataRequestsExtensionRevision: "2.0.0-qgov"
+      YTPExtensionRevision: "2.0.0-qgov"
 
   - name: "{{ titlecase_name }}-STAGING-Salsa-CKANExtensions"
     template_parameters:
@@ -33,11 +33,11 @@ cloudformation_stacks:
       DCATExtensionRevision: v0.0.9
       SchemingExtensionRevision: release-1.2.0
       ValidationExtensionRevision: v0.0.7
-      DataQldExtensionRevision: "2019-07-11_CHG-5124"
+      DataQldExtensionRevision: "1.0.0"
       DataQldThemeExtensionRevision: "master"
-      ODIExtensionRevision: "2019-07-11_CHG-5124"
-      DataRequestsExtensionRevision: "2019-07-11_CHG-5124"
-      YTPExtensionRevision: "2019-07-11_CHG-5124"
+      ODIExtensionRevision: "1.0.0"
+      DataRequestsExtensionRevision: "2.0.0-qgov"
+      YTPExtensionRevision: "2.0.0-qgov"
 
   - name: "{{ titlecase_name }}-TRAINING-Salsa-CKANExtensions"
     template_parameters:
