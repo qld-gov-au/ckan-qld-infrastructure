@@ -18,14 +18,33 @@ cloudformation_stacks:
   - name: "{{ titlecase_name }}-PROD-Salsa-CKANExtensions"
     template_parameters:
       Environment: "PROD"
+      DCATExtensionRevision: v0.0.9
+      SchemingExtensionRevision: release-1.2.0
+      ValidationExtensionRevision: v0.0.7
+      DataQldExtensionRevision: "1.0.0"
+      DataQldThemeExtensionRevision: "master"
+      ODIExtensionRevision: "1.0.0"
+      DataRequestsExtensionRevision: "2.0.0-qgov"
+      YTPExtensionRevision: "2.0.0-qgov"
 
   - name: "{{ titlecase_name }}-STAGING-Salsa-CKANExtensions"
     template_parameters:
       Environment: "STAGING"
+      DCATExtensionRevision: v0.0.9
+      SchemingExtensionRevision: release-1.2.0
+      ValidationExtensionRevision: v0.0.7
+      DataQldExtensionRevision: "1.0.0"
+      DataQldThemeExtensionRevision: "master"
+      ODIExtensionRevision: "1.0.0"
+      DataRequestsExtensionRevision: "2.0.0-qgov"
+      YTPExtensionRevision: "2.0.0-qgov"
 
   - name: "{{ titlecase_name }}-TRAINING-Salsa-CKANExtensions"
     template_parameters:
       Environment: "TRAINING"
+      DCATExtensionRevision: v0.0.9
+      SchemingExtensionRevision: release-1.2.0
+      ValidationExtensionRevision: v0.0.7
       DataQldExtensionRevision: "training"
       DataQldThemeExtensionRevision: "training"
       ODIExtensionRevision: "training"
@@ -35,6 +54,9 @@ cloudformation_stacks:
   - name: "{{ titlecase_name }}-DEV-Salsa-CKANExtensions"
     template_parameters:
       Environment: "DEV"
+      DCATExtensionRevision: v0.0.9
+      SchemingExtensionRevision: release-1.2.0
+      ValidationExtensionRevision: v0.0.7
       DataQldExtensionRevision: "develop"
       DataQldThemeExtensionRevision: "develop"
       ODIExtensionRevision: "develop"
