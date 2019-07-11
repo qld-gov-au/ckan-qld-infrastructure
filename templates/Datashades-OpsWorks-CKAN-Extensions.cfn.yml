@@ -38,6 +38,10 @@ Parameters:
     Description: URL for QGOV CKAN extension.
     Default: https://github.com/qld-gov-au/ckan-ex-qgov.git
     Type: String
+  QgovExtensionRevision:
+    Description: Branch/tag name in repository to checkout.
+    Default: master
+    Type: String
 
 Conditions:
   DeployLegacyTheme:
@@ -68,6 +72,7 @@ Resources:
       AppSource:
         Type: git
         Url: !Ref QgovExtensionSource
+        Revision: !Ref QgovExtensionRevision
       Description: CKAN Extension for Queensland Government
       EnableSsl: false
       Name: !Sub "ckanext-qgov-${Environment}"
