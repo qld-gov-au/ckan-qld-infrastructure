@@ -10,6 +10,7 @@ common_stack:
     ApplicationName: "{{ titlecase_name }}"
     ApplicationId: "{{ lowercase_name }}"
     ApplicationTitle: "{{ title }}"
+    CKANSource: "{{ CKANSource }}"
     PublicTLD: "{{ public_tld }}"
     CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
     StackVPC: "CKANVpc-{{ Environment }}"
@@ -44,7 +45,6 @@ cloudformation_stacks:
       Environment: PROD
       IntermediateTLD: ckan.services.qld.gov.au
       CookbookRevision: "2.0.0-qgov"
-      CKANSource: "{{ CKANSource | default('https://github.com/ckan/ckan/archive/ckan-2.7.3.zip') }}"
       ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/29d2a412-555a-49d9-a20d-cfe598fd2ce1"
       GTMContainerId: "GTM-PJBVFG"
     tags:
@@ -55,7 +55,6 @@ cloudformation_stacks:
       Environment: STAGING
       IntermediateTLD: ckan.staging-services.qld.gov.au
       CookbookRevision: "2.0.0-qgov"
-      CKANSource: "{{ CKANSource | default('https://github.com/ckan/ckan/archive/ckan-2.7.3.zip') }}"
       ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/c11bea3d-07d0-49df-9e44-1e81f048f576"
       GTMContainerId: "{{ NonProductionGTMId }}"
     tags:
@@ -66,7 +65,6 @@ cloudformation_stacks:
       Environment: TRAINING
       IntermediateTLD: training.ckan.devpit140cs.qgov.net.au
       CookbookRevision: training
-      CKANSource: "{{ CKANSource | default('https://github.com/ckan/ckan/archive/ckan-2.8.2.zip') }}"
       ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/f280a938-d6bb-4056-9a54-a94543bff03a"
       GTMContainerId: "{{ NonProductionGTMId }}"
     tags:
@@ -77,7 +75,6 @@ cloudformation_stacks:
       Environment: DEV
       IntermediateTLD: dev.ckan.devpit140cs.qgov.net.au
       CookbookRevision: develop
-      CKANSource: "{{ CKANSource | default('https://github.com/ckan/ckan/archive/ckan-2.8.2.zip') }}"
       ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/db8fbe61-7690-4953-9eaa-c3b30814d9e8"
       GTMContainerId: "{{ NonProductionGTMId }}"
     tags:
