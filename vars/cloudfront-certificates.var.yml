@@ -4,7 +4,7 @@ NonProdOpenDataCertificateArn: "arn:aws:acm:us-east-1:265326298602:certificate/4
 NonProdPublicationsCertificateArn: "arn:aws:acm:us-east-1:265326298602:certificate/a0bce356-b363-4d2d-9e16-2225687e3d18"
 legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ titlecase_name }}-{{ Environment }}/CKAN-theme.zip"
 ckan_2_7: "https://github.com/ckan/ckan/archive/ckan-2.7.3.zip"
-ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.2.zip"
+ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip"
 
 certificate_arns:
   - profile: opendata
