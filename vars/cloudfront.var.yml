@@ -10,6 +10,7 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       WebOrigin: "{{ Environment }}{{ titlecase_name }}WebElbNiceDNSName"
+      CmsOrigin: "{{ CmsOrigin }}"
       WebACLId: "{{ Environment }}CKANWebACLId"
       Environment: "{{ Environment }}"
       Platform: "{{ titlecase_name }}"
