@@ -9,6 +9,9 @@ Parameters:
   WebOrigin:
     Description: Platform ELB
     Type: String
+  CmsOrigin:
+    Description: CMS cname
+    Type: String
   Environment:
     Description: Platform environment
     Type: String
@@ -45,6 +48,97 @@ Resources:
             TargetOriginId: 'WebOrigin'
             MinTTL: 120
             ViewerProtocolPolicy: allow-all
+
+          - PathPattern: /
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /__data/*
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_admin/*
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_edit/*
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /article/*
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
         DefaultCacheBehavior:
           AllowedMethods:
           - GET
@@ -73,6 +167,11 @@ Resources:
         - DomainName:
             Fn::ImportValue: !Ref WebOrigin
           Id: 'WebOrigin'
+          CustomOriginConfig:
+            OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
+        - DomainName:
+            !Ref CmsOrigin
+          Id: 'CmsOrigin'
           CustomOriginConfig:
             OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
         PriceClass: PriceClass_All
