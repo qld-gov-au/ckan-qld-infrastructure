@@ -11,7 +11,7 @@ certificate_arns:
     Environment: PROD
     ACMCertificateARN: "arn:aws:acm:us-east-1:265326298602:certificate/4e998cee-fb84-466f-89f4-8d87b7db83fd"
     Domain: data.qld.gov.au,www.data.qld.gov.au
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "oss.clients.squiz.net"
     CKANThemeSource: "none"
     CKANSource: "{{ ckan_2_8 }}"
 
@@ -19,7 +19,7 @@ certificate_arns:
     Environment: STAGING
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
     Domain: staging.data.qld.gov.au
-    CmsOrigin: "staging.squizedge.net"
+    CmsOrigin: "oss-uat.clients.squiz.net"
     CKANThemeSource: "none"
     CKANSource: "{{ ckan_2_8 }}"
 
@@ -27,7 +27,7 @@ certificate_arns:
     Environment: TRAINING
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
     Domain: training.data.qld.gov.au
-    CmsOrigin: "staging.squizedge.net"
+    CmsOrigin: "oss-uat.clients.squiz.net"
     CKANThemeSource: "none"
     CKANSource: "{{ ckan_2_8 }}"
 
@@ -35,7 +35,7 @@ certificate_arns:
     Environment: DEV
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
     Domain: dev.data.qld.gov.au
-    CmsOrigin: "staging.squizedge.net"
+    CmsOrigin: "oss-uat.clients.squiz.net"
     CKANThemeSource: "none"
     CKANSource: "{{ ckan_2_8 }}"
 

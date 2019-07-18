@@ -128,24 +128,6 @@ Resources:
             MinTTL: 120
             ViewerProtocolPolicy: allow-all
           #This is CMS behaviours below
-          - PathPattern: /
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "*"
-            ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /index.html
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -254,7 +236,7 @@ Resources:
              - "*"
           TargetOriginId: 'WebOrigin'
           ViewerProtocolPolicy: redirect-to-https
-        DefaultRootObject: /
+        DefaultRootObject: index.html
         Enabled: true
         Logging:
           Bucket: !Sub "${LogBucketName}.s3.amazonaws.com"
