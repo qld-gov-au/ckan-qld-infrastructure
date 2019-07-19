@@ -2,6 +2,7 @@
 #North Virginia cert required for Cloudfront
 NonProdOpenDataCertificateArn: "arn:aws:acm:us-east-1:265326298602:certificate/40d5f634-d3b8-4142-aede-8f6b74f3bbae"
 NonProdPublicationsCertificateArn: "arn:aws:acm:us-east-1:265326298602:certificate/a0bce356-b363-4d2d-9e16-2225687e3d18"
+NonProdCKANTestCertificateArn: "arn:aws:acm:us-east-1:265326298602:certificate/74035fa3-b2f6-4bf9-b33f-01f50f76f790"
 legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ titlecase_name }}-{{ Environment }}/CKAN-theme.zip"
 ckan_2_7: "https://github.com/ckan/ckan/archive/ckan-2.7.3.zip"
 ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip"
@@ -33,6 +34,13 @@ certificate_arns:
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
     Domain: dev.data.qld.gov.au
     CKANThemeSource: "none"
+    CKANSource: "{{ ckan_2_8 }}"
+
+  - profile: ckantest
+    Environment: DEV
+    ACMCertificateARN: "{{ NonProdCKANTestCertificateArn }}"
+    Domain: test.data.qld.gov.au
+    CKANThemeSource: "{{ legacy_theme }}"
     CKANSource: "{{ ckan_2_8 }}"
 
   - profile: publications
