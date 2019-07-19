@@ -111,24 +111,26 @@ Resources:
       DistributionConfig:
         Aliases: !Ref Domain
         CacheBehaviors:
-          - PathPattern: /assets/*
-            Compress: true
-            ForwardedValues:
-              QueryString: true
-            TargetOriginId: 'WebOrigin'
-            MinTTL: 1800
-            ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /dataset/*/resource/*/download/*
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-            TargetOriginId: 'WebOrigin'
-            MinTTL: 120
-            ViewerProtocolPolicy: allow-all
-          #This is CMS behaviours below
-          - PathPattern: /index.html
+          # Why are we defining "default" behaviour for the next two path patterns?
+          #- PathPattern: /assets/*
+          #  Compress: true
+          #  ForwardedValues:
+          #    QueryString: true
+          #  TargetOriginId: 'WebOrigin'
+          #  MinTTL: 1800
+          #  ViewerProtocolPolicy: redirect-to-https
+          #- PathPattern: /dataset/*/resource/*/download/*
+          #  Compress: true
+          #  ForwardedValues:
+          #    Cookies:
+          #      Forward: all
+          #    QueryString: true
+          #  TargetOriginId: 'WebOrigin'
+          #  MinTTL: 120
+          #  ViewerProtocolPolicy: allow-all
+          
+          #Everything that isn't the below rules for CMS resources should go to CKAN
+          - PathPattern: /index.* #If anyone reaches the homepage on an "index" url
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -146,7 +148,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /__data/*
+          - PathPattern: /__data/* #Squiz data that may be needed. 
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -164,7 +166,24 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /_admin/*
+          - PathPattern: / #The homepage
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+          - PathPattern: /_admin #The Squiz admin interface on the homepage
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -182,7 +201,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /_edit/*
+          - PathPattern: /_edit #The Squiz edit interface of the homepage
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -200,7 +219,133 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /article/*
+          - PathPattern: /_login #The Squiz login page on the homepage
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_editplusapi #The Squiz editplusapi on the homepage
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_nocache #Squiz nocache on the homepage
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_noproxycache #Squiz noproxycache on the homepage
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_recache #Squiz recache on the homepage
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_performance #Squiz performance page on the homepage
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /article #Not sure if this page exists but just in case, a top level artlce page
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /article/* #sub pages of article, also including things like /articles/blahblah/_admin
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
