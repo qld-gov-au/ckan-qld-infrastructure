@@ -129,6 +129,62 @@ Resources:
           #  MinTTL: 120
           #  ViewerProtocolPolicy: allow-all
           
+          
+          #The next 3 rules are for testing ONLY
+          
+          - PathPattern: /oss-squizedge-net* #oss.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+          - PathPattern: /staging-squizedge-net* #staging.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+          - PathPattern: /oss-uat-clients-squiz-net* #oss-uat.clients.squiz.net origin test, paths are configured on Squiz Matrix to handle this as if it was the root domain
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+          
+          
           #Everything that isn't the below rules for CMS resources should go to CKAN
           - PathPattern: /index.* #If anyone reaches the homepage on an "index" url
             TargetOriginId: 'CmsOrigin'
