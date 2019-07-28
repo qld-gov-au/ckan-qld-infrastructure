@@ -22,12 +22,12 @@ cloudformation_stacks:
   - name: "{{ titlecase_name }}-PROD-OpsWorks-CKANExtensions"
     template_parameters:
       Environment: "PROD"
-      QgovExtensionRevision: "1.0.0"
+      QgovExtensionRevision: "1.1.0"
 
   - name: "{{ titlecase_name }}-STAGING-OpsWorks-CKANExtensions"
     template_parameters:
       Environment: "STAGING"
-      QgovExtensionRevision: "1.0.0"
+      QgovExtensionRevision: "1.1.0"
 
   - name: "{{ titlecase_name }}-TRAINING-OpsWorks-CKANExtensions"
     template_parameters:
