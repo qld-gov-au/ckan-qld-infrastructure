@@ -25,87 +25,10 @@ Parameters:
     Description: WAF web ACL Id .
     Type: String
 
-Conditions:
-  hasCmsOrigin:
-    !Not [ !Equals [ !Ref CmsOrigin , '']]
-  noCmsOrigin:
-    !Equals [ !Ref CmsOrigin, '']
-
 Resources:
-  #This is publications once CMS is enabled. (don't forget to keep the one below updated (except for CmsOrigin bits)
-  DistributionConfig:
-    Condition: noCmsOrigin
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Aliases: !Ref Domain
-        CacheBehaviors:
-          - PathPattern: /assets/*
-            Compress: true
-            ForwardedValues:
-              QueryString: true
-            TargetOriginId: 'WebOrigin'
-            MinTTL: 1800
-            ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /dataset/*/resource/*/download/*
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-            TargetOriginId: 'WebOrigin'
-            MinTTL: 120
-            ViewerProtocolPolicy: allow-all
-        DefaultCacheBehavior:
-          AllowedMethods:
-            - GET
-            - HEAD
-            - POST
-            - DELETE
-            - OPTIONS
-            - PUT
-            - PATCH
-          Compress: true
-          ForwardedValues:
-            Cookies:
-              Forward: all
-            QueryString: 'true'
-            Headers:
-              - "*"
-          TargetOriginId: 'WebOrigin'
-          ViewerProtocolPolicy: redirect-to-https
-        DefaultRootObject: /
-        Enabled: true
-        Logging:
-          Bucket: !Sub "${LogBucketName}.s3.amazonaws.com"
-          IncludeCookies: true
-          Prefix: !Sub "cloudfront-logs/${Platform}/${Environment}/"
-        Origins:
-          - DomainName:
-              Fn::ImportValue: !Ref WebOrigin
-            Id: 'WebOrigin'
-            CustomOriginConfig:
-              OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
-        PriceClass: PriceClass_All
-        WebACLId:
-          Fn::ImportValue: !Ref WebACLId
-        HttpVersion: 'http2'
-        #IsIPV6Enabled: 'true'
-        ViewerCertificate:
-          AcmCertificateArn:
-            Ref: ACMCertificateARN
-          SslSupportMethod: sni-only
-        Comment:
-          Fn::Sub:
-            - "${Environment}-${Platform} ${Domain}"
-            - Domain:
-                Fn::Select:
-                  - 0
-                  - !Ref Domain
 
   #this is data with cms details. (don't forget to keep the one above updated (except for CmsOrigin bits)
   DistributionConfig:
-    Condition: hasCmsOrigin
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:

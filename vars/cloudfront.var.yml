@@ -1,5 +1,5 @@
 ---
-template: "templates/cloudfront.cfn.yml"
+template: "templates/cloudfront-{{ titlecase_name }}.cfn.yml"
 
 cloudformation_stacks:
   - name: "{{ titlecase_name }}-{{ Environment }}-CLOUDFRONT"
