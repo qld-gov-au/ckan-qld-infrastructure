@@ -34,7 +34,7 @@ Resources:
       DistributionConfig:
         Aliases: !Ref Domain
         CacheBehaviors:
-          # Why are we defining "default" behaviour for the next two path patterns?
+          # The following rules for sending traffic to CKAN are not needed. Commenting out for now but could be removed in the future.
           #- PathPattern: /assets/*
           #  Compress: true
           #  ForwardedValues:
@@ -53,61 +53,62 @@ Resources:
           #  ViewerProtocolPolicy: allow-all
           
           
-          #The next 3 rules are for testing ONLY
+          #The next 3 rules are for testing ONLY. As the connection to Squiz is currently working they're not needed
           
-          - PathPattern: /oss-squizedge-net* #oss.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "*"
-          - PathPattern: /staging-squizedge-net* #staging.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "*"
-          - PathPattern: /oss-uat-clients-squiz-net* #oss-uat.clients.squiz.net origin test, paths are configured on Squiz Matrix to handle this as if it was the root domain
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "*"
-          
-          
+          #- PathPattern: /oss-squizedge-net* #oss.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
+          #  TargetOriginId: 'CmsOrigin'
+          #  AllowedMethods:
+          #    - GET
+          #    - HEAD
+          #    - OPTIONS
+          #    - PUT
+          #    - PATCH
+          #    - POST
+          #    - DELETE
+          #  Compress: true
+          #  ForwardedValues:
+          #    Cookies:
+          #      Forward: all
+          #    QueryString: true
+          #    Headers:
+          #      - "*"
+          #  ViewerProtocolPolicy: redirect-to-https
+          #- PathPattern: /staging-squizedge-net* #staging.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
+          #  TargetOriginId: 'CmsOrigin'
+          #  AllowedMethods:
+          #    - GET
+          #    - HEAD
+          #    - OPTIONS
+          #    - PUT
+          #    - PATCH
+          #    - POST
+          #    - DELETE
+          #  Compress: true
+          #  ForwardedValues:
+          #    Cookies:
+          #      Forward: all
+          #    QueryString: true
+          #    Headers:
+          #      - "*"
+          #  ViewerProtocolPolicy: redirect-to-https
+          #- PathPattern: /oss-uat-clients-squiz-net* #oss-uat.clients.squiz.net origin test, paths are configured on Squiz Matrix to handle this as if it was the root domain
+          #  TargetOriginId: 'CmsOrigin'
+          #  AllowedMethods:
+          #    - GET
+          #    - HEAD
+          #    - OPTIONS
+          #    - PUT
+          #    - PATCH
+          #    - POST
+          #    - DELETE
+          #  Compress: true
+          #  ForwardedValues:
+          #    Cookies:
+          #      Forward: all
+          #    QueryString: true
+          #    Headers:
+          #      - "*"
+          #	ViewerProtocolPolicy: redirect-to-https
           #Everything that isn't the below rules for CMS resources should go to CKAN
           - PathPattern: /index.* #If anyone reaches the homepage on an "index" url
             TargetOriginId: 'CmsOrigin'
@@ -162,6 +163,7 @@ Resources:
               QueryString: true
               Headers:
                 - "*"
+            ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /_admin #The Squiz admin interface on the homepage
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -306,7 +308,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /article #Not sure if this page exists but just in case, a top level artlce page
+          - PathPattern: /article #Not sure if this page exists but just in case, a top level article page
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
