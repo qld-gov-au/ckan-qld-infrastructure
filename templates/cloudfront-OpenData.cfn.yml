@@ -379,6 +379,9 @@ Resources:
           Id: 'CmsOrigin'
           CustomOriginConfig:
             OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
+            OriginSSLProtocols:
+              - "TLSv1.1"
+              - "TLSv1.2"
         PriceClass: PriceClass_All
         WebACLId:
           Fn::ImportValue: !Ref WebACLId
