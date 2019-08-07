@@ -496,6 +496,7 @@ Resources:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
       LoadBalancerName: !Sub "${Environment}-${ApplicationName}ELB"
+      CrossZone: true
       HealthCheck:
         Target: "HTTP:80/"
         HealthyThreshold: 2
