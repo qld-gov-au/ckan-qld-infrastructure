@@ -121,12 +121,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /__data/* #Squiz data that may be needed. 
             TargetOriginId: 'CmsOrigin'
@@ -139,12 +151,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: / #The homepage
             TargetOriginId: 'CmsOrigin'
@@ -157,12 +181,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /_admin #The Squiz admin interface on the homepage
             TargetOriginId: 'CmsOrigin'
@@ -175,12 +211,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /_edit #The Squiz edit interface of the homepage
             TargetOriginId: 'CmsOrigin'
@@ -193,12 +241,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /_login #The Squiz login page on the homepage
             TargetOriginId: 'CmsOrigin'
@@ -229,12 +289,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /_nocache #Squiz nocache on the homepage
             TargetOriginId: 'CmsOrigin'
@@ -247,12 +319,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /_noproxycache #Squiz noproxycache on the homepage
             TargetOriginId: 'CmsOrigin'
@@ -265,12 +349,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /_recache #Squiz recache on the homepage
             TargetOriginId: 'CmsOrigin'
@@ -283,12 +379,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /_performance #Squiz performance page on the homepage
             TargetOriginId: 'CmsOrigin'
@@ -301,12 +409,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /article #Not sure if this page exists but just in case, a top level article page
             TargetOriginId: 'CmsOrigin'
@@ -319,12 +439,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
           - PathPattern: /article/* #sub pages of article, also including things like /articles/blahblah/_admin
             TargetOriginId: 'CmsOrigin'
@@ -337,12 +469,24 @@ Resources:
               - POST
               - DELETE
             Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
             ForwardedValues:
               Cookies:
                 Forward: all
               QueryString: true
               Headers:
-                - "*"
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
         DefaultCacheBehavior:
           AllowedMethods:
