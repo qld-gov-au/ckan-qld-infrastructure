@@ -164,6 +164,24 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /__fudge/* #Provides content for the Squiz CMS functionally in _admin
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
           - PathPattern: / #The homepage
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
