@@ -200,7 +200,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /_admin #The Squiz admin interface on the homepage
+          - PathPattern: /_admin* #The Squiz admin interface on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -218,7 +218,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /_edit #The Squiz edit interface of the homepage
+          - PathPattern: /_edit* #The Squiz edit interface of the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -236,7 +236,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /_login #The Squiz login page on the homepage
+          - PathPattern: /_login* #The Squiz login page on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -254,7 +254,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /_editplusapi #The Squiz editplusapi on the homepage
+          - PathPattern: /_editplusapi* #The Squiz editplusapi on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -272,7 +272,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /_nocache #Squiz nocache on the homepage
+          - PathPattern: /_nocache* #Squiz nocache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -290,7 +290,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /_noproxycache #Squiz noproxycache on the homepage
+          - PathPattern: /_noproxycache* #Squiz noproxycache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -308,7 +308,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /_recache #Squiz recache on the homepage
+          - PathPattern: /_recache* #Squiz recache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -326,7 +326,7 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: /_performance #Squiz performance page on the homepage
+          - PathPattern: /_performance* #Squiz performance page on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
