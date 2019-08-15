@@ -20,7 +20,7 @@ certificate_arns:
     Environment: STAGING
     ACMCertificateARN: "{{ NonProdOpenDataCertificateArn }}"
     Domain: staging.data.qld.gov.au
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "staging.squizedge.net"
     CKANThemeSource: "none"
     CKANSource: "{{ ckan_2_8 }}"
 
