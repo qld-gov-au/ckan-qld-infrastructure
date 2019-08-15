@@ -1,0 +1,607 @@
+Description: Cloudfront Distribution for fronting an application.
+Parameters:
+  ACMCertificateARN:
+    Description: ARN for certificate to be used by CloudFront
+    Type: String
+  Domain:
+    Description: Domain pointing to EC2 load balancer
+    Type: CommaDelimitedList
+  WebOrigin:
+    Description: Platform ELB
+    Type: String
+  CmsOrigin:
+    Description: CMS cname
+    Type: String
+  Environment:
+    Description: Platform environment
+    Type: String
+  Platform:
+    Description: Name of the platform ie GI, Services, Static,etc
+    Type: String
+  LogBucketName:
+    Description: Name of the S3 logging bucket.
+    Type: String
+  WebACLId:
+    Description: WAF web ACL Id .
+    Type: String
+
+Resources:
+
+  #this is data with cms details. (don't forget to keep the one above updated (except for CmsOrigin bits)
+  DistributionConfig:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases: !Ref Domain
+        CacheBehaviors:
+          # The following rules for sending traffic to CKAN are not needed. Commenting out for now but could be removed in the future.
+          #- PathPattern: /assets/*
+          #  Compress: true
+          #  ForwardedValues:
+          #    QueryString: true
+          #  TargetOriginId: 'WebOrigin'
+          #  MinTTL: 1800
+          #  ViewerProtocolPolicy: redirect-to-https
+          #- PathPattern: /dataset/*/resource/*/download/*
+          #  Compress: true
+          #  ForwardedValues:
+          #    Cookies:
+          #      Forward: all
+          #    QueryString: true
+          #  TargetOriginId: 'WebOrigin'
+          #  MinTTL: 120
+          #  ViewerProtocolPolicy: allow-all
+          
+          
+          #The next 3 rules are for testing ONLY. As the connection to Squiz is currently working they're not needed
+          
+          #- PathPattern: /oss-squizedge-net* #oss.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
+          #  TargetOriginId: 'CmsOrigin'
+          #  AllowedMethods:
+          #    - GET
+          #    - HEAD
+          #    - OPTIONS
+          #    - PUT
+          #    - PATCH
+          #    - POST
+          #    - DELETE
+          #  Compress: true
+          #  ForwardedValues:
+          #    Cookies:
+          #      Forward: all
+          #    QueryString: true
+          #    Headers:
+          #      - "*"
+          #  ViewerProtocolPolicy: redirect-to-https
+          #- PathPattern: /staging-squizedge-net* #staging.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
+          #  TargetOriginId: 'CmsOrigin'
+          #  AllowedMethods:
+          #    - GET
+          #    - HEAD
+          #    - OPTIONS
+          #    - PUT
+          #    - PATCH
+          #    - POST
+          #    - DELETE
+          #  Compress: true
+          #  ForwardedValues:
+          #    Cookies:
+          #      Forward: all
+          #    QueryString: true
+          #    Headers:
+          #      - "*"
+          #  ViewerProtocolPolicy: redirect-to-https
+          #- PathPattern: /oss-uat-clients-squiz-net* #oss-uat.clients.squiz.net origin test, paths are configured on Squiz Matrix to handle this as if it was the root domain
+          #  TargetOriginId: 'CmsOrigin'
+          #  AllowedMethods:
+          #    - GET
+          #    - HEAD
+          #    - OPTIONS
+          #    - PUT
+          #    - PATCH
+          #    - POST
+          #    - DELETE
+          #  Compress: true
+          #  ForwardedValues:
+          #    Cookies:
+          #      Forward: all
+          #    QueryString: true
+          #    Headers:
+          #      - "*"
+          #	ViewerProtocolPolicy: redirect-to-https
+          #Everything that isn't the below rules for CMS resources should go to CKAN
+          - PathPattern: /index.* #If anyone reaches the homepage on an "index" url
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /__data/* #Squiz data that may be needed. 
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /__lib/* #Provides content for the Squiz CMS functionally in _admin
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /__fudge/* #Provides content for the Squiz CMS functionally in _admin
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: / #The homepage
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_admin* #The Squiz admin interface on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_edit* #The Squiz edit interface of the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_login* #The Squiz login page on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "*"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_editplusapi* #The Squiz editplusapi on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_nocache* #Squiz nocache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_noproxycache* #Squiz noproxycache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_recache* #Squiz recache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /_performance* #Squiz performance page on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /article #Not sure if this page exists but just in case, a top level article page
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: /article/* #sub pages of article, also including things like /articles/blahblah/_admin
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          - POST
+          - DELETE
+          - OPTIONS
+          - PUT
+          - PATCH
+          Compress: true
+          ForwardedValues:
+            Cookies:
+              Forward: all
+            QueryString: 'true'
+            Headers:
+             - "*"
+          TargetOriginId: 'WebOrigin'
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: index.html
+        Enabled: true
+        Logging:
+          Bucket: !Sub "${LogBucketName}.s3.amazonaws.com"
+          IncludeCookies: true
+          Prefix: !Sub "cloudfront-logs/${Platform}/${Environment}/"
+        Origins:
+        - DomainName:
+            Fn::ImportValue: !Ref WebOrigin
+          Id: 'WebOrigin'
+          CustomOriginConfig:
+            OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
+        - DomainName:
+            !Ref CmsOrigin
+          Id: 'CmsOrigin'
+          CustomOriginConfig:
+            OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
+            OriginSSLProtocols:
+              - "TLSv1.1"
+              - "TLSv1.2"
+        PriceClass: PriceClass_All
+        WebACLId:
+          Fn::ImportValue: !Ref WebACLId
+        HttpVersion: 'http2'
+        #IsIPV6Enabled: 'true'
+        ViewerCertificate:
+          AcmCertificateArn:
+            Ref: ACMCertificateARN
+          SslSupportMethod: sni-only
+        Comment:
+          Fn::Sub:
+            - "${Environment}-${Platform} ${Domain}"
+            - Domain:
+                Fn::Select:
+                  - 0
+                  - !Ref Domain
+
+Outputs:
+  CloudfrontAliasDNSName:
+    Value:
+      Fn::GetAtt:
+      - DistributionConfig
+      - DomainName
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "CloudfrontAliasDNSName"
+
+  CloudfrontAliasHostedZoneID:
+    Value: "Z2FDTNDATAQYW2" # All CloudFront distributions are in this zone, see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "CloudfrontAliasHostedZoneID"
+
+  AwsAccount:
+    Value: !Ref "AWS::AccountId"
