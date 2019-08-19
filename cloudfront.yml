@@ -11,6 +11,7 @@
       set_fact:
         ACMCertificateARN={{ item.ACMCertificateARN }}
         Domain={{ item.Domain }}
+        CmsOrigin={{ item.CmsOrigin }}
       when: item.Environment == Environment and item.profile == lowercase_name
       with_items: "{{ certificate_arns }}"
 
