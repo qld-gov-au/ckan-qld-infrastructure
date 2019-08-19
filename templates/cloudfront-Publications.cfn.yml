@@ -87,6 +87,7 @@ Resources:
           AcmCertificateArn:
             Ref: ACMCertificateARN
           SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.1_2016
         Comment:
           Fn::Sub:
             - "${Environment}-${Platform} ${Domain}"
