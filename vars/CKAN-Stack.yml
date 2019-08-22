@@ -54,7 +54,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: STAGING
       IntermediateTLD: ckan.staging-services.qld.gov.au
-      CookbookRevision: "2.0.1-qgov"
+      CookbookRevision: "2.1.0-qgov"
       ACMCertificateARN: "arn:aws:acm:ap-southeast-2:265326298602:certificate/c11bea3d-07d0-49df-9e44-1e81f048f576"
       GTMContainerId: "{{ NonProductionGTMId }}"
     tags:
