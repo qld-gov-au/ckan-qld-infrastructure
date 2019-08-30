@@ -3,7 +3,7 @@
   hosts: local
   connection: local
   vars_files:
-    - vars/CKAN-Stack.yml
+    - vars/CKAN-Stack.var.yml
   pre_tasks:
 
     - name: Identify CloudFormation stack

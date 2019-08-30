@@ -1,0 +1,24 @@
+---
+service_name: CKANTest
+service_name_lower: "{{ service_name | lower }}"
+title: CKAN Test
+enable_datastore: "yes"
+#public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
+public_tld: data.qld.gov.au
+
+legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip"
+ckan_2_7: "https://github.com/ckan/ckan/archive/ckan-2.7.3.zip"
+ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip"
+
+basic_facts:
+  - Environment: DEV #dev == test 0_0
+    PublicStackZoneTLD: "{{ public_tld }}"
+    BaseDomain: "test.data.qld.gov.au"
+    Domain: "www.test.data.qld.gov.au,test.data.qld.gov.au"
+    CmsOrigin: ""
+    SiteDomain: "test.data.qld.gov.au" #CKAN SiteDomain
+    RootDomain: "test.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
+    CKANThemeSource: "{{ legacy_theme }}"
+    CKANSource: "{{ ckan_2_8 }}"
+    CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
+    QgovExtensionRevision: develop #https://github.com/qld-gov-au/ckan-ex-qgov.git

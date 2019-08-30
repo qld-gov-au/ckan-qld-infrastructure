@@ -3,7 +3,7 @@
   hosts: localhost
   connection: local
   vars_files:
-    - vars/database.yml
+    - vars/database.var.yml
   pre_tasks:
 
     - name: Identify database (RDS) cloudformation stack
@@ -25,15 +25,15 @@
       set_fact:
         MasterUserKey: "/config/CKAN/{{ Environment }}/db/master_user"
         MasterPassKey: "/config/CKAN/{{ Environment }}/db/master_password"
-        UserKey: "/config/CKAN/{{ Environment }}/db/{{ lowercase_name }}_user"
-        PassKey: "/config/CKAN/{{ Environment }}/db/{{ lowercase_name }}_password"
+        UserKey: "/config/CKAN/{{ Environment }}/db/{{ service_name_lower }}_user"
+        PassKey: "/config/CKAN/{{ Environment }}/db/{{ service_name_lower }}_password"
 
     - name: Set variable (facts) dependencies
       set_fact:
         DBEndpoint: "{{ database.ansible_facts.cloudformation[Stack_Name].stack_outputs.DBEndpoint }}"
         DBMasterPass: "{{ lookup('aws_ssm', MasterPassKey, region=region) }}"
         DBMasterUser: "{{ lookup('aws_ssm', MasterUserKey, region=region) }}"
-        DBName: "{{ titlecase_name }}"
+        DBName: "{{ service_name }}"
         DBPass: "{{ lookup('aws_ssm', PassKey, region=region) }}"
         DBPort: "{{ database.ansible_facts.cloudformation[Stack_Name].stack_outputs.DBPort }}"
         DBUser: "{{ lookup('aws_ssm', UserKey, region=region) }}"

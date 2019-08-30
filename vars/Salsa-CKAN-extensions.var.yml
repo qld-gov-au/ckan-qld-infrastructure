@@ -1,0 +1,28 @@
+---
+
+common_stack:
+  state: "{{ state | default('present')}}"
+  region: "{{ region }}"
+  disable_rollback: true
+  template: "templates/Salsa-CKAN-Extensions.cfn.yml"
+  template_parameters:
+    OpsWorksStack: "{{ Environment }}{{ service_name }}OpsWorksStack"
+    DCATExtensionRevision: "{{ DCATExtensionRevision }}"
+    SchemingExtensionRevision: "{{ SchemingExtensionRevision }}"
+    ValidationExtensionRevision: "{{ ValidationExtensionRevision }}"
+    DataQldExtensionRevision: "{{ DataQldExtensionRevision }}"
+    DataQldThemeExtensionRevision: "{{ DataQldThemeExtensionRevision }}"
+    ODIExtensionRevision: "{{ ODIExtensionRevision }}"
+    DataRequestsExtensionRevision: "{{ DataRequestsExtensionRevision }}"
+    YTPExtensionRevision: "{{ YTPExtensionRevision }}"
+  tags:
+    Environment: "{{ Environment }}"
+    Service: "{{ service_name }}"
+    Division: "{{ Division }}"
+    Owner: "{{ Owner }}"
+    Version: "1.0"
+
+cloudformation_stacks:
+  - name: "{{ service_name }}-{{ Environment }}-Salsa-CKANExtensions"
+    template_parameters:
+      Environment: "{{ Environment }}"

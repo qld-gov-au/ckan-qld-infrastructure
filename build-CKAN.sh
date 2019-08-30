@@ -25,11 +25,11 @@ run-playbook () {
 run-shared-resource-playbooks () {
   run-playbook "vpc"
   run-playbook "security_groups"
-  run-playbook CloudFormation "vars/hosted-zone.var.yml"
-  run-playbook CloudFormation "vars/database.yml"
-  run-playbook CloudFormation "vars/efs.yml"
-  run-playbook CloudFormation "vars/cache.yml"
-  run-playbook CloudFormation "vars/waf_web_acl.var.yml"
+  run-playbook "CloudFormation" "vars/hosted-zone.var.yml"
+  run-playbook "CloudFormation" "vars/database.var.yml"
+  run-playbook "CloudFormation" "vars/efs.var.yml"
+  run-playbook "CloudFormation" "vars/cache.var.yml"
+  run-playbook "CloudFormation" "vars/waf_web_acl.var.yml"
 }
 
 if [ $# -ge 3 ]; then

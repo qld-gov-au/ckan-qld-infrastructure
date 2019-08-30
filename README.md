@@ -29,6 +29,8 @@ The Datashades-OpsWorks-EFS-CKAN-Stack template has been split, with RDS and EFS
 
 The RDS setup expects the master credentials to already exist in the Systems Manager Parameter Store at '/config/CKAN/[DEV|TRAINING|STAGING|PROD]/db/master_user' and '/config/CKAN/[DEV|TRAINING|STAGING|PROD]/db/master_password'.
 
+var/shared-${service-name} has the basic facts for the n number of environments
+
 **2017 Update**
 
 We've switched back to our more traditional NFS Solr stack for a number of reasons:
@@ -316,3 +318,11 @@ and automated system maintenance.
 
 Our hope and expectation is that it benefits the wider Public Data community and progresses the Open Data ideal.
 
+
+
+TODO:
+acm cert usage instead of manual ones
+add cloudfront lambda import to ansible to extract from other region.
+scrape internal route53 zone
+migrate from *services.qld.gov.au to normal domain and include ap-southeast-2 acm cert generation
+run the acm cert scripts so there is no stalls in environment standups.

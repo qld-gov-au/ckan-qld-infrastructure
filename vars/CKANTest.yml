@@ -1,6 +1,0 @@
----
-titlecase_name: CKANTest
-lowercase_name: "{{ titlecase_name | lower }}"
-title: CKAN Test
-enable_datastore: "yes"
-public_tld: data.qld.gov.au

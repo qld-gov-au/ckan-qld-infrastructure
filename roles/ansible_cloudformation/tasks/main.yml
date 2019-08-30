@@ -12,7 +12,7 @@
 - name: Run CloudFormation stack
   cloudformation:
     stack_name: "{{ item.name | default(common_stack.name) }}"
-    # 'profile' is optional so we default to empty string
+    # 'profile' is optional so we default to empty string, this is to change aws keys
     profile: "{{ item.profile | default(common_stack.profile | default('')) }}"
     state: "{{ item.state | default(common_stack.state) }}"
     region: "{{ item.region | default(common_stack.region) }}"

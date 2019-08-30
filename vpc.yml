@@ -3,7 +3,7 @@
   hosts: local
   connection: local
   vars_files:
-    - vars/vpc.yml
+    - vars/vpc.var.yml
   pre_tasks:
 
     # Get index which will allow collecting correct cloudformation details from the app_deploy file
@@ -65,7 +65,7 @@
         VPCPeeringEnabled: "true "
       when: vpcPeeringDescibed is defined and vpcPeeringDescibed.vpc_peer_connection is defined
 
-    - include_vars: vars/vpc.yml
+    - include_vars: vars/vpc.var.yml
 
   roles:
     - ansible_cloudformation

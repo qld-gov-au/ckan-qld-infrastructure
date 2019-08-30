@@ -2,14 +2,33 @@
 - name: Cloudformation Playbook
   hosts: local
   connection: local
-  vars_files:
-    - vars/cloudfront-certificates.var.yml
+
   pre_tasks:
-    - name: Get CKAN source for environment
+    - name: get basic_facts
       set_fact:
-        CKANSource={{ item.CKANSource }}
-      when: item.Environment == Environment and item.profile == lowercase_name
-      with_items: "{{ certificate_arns }}"
+        basic_fact={{ item }}
+#        CKANSource={{ item.CKANSource }}
+      when: item.Environment == Environment
+      with_items: "{{ basic_facts }}"
+
+    - name: set facts to environment from basic_fact
+      set_fact: "{{ item.key }}={{ item.value }}"
+      with_dict: "{{ basic_fact }}"
+      when: basic_fact is defined
+
+    - set_fact:
+        acm_stack_name: "{{ service_name }}-{{ Environment }}-acm"
+
+    - name: Describe acm cert cloudformation stack in default region
+      cloudformation_facts:
+        region: "{{ region }}"
+        stack_name: "{{ acm_stack_name }}"
+        stack_resources: true
+      register: acm
+
+    - set_fact:
+        ACMCertificateARNForDefaultRegion: "{{ acm.ansible_facts.cloudformation[acm_stack_name].stack_outputs.AcmCert }}"
+
 
     - name: kms alias fact
       aws_kms_facts:
@@ -25,6 +44,6 @@
       set_fact:
         SSMKey: "{{ ssmKeyFacts['keys'][0].key_arn }}"
 
-    - include_vars: vars/CKAN-Stack.yml
+    - include_vars: vars/CKAN-Stack.var.yml
   roles:
     - ansible_cloudformation
