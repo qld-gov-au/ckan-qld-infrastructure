@@ -19,7 +19,7 @@ basic_facts:
     CmsOrigin: "oss.squizedge.net"
     CKANThemeSource: "none"
     CKANSource: "{{ ckan_2_8 }}"
-    CookbookRevision: "2.0.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
+    CookbookRevision: "2.1.0-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
     QgovExtensionRevision: "1.1.0" #https://github.com/qld-gov-au/ckan-ex-qgov.git
     DCATExtensionRevision: v0.0.9 #https://github.com/ckan/ckanext-dcat.git
     SchemingExtensionRevision: release-1.2.0 #https://github.com/ckan/ckanext-scheming.git
