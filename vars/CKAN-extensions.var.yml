@@ -1,0 +1,25 @@
+---
+
+common_stack:
+  state: "{{ state | default('present')}}"
+  region: "{{ region }}"
+  disable_rollback: true
+  template: "templates/Datashades-OpsWorks-CKAN-Extensions.cfn.yml"
+  template_parameters:
+    ApplicationName: "{{ service_name }}"
+    ApplicationId: "{{ service_name | lower }}"
+    OpsWorksStack: "{{ Environment }}{{ service_name }}OpsWorksStack"
+    CKANThemeSource: "{{ CKANThemeSource }}"
+    QgovExtensionRevision: "{{ QgovExtensionRevision }}"
+  tags:
+    Environment: "{{ Environment }}"
+    Service: "{{ service_name }}"
+    Division: "{{ Division }}"
+    Owner: "{{ Owner }}"
+    Version: "1.0"
+    PowerManaged: "No"
+
+cloudformation_stacks:
+  - name: "{{ service_name }}-{{ Environment }}-OpsWorks-CKANExtensions"
+    template_parameters:
+      Environment: "{{ Environment }}"

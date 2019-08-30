@@ -1,0 +1,17 @@
+---
+template: "templates/cloudfront-lambdaAtEdge.cfn.yml"
+
+cloudformation_stacks:
+  - name: "{{ service_name }}-{{ Environment }}-CLOUDFRONT-LAMBDA-AT-EDGE"
+    state: "{{ state | default('present')}}"
+    region: "us-east-1"
+    disable_rollback: 'true'
+    template: "{{ template }}"
+    template_parameters:
+      Environment: "{{ Environment }}"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "CKAN"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"

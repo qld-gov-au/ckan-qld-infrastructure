@@ -1,0 +1,80 @@
+---
+NonProductionGTMId: "GTM-NBSWN3"
+ProductionGTMId: "GTM-PJBVFG"
+
+common_stack:
+  state: "{{ state | default('present')}}"
+  region: "{{ region }}"
+  disable_rollback: true
+  template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
+  template_parameters:
+    ApplicationName: "{{ service_name }}"
+    ApplicationId: "{{ service_name | lower }}"
+    ApplicationTitle: "{{ title }}"
+    CKANSource: "{{ CKANSource }}"
+    PublicStackZoneTLD: "{{ PublicStackZoneTLD }}"
+    PublicTLD: "{{ public_tld }}"
+    EmailDomain: "{{ RootDomain }}"
+    SiteDomain: "{{ SiteDomain }}"
+    RootDomain: "{{ RootDomain }}"
+    ACMCertificateARN: "{{ ACMCertificateARNForDefaultRegion }}"
+    CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
+    StackVPC: "CKANVpc-{{ Environment }}"
+    InternalStackZoneTLD: "{{ Environment }}CKANPrivateTLD"
+    InternalStackZone: "{{ Environment }}CKANPrivateHostedZone"
+    CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/admin_email', region=region) }}"
+    CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/admin_password', region=region) }}"
+    PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + service_name_lower + '_user', region=region) }}"
+    PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + service_name_lower + '_password', region=region) }}"
+    BeakerSecret: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/beaker_secret', region=region) }}"
+    WebSubnets: "{{ Environment }}CKANWebSubnet"
+    AppSubnets: "{{ Environment }}CKANAppSubnet"
+    AdminSG: "{{ Environment }}CKANManagementSG"
+    AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
+    CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+    AppSG: "{{ Environment }}CKANAppAsgSG"
+    DatabaseSG: "{{ Environment }}CKANDatabaseSG"
+    CreateServiceRole: "yes"
+    EnableDataStore: "{{ enable_datastore | default('no') }}"
+    SSMKey: "{{ SSMKey | default('') }}"
+    DefaultEC2Key: osssio-global-ckan
+    CookbookRevision: "{{ CookbookRevision }}"
+  tags:
+    Environment: "{{ Environment }}"
+    Service: "{{ service_name }}"
+    Division: "{{ Division }}"
+    Owner: "{{ Owner }}"
+    Version: "1.0"
+
+cloudformation_stacks:
+  - name: "{{ service_name }}-PROD-OpsWorks-stack"
+    template_parameters:
+      Environment: PROD
+      GTMContainerId: "{{ ProductionGTMId }}"
+      IntermediateTLD: ckan.services.qld.gov.au #delete me once cloudfront has unlocked export name
+    tags:
+      PowerManaged: "No"
+
+  - name: "{{ service_name }}-STAGING-OpsWorks-stack"
+    template_parameters:
+      Environment: STAGING
+      GTMContainerId: "{{ NonProductionGTMId }}"
+      IntermediateTLD: ckan.staging-services.qld.gov.au
+    tags:
+      PowerManaged: "No"
+
+  - name: "{{ service_name }}-TRAINING-OpsWorks-stack"
+    template_parameters:
+      Environment: TRAINING
+      GTMContainerId: "{{ NonProductionGTMId }}"
+      IntermediateTLD: training.ckan.devpit140cs.qgov.net.au
+    tags:
+      PowerManaged: "Yes"
+
+  - name: "{{ service_name }}-DEV-OpsWorks-stack"
+    template_parameters:
+      Environment: DEV
+      GTMContainerId: "{{ NonProductionGTMId }}"
+      IntermediateTLD: dev.ckan.devpit140cs.qgov.net.au
+    tags:
+      PowerManaged: "Yes"

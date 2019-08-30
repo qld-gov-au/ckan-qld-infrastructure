@@ -1,0 +1,78 @@
+Description: Cloudfront Lambda At Edge for fronting an application.
+Parameters:
+  Environment:
+    Description: Stack environment eg DEV, TRAINING
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+Resources:
+
+  #This lambda function reorders querystring alphabetically for improved caching and remove www from host name if set
+  LambdaEdgeFunction: #change name if changing lambda code and update VersionedLambdaFunction link
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code: #see files/cloudfrontLambda.js for human readable code (remove comments when updating inline js
+        ZipFile:  |
+          'use strict';
+          const querystring = require('querystring');
+          exports.handler = (event, context, callback) => {
+              const request = event.Records[0].cf.request;
+              const params = querystring.parse(request.querystring);
+              const sortedParams = {};
+              Object.keys(params).sort().forEach(key => {
+                  sortedParams[key] = params[key];
+              });
+              request.querystring = querystring.stringify(sortedParams);
+              if ((request.headers.host[0].value === 'data.qld.gov.au' || request.headers.host[0].value === 'publications.qld.gov.au' ) && request.method !== 'POST') {
+                  let alternativeHostname = 'www.' + request.headers.host[0].value;
+                  let redirect = {
+                      status: '301',
+                      statusDescription: `Redirecting to apex domain`,
+                      headers: {
+                          location: [{
+                              key: 'Location',
+                              value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}`
+                          }]
+                      }
+                  };
+                  callback(null, redirect);
+              } else {
+                  callback(null, request);
+              }
+          };
+      Role: !GetAtt LambdaEdgeFunctionRole.Arn
+      Runtime: nodejs8.10
+      Handler: index.handler
+      Timeout: 5
+
+  VersionedLambdaFunction: #change name if changing lambda code and update cloudfront link
+    Type: 'AWS::Lambda::Version'
+    Properties:
+      FunctionName: !Ref LambdaEdgeFunction
+
+  LambdaEdgeFunctionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Sid: "AllowLambdaServiceToAssumeRole"
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRole"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+                - "edgelambda.amazonaws.com"
+
+Outputs:
+  VersionedLambdaFunction:
+    Value: !Ref VersionedLambdaFunction

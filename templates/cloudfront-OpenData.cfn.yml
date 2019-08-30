@@ -24,10 +24,24 @@ Parameters:
   WebACLId:
     Description: WAF web ACL Id .
     Type: String
+  Service:
+    Description: for Tagging Distribution
+    Type: String
+  Division:
+    Description: for Tagging Distribution
+    Type: String
+  Owner:
+    Description: for Tagging Distribution
+    Type: String
+  Version:
+    Description: for Tagging Distribution
+    Type: String
+  LambdaAtEdgeOriginRequestVersion:
+    Description: Lambda at Edge which is located in us-east-1
+    Type: String
 
 Resources:
 
-  #this is data with cms details. (don't forget to keep the one above updated (except for CmsOrigin bits)
   DistributionConfig:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -140,6 +154,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /_resources/* #Resources in Squiz such as PDF documents
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -170,6 +187,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /__data/* #Squiz data that may be needed. 
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -200,6 +220,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /__lib/* #Provides content for the Squiz CMS functionally in _admin
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -218,6 +241,9 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /__fudge/* #Provides content for the Squiz CMS functionally in _admin
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -236,6 +262,9 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: / #The homepage
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -266,6 +295,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /home* #The homepage
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -296,6 +328,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /_admin* #The Squiz admin interface on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -326,6 +361,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /_edit* #The Squiz edit interface of the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -356,6 +394,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /_login* #The Squiz login page on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -374,6 +415,9 @@ Resources:
               Headers:
                 - "*"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /_editplusapi* #The Squiz editplusapi on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -404,6 +448,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /_nocache* #Squiz nocache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -434,6 +481,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /_noproxycache* #Squiz noproxycache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -464,6 +514,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /_recache* #Squiz recache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -494,6 +547,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /_performance* #Squiz performance page on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -524,6 +580,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /article #Not sure if this page exists but just in case, a top level article page
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -554,6 +613,9 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           - PathPattern: /article/* #sub pages of article, also including things like /articles/blahblah/_admin
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -584,24 +646,30 @@ Resources:
                 - "Host"
                 - "Referer"
             ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
         DefaultCacheBehavior:
           AllowedMethods:
-          - GET
-          - HEAD
-          - POST
-          - DELETE
-          - OPTIONS
-          - PUT
-          - PATCH
+            - GET
+            - HEAD
+            - POST
+            - DELETE
+            - OPTIONS
+            - PUT
+            - PATCH
           Compress: true
           ForwardedValues:
             Cookies:
               Forward: all
             QueryString: 'true'
             Headers:
-             - "*"
+            - "*"
           TargetOriginId: 'WebOrigin'
           ViewerProtocolPolicy: redirect-to-https
+          LambdaFunctionAssociations:
+            - EventType: 'viewer-request'
+              LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
         DefaultRootObject: home
         Enabled: true
         Logging:
@@ -639,6 +707,17 @@ Resources:
                 Fn::Select:
                   - 0
                   - !Ref Domain
+      Tags:
+        - Key: "Environment"
+          Value:  !Ref Environment
+        - Key: "Service"
+          Value: !Ref Service
+        - Key: "Division"
+          Value: !Ref Division
+        - Key: "Owner"
+          Value: !Ref Owner
+        - Key: "Version"
+          Value: !Ref Version
 
 Outputs:
   CloudfrontAliasDNSName:

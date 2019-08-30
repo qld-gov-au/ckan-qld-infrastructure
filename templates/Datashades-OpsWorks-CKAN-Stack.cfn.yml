@@ -58,19 +58,34 @@ Parameters:
       - TRAINING
       - STAGING
       - PROD
-  StackTLD:
+  InternalStackZoneTLD:
     Description: Exported name of the private top-level domain name for the stack
     Type: String
-  StackZone:
+  InternalStackZone:
     Description: Exported name of the Route53 hosted zone ID.
     Type: String
-  IntermediateTLD:
-    Description: Route53 hosted TLD for support access (public but not advertised)
+  EmailDomain:
+    Description: Email Domain to be used
     Type: String
     MinLength: 6
     MaxLength: 254
   PublicTLD:
+    Description: Route53 hosted TLD for public access (will be dropped soon)
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  PublicStackZoneTLD:
     Description: Route53 hosted TLD for public access
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  SiteDomain:
+    Description: Used base for cookies on login this could be www.${rootdomain} or the same as rootdomain
+    Type: String
+    MinLength: 6
+    MaxLength: 254
+  RootDomain:
+    Description: Used as suffix for loadbalancer name
     Type: String
     MinLength: 6
     MaxLength: 254
@@ -167,6 +182,9 @@ Parameters:
     Description: KMS key for alias/aws/ssm
   GTMContainerId:
     Description: Google Tag Manager container ID
+    Type: String
+  IntermediateTLD: #delete me once cloudfront has unlocked export
+    Description: Route53 hosted TLD for support access (public but not advertised)
     Type: String
 
 Conditions:
@@ -265,7 +283,7 @@ Resources:
                   Fn::Join:
                     - ""
                     - - "arn:aws:route53:::hostedzone/"
-                      - Fn::ImportValue: !Ref StackZone
+                      - Fn::ImportValue: !Ref InternalStackZone
       ManagedPolicyArns:
         - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
@@ -324,6 +342,7 @@ Resources:
         datashades:
           ckan_web:
             title: !Sub "${ApplicationTitle} | Queensland Government"
+            email_domain: !Ref EmailDomain
             adminpw: !Ref CKANAdminPW
             adminemail: !Ref CKANAdminEmail
             beaker_secret: !Ref BeakerSecret
@@ -345,7 +364,7 @@ Resources:
               Fn::ImportValue: !Ref CacheAddress
             port: !Ref CachePort
           tld:
-            Fn::ImportValue: !Ref StackTLD
+            Fn::ImportValue: !Ref InternalStackZoneTLD
           public_tld: !Ref PublicTLD
           version: !Ref Environment
           app_id: !Ref ApplicationId
@@ -454,11 +473,13 @@ Resources:
     Type: AWS::OpsWorks::App
     Properties:
       Domains:
-        - !Sub "${ApplicationId}.${IntermediateTLD}"
+        - !Ref SiteDomain #list 0 is used for site_url
+        - !Ref RootDomain
+        - !Sub "${ApplicationId}.${RootDomain}"
       AppSource:
         Type: archive
         Url: !Ref CKANSource
-      Description: "CKAN 2.7"
+      Description: "CKAN 2.8"
       EnableSsl: false
       Name: !Sub "${ApplicationName}-${Environment}"
       Shortname: !Sub "${ApplicationId}-${Environment}"
@@ -531,6 +552,23 @@ Resources:
       ElasticLoadBalancerName: !Ref CKANELB
       LayerId: !Ref OpsWorksWebLayer
 
+  WebELBDNSName:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Type: A
+      Name: !Sub "${ApplicationId}.${RootDomain}"
+      HostedZoneName: !Sub "${PublicStackZoneTLD}."
+      AliasTarget:
+        HostedZoneId:
+          Fn::GetAtt:
+            - CKANELB
+            - CanonicalHostedZoneNameID
+        DNSName:
+          Fn::GetAtt:
+            - CKANELB
+            - DNSName
+
+  #Delete me/cleanup once cloudfront has unlocked me
   WebELBCNAME:
     Type: AWS::Route53::RecordSet
     Properties:
@@ -584,7 +622,13 @@ Outputs:
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrApplication"
 
+  #Delete me/cleanup once cloudfront has unlocked me
   WebELBDomainName:
     Value: !Ref WebELBCNAME
     Export:
       Name: !Sub "${Environment}${ApplicationName}WebElbNiceDNSName"
+
+  WebELBDNSName:
+    Value: !Ref WebELBDNSName
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebElbDNSName"

@@ -4,7 +4,7 @@
   connection: local
   gather_facts: yes
   vars_files:
-    - vars/security_groups.yml
+    - vars/security_groups.var.yml
   pre_tasks:
 
     - name: Obtain list of AWS IPs

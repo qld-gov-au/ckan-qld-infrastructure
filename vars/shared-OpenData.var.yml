@@ -1,0 +1,88 @@
+---
+service_name: OpenData
+service_name_lower: "{{ service_name | lower }}"
+title: Data
+enable_datastore: "yes"
+#public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
+public_tld: data.qld.gov.au
+
+legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip"
+ckan_2_7: "https://github.com/ckan/ckan/archive/ckan-2.7.3.zip"
+ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip"
+
+basic_facts:
+  - Environment: PROD
+    PublicStackZoneTLD: "{{ public_tld }}"
+    Domain: "www.data.qld.gov.au,data.qld.gov.au" #Cloudfront Alt Domains
+    SiteDomain: "www.data.qld.gov.au" #CKAN SiteDomain
+    RootDomain: "data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "oss.squizedge.net"
+    CKANThemeSource: "none"
+    CKANSource: "{{ ckan_2_8 }}"
+    CookbookRevision: "2.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
+    QgovExtensionRevision: "1.1.1" #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    DCATExtensionRevision: v0.0.9 #https://github.com/ckan/ckanext-dcat.git
+    SchemingExtensionRevision: release-1.2.0 #https://github.com/ckan/ckanext-scheming.git
+    ValidationExtensionRevision: v0.0.7 #https://github.com/frictionlessdata/ckanext-validation
+    DataQldExtensionRevision: "1.3.0" #https://github.com/qld-gov-au/ckanext-data-qld.git
+    DataQldThemeExtensionRevision: "master" #https://github.com/qld-gov-au/ckanext-data-qld-theme.git
+    ODIExtensionRevision: "1.0.1" #https://github.com/qld-gov-au/ckanext-odi-certificates.git
+    DataRequestsExtensionRevision: "2.0.1-qgov" #https://github.com/qld-gov-au/ckanext-datarequests.git
+    YTPExtensionRevision: "2.0.1-qgov" #https://github.com/qld-gov-au/ckanext-ytp-comments
+
+  - Environment: STAGING
+    PublicStackZoneTLD: "{{ public_tld }}"
+    Domain: "www.staging.data.qld.gov.au,staging.data.qld.gov.au" #Cloudfront Alt Domains
+    SiteDomain: "staging.data.qld.gov.au" #CKAN SiteDomain
+    RootDomain: "staging.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "staging.squizedge.net"
+    CKANThemeSource: "none"
+    CKANSource: "{{ ckan_2_8 }}"
+    CookbookRevision: "2.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
+    QgovExtensionRevision: "1.1.1" #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    DCATExtensionRevision: v0.0.9
+    SchemingExtensionRevision: release-1.2.0
+    ValidationExtensionRevision: v0.0.7
+    DataQldExtensionRevision: "1.3.0"
+    DataQldThemeExtensionRevision: "master"
+    ODIExtensionRevision: "1.0.1"
+    DataRequestsExtensionRevision: "2.0.1-qgov"
+    YTPExtensionRevision: "2.0.1-qgov"
+
+  - Environment: TRAINING
+    PublicStackZoneTLD: "{{ public_tld }}"
+    Domain: "www.training.data.qld.gov.au,training.data.qld.gov.au" #Cloudfront Alt Domains
+    SiteDomain: "training.data.qld.gov.au" #CKAN SiteDomain
+    RootDomain: "training.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "staging.squizedge.net"
+    CKANThemeSource: "none"
+    CKANSource: "{{ ckan_2_8 }}"
+    CookbookRevision: training  #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/training
+    QgovExtensionRevision: training #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    DCATExtensionRevision: v0.0.9
+    SchemingExtensionRevision: release-1.2.0
+    ValidationExtensionRevision: v0.0.7
+    DataQldExtensionRevision: "training"
+    DataQldThemeExtensionRevision: "training"
+    ODIExtensionRevision: "training"
+    DataRequestsExtensionRevision: "training"
+    YTPExtensionRevision: "training"
+
+  - Environment: DEV
+    PublicStackZoneTLD: "{{ public_tld }}"
+    Domain: "www.dev.data.qld.gov.au,dev.data.qld.gov.au" #Cloudfront Alt Domains
+    SiteDomain: "dev.data.qld.gov.au" #CKAN SiteDomain
+    RootDomain: "dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "staging.squizedge.net"
+    CKANThemeSource: "none"
+    CKANSource: "{{ ckan_2_8 }}"
+    CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
+    QgovExtensionRevision: develop #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    DCATExtensionRevision: v0.0.9
+    SchemingExtensionRevision: release-1.2.0
+    ValidationExtensionRevision: v0.0.7
+    DataQldExtensionRevision: "develop"
+    DataQldThemeExtensionRevision: "develop"
+    ODIExtensionRevision: "develop"
+    DataRequestsExtensionRevision: "develop"
+    YTPExtensionRevision: "develop"

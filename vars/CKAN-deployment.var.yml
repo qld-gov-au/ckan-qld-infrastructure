@@ -1,3 +1,3 @@
 ---
-Layer_Name: "{{ lowercase_name }}-web"
-App_Name: "{{ lowercase_name }}-{{ Environment }}"
+Layer_Name: "{{ service_name | lower }}-web"
+App_Name: "{{ service_name | lower }}-{{ Environment }}"
