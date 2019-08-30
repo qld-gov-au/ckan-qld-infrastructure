@@ -35,7 +35,7 @@ exports.handler = (event, context, callback) => {
     /* Update request querystring with normalized  */
     request.querystring = querystring.stringify(sortedParams);
 
-    /* redirect www to root domain */
+    /* redirect root domain to www for prod*/
     if ((request.headers.host[0].value === 'data.qld.gov.au' || request.headers.host[0].value === 'publications.qld.gov.au' ) && request.method !== 'POST') {
         let alternativeHostname = 'www.' + request.headers.host[0].value;
         let redirect = {
