@@ -1,6 +1,8 @@
 ---
 NonProductionGTMId: "GTM-NBSWN3"
 ProductionGTMId: "GTM-PJBVFG"
+NonProductionAnalyticsId: "UA-7276966-12"
+ProductionAnalyticsId: "UA-7276966-13"
 
 common_stack:
   state: "{{ state | default('present')}}"
@@ -51,6 +53,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: PROD
       GTMContainerId: "{{ ProductionGTMId }}"
+      AnalyticsId: "{{ ProductionAnalyticsId }}"
       IntermediateTLD: ckan.services.qld.gov.au #delete me once cloudfront has unlocked export name
     tags:
       PowerManaged: "No"
@@ -59,6 +62,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: STAGING
       GTMContainerId: "{{ NonProductionGTMId }}"
+      AnalyticsId: "{{ NonProductionAnalyticsId }}"
       IntermediateTLD: ckan.staging-services.qld.gov.au
     tags:
       PowerManaged: "No"
@@ -67,6 +71,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: TRAINING
       GTMContainerId: "{{ NonProductionGTMId }}"
+      AnalyticsId: "{{ NonProductionAnalyticsId }}"
       IntermediateTLD: training.ckan.devpit140cs.qgov.net.au
     tags:
       PowerManaged: "Yes"
@@ -75,6 +80,7 @@ cloudformation_stacks:
     template_parameters:
       Environment: DEV
       GTMContainerId: "{{ NonProductionGTMId }}"
+      AnalyticsId: "{{ NonProductionAnalyticsId }}"
       IntermediateTLD: dev.ckan.devpit140cs.qgov.net.au
     tags:
       PowerManaged: "Yes"
