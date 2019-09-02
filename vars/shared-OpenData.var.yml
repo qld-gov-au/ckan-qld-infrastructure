@@ -39,7 +39,7 @@ basic_facts:
     CKANThemeSource: "none"
     CKANSource: "{{ ckan_2_8 }}"
     CookbookRevision: "2.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
-    QgovExtensionRevision: "1.1.1" #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    QgovExtensionRevision: "1.3.0" #https://github.com/qld-gov-au/ckan-ex-qgov.git
     DCATExtensionRevision: v0.0.9
     SchemingExtensionRevision: release-1.2.0
     ValidationExtensionRevision: v0.0.7
