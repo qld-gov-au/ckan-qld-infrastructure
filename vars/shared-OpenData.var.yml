@@ -39,15 +39,15 @@ basic_facts:
     CKANThemeSource: "none"
     CKANSource: "{{ ckan_2_8 }}"
     CookbookRevision: "2.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
-    QgovExtensionRevision: "1.3.0" #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    QgovExtensionRevision: "1.1.1" #https://github.com/qld-gov-au/ckan-ex-qgov.git
     DCATExtensionRevision: v0.0.9
     SchemingExtensionRevision: release-1.2.0
     ValidationExtensionRevision: v0.0.7
-    DataQldExtensionRevision: "1.3.0"
+    DataQldExtensionRevision: "1.3.0"  #https://github.com/qld-gov-au/ckanext-data-qld.git
     DataQldThemeExtensionRevision: "master"
     ODIExtensionRevision: "1.0.1"
-    DataRequestsExtensionRevision: "2.0.1-qgov"
-    YTPExtensionRevision: "2.0.1-qgov"
+    DataRequestsExtensionRevision: "2.0.1-qgov" #https://github.com/qld-gov-au/ckanext-datarequests.git
+    YTPExtensionRevision: "2.0.1-qgov" #https://github.com/qld-gov-au/ckanext-ytp-comments
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
