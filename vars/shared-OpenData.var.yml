@@ -40,14 +40,14 @@ basic_facts:
     CKANSource: "{{ ckan_2_8 }}"
     CookbookRevision: "2.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
     QgovExtensionRevision: "1.1.1" #https://github.com/qld-gov-au/ckan-ex-qgov.git
-    DCATExtensionRevision: v0.0.9
-    SchemingExtensionRevision: release-1.2.0
-    ValidationExtensionRevision: v0.0.7
-    DataQldExtensionRevision: "1.3.0"
-    DataQldThemeExtensionRevision: "master"
-    ODIExtensionRevision: "1.0.1"
-    DataRequestsExtensionRevision: "2.0.1-qgov"
-    YTPExtensionRevision: "2.0.1-qgov"
+    DCATExtensionRevision: v0.0.9 #https://github.com/ckan/ckanext-dcat.git
+    SchemingExtensionRevision: release-1.2.0 #https://github.com/ckan/ckanext-scheming.git
+    ValidationExtensionRevision: v0.0.7 #https://github.com/frictionlessdata/ckanext-validation
+    DataQldExtensionRevision: "1.3.0"  #https://github.com/qld-gov-au/ckanext-data-qld.git
+    DataQldThemeExtensionRevision: "master" #https://github.com/qld-gov-au/ckanext-data-qld-theme.git
+    ODIExtensionRevision: "1.0.1" #https://github.com/qld-gov-au/ckanext-odi-certificates.git
+    DataRequestsExtensionRevision: "2.0.1-qgov" #https://github.com/qld-gov-au/ckanext-datarequests.git
+    YTPExtensionRevision: "2.0.1-qgov" #https://github.com/qld-gov-au/ckanext-ytp-comments
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -59,14 +59,14 @@ basic_facts:
     CKANSource: "{{ ckan_2_8 }}"
     CookbookRevision: training  #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/training
     QgovExtensionRevision: training #https://github.com/qld-gov-au/ckan-ex-qgov.git
-    DCATExtensionRevision: v0.0.9
-    SchemingExtensionRevision: release-1.2.0
-    ValidationExtensionRevision: v0.0.7
-    DataQldExtensionRevision: "training"
-    DataQldThemeExtensionRevision: "training"
-    ODIExtensionRevision: "training"
-    DataRequestsExtensionRevision: "training"
-    YTPExtensionRevision: "training"
+    DCATExtensionRevision: v0.0.9 #https://github.com/ckan/ckanext-dcat.git
+    SchemingExtensionRevision: release-1.2.0 #https://github.com/ckan/ckanext-scheming.git
+    ValidationExtensionRevision: v0.0.7 #https://github.com/frictionlessdata/ckanext-validation
+    DataQldExtensionRevision: "training"  #https://github.com/qld-gov-au/ckanext-data-qld.git
+    DataQldThemeExtensionRevision: "training" #https://github.com/qld-gov-au/ckanext-data-qld-theme.git
+    ODIExtensionRevision: "training" #https://github.com/qld-gov-au/ckanext-odi-certificates.git
+    DataRequestsExtensionRevision: "training" #https://github.com/qld-gov-au/ckanext-datarequests.git
+    YTPExtensionRevision: "training" #https://github.com/qld-gov-au/ckanext-ytp-comments
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -78,11 +78,11 @@ basic_facts:
     CKANSource: "{{ ckan_2_8 }}"
     CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
     QgovExtensionRevision: develop #https://github.com/qld-gov-au/ckan-ex-qgov.git
-    DCATExtensionRevision: v0.0.9
-    SchemingExtensionRevision: release-1.2.0
-    ValidationExtensionRevision: v0.0.7
-    DataQldExtensionRevision: "develop"
-    DataQldThemeExtensionRevision: "develop"
-    ODIExtensionRevision: "develop"
-    DataRequestsExtensionRevision: "develop"
-    YTPExtensionRevision: "develop"
+    DCATExtensionRevision: v0.0.9 #https://github.com/ckan/ckanext-dcat.git
+    SchemingExtensionRevision: release-1.2.0 #https://github.com/ckan/ckanext-scheming.git
+    ValidationExtensionRevision: v0.0.7 #https://github.com/frictionlessdata/ckanext-validation
+    DataQldExtensionRevision: "develop"  #https://github.com/qld-gov-au/ckanext-data-qld.git
+    DataQldThemeExtensionRevision: "develop" #https://github.com/qld-gov-au/ckanext-data-qld-theme.git
+    ODIExtensionRevision: "develop" #https://github.com/qld-gov-au/ckanext-odi-certificates.git
+    DataRequestsExtensionRevision: "develop" #https://github.com/qld-gov-au/ckanext-datarequests.git
+    YTPExtensionRevision: "develop" #https://github.com/qld-gov-au/ckanext-ytp-comments
