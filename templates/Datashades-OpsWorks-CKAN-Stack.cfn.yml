@@ -183,6 +183,9 @@ Parameters:
   GTMContainerId:
     Description: Google Tag Manager container ID
     Type: String
+  AnalyticsId:
+    Description: Google Analytics container ID
+    Type: String
   IntermediateTLD: #delete me once cloudfront has unlocked export
     Description: Route53 hosted TLD for support access (public but not advertised)
     Type: String
@@ -354,6 +357,7 @@ Resources:
             endpoint: /
             google:
               gtm_container_id: !Ref GTMContainerId
+              analytics_id: !Ref AnalyticsId
           jumpbox:
             bucket: !Ref AdminPubKeyBucket
             usergroup: !Ref AdminUserGroup
