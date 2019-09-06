@@ -73,7 +73,7 @@ Resources:
                       headers: {
                           location: [{ key: 'Location', value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}` }],
                           "access-control-allow-origin": [{ key: "Access-Control-Allow-Origin", value: "*" }],
-                          "access-control-allow-methods": [{ key: "Access-Control-Allow-Methods'", value: "POST, PUT, GET, DELETE, OPTIONS" }],
+                          "access-control-allow-methods": [{ key: "Access-Control-Allow-Methods", value: "POST, PUT, GET, DELETE, OPTIONS" }],
                           "access-control-allow-headers": [{ key: "Access-Control-Allow-Headers", value: "X-CKAN-API-KEY, Authorization, Content-Type" }]
                       }
                   };
@@ -86,7 +86,7 @@ Resources:
                       headers: {
                           location: [{ key: 'Location', value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}` }],
                           "access-control-allow-origin": [{ key: "Access-Control-Allow-Origin", value: "*" }],
-                          "access-control-allow-methods": [{ key: "Access-Control-Allow-Methods'", value: "POST, PUT, GET, DELETE, OPTIONS" }],
+                          "access-control-allow-methods": [{ key: "Access-Control-Allow-Methods", value: "POST, PUT, GET, DELETE, OPTIONS" }],
                           "access-control-allow-headers": [{ key: "Access-Control-Allow-Headers", value: "X-CKAN-API-KEY, Authorization, Content-Type" }]
                       }
                   };
