@@ -49,10 +49,66 @@ Resources:
       Handler: index.handler
       Timeout: 5
 
+  #This lambda function reorders querystring alphabetically for improved caching and remove www from host name if set
+  LambdaEdgeFunction48e660f: #change name if changing lambda code and update VersionedLambdaFunction link
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code: #see files/cloudfrontLambda.js for human readable code (remove comments when updating inline js
+        ZipFile:  |
+          'use strict';
+          const querystring = require('querystring');
+          exports.handler = (event, context, callback) => {
+              const request = event.Records[0].cf.request;
+              const params = querystring.parse(request.querystring);
+              const sortedParams = {};
+              Object.keys(params).sort().forEach(key => {
+                  sortedParams[key] = params[key];
+              });
+              request.querystring = querystring.stringify(sortedParams);
+              if ((request.headers.host[0].value === 'data.qld.gov.au' || request.headers.host[0].value === 'publications.qld.gov.au' ) && request.method !== 'POST') {
+                  let alternativeHostname = 'www.' + request.headers.host[0].value;
+                  let redirect = {
+                      status: '301',
+                      statusDescription: `Redirecting to apex domain`,
+                      headers: {
+                          location: [{ key: 'Location', value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}` }],
+                          "access-control-allow-origin": [{ key: "Access-Control-Allow-Origin", value: "*" }],
+                          "access-control-allow-methods": [{ key: "Access-Control-Allow-Methods", value: "POST, PUT, GET, DELETE, OPTIONS" }],
+                          "access-control-allow-headers": [{ key: "Access-Control-Allow-Headers", value: "X-CKAN-API-KEY, Authorization, Content-Type" }]
+                      }
+                  };
+                  callback(null, redirect);
+              } else if (request.headers.host[0].value.startsWith('www.') && request.method !== 'POST') {
+                  let alternativeHostname = request.headers.host[0].value.substring(4);
+                  let redirect = {
+                      status: '301',
+                      statusDescription: `Redirecting to apex domain`,
+                      headers: {
+                          location: [{ key: 'Location', value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}` }],
+                          "access-control-allow-origin": [{ key: "Access-Control-Allow-Origin", value: "*" }],
+                          "access-control-allow-methods": [{ key: "Access-Control-Allow-Methods", value: "POST, PUT, GET, DELETE, OPTIONS" }],
+                          "access-control-allow-headers": [{ key: "Access-Control-Allow-Headers", value: "X-CKAN-API-KEY, Authorization, Content-Type" }]
+                      }
+                  };
+                  callback(null, redirect);
+              } else {
+                  callback(null, request);
+              }
+          };
+      Role: !GetAtt LambdaEdgeFunctionRole.Arn
+      Runtime: nodejs8.10
+      Handler: index.handler
+      Timeout: 5
+
   VersionedLambdaFunction: #change name if changing lambda code and update cloudfront link
     Type: 'AWS::Lambda::Version'
     Properties:
       FunctionName: !Ref LambdaEdgeFunction
+
+  VersionedLambdaFunction48e660f: #change name if changing lambda code and update cloudfront link
+    Type: 'AWS::Lambda::Version'
+    Properties:
+      FunctionName: !Ref LambdaEdgeFunction48e660f
 
   LambdaEdgeFunctionRole:
     Type: "AWS::IAM::Role"
@@ -76,3 +132,5 @@ Resources:
 Outputs:
   VersionedLambdaFunction:
     Value: !Ref VersionedLambdaFunction
+  VersionedLambdaFunction2:
+    Value: !Ref VersionedLambdaFunction48e660f
