@@ -78,7 +78,7 @@ Resources:
                       }
                   };
                   callback(null, redirect);
-              } else if (request.headers.host[0].value.startsWith('www.') && request.method !== 'POST') {
+              } else if ((request.headers.host[0].value !== 'www.data.qld.gov.au' && request.headers.host[0].value !== 'www.publications.qld.gov.au' ) &&  request.headers.host[0].value.startsWith('www.') && request.method !== 'POST') {
                   let alternativeHostname = request.headers.host[0].value.substring(4);
                   let redirect = {
                       status: '301',
@@ -110,6 +110,16 @@ Resources:
     Properties:
       FunctionName: !Ref LambdaEdgeFunction48e660f
 
+  VersionedLambdaFunction48e660f2: #change name if changing lambda code and update cloudfront link
+    Type: 'AWS::Lambda::Version'
+    Properties:
+      FunctionName: !Ref LambdaEdgeFunction48e660f
+
+  VersionedLambdaFunction48e660f3: #change name if changing lambda code and update cloudfront link
+    Type: 'AWS::Lambda::Version'
+    Properties:
+      FunctionName: !Ref LambdaEdgeFunction48e660f
+
   LambdaEdgeFunctionRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -134,3 +144,7 @@ Outputs:
     Value: !Ref VersionedLambdaFunction
   VersionedLambdaFunction2:
     Value: !Ref VersionedLambdaFunction48e660f
+  VersionedLambdaFunction48e660f2:
+    Value: !Ref VersionedLambdaFunction48e660f2
+  VersionedLambdaFunction48e660f3:
+    Value: !Ref VersionedLambdaFunction48e660f3
