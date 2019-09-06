@@ -50,7 +50,7 @@ Resources:
       Timeout: 5
 
   #This lambda function reorders querystring alphabetically for improved caching and remove www from host name if set
-  LambdaEdgeFunction2: #change name if changing lambda code and update VersionedLambdaFunction link
+  LambdaEdgeFunction48e660f: #change name if changing lambda code and update VersionedLambdaFunction link
     Type: 'AWS::Lambda::Function'
     Properties:
       Code: #see files/cloudfrontLambda.js for human readable code (remove comments when updating inline js
@@ -105,10 +105,10 @@ Resources:
     Properties:
       FunctionName: !Ref LambdaEdgeFunction
 
-  VersionedLambdaFunction2: #change name if changing lambda code and update cloudfront link
+  VersionedLambdaFunction48e660f: #change name if changing lambda code and update cloudfront link
     Type: 'AWS::Lambda::Version'
     Properties:
-      FunctionName: !Ref LambdaEdgeFunction2
+      FunctionName: !Ref LambdaEdgeFunction48e660f
 
   LambdaEdgeFunctionRole:
     Type: "AWS::IAM::Role"
@@ -133,4 +133,4 @@ Outputs:
   VersionedLambdaFunction:
     Value: !Ref VersionedLambdaFunction
   VersionedLambdaFunction2:
-    Value: !Ref VersionedLambdaFunction2
+    Value: !Ref VersionedLambdaFunction48e660f
