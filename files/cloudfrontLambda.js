@@ -7,6 +7,31 @@ without removing capital case
 
 const querystring = require('querystring');
 
+exports.redirectGen = (alternativeHostname, request ) => {
+    return {
+        status: '301',
+        statusDescription: `Redirecting to apex domain`,
+        headers: {
+            location: [{
+                key: 'Location',
+                value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}`
+            }],
+            "access-control-allow-origin": [{
+                key: "Access-Control-Allow-Origin",
+                value: "*"
+            }],
+            "access-control-allow-methods": [{
+                key: "Access-Control-Allow-Methods'",
+                value: "POST, PUT, GET, DELETE, OPTIONS"
+            }],
+            "access-control-allow-headers": [{
+                key: "Access-Control-Allow-Headers",
+                value: "X-CKAN-API-KEY, Authorization, Content-Type"
+            }]
+        }
+    };
+};
+
 exports.handler = (event, context, callback) => {
     const request = event.Records[0].cf.request;
     /* When you configure a distribution to forward query strings to the origin and
@@ -45,6 +70,44 @@ exports.handler = (event, context, callback) => {
                 location: [{
                     key: 'Location',
                     value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}`
+                }],
+                "access-control-allow-origin": [{
+                    key: "Access-Control-Allow-Origin",
+                    value: "*"
+                }],
+                "access-control-allow-methods": [{
+                    key: "Access-Control-Allow-Methods'",
+                    value: "POST, PUT, GET, DELETE, OPTIONS"
+                }],
+                "access-control-allow-headers": [{
+                    key: "Access-Control-Allow-Headers",
+                    value: "X-CKAN-API-KEY, Authorization, Content-Type"
+                }]
+            }
+        };
+        //302 redirect
+        callback(null, redirect);
+    } else  if (request.headers.host[0].value.startsWith('www.') && request.method !== 'POST') {
+        let alternativeHostname = request.headers.host[0].value.substring(4);
+        let redirect = {
+            status: '301',
+            statusDescription: `Redirecting to apex domain`,
+            headers: {
+                location: [{
+                    key: 'Location',
+                    value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}`
+                }],
+                "access-control-allow-origin": [{
+                    key: "Access-Control-Allow-Origin",
+                    value: "*"
+                }],
+                "access-control-allow-methods": [{
+                    key: "Access-Control-Allow-Methods'",
+                    value: "POST, PUT, GET, DELETE, OPTIONS"
+                }],
+                "access-control-allow-headers": [{
+                    key: "Access-Control-Allow-Headers",
+                    value: "X-CKAN-API-KEY, Authorization, Content-Type"
                 }]
             }
         };
