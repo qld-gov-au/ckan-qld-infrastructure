@@ -23,6 +23,14 @@ Copyright 2016 Datashades
 * AWS RDS for Postgres
 * User selectable instance and data volume sizes
 
+**Cloudfront Lambda @ Edge controles**
+
+For the system to work with updates to the lambda function, you must;
+* first add a new version to cloudfront-lambdaAtEdge.cfn.yml which references the changed lambda function (there is no need for a new lambda function)
+* export the new version from said cloudformation template
+* update the cloudfront.yml ansible script to load the new version property name. 
+* you can delete previous versions after a successful real, do note that cloudfront will hold onto a lambda function and versions until its 'replication' finishes.
+
 **QOL 2019 update**
 
 The Datashades-OpsWorks-EFS-CKAN-Stack template has been split, with RDS and EFS setup moving to separate templates. Also, there is a new VPC template, based on work done in Get Involved. These multiple templates are handled by 'build.sh', which runs them via Ansible playbooks.

@@ -11,7 +11,7 @@ Parameters:
       - PROD
 Resources:
 
-  #This lambda function reorders querystring alphabetically for improved caching and remove www from host name if set
+  #delete me after publications release
   LambdaEdgeFunction: #change name if changing lambda code and update VersionedLambdaFunction link
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -50,7 +50,7 @@ Resources:
       Timeout: 5
 
   #This lambda function reorders querystring alphabetically for improved caching and remove www from host name if set
-  LambdaEdgeFunction48e660f: #change name if changing lambda code and update VersionedLambdaFunction link
+  LambdaEdgeFunction48e660f:
     Type: 'AWS::Lambda::Function'
     Properties:
       Code: #see files/cloudfrontLambda.js for human readable code (remove comments when updating inline js
@@ -78,7 +78,7 @@ Resources:
                       }
                   };
                   callback(null, redirect);
-              } else if (request.headers.host[0].value.startsWith('www.') && request.method !== 'POST') {
+              } else if ((request.headers.host[0].value !== 'www.data.qld.gov.au' && request.headers.host[0].value !== 'www.publications.qld.gov.au' ) &&  request.headers.host[0].value.startsWith('www.') && request.method !== 'POST') {
                   let alternativeHostname = request.headers.host[0].value.substring(4);
                   let redirect = {
                       status: '301',
@@ -100,12 +100,27 @@ Resources:
       Handler: index.handler
       Timeout: 5
 
+  #delete me once publications is released to prod
   VersionedLambdaFunction: #change name if changing lambda code and update cloudfront link
     Type: 'AWS::Lambda::Version'
     Properties:
       FunctionName: !Ref LambdaEdgeFunction
 
+  #Versions need to be generated uniquely and is connected to the same lambda function, each time a version is added,
+  # it will gen a point in time 'version' of the lambda function, this is what is used in cloudfront lambda@edge
   VersionedLambdaFunction48e660f: #change name if changing lambda code and update cloudfront link
+    Type: 'AWS::Lambda::Version'
+    Properties:
+      FunctionName: !Ref LambdaEdgeFunction48e660f
+
+  #should not be in use, but leave until we are all on v3 of lambda 48e660f3
+  VersionedLambdaFunction48e660f2: #change name if changing lambda code and update cloudfront link
+    Type: 'AWS::Lambda::Version'
+    Properties:
+      FunctionName: !Ref LambdaEdgeFunction48e660f
+
+  #current version as of 6/9/2019
+  VersionedLambdaFunction48e660f3: #change name if changing lambda code and update cloudfront link
     Type: 'AWS::Lambda::Version'
     Properties:
       FunctionName: !Ref LambdaEdgeFunction48e660f
@@ -130,7 +145,16 @@ Resources:
                 - "edgelambda.amazonaws.com"
 
 Outputs:
+  #delete me once publications is released to prod
   VersionedLambdaFunction:
     Value: !Ref VersionedLambdaFunction
+  #should not be in use, but leave until we are all on v3 of lambda 48e660f3
   VersionedLambdaFunction2:
     Value: !Ref VersionedLambdaFunction48e660f
+  #should not be in use, but leave until we are all on v3 of lambda 48e660f3
+  VersionedLambdaFunction48e660f2:
+    Value: !Ref VersionedLambdaFunction48e660f2
+  #current version as of 6/9/2019
+  VersionedLambdaFunction48e660f3:
+    Value: !Ref VersionedLambdaFunction48e660f3
+  #don't forget add the new version to output the value for cross region referencing. Note cfn import's don't work cross region so we can't lock it sadly
