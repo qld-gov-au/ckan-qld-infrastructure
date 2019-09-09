@@ -45,4 +45,3 @@
     - include_vars: vars/cloudfront.var.yml
   roles:
     - ansible_cloudformation
-
