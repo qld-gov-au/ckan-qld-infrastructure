@@ -20,7 +20,7 @@ basic_facts:
     CKANThemeSource: "{{ legacy_theme }}"
     CKANSource: "{{ ckan_2_7 }}"
     CookbookRevision: "2.1.2-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
-    QgovExtensionRevision: "2.0.3" #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    QgovExtensionRevision: "2.0.4" #https://github.com/qld-gov-au/ckan-ex-qgov.git
 
 
   - Environment: STAGING
@@ -32,7 +32,7 @@ basic_facts:
     CKANThemeSource: "{{ legacy_theme }}"
     CKANSource: "{{ ckan_2_7 }}"
     CookbookRevision: "2.1.2-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
-    QgovExtensionRevision: "2.0.3" #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    QgovExtensionRevision: "2.0.4" #https://github.com/qld-gov-au/ckan-ex-qgov.git
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
