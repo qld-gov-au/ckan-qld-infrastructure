@@ -1,0 +1,22 @@
+---
+common_stack:
+  state: "{{ state | default('present')}}"
+  disable_rollback: true
+  template: "templates/acm.cfn.yml"
+  template_parameters:
+    Service: "{{ service_name }}"
+    RootDomain: "{{ RootDomain }}"
+    Environment: "{{ Environment }}"
+  tags:
+    Environment: "{{ Environment }}"
+    Service: "{{ service_name }}"
+    Division: "{{ Division }}"
+    Owner: "{{ Owner }}"
+    Version: "1.0"
+
+cloudformation_stacks:
+  - name: "{{ service_name }}-{{ Environment }}-acm"
+    region: "us-east-1"
+  - name: "{{ service_name }}-{{ Environment }}-acm"
+    region: "{{ region }}"
+

@@ -1,0 +1,51 @@
+---
+- name: Configure RDS Database Playbook
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/database.var.yml
+  pre_tasks:
+
+    - name: Identify database (RDS) cloudformation stack
+      set_fact:
+        Stack_Name: "{{ item.name }}"
+        state: "{{ item.state | default(common_stack.state) }}"
+        template_parameters: "{{ common_stack.template_parameters | combine(item.template_parameters) }}"
+      when: item.template_parameters.Environment == Environment
+      with_items: "{{ cloudformation_stacks }}"
+
+    - name: Describe database (RDS) cloudformation stack
+      cloudformation_facts:
+        region: "{{ region }}"
+        stack_name: "{{ Stack_Name }}"
+        stack_resources: true
+      register: database
+
+    - name: Set parameter store keys for lookup
+      set_fact:
+        MasterUserKey: "/config/CKAN/{{ Environment }}/db/master_user"
+        MasterPassKey: "/config/CKAN/{{ Environment }}/db/master_password"
+        UserKey: "/config/CKAN/{{ Environment }}/db/{{ service_name_lower }}_user"
+        PassKey: "/config/CKAN/{{ Environment }}/db/{{ service_name_lower }}_password"
+
+    - name: Set variable (facts) dependencies
+      set_fact:
+        DBEndpoint: "{{ database.ansible_facts.cloudformation[Stack_Name].stack_outputs.DBEndpoint }}"
+        DBMasterPass: "{{ lookup('aws_ssm', MasterPassKey, region=region) }}"
+        DBMasterUser: "{{ lookup('aws_ssm', MasterUserKey, region=region) }}"
+        DBName: "{{ service_name }}"
+        DBPass: "{{ lookup('aws_ssm', PassKey, region=region) }}"
+        DBPort: "{{ database.ansible_facts.cloudformation[Stack_Name].stack_outputs.DBPort }}"
+        DBUser: "{{ lookup('aws_ssm', UserKey, region=region) }}"
+
+  roles:
+    - ansible-linux-postgres
+
+  tasks:
+    - name: Prepare DataStore permissions script
+      template:
+        src: datastore-set-permissions.sql.j2
+        dest: templates/datastore-set-permissions.sql
+
+    - name: Set DataStore permissions
+      shell: "psql 'postgresql://{{ DBMasterUser }}:{{ DBMasterPass }}@{{ DBEndpoint }}:{{ DBPort }}/{{ DBName }}_datastore' -f templates/datastore-set-permissions.sql"

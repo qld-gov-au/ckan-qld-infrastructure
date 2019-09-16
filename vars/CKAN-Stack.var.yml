@@ -1,0 +1,83 @@
+---
+NonProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdNonProduction', region=region) }}"
+ProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdProduction', region=region) }}"
+NonProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdNonProduction', region=region) }}"
+ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', region=region) }}"
+
+common_stack:
+  state: "{{ state | default('present')}}"
+  region: "{{ region }}"
+  disable_rollback: true
+  template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
+  template_parameters:
+    ApplicationName: "{{ service_name }}"
+    ApplicationId: "{{ service_name | lower }}"
+    ApplicationTitle: "{{ title }}"
+    CKANSource: "{{ CKANSource }}"
+    PublicStackZoneTLD: "{{ PublicStackZoneTLD }}"
+    PublicTLD: "{{ public_tld }}"
+    EmailDomain: "{{ RootDomain }}"
+    SiteDomain: "{{ SiteDomain }}"
+    RootDomain: "{{ RootDomain }}"
+    ACMCertificateARN: "{{ ACMCertificateARNForDefaultRegion }}"
+    CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
+    StackVPC: "CKANVpc-{{ Environment }}"
+    InternalStackZoneTLD: "{{ Environment }}CKANPrivateTLD"
+    InternalStackZone: "{{ Environment }}CKANPrivateHostedZone"
+    CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/admin_email', region=region) }}"
+    CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/admin_password', region=region) }}"
+    PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + service_name_lower + '_user', region=region) }}"
+    PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + service_name_lower + '_password', region=region) }}"
+    BeakerSecret: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/beaker_secret', region=region) }}"
+    WebSubnets: "{{ Environment }}CKANWebSubnet"
+    AppSubnets: "{{ Environment }}CKANAppSubnet"
+    AdminSG: "{{ Environment }}CKANManagementSG"
+    AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
+    CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+    AppSG: "{{ Environment }}CKANAppAsgSG"
+    DatabaseSG: "{{ Environment }}CKANDatabaseSG"
+    CreateServiceRole: "yes"
+    EnableDataStore: "{{ enable_datastore | default('no') }}"
+    SSMKey: "{{ SSMKey | default('') }}"
+    DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
+    CookbookRevision: "{{ CookbookRevision }}"
+    LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
+  tags:
+    Environment: "{{ Environment }}"
+    Service: "{{ service_name }}"
+    Division: "{{ Division }}"
+    Owner: "{{ Owner }}"
+    Version: "1.0"
+
+cloudformation_stacks:
+  - name: "{{ service_name }}-PROD-OpsWorks-stack"
+    template_parameters:
+      Environment: PROD
+      GTMContainerId: "{{ ProductionGTMId }}"
+      AnalyticsId: "{{ ProductionAnalyticsId }}"
+    tags:
+      PowerManaged: "No"
+
+  - name: "{{ service_name }}-STAGING-OpsWorks-stack"
+    template_parameters:
+      Environment: STAGING
+      GTMContainerId: "{{ NonProductionGTMId }}"
+      AnalyticsId: "{{ NonProductionAnalyticsId }}"
+    tags:
+      PowerManaged: "No"
+
+  - name: "{{ service_name }}-TRAINING-OpsWorks-stack"
+    template_parameters:
+      Environment: TRAINING
+      GTMContainerId: "{{ NonProductionGTMId }}"
+      AnalyticsId: "{{ NonProductionAnalyticsId }}"
+    tags:
+      PowerManaged: "Yes"
+
+  - name: "{{ service_name }}-DEV-OpsWorks-stack"
+    template_parameters:
+      Environment: DEV
+      GTMContainerId: "{{ NonProductionGTMId }}"
+      AnalyticsId: "{{ NonProductionAnalyticsId }}"
+    tags:
+      PowerManaged: "Yes"

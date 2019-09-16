@@ -1,0 +1,176 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Creates instances for OpsWorks CKAN NFS Stack.'
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: OpsWorks Stack Details
+        Parameters:
+          - Environment
+          - OpsWorksStackID
+          - SolrLayerID
+          - WebLayerID
+
+      - Label:
+          default: Stack Instance Details
+        Parameters:
+          - ServicesEC2Size
+          - WebEC2Size
+          - WebEC2Count
+          - AppSubnets
+
+    ParameterLabels:
+      Environment:
+        default: What version is this OpsWorks stack (eg STAGING)?
+      ServicesEC2Size:
+        default: What instance size do you want to use for Service Instances?
+      WebEC2Size:
+        default: What instance size do you want to use for Web Instances?
+      WebEC2Count:
+        default: How many web instances do you want?
+      OpsWorksStackID:
+        default: What OpsWorks stack do you want to provision instances into?
+      DataPusherLayerID:
+        default: What is the DataPusher Layer ID of the stack?
+      SolrLayerID:
+        default: What is the Solr Layer ID of the stack?
+      WebLayerID:
+        default: What is the Web Layer ID of the stack?
+      AppSubnets:
+        default: What base name are the application layer subnet IDs exported under?
+
+Parameters:
+  Environment:
+    Description: Select a stack version.
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  ServicesEC2Size:
+    Description: Select EC2 Instance Size.
+    Type: String
+    Default: t3.small
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - m3.medium
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m4.10xlarge
+      - m5.12xlarge
+  WebEC2Size:
+    Description: Select EC2 Instance Size.
+    Type: String
+    Default: t3.medium
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - m3.medium
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m4.10xlarge
+      - m5.12xlarge
+  EnableDataStore:
+    Description: Whether or not to support the DataStore.
+    Type: String
+    Default: "yes"
+    AllowedValues:
+      - "yes"
+      - "no"
+  WebEC2Count:
+    Description: The number of EC2 instances to create in the web layer.
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 2
+  OpsWorksStackID:
+    Description: The exported name of the OpsWorks Stack ID.
+    Type: String
+  DataPusherLayerID:
+    Description: The exported name of the OpsWorks DataPusher Stack Layer ID.
+    Type: String
+  SolrLayerID:
+    Description: The exported name of the OpsWorks Solr Stack Layer ID.
+    Type: String
+  WebLayerID:
+    Description: The exported name of the OpsWorks Web Stack Layer ID.
+    Type: String
+  AppSubnets:
+    Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'. Only needed for HA configurations.
+    Type: String
+    Default: none
+
+Conditions:
+  2PlusWebInstances:
+    Fn::Equals:
+      - 2
+      - !Ref WebEC2Count
+  ProvisionDataPusher:
+    Fn::Equals:
+      - "yes"
+      - !Ref EnableDataStore
+
+Resources:
+  OpswxEC2Services1:
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref ServicesEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref SolrLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+
+  OpswxEC2Services2:
+    Condition: ProvisionDataPusher
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref ServicesEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref DataPusherLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+
+  OpswxEC2Web1:
+    Type: AWS::OpsWorks::Instance
+    DependsOn:
+      - OpswxEC2Services1
+    Properties:
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref WebEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref WebLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+
+  OpswxEC2Web2:
+    Condition: 2PlusWebInstances
+    Type: AWS::OpsWorks::Instance
+    DependsOn:
+      - OpswxEC2Web1 # if we try to start both at once, OpsWorks can get confused and give them the same name, which breaks things
+    Properties:
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref WebEC2Size
+      SubnetId:
+        Fn::ImportValue: !Sub "${AppSubnets}C"
+      LayerIds:
+        - Fn::ImportValue: !Ref WebLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID

@@ -1,0 +1,14 @@
+---
+cloudformation_stacks:
+  - name: "CKAN-CLOUDFRONT-LOGGING-BUCKET"
+    state: present
+    region: "{{ region }}"
+    disable_rollback: 'true'
+    template: "templates/cloudfront-logging-bucket.cfn.yml"
+    template_parameters:
+      LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
+    tags:
+      Service: "CKAN"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"

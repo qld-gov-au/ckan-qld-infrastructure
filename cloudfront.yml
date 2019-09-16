@@ -1,0 +1,47 @@
+---
+
+# This playbook is run after CKAN-Stack & WAF cloudformation stacks.
+- name: Cloudformation Playbook
+  hosts: local
+  connection: local
+
+  pre_tasks:
+    - name: get basic_facts
+      set_fact:
+        basic_fact={{ item }}
+#        ACMCertificateARN={{ item.ACMCertificateARN }}
+#        Domain={{ item.Domain }}
+#        CmsOrigin={{ item.CmsOrigin }}
+      when: item.Environment == Environment
+      with_items: "{{ basic_facts }}"
+
+    - name: set facts to environment from basic_fact
+      set_fact: "{{ item.key }}={{ item.value }}"
+      with_dict: "{{ basic_fact }}"
+      when: basic_fact is defined
+
+    - set_fact:
+        lambdaAtEdgestack_name: "{{ service_name }}-{{ Environment }}-CLOUDFRONT-LAMBDA-AT-EDGE"
+        acm_stack_name: "{{ service_name }}-{{ Environment }}-acm"
+
+    - name: Describe Lambda@Edge cloudformation stack in us-east-1
+      cloudformation_facts:
+        region: "us-east-1"
+        stack_name: "{{ lambdaAtEdgestack_name }}"
+        stack_resources: true
+      register: lambdaAtEdgeStack
+
+    - name: Describe acm cert cloudformation stack in us-east-1
+      cloudformation_facts:
+        region: "us-east-1"
+        stack_name: "{{ acm_stack_name }}"
+        stack_resources: true
+      register: acmUsEast1
+
+    - set_fact:
+        LambdaAtEdgeOriginRequestVersion: "{{ lambdaAtEdgeStack.ansible_facts.cloudformation[lambdaAtEdgestack_name].stack_outputs.VersionedLambdaFunction48e660f3 }}"
+        ACMCertificateARNForUsEast1: "{{ acmUsEast1.ansible_facts.cloudformation[acm_stack_name].stack_outputs.AcmCert }}"
+
+    - include_vars: vars/cloudfront.var.yml
+  roles:
+    - ansible_cloudformation

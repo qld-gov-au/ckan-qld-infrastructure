@@ -1,0 +1,8 @@
+---
+- name: Cloudformation Playbook
+  hosts: local
+  connection: local
+  vars_files:
+    - vars/cloudfront-logging-bucket.var.yml
+  roles:
+    - ansible_cloudformation

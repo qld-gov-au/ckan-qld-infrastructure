@@ -1,0 +1,159 @@
+Description: Cloudfront Distribution for fronting an application.
+Parameters:
+  ACMCertificateARN:
+    Description: ARN for certificate to be used by CloudFront
+    Type: String
+  Domain:
+    Description: Domain pointing to EC2 load balancer
+    Type: CommaDelimitedList
+  WebOrigin:
+    Description: Platform ELB
+    Type: String
+  CmsOrigin:
+    Description: CMS cname
+    Type: String
+  Environment:
+    Description: Platform environment
+    Type: String
+  Platform:
+    Description: Name of the platform ie GI, Services, Static,etc
+    Type: String
+  LogBucketName:
+    Description: Name of the S3 logging bucket.
+    Type: String
+  WebACLId:
+    Description: WAF web ACL Id .
+    Type: String
+  Service:
+    Description: for Tagging Distribution
+    Type: String
+  Division:
+    Description: for Tagging Distribution
+    Type: String
+  Owner:
+    Description: for Tagging Distribution
+    Type: String
+  Version:
+    Description: for Tagging Distribution
+    Type: String
+  LambdaAtEdgeOriginRequestVersion:
+    Description: Lambda at Edge which is located in us-east-1
+    Type: String
+
+Resources:
+  DistributionConfig:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases: !Ref Domain
+        CacheBehaviors:
+          - PathPattern: /assets/*
+            Compress: true
+            ForwardedValues:
+              QueryString: true
+            TargetOriginId: 'WebOrigin'
+            MinTTL: 1800
+            ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+          - PathPattern: /dataset/*/resource/*/download/*
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+            TargetOriginId: 'WebOrigin'
+            MinTTL: 120
+            ViewerProtocolPolicy: allow-all
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+        DefaultCacheBehavior:
+          LambdaFunctionAssociations:
+            - EventType: 'viewer-request'
+              LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+          AllowedMethods:
+            - GET
+            - HEAD
+            - POST
+            - DELETE
+            - OPTIONS
+            - PUT
+            - PATCH
+          Compress: true
+          ForwardedValues:
+            Cookies:
+              Forward: all
+            QueryString: 'true'
+            Headers:
+              - "*"
+          TargetOriginId: 'WebOrigin'
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: /
+        Enabled: true
+        Logging:
+          Bucket: !Sub "${LogBucketName}.s3.amazonaws.com"
+          IncludeCookies: true
+          Prefix: !Sub "cloudfront-logs/${Platform}/${Environment}/"
+        Origins:
+          - DomainName:
+              Fn::ImportValue: !Ref WebOrigin
+            Id: 'WebOrigin'
+            CustomOriginConfig:
+              OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
+        PriceClass: PriceClass_All
+        WebACLId:
+          Fn::ImportValue: !Ref WebACLId
+        HttpVersion: 'http2'
+        #IsIPV6Enabled: 'true'
+        ViewerCertificate:
+          AcmCertificateArn:
+            Ref: ACMCertificateARN
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.1_2016
+        Comment:
+          Fn::Sub:
+            - "${Environment}-${Platform} ${Domain}"
+            - Domain:
+                Fn::Select:
+                  - 0
+                  - !Ref Domain
+      Tags:
+        - Key: "Environment"
+          Value:  !Ref Environment
+        - Key: "Service"
+          Value: !Ref Service
+        - Key: "Division"
+          Value: !Ref Division
+        - Key: "Owner"
+          Value: !Ref Owner
+        - Key: "Version"
+          Value: !Ref Version
+
+Outputs:
+  CloudfrontAliasDNSName:
+    Value:
+      Fn::GetAtt:
+      - DistributionConfig
+      - DomainName
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "CloudfrontAliasDNSName"
+
+  CloudfrontAliasHostedZoneID:
+    Value: "Z2FDTNDATAQYW2" # All CloudFront distributions are in this zone, see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "CloudfrontAliasHostedZoneID"
+
+  AwsAccount:
+    Value: !Ref "AWS::AccountId"

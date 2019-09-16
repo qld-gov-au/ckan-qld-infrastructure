@@ -1,0 +1,30 @@
+---
+template: "templates/cloudfront-{{ service_name }}.cfn.yml"
+
+cloudformation_stacks:
+  - name: "{{ service_name }}-{{ Environment }}-CLOUDFRONT"
+    cloudformation_waf: "CKAN-{{ Environment }}-WAF"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: 'true'
+    template: "{{ template }}"
+    template_parameters:
+      WebOrigin: "{{ Environment }}{{ service_name }}WebElbDNSName"
+      CmsOrigin: "{{ CmsOrigin }}"
+      WebACLId: "{{ Environment }}CKANWebACLId"
+      Environment: "{{ Environment }}"
+      Platform: "{{ service_name }}"
+      ACMCertificateARN: "{{ ACMCertificateARNForUsEast1 }}"
+      Domain: "{{ Domain }}"
+      LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
+      Service: "{{ service_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      LambdaAtEdgeOriginRequestVersion: "{{ LambdaAtEdgeOriginRequestVersion }}"
+      Version: "1.0"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ service_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"

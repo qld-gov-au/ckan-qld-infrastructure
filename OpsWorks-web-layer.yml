@@ -1,0 +1,16 @@
+---
+- name: Cloudformation Playbook
+  hosts: local
+  connection: local
+
+  pre_tasks:
+    - name: Get domain and certificate for environment
+      set_fact:
+        ACMCertificateARN={{ item.ACMCertificateARN }}
+        Domain={{ item.Domain }}
+      when: item.Environment == Environment
+      with_items: "{{ basic_facts }}"
+
+    - include_vars: vars/OpsWorks-web-layer.var.yml
+  roles:
+    - ansible_cloudformation

@@ -1,0 +1,17 @@
+---
+cloudformation_stacks:
+  - name: "CKAN-{{ Environment }}-hosted-zone"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "templates/hosted-zone.cfn.yml"
+    template_parameters:
+      Environment: "{{ Environment }}"
+      VPC: "CKANVpc-{{ Environment }}"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "CKAN"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "1.0"
+      PowerManaged: "No"

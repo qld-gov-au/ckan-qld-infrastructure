@@ -1,0 +1,66 @@
+---
+common_stack:
+  state: "{{ state | default('present')}}"
+  region: "{{ region }}"
+  disable_rollback: true
+  template: "templates/database.cfn.yml"
+  template_parameters:
+    DBEngine: postgres
+    DBEngineVersion: 10.9
+    DBName: ckan
+    DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
+    DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
+    DBPrivileges: "ALL"
+    PubliclyAccessible: "false"
+    Platform: CKAN
+    Subnets: "{{ Environment }}CKANDBSubnet"
+    VPC: "CKANVpc-{{ Environment }}"
+    StackTLD: "{{ Environment }}CKANPrivateTLD"
+    StackZone: "{{ Environment }}CKANPrivateHostedZone"
+  tags:
+    Environment: "{{ Environment }}"
+    Service: CKAN
+    Division: "{{ Division }}"
+    Owner: "{{ Owner }}"
+    Version: "1.0"
+
+cloudformation_stacks:
+  - name: CKAN-PROD-RDS
+    template_parameters:
+      DBAllocatedStorage: "600"
+      DBClass: db.m5.large
+      StorageEncrypted: "True"
+      Environment: PROD
+      MultiAZ: "true"
+    tags:
+      PowerManaged: "No"
+
+  - name: CKAN-STAGING-RDS
+    template_parameters:
+      DBAllocatedStorage: '300'
+      DBClass: db.t3.large
+      StorageEncrypted: "True"
+      Environment: STAGING
+      MultiAZ: "true"
+    tags:
+      PowerManaged: "No"
+
+  - name: CKAN-TRAINING-RDS
+    template_parameters:
+      DBAllocatedStorage: "100"
+      DBClass: db.t3.medium
+      StorageEncrypted: "False"
+      Environment: TRAINING
+      MultiAZ: "false"
+    tags:
+      PowerManaged: "Yes"
+
+  - name: CKAN-DEV-RDS
+    template_parameters:
+      DBAllocatedStorage: "200"
+      DBClass: db.t3.medium
+      StorageEncrypted: "False"
+      Environment: DEV
+      MultiAZ: "false"
+    tags:
+      PowerManaged: "Yes"

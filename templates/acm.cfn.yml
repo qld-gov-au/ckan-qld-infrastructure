@@ -1,0 +1,29 @@
+--- #run this in https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks?filter=active
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "ssl certificate"
+Parameters:
+  Environment:
+    Description: Environment
+    Type: String
+  Service:
+    Description: Name of the service ie OpenData
+    Type: String
+  RootDomain:
+    Description: Root Domain of service
+    Type: String
+Resources:
+  acmCert:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      ValidationMethod: "DNS"
+      DomainName: !Sub "${RootDomain}"
+      SubjectAlternativeNames: #used for ssl email ease of use
+        - !Sub "*.${RootDomain}"
+      Tags:
+        - Key: Name
+          Value: !Sub "${Service}-${Environment}"
+Outputs:
+  AcmCert:
+    Value: !Ref acmCert
+    Export:
+      Name: !Sub "${Service}-${Environment}-AcmCert"

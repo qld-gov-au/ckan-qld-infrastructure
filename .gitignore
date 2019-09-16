@@ -1,0 +1,5 @@
+*.pyc
+*.retry
+templates/security_groups.cfn.yml
+templates/*.sql
+.idea
