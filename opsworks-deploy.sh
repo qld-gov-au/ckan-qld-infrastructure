@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ "$#" -lt 2 ]; then
-  echo "Usage: $0 <command eg setup> <stack name eg OpenData_DEV"
+  echo "Usage: $0 <command eg setup> <stack name eg OpenData_DEV> [layer name eg opendata-web] [recipe name eg datashades::ckanweb-deploy]"
   exit 1
 fi
 
