@@ -2,6 +2,8 @@
 
 if [ "$#" -lt 2 ]; then
   echo "Usage: [PARALLEL=true] $0 <command eg setup> <stack name eg OpenData_DEV> [layer name eg opendata-web] [recipe name eg datashades::ckanweb-deploy]"
+  echo "When PARALLEL is true, deployments will run on all servers in the stack/layer simultaneously. This is suitable for low-impact commands like 'update_custom_cookbooks' and 'configure'."
+  echo "When PARALLEL is false or not set, deployments will run on each server sequentially. This is slower, but safer, avoiding race conditions and allowing disruptive commands like 'setup' without downtime."
   exit 1
 fi
 
