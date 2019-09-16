@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ "$#" -lt 2 ]; then
-  echo "Usage: $0 <command eg setup> <stack name eg OpenData_DEV> [layer name eg opendata-web] [recipe name eg datashades::ckanweb-deploy]"
+  echo "Usage: [PARALLEL=true] $0 <command eg setup> <stack name eg OpenData_DEV> [layer name eg opendata-web] [recipe name eg datashades::ckanweb-deploy]"
   exit 1
 fi
 
@@ -48,7 +48,12 @@ wait_for_deployment () {
   fi
 }
 
-if [ "$PARALLEL" = "1" ]; then
+for truthy in "y t T 1"; do
+  if [ "$PARALLEL" = "$truthy" ]; then
+    PARALLEL=true
+  fi
+done
+if [ "$PARALLEL" = "true" ]; then
   DEPLOYMENT_ID=$(aws opsworks create-deployment $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET $COMMAND_SNIPPET --output text)
   wait_for_deployment $DEPLOYMENT_ID || exit 1
 else
