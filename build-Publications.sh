@@ -1,6 +1,10 @@
 #!/bin/bash
 #deploy Publications base infrastructure
 
+INSTANCE_NAME=Publications
+INSTANCE_SHORTNAME=`echo $INSTANCE_NAME |tr '[A-Z]' '[a-z]'`
+STACK_NAME="${INSTANCE_NAME}_$bamboo_deploy_environment"
+
 run-all-playbooks () {
   #ensure we die if any function fails
   set -e
@@ -13,9 +17,10 @@ run-all-playbooks () {
   run-playbook "CloudFormation" "vars/CKAN-instances.var.yml"
   run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
   run-playbook "cloudfront"
-  run-playbook "opsworks-deployment" "Deployment_Type=update_custom_cookbooks"
-  run-playbook "opsworks-deployment" "vars/CKAN-deployment.var.yml"
-  run-playbook "opsworks-deployment" "Deployment_Type=configure"
+  PARALLEL=1 ./opsworks-deploy.sh update_custom_cookbooks $STACK_NAME
+  ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-web
+  ./opsworks-deploy.sh execute_recipes $STACK_NAME ${INSTANCE_SHORTNAME}-solr datashades::solr-deploy
+  PARALLEL=1 ./opsworks-deploy.sh configure $STACK_NAME
 }
 
-. ./build-CKAN.sh vars/shared-Publications.var.yml $bamboo_deploy_environment $@
+. ./build-CKAN.sh vars/shared-$INSTANCE_NAME.var.yml $bamboo_deploy_environment $@
