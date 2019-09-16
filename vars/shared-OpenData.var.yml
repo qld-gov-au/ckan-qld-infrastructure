@@ -20,7 +20,7 @@ basic_facts:
     CKANThemeSource: "none"
     CKANSource: "{{ ckan_2_8 }}"
     CookbookRevision: "2.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
-    QgovExtensionRevision: "2.0.1" #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    QgovExtensionRevision: "2.0.4" #https://github.com/qld-gov-au/ckan-ex-qgov.git
     DCATExtensionRevision: "v0.0.9" #https://github.com/ckan/ckanext-dcat.git
     SchemingExtensionRevision: "release-1.2.0" #https://github.com/ckan/ckanext-scheming.git
     ValidationExtensionRevision: "v0.0.7" #https://github.com/frictionlessdata/ckanext-validation
@@ -39,7 +39,7 @@ basic_facts:
     CKANThemeSource: "none"
     CKANSource: "{{ ckan_2_8 }}"
     CookbookRevision: "2.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
-    QgovExtensionRevision: "2.0.1" #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    QgovExtensionRevision: "2.0.4" #https://github.com/qld-gov-au/ckan-ex-qgov.git
     DCATExtensionRevision: "v0.0.9" #https://github.com/ckan/ckanext-dcat.git
     SchemingExtensionRevision: "release-1.2.0" #https://github.com/ckan/ckanext-scheming.git
     ValidationExtensionRevision: "v0.0.7" #https://github.com/frictionlessdata/ckanext-validation
