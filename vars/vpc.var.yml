@@ -1,7 +1,7 @@
 ---
-opsAccount: "103119354886"
-opsRole: "VPC-Peering"
-opsVpcID: "vpc-d5ba8bb0"
+opsAccount: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcAccount', region=region) }}"
+opsRole: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcRole', region=region) }}"
+opsVpcID:  "{{ lookup('aws_ssm', '/config/CKAN/opsVpcId', region=region) }}"
 
 common_stack:
   # VPC stacks cannot be properly torn down via Ansible
@@ -12,13 +12,13 @@ common_stack:
   template_parameters:
     ApplicationName: "CKAN"
     AZCount: '3'
-    BambooAgentIp: "13.210.53.223/32"
-    BambooAgentIp2: "13.211.7.108/32"
+    BambooAgentIp: "{{ lookup('aws_ssm', '/config/CKAN/cicdIpA', region=region) }}"
+    BambooAgentIp2: "{{ lookup('aws_ssm', '/config/CKAN/cicdIpB', region=region) }}"
     NatGateways: 'true'
     VPCNamePrefix: CKAN
     VPCPeeringEnabled: "{{ VPCPeeringEnabled | default('false') }} "
     VPCPeeringID: "{{ VPCPeeringID| default('') }}"
-    VPCPeeringCidr: "10.10.0.0/16"
+    VPCPeeringCidr: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcCidr', region=region) }}"
   tags:
     Environment: "{{ Environment }}"
     Service: "CKAN"

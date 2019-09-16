@@ -11,6 +11,9 @@ Parameters:
   BambooAgentSecurityGroup:
     Description: Security group containing bamboo agents.
     Type: String
+  VPCPeeringCidr:
+    Description: CIDR for VPC Peering network
+    Type: String
   VPC:
     Type: String
     Description: Name of the VPC
@@ -94,36 +97,18 @@ Resources:
       VpcId:
         Fn::ImportValue: !Ref VPC
       SecurityGroupIngress:
-      # Itoc OpenVPN server in osssio ops
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 54.153.232.134/32
-      # AnsibleRundeck Server (osssio-ops)
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 52.64.173.92/32
-      # BastionOpenVpn Server primary (osssio-ops)
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 52.65.228.39/32
-      # Local Bamboo Agent
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: !Ref BambooAgentIp
-      # Local Bamboo Agent 2
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: !Ref BambooAgentIp2
-      # OSSSIO OPS Range
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 8443
-        CidrIp: 10.10.0.0/16
+        CidrIp: !Ref VPCPeeringCidr
 
   AppLoadBalancer:
     Type: AWS::EC2::SecurityGroup

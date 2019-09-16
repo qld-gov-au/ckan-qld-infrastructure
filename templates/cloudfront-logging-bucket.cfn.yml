@@ -3,7 +3,6 @@ Parameters:
   LogBucketName:
     Description: Name of the S3 logging bucket.
     Type: String
-    Default: osssio-ckan-web-logs
 
 Resources:
   OriginAccessIdentity:

@@ -186,8 +186,8 @@ Parameters:
   AnalyticsId:
     Description: Google Analytics container ID
     Type: String
-  IntermediateTLD: #delete me once cloudfront has unlocked export
-    Description: Route53 hosted TLD for support access (public but not advertised)
+  LogBucketName:
+    Description: Name of the S3 logging bucket.
     Type: String
 
 Conditions:
@@ -372,6 +372,7 @@ Resources:
           public_tld: !Ref PublicTLD
           version: !Ref Environment
           app_id: !Ref ApplicationId
+          log_bucket: !Ref LogBucketName
       DefaultInstanceProfileArn:
         Fn::GetAtt:
           - InstanceRoleProfile
@@ -570,23 +571,6 @@ Resources:
             - CKANELB
             - DNSName
 
-  #Delete me/cleanup once cloudfront has unlocked me
-  WebELBCNAME:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      Type: A
-      Name: !Sub "${ApplicationId}.${IntermediateTLD}"
-      HostedZoneName: !Sub "${IntermediateTLD}."
-      AliasTarget:
-        HostedZoneId:
-          Fn::GetAtt:
-            - CKANELB
-            - CanonicalHostedZoneNameID
-        DNSName:
-          Fn::GetAtt:
-            - CKANELB
-            - DNSName
-
 Outputs:
   StackID:
     Value: !Ref OpsWorksStack
@@ -623,12 +607,6 @@ Outputs:
     Description: SolrCloud Application Id
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrApplication"
-
-  #Delete me/cleanup once cloudfront has unlocked me
-  WebELBDomainName:
-    Value: !Ref WebELBCNAME
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}WebElbNiceDNSName"
 
   WebELBDNSName:
     Value: !Ref WebELBDNSName
