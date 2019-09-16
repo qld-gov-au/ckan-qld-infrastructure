@@ -33,7 +33,7 @@ RUN fix-permissions /app/ckan \
 
 # Add current extension and files.
 #COPY ckanext /app/ckanext #this is all in one project pulling in all requirments dev files, there is no ckanext in this project
-COPY requirements.txt requirements-dev.txt setup.cfg setup.py /app/
+COPY requirements.txt requirements-dev.txt /app/
 
 # Init current extension.
 RUN /app/scripts/init-ext.sh
