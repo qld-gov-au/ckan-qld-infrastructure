@@ -120,3 +120,6 @@ Our hope and expectation is that it benefits the wider Public Data community and
 
 Current AWS costs for 2 CKAN applications by 4 envirionments is just shy of 3k USD a month. 
 
+## TODO ##
+Make requirements-dev look up vars/shared-${app}.var.yml and test all environment plugins
+Make cicd pipe line do publications and data testing
