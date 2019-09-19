@@ -6,9 +6,10 @@ cloudformation_stacks:
     disable_rollback: true
     template: "templates/security_groups.cfn.yml"
     template_parameters:
-      BambooAgentIp: "13.210.53.223/32" #Green
-      BambooAgentIp2: "13.211.7.108/32" #Blue
-      BambooAgentSecurityGroup: sg-0d7f802e57ee52ab6
+      BambooAgentIp: "{{ lookup('aws_ssm', '/config/CKAN/cicdIpA', region=region) }}"
+      BambooAgentIp2: "{{ lookup('aws_ssm', '/config/CKAN/cicdIpB', region=region) }}"
+      BambooAgentSecurityGroup: "{{ lookup('aws_ssm', '/config/CKAN/cicdSecurityGroup', region=region) }}"
+      VPCPeeringCidr: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcCidr', region=region) }}"
       Environment: "{{ Environment }}"
       Platform: CKAN
       VPC: "CKANVpc-{{ Environment }}"

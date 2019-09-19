@@ -1,8 +1,8 @@
 ---
-NonProductionGTMId: "GTM-NBSWN3"
-ProductionGTMId: "GTM-PJBVFG"
-NonProductionAnalyticsId: "UA-7276966-12"
-ProductionAnalyticsId: "UA-7276966-13"
+NonProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdNonProduction', region=region) }}"
+ProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdProduction', region=region) }}"
+NonProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdNonProduction', region=region) }}"
+ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', region=region) }}"
 
 common_stack:
   state: "{{ state | default('present')}}"
@@ -39,8 +39,9 @@ common_stack:
     CreateServiceRole: "yes"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     SSMKey: "{{ SSMKey | default('') }}"
-    DefaultEC2Key: osssio-global-ckan
+    DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
     CookbookRevision: "{{ CookbookRevision }}"
+    LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
   tags:
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
@@ -54,7 +55,6 @@ cloudformation_stacks:
       Environment: PROD
       GTMContainerId: "{{ ProductionGTMId }}"
       AnalyticsId: "{{ ProductionAnalyticsId }}"
-      IntermediateTLD: ckan.services.qld.gov.au #delete me once cloudfront has unlocked export name
     tags:
       PowerManaged: "No"
 
@@ -63,7 +63,6 @@ cloudformation_stacks:
       Environment: STAGING
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
-      IntermediateTLD: ckan.staging-services.qld.gov.au
     tags:
       PowerManaged: "No"
 
@@ -72,7 +71,6 @@ cloudformation_stacks:
       Environment: TRAINING
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
-      IntermediateTLD: training.ckan.devpit140cs.qgov.net.au
     tags:
       PowerManaged: "Yes"
 
@@ -81,6 +79,5 @@ cloudformation_stacks:
       Environment: DEV
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
-      IntermediateTLD: dev.ckan.devpit140cs.qgov.net.au
     tags:
       PowerManaged: "Yes"
