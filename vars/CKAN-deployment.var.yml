@@ -1,0 +1,3 @@
+---
+Layer_Name: "{{ service_name | lower }}-web"
+App_Name: "{{ service_name | lower }}-{{ Environment }}"
