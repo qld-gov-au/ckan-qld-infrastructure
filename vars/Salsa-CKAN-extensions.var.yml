@@ -7,14 +7,6 @@ common_stack: &common_stack
   template: "templates/Salsa-CKAN-Extensions.cfn.yml"
   template_parameters: &common_stack_template_parameters
     OpsWorksStack: "{{ Environment }}{{ service_name }}OpsWorksStack"
-    DCATExtensionRevision: "{{ DCATExtensionRevision }}"
-    SchemingExtensionRevision: "{{ SchemingExtensionRevision }}"
-    ValidationExtensionRevision: "{{ ValidationExtensionRevision }}"
-    DataQldExtensionRevision: "{{ DataQldExtensionRevision }}"
-    DataQldThemeExtensionRevision: "{{ DataQldThemeExtensionRevision }}"
-    ODIExtensionRevision: "{{ ODIExtensionRevision }}"
-    DataRequestsExtensionRevision: "{{ DataRequestsExtensionRevision }}"
-    YTPExtensionRevision: "{{ YTPExtensionRevision }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"

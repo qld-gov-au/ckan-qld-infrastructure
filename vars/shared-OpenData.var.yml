@@ -76,6 +76,7 @@ extensions:
       description: "CKAN Extension for YTP Comments"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
       version: "2.0.1-qgov"
+
   PROD:
     <<: *default_extensions
 
