@@ -1,10 +1,10 @@
 ---
-common_stack:
+common_stack: &common_stack
   state: "{{ state | default('present')}}"
   region: "{{ region }}"
   disable_rollback: true
   template: "templates/database.cfn.yml"
-  template_parameters:
+  template_parameters: &common_stack_template_parameters
     DBEngine: postgres
     DBEngineVersion: 10.9
     DBName: ckan
@@ -17,7 +17,7 @@ common_stack:
     VPC: "CKANVpc-{{ Environment }}"
     StackTLD: "{{ Environment }}CKANPrivateTLD"
     StackZone: "{{ Environment }}CKANPrivateHostedZone"
-  tags:
+  tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: CKAN
     Division: "{{ Division }}"
@@ -25,42 +25,54 @@ common_stack:
     Version: "1.0"
 
 cloudformation_stacks:
-  - name: CKAN-PROD-RDS
+  - <<: *common_stack
+    name: CKAN-PROD-RDS
     template_parameters:
+      <<: *common_stack_template_parameters
       DBAllocatedStorage: "600"
       DBClass: db.m5.large
       StorageEncrypted: "True"
       Environment: PROD
       MultiAZ: "true"
     tags:
+      <<: *common_stack_tags
       PowerManaged: "No"
 
-  - name: CKAN-STAGING-RDS
+  - <<: *common_stack
+    name: CKAN-STAGING-RDS
     template_parameters:
+      <<: *common_stack_template_parameters
       DBAllocatedStorage: '300'
       DBClass: db.t3.large
       StorageEncrypted: "True"
       Environment: STAGING
       MultiAZ: "true"
     tags:
+      <<: *common_stack_tags
       PowerManaged: "No"
 
-  - name: CKAN-TRAINING-RDS
+  - <<: *common_stack
+    name: CKAN-TRAINING-RDS
     template_parameters:
+      <<: *common_stack_template_parameters
       DBAllocatedStorage: "100"
       DBClass: db.t3.medium
       StorageEncrypted: "False"
       Environment: TRAINING
       MultiAZ: "false"
     tags:
+      <<: *common_stack_tags
       PowerManaged: "Yes"
 
-  - name: CKAN-DEV-RDS
+  - <<: *common_stack
+    name: CKAN-DEV-RDS
     template_parameters:
+      <<: *common_stack_template_parameters
       DBAllocatedStorage: "200"
       DBClass: db.t3.medium
       StorageEncrypted: "False"
       Environment: DEV
       MultiAZ: "false"
     tags:
+      <<: *common_stack_tags
       PowerManaged: "Yes"

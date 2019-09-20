@@ -1,5 +1,10 @@
 ---
 
 common_stack:
+  state: "{{ state | default('present')}}"
+  region: "{{ region | default('ap-southeast-2')}}"
+  disable_rollback: true
+  template_jinja: {}
+  template: {}
   template_parameters: {}
   tags: {}
