@@ -32,6 +32,7 @@ extensions:
       name: "ckanext-scheming-{{ Environment }}"
       shortname: "ckanext-scheming"
       description: "CKAN Extension for Scheming"
+      type: "git"
       url: "https://github.com/ckan/ckanext-scheming.git"
       version: "release-1.2.0"
 
@@ -39,6 +40,7 @@ extensions:
       name: "ckanext-validation-{{ Environment }}"
       shortname: "ckanext-validation"
       description: "CKAN Extension for Data Requests"
+      type: "git"
       url: "https://github.com/frictionlessdata/ckanext-validation.git"
       version: "v0.0.7"
 
@@ -46,12 +48,14 @@ extensions:
       name: "ckanext-data-qld-{{ Environment }}"
       shortname: "ckanext-data-qld"
       description: "CKAN Extension for Queensland Government Open Data"
+      type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
       version: "v1.3.0"
 
     CKANExtDataQldTheme: &CKANExtDataQldTheme
       name: "ckanext-data-qld-theme-{{ Environment }}"
       shortname: "ckanext-data-qld-theme"
+      type: "git"
       description: "CKAN Extension for Queensland Government Open Data theme"
       url: "https://github.com/qld-gov-au/ckanext-data-qld-theme.git"
       version: "master"
@@ -60,6 +64,7 @@ extensions:
       name: "ckanext-odi-certificates-{{ Environment }}"
       shortname: "ckanext-odi-certificates"
       description: "CKAN Extension for ODI Certificates"
+      type: "git"
       url: "https://github.com/qld-gov-au/ckanext-odi-certificates.git"
       version: "1.0.1"
 
@@ -67,6 +72,7 @@ extensions:
       name: "ckanext-datarequests-{{ Environment }}"
       shortname: "ckanext-datarequests"
       description: "CKAN Extension for Data Requests"
+      type: "git"
       url: "https://github.com/qld-gov-au/ckanext-datarequests.git"
       version: "2.0.1-qgov"
 
@@ -74,6 +80,7 @@ extensions:
       name: "ckanext-ytp-comments-{{ Environment }}"
       shortname: "ckanext-ytp-comments"
       description: "CKAN Extension for YTP Comments"
+      type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
       version: "2.0.1-qgov"
 
