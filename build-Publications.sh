@@ -9,7 +9,7 @@ run-all-playbooks () {
   run-playbook "CloudFormation" "vars/acm.var.yml"
   run-playbook "database-config"
   run-playbook "CKAN-Stack"
-  run-playbook "CloudFormation" "vars/CKAN-extensions.var.yml"
+  run-playbook "CKAN-extensions" "vars/CKAN-extensions.var.yml"
   run-playbook "CloudFormation" "vars/CKAN-instances.var.yml"
   run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
   run-playbook "cloudfront"

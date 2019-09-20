@@ -10,6 +10,19 @@ legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_na
 ckan_2_7: "https://github.com/ckan/ckan/archive/ckan-2.7.3.zip"
 ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip"
 
+extensions:
+  default:  &default_extensions
+    OpwxAppCKANTheme: &OpwxAppCKANTheme
+      name: "{{ service_name }} {{ Environment }} theme"
+      shortname: "{{ service_name | lower }}-theme-{{ Environment }}"
+      description: "Page templates and public assets for {{ service_name }}-{{ Environment }}"
+      type: "s3"
+      url: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip "
+  DEV:
+    <<: *default_extensions
+
+
+
 basic_facts:
   - Environment: DEV #dev == test 0_0
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -18,7 +31,5 @@ basic_facts:
     CmsOrigin: ""
     SiteDomain: "test.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CKANThemeSource: "{{ legacy_theme }}"
     CKANSource: "{{ ckan_2_8 }}"
     CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
-    QgovExtensionRevision: develop #https://github.com/qld-gov-au/ckan-ex-qgov.git
