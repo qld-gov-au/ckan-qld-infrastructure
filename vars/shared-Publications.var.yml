@@ -77,5 +77,5 @@ basic_facts:
     SiteDomain: "dev.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "dev.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
-    CKANSource: *CKANSource
+    CKANSource: "{{ ckan_2_8 }}"
     CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
