@@ -6,8 +6,8 @@ enable_datastore: "yes"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: data.qld.gov.au
 
-CKANSource: &CKANSource "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip" #ckan_2_8
-CookbookRevision: &CookbookRevision  "2.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
+DefaultCKANSource: &CKANSource "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip" #ckan_2_8
+DefaultCookbookRevision: &CookbookRevision  "2.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
 
 #yaml anchors https://confluence.atlassian.com/bitbucket/yaml-anchors-960154027.html
 extensions:
