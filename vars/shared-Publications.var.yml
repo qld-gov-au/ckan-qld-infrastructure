@@ -40,8 +40,8 @@ extensions:
       revision: "develop"
 
 
-CKANSource: &CKANSource "{{ ckan_2_7 }}"
-CookbookRevision: &CookbookRevision  "2.1.2-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
+DefaultCKANSource: &CKANSource "{{ ckan_2_8 }}"
+DefaultCookbookRevision: &CookbookRevision  "2.1.2-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -51,7 +51,6 @@ basic_facts:
     CmsOrigin: ""
     CKANSource: *CKANSource
     CookbookRevision: *CookbookRevision
-
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -77,5 +76,5 @@ basic_facts:
     SiteDomain: "dev.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "dev.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
-    CKANSource: "{{ ckan_2_8 }}"
+    CKANSource: *CKANSource
     CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
