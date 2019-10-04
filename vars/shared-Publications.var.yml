@@ -10,6 +10,38 @@ legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_na
 ckan_2_7: "https://github.com/ckan/ckan/archive/ckan-2.7.3.zip"
 ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip"
 
+
+extensions:
+  default:  &default_extensions
+    CKANExtQGOV: &CKANExtQGOV
+      name: "ckanext-qgov-{{ Environment }}"
+      shortname: "ckanext-qgov"
+      description: "CKAN Extension for Queensland Government Open Data"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
+      version: "2.0.4"
+
+    OpwxAppCKANTheme: &OpwxAppCKANTheme
+      name: "{{ service_name }} {{ Environment }} theme"
+      shortname: "{{ service_name | lower }}-theme-{{ Environment }}"
+      description: "Page templates and public assets for {{ service_name }}-{{ Environment }}"
+      type: "s3"
+      url: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip "
+  PROD:
+    <<: *default_extensions
+  STAGING:
+    <<: *default_extensions
+  TRAINING:
+    <<: *default_extensions
+  DEV:
+    <<: *default_extensions
+    CKANExtQGOV:
+      <<: *CKANExtQGOV
+      revision: "develop"
+
+
+DefaultCKANSource: &CKANSource "{{ ckan_2_8 }}"
+DefaultCookbookRevision: &CookbookRevision  "2.1.2-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -17,11 +49,8 @@ basic_facts:
     SiteDomain: "www.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
-    CKANThemeSource: "{{ legacy_theme }}"
-    CKANSource: "{{ ckan_2_7 }}"
-    CookbookRevision: "2.1.2-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
-    QgovExtensionRevision: "2.0.4" #https://github.com/qld-gov-au/ckan-ex-qgov.git
-
+    CKANSource: *CKANSource
+    CookbookRevision: *CookbookRevision
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -29,10 +58,8 @@ basic_facts:
     SiteDomain: "staging.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "staging.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
-    CKANThemeSource: "{{ legacy_theme }}"
-    CKANSource: "{{ ckan_2_7 }}"
-    CookbookRevision: "2.1.2-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
-    QgovExtensionRevision: "2.0.4" #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    CKANSource: *CKANSource
+    CookbookRevision: *CookbookRevision
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -40,10 +67,8 @@ basic_facts:
     SiteDomain: "training.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "training.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
-    CKANThemeSource: "{{ legacy_theme }}"
-    CKANSource: "{{ ckan_2_7 }}"
-    CookbookRevision: training  #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/training
-    QgovExtensionRevision: training #https://github.com/qld-gov-au/ckan-ex-qgov.git
+    CKANSource: *CKANSource
+    CookbookRevision: *CookbookRevision
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -51,7 +76,5 @@ basic_facts:
     SiteDomain: "dev.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "dev.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
-    CKANThemeSource: "{{ legacy_theme }}"
-    CKANSource: "{{ ckan_2_7 }}"
+    CKANSource: *CKANSource
     CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
-    QgovExtensionRevision: develop #https://github.com/qld-gov-au/ckan-ex-qgov.git

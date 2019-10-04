@@ -16,7 +16,7 @@ cloudformation_stacks:
       Platform: "{{ service_name }}"
       ACMCertificateARN: "{{ ACMCertificateARNForUsEast1 }}"
       Domain: "{{ Domain }}"
-      LogBucketName: "osssio-ckan-web-logs"
+      LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
       Service: "{{ service_name }}"
       Division: "{{ Division }}"
       Owner: "{{ Owner }}"

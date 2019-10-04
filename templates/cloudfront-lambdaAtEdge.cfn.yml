@@ -10,45 +10,6 @@ Parameters:
       - STAGING
       - PROD
 Resources:
-
-  #delete me after publications release
-  LambdaEdgeFunction: #change name if changing lambda code and update VersionedLambdaFunction link
-    Type: 'AWS::Lambda::Function'
-    Properties:
-      Code: #see files/cloudfrontLambda.js for human readable code (remove comments when updating inline js
-        ZipFile:  |
-          'use strict';
-          const querystring = require('querystring');
-          exports.handler = (event, context, callback) => {
-              const request = event.Records[0].cf.request;
-              const params = querystring.parse(request.querystring);
-              const sortedParams = {};
-              Object.keys(params).sort().forEach(key => {
-                  sortedParams[key] = params[key];
-              });
-              request.querystring = querystring.stringify(sortedParams);
-              if ((request.headers.host[0].value === 'data.qld.gov.au' || request.headers.host[0].value === 'publications.qld.gov.au' ) && request.method !== 'POST') {
-                  let alternativeHostname = 'www.' + request.headers.host[0].value;
-                  let redirect = {
-                      status: '301',
-                      statusDescription: `Redirecting to apex domain`,
-                      headers: {
-                          location: [{
-                              key: 'Location',
-                              value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}`
-                          }]
-                      }
-                  };
-                  callback(null, redirect);
-              } else {
-                  callback(null, request);
-              }
-          };
-      Role: !GetAtt LambdaEdgeFunctionRole.Arn
-      Runtime: nodejs8.10
-      Handler: index.handler
-      Timeout: 5
-
   #This lambda function reorders querystring alphabetically for improved caching and remove www from host name if set
   LambdaEdgeFunction48e660f:
     Type: 'AWS::Lambda::Function'
@@ -100,25 +61,7 @@ Resources:
       Handler: index.handler
       Timeout: 5
 
-  #delete me once publications is released to prod
-  VersionedLambdaFunction: #change name if changing lambda code and update cloudfront link
-    Type: 'AWS::Lambda::Version'
-    Properties:
-      FunctionName: !Ref LambdaEdgeFunction
-
-  #Versions need to be generated uniquely and is connected to the same lambda function, each time a version is added,
-  # it will gen a point in time 'version' of the lambda function, this is what is used in cloudfront lambda@edge
-  VersionedLambdaFunction48e660f: #change name if changing lambda code and update cloudfront link
-    Type: 'AWS::Lambda::Version'
-    Properties:
-      FunctionName: !Ref LambdaEdgeFunction48e660f
-
-  #should not be in use, but leave until we are all on v3 of lambda 48e660f3
-  VersionedLambdaFunction48e660f2: #change name if changing lambda code and update cloudfront link
-    Type: 'AWS::Lambda::Version'
-    Properties:
-      FunctionName: !Ref LambdaEdgeFunction48e660f
-
+  #verisons are hard coded, if you need two versions, leave the old one in, but be aware that cloudformation does not like having two versions which are the same so it might get cranky.
   #current version as of 6/9/2019
   VersionedLambdaFunction48e660f3: #change name if changing lambda code and update cloudfront link
     Type: 'AWS::Lambda::Version'
@@ -145,15 +88,6 @@ Resources:
                 - "edgelambda.amazonaws.com"
 
 Outputs:
-  #delete me once publications is released to prod
-  VersionedLambdaFunction:
-    Value: !Ref VersionedLambdaFunction
-  #should not be in use, but leave until we are all on v3 of lambda 48e660f3
-  VersionedLambdaFunction2:
-    Value: !Ref VersionedLambdaFunction48e660f
-  #should not be in use, but leave until we are all on v3 of lambda 48e660f3
-  VersionedLambdaFunction48e660f2:
-    Value: !Ref VersionedLambdaFunction48e660f2
   #current version as of 6/9/2019
   VersionedLambdaFunction48e660f3:
     Value: !Ref VersionedLambdaFunction48e660f3

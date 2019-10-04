@@ -9,6 +9,16 @@
 #
 # The net effect is that the common and individual stacks have the same
 # structure, but any values in the individual stacks take priority.
+
+- name: Compile Jinja2 template if required
+  template:
+    src: "{{ item.template_jinja }}"
+    dest: "{{ item.template }}"
+  when: item.template_parameters is defined and item.template_parameters.Environment == Environment and item.template_jinja is defined
+  with_items: "{{ cloudformation_stacks }}"
+
+##TODO do cfn check on template
+
 - name: Run CloudFormation stack
   cloudformation:
     stack_name: "{{ item.name | default(common_stack.name) }}"

@@ -1,0 +1,52 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |-
+  Creates OpsWorks Applications for CKAN Stack extensions.
+  Current extension list:
+  Legacy theme
+  Queensland Government extension
+
+Parameters:
+  Environment:
+    Description: Select a stack version.
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  OpsWorksStack:
+    Description: The exported name of the OpsWorks Stack ID
+    Type: String
+  ApplicationName:
+    Description: Name of the application (ie. GI or Services, etc)
+    Type: String
+  ApplicationId:
+    Description: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+    Type: String
+    ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
+    AllowedPattern: '[-_a-z0-9]*'
+
+
+Resources:
+
+  {% for key in EnvExtensions %}
+
+  {{ key }}:
+    Type: AWS::OpsWorks::App
+    Properties:
+      AppSource:
+        Type: "{{ EnvExtensions[key].type }}"
+        Url: "{{ EnvExtensions[key].url }}"
+        {% if EnvExtensions[key].version is defined %}Revision: "{{ EnvExtensions[key].version }}"{% endif %}
+      #new line required for jinja to not merge groups
+      Description: {{ EnvExtensions[key].description }}
+      EnableSsl: !!bool false
+      Name: "{{ EnvExtensions[key].name }}"
+      Shortname: "{{ EnvExtensions[key].shortname }}"
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStack
+      Type: "other"
+
+  {% endfor %}

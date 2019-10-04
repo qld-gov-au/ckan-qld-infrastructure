@@ -1,25 +1,25 @@
 ---
-opsAccount: "103119354886"
-opsRole: "VPC-Peering"
-opsVpcID: "vpc-d5ba8bb0"
+opsAccount: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcAccount', region=region) }}"
+opsRole: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcRole', region=region) }}"
+opsVpcID:  "{{ lookup('aws_ssm', '/config/CKAN/opsVpcId', region=region) }}"
 
-common_stack:
+common_stack: &common_stack
   # VPC stacks cannot be properly torn down via Ansible
   state: present
   region: "{{ region }}"
   disable_rollback: true
   template: "templates/3_tier_vpc.yml"
-  template_parameters:
+  template_parameters: &common_stack_template_parameters
     ApplicationName: "CKAN"
     AZCount: '3'
-    BambooAgentIp: "13.210.53.223/32"
-    BambooAgentIp2: "13.211.7.108/32"
+    BambooAgentIp: "{{ lookup('aws_ssm', '/config/CKAN/cicdIpA', region=region) }}"
+    BambooAgentIp2: "{{ lookup('aws_ssm', '/config/CKAN/cicdIpB', region=region) }}"
     NatGateways: 'true'
     VPCNamePrefix: CKAN
     VPCPeeringEnabled: "{{ VPCPeeringEnabled | default('false') }} "
     VPCPeeringID: "{{ VPCPeeringID| default('') }}"
-    VPCPeeringCidr: "10.10.0.0/16"
-  tags:
+    VPCPeeringCidr: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcCidr', region=region) }}"
+  tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "CKAN"
     Division: "{{ Division }}"
@@ -27,22 +27,30 @@ common_stack:
     Version: "1.0"
 
 cloudformation_stacks:
-  - name: "CKAN-PROD-VPC"
+  - <<: *common_stack
+    name: "CKAN-PROD-VPC"
     template_parameters:
+      <<: *common_stack_template_parameters
       Environment: PROD
       VPCPrefix: '10.43'
 
-  - name: "CKAN-STAGING-VPC"
+  - <<: *common_stack
+    name: "CKAN-STAGING-VPC"
     template_parameters:
+      <<: *common_stack_template_parameters
       Environment: STAGING
       VPCPrefix: '10.42'
 
-  - name: "CKAN-TRAINING-VPC"
+  - <<: *common_stack
+    name: "CKAN-TRAINING-VPC"
     template_parameters:
+      <<: *common_stack_template_parameters
       Environment: TRAINING
       VPCPrefix: '10.41'
 
-  - name: "CKAN-DEV-VPC"
+  - <<: *common_stack
+    name: "CKAN-DEV-VPC"
     template_parameters:
+      <<: *common_stack_template_parameters
       Environment: DEV
       VPCPrefix: '10.40'

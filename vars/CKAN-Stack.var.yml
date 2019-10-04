@@ -1,15 +1,15 @@
 ---
-NonProductionGTMId: "GTM-NBSWN3"
-ProductionGTMId: "GTM-PJBVFG"
-NonProductionAnalyticsId: "UA-7276966-12"
-ProductionAnalyticsId: "UA-7276966-13"
+NonProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdNonProduction', region=region) }}"
+ProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdProduction', region=region) }}"
+NonProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdNonProduction', region=region) }}"
+ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', region=region) }}"
 
-common_stack:
+common_stack: &common_stack
   state: "{{ state | default('present')}}"
   region: "{{ region }}"
   disable_rollback: true
   template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
-  template_parameters:
+  template_parameters: &common_stack_template_parameters
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name | lower }}"
     ApplicationTitle: "{{ title }}"
@@ -39,9 +39,10 @@ common_stack:
     CreateServiceRole: "yes"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     SSMKey: "{{ SSMKey | default('') }}"
-    DefaultEC2Key: osssio-global-ckan
+    DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
     CookbookRevision: "{{ CookbookRevision }}"
-  tags:
+    LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
+  tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
     Division: "{{ Division }}"
@@ -49,38 +50,46 @@ common_stack:
     Version: "1.0"
 
 cloudformation_stacks:
-  - name: "{{ service_name }}-PROD-OpsWorks-stack"
+  - <<: *common_stack
+    name: "{{ service_name }}-PROD-OpsWorks-stack"
     template_parameters:
+      <<: *common_stack_template_parameters
       Environment: PROD
       GTMContainerId: "{{ ProductionGTMId }}"
       AnalyticsId: "{{ ProductionAnalyticsId }}"
-      IntermediateTLD: ckan.services.qld.gov.au #delete me once cloudfront has unlocked export name
     tags:
+      <<: *common_stack_tags
       PowerManaged: "No"
 
-  - name: "{{ service_name }}-STAGING-OpsWorks-stack"
+  - <<: *common_stack
+    name: "{{ service_name }}-STAGING-OpsWorks-stack"
     template_parameters:
+      <<: *common_stack_template_parameters
       Environment: STAGING
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
-      IntermediateTLD: ckan.staging-services.qld.gov.au
     tags:
+      <<: *common_stack_tags
       PowerManaged: "No"
 
-  - name: "{{ service_name }}-TRAINING-OpsWorks-stack"
+  - <<: *common_stack
+    name: "{{ service_name }}-TRAINING-OpsWorks-stack"
     template_parameters:
+      <<: *common_stack_template_parameters
       Environment: TRAINING
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
-      IntermediateTLD: training.ckan.devpit140cs.qgov.net.au
     tags:
+      <<: *common_stack_tags
       PowerManaged: "Yes"
 
-  - name: "{{ service_name }}-DEV-OpsWorks-stack"
+  - <<: *common_stack
+    name: "{{ service_name }}-DEV-OpsWorks-stack"
     template_parameters:
+      <<: *common_stack_template_parameters
       Environment: DEV
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
-      IntermediateTLD: dev.ckan.devpit140cs.qgov.net.au
     tags:
+      <<: *common_stack_tags
       PowerManaged: "Yes"
