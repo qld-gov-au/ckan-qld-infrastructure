@@ -156,5 +156,5 @@ basic_facts:
     RootDomain: "dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "staging.squizedge.net"
     CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
+    CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
 
