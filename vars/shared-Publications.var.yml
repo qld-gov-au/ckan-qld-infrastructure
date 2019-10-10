@@ -41,7 +41,7 @@ extensions:
 
 
 DefaultCKANSource: &CKANSource "{{ ckan_2_8 }}"
-DefaultCookbookRevision: &CookbookRevision  "2.1.2-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
+DefaultCookbookRevision: &CookbookRevision  "2.1.3-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
