@@ -130,7 +130,12 @@ Resources:
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
-{% for day in ["Monday","Tuesday","Wednesday","Thursday","Friday"] %}
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
         {{ day }}:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
@@ -138,6 +143,11 @@ Resources:
 {% for hour in range(20, 24) %}
           "{{ hour }}": "on"
 {% endfor %}
+{% endfor %}
+
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
       RootDeviceType: ebs
@@ -156,7 +166,12 @@ Resources:
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
-{% for day in ["Monday","Tuesday","Wednesday","Thursday","Friday"] %}
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
         {{ day }}:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
@@ -164,6 +179,11 @@ Resources:
 {% for hour in range(20, 24) %}
           "{{ hour }}": "on"
 {% endfor %}
+{% endfor %}
+
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
       RootDeviceType: ebs
@@ -183,7 +203,12 @@ Resources:
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
-{% for day in ["Monday","Tuesday","Wednesday","Thursday","Friday"] %}
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
         {{ day }}:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
@@ -191,6 +216,11 @@ Resources:
 {% for hour in range(20, 24) %}
           "{{ hour }}": "on"
 {% endfor %}
+{% endfor %}
+
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
       RootDeviceType: ebs
@@ -211,7 +241,12 @@ Resources:
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
-{% for day in ["Monday","Tuesday","Wednesday","Thursday","Friday"] %}
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
         {{ day }}:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
@@ -219,6 +254,11 @@ Resources:
 {% for hour in range(20, 24) %}
           "{{ hour }}": "on"
 {% endfor %}
+{% endfor %}
+
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
       RootDeviceType: ebs

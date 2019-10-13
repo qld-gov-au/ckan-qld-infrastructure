@@ -39,7 +39,7 @@ cloudformation_stacks:
       WebEC2Count: 2
     tags:
       <<: *common_stack_tags
-      PowerManaged: "No"
+      PowerManaged: "Yes"
 
   - <<: *common_stack
     name: "{{ service_name }}-TRAINING-OpsWorks-instances"
