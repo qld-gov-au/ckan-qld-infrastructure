@@ -33,8 +33,12 @@ run-shared-resource-playbooks () {
 }
 
 if [ $# -ge 3 ]; then
-  # run custom playbook
-  run-playbook "$3" "$4"
+  if [ "$3" = "deploy" ]; then
+    run-deployment
+  else
+    # run custom playbook
+    run-playbook "$3" "$4"
+  fi
 else
   run-all-playbooks
 fi

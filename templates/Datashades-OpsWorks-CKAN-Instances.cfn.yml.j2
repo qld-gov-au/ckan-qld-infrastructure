@@ -126,6 +126,30 @@ Resources:
   OpswxEC2Services1:
     Type: AWS::OpsWorks::Instance
     Properties:
+{% if item.tags["PowerManaged"] == "Yes" %}
+      AutoScalingType: timer
+      # Monday-Friday 06:00-20:00 GMT+10
+      TimeBasedAutoScaling:
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+        {{ day }}:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endfor %}
+
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endif %}
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
@@ -138,6 +162,30 @@ Resources:
     Condition: ProvisionDataPusher
     Type: AWS::OpsWorks::Instance
     Properties:
+{% if item.tags["PowerManaged"] == "Yes" %}
+      AutoScalingType: timer
+      # Monday-Friday 06:00-20:00 GMT+10
+      TimeBasedAutoScaling:
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+        {{ day }}:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endfor %}
+
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endif %}
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
@@ -151,6 +199,30 @@ Resources:
     DependsOn:
       - OpswxEC2Services1
     Properties:
+{% if item.tags["PowerManaged"] == "Yes" %}
+      AutoScalingType: timer
+      # Monday-Friday 06:00-20:00 GMT+10
+      TimeBasedAutoScaling:
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+        {{ day }}:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endfor %}
+
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endif %}
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
@@ -165,6 +237,30 @@ Resources:
     DependsOn:
       - OpswxEC2Web1 # if we try to start both at once, OpsWorks can get confused and give them the same name, which breaks things
     Properties:
+{% if item.tags["PowerManaged"] == "Yes" %}
+      AutoScalingType: timer
+      # Monday-Friday 06:00-20:00 GMT+10
+      TimeBasedAutoScaling:
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+        {{ day }}:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endfor %}
+
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endif %}
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size

@@ -50,8 +50,9 @@ wait_for_deployment () {
   fi
 }
 
-for truthy in "y t T 1"; do
+for truthy in `echo "y t T 1" |xargs echo`; do
   if [ "$PARALLEL" = "$truthy" ]; then
+    echo "Parallel enabled, will deploy to entire stack/layer simultaneously"
     PARALLEL=true
   fi
 done
@@ -59,7 +60,7 @@ if [ "$PARALLEL" = "true" ]; then
   DEPLOYMENT_ID=$(aws opsworks create-deployment $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET $COMMAND_SNIPPET --output text)
   wait_for_deployment $DEPLOYMENT_ID || exit 1
 else
-  INSTANCE_IDS=$(aws opsworks describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Instances[].{Id: InstanceId, Status: Status}[?Status=='online']|[].Id" --output text)
+  INSTANCE_IDS=$(aws opsworks describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Instances[].{Id: InstanceId, Status: Status}[?Status=='online']|[].Id" --output text) || exit 1
   echo "Target instance(s): $INSTANCE_IDS"
   for instance in $INSTANCE_IDS; do
     DEPLOYMENT_ID=$(aws opsworks create-deployment $REGION_SNIPPET $STACK_SNIPPET --instance-id $instance $COMMAND_SNIPPET --output text)
