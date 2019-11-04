@@ -900,6 +900,7 @@ Resources:
       SubnetId:
         Ref: WebSubnetE
     Type: AWS::EC2::SubnetRouteTableAssociation
+  #Allow s3 root for listing as well as get set on folders
   S3Endpoint:
     Type: "AWS::EC2::VPCEndpoint"
     Properties:
@@ -909,7 +910,12 @@ Resources:
           "Effect":"Allow",
           "Principal": "*",
           "Action":["s3:*"],
-          "Resource":["arn:aws:s3:::*/*"]
+          "Resource":["arn:aws:s3:::"]
+        },{
+          "Effect":"Allow",
+          "Principal": "*",
+          "Action":["s3:*"],
+          "Resource":["arn:aws:s3:::*"]
         }]
       }
       RouteTableIds:

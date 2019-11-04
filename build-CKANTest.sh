@@ -20,6 +20,7 @@ run-all-playbooks () {
   run-shared-resource-playbooks
   run-playbook "CloudFormation" "vars/acm.var.yml"
   run-playbook "database-config"
+  run-playbook "s3_buckets"
   run-playbook "CKAN-Stack"
   run-playbook "CKAN-extensions" "vars/CKAN-extensions.var.yml"
   run-playbook "CloudFormation" "vars/CKAN-instances.var.yml"

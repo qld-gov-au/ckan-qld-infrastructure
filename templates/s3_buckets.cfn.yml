@@ -1,0 +1,60 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  AttachmentsBucketName:
+    Description: Name of Code Storage bucket for all things that is not public
+    Type: String
+  Environment:
+    Description: ApplicationName environment
+    Type: String
+  ApplicationName:
+    Description: Name of the ApplicationName ie OpenData, Publications
+    Type: String
+  BucketsExist:
+    Description: Set if buckets already exist so cloudformation does not hang on s3 bucket creation and only sets policy's instead
+    Type: String
+    Default: false
+Conditions:
+  IsBucketsNotExisting:
+    !Not [!Equals [ !Ref BucketsExist, 'true' ]]
+Resources:
+
+  #note, if this is re-imported and bucketExist is set to true, then this code will not change the s3 bucket anymore.
+  S3AttachmentsBucket:
+    Condition: IsBucketsNotExisting
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref AttachmentsBucketName
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+              Rules:
+              - Id: "VersionExpiry"
+                Status: Enabled
+                NoncurrentVersionExpirationInDays: '960'
+                AbortIncompleteMultipartUpload:
+                  DaysAfterInitiation: 7
+              - Id: "IntelligentTieringTransition"
+                Status: Enabled
+                Transitions:
+                    - TransitionInDays: 30
+                      StorageClass: "INTELLIGENT_TIERING"
+#work out how many small objects we have in version control as it can get expensive..
+#              - Id: "IntelligentTieringTransitionOnVersions"
+#                Status: Enabled
+#                NoncurrentVersionTransitions:
+#                    - TransitionInDays: 10
+#                      StorageClass: "INTELLIGENT_TIERING"
+#                    - TransitionInDays: 60
+#                      StorageClass: GLACIER
+    DeletionPolicy: Retain
+
+Outputs:
+  S3AttachmentsBucket:
+    Description: Name of the S3AttachmentsBucket
+    Value: !Ref AttachmentsBucketName
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}S3AttachmentsBucket"
+  IsBucketsExisting:
+    Description: s3 bucket retain re-run
+    Value: !Ref BucketsExist

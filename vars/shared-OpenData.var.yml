@@ -157,4 +157,3 @@ basic_facts:
     CmsOrigin: "staging.squizedge.net"
     CKANSource: *CKANSource
     CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
-
