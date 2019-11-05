@@ -11,7 +11,7 @@ Parameters:
     Description: Name of the ApplicationName ie OpenData, Publications
     Type: String
   BucketsExist:
-    Description: Set if buckets already exist so cloudformation does not hang on s3 bucket creation and only sets policy's instead
+    Description: Set if buckets already exist so cloudformation does not hang on s3 bucket creation and only sets policies instead
     Type: String
     Default: false
 Conditions:
