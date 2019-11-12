@@ -19,11 +19,13 @@ run-all-playbooks () {
 
   run-shared-resource-playbooks
   run-playbook "CloudFormation" "vars/acm.var.yml"
-  run-playbook "database-config"
+  if [ "$SKIP_CKAN_DB" != "true" ]; then
+    run-playbook "database-config"
+  fi
   run-playbook "CloudFormation" "vars/s3_buckets.var.yml"
   run-playbook "CKAN-Stack"
   run-playbook "CloudFormation" "vars/Salsa-CKAN-extensions.var.yml"
-  run-playbook "CKAN-extensions" "vars/CKAN-extensions.var.yml"
+  run-playbook "CKAN-extensions"
   run-playbook "CloudFormation" "vars/CKAN-instances.var.yml"
   run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
   run-playbook "cloudfront"

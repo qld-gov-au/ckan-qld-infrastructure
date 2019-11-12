@@ -12,6 +12,14 @@ DefaultCookbookRevision: &CookbookRevision  "2.2.0-qgov" #https://github.com/qld
 #yaml anchors https://confluence.atlassian.com/bitbucket/yaml-anchors-960154027.html
 extensions:
   default: &default_extensions
+    CKANExtXLoader: &CKANExtXLoader
+      name: "ckanext-xloader-{{ Environment }}"
+      shortname: "ckanext-xloader"
+      description: "CKAN Express Loader Extension"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-xloader.git"
+      revision: "0.4.0"
+
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
       shortname: "ckanext-qgov"
