@@ -12,6 +12,14 @@ ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip"
 
 extensions:
   default:  &default_extensions
+    CKANExtXLoader: &CKANExtXLoader
+      name: "ckanext-xloader-{{ Environment }}"
+      shortname: "ckanext-xloader"
+      description: "CKAN Express Loader Extension"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-xloader.git"
+      revision: "0.4.0"
+
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
       shortname: "ckanext-qgov"
