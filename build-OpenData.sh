@@ -22,6 +22,7 @@ run-all-playbooks () {
   if [ "$SKIP_CKAN_DB" != "true" ]; then
     run-playbook "database-config"
   fi
+  run-playbook "CloudFormation" "vars/s3_buckets.var.yml"
   run-playbook "CKAN-Stack"
   run-playbook "CloudFormation" "vars/Salsa-CKAN-extensions.var.yml"
   run-playbook "CKAN-extensions"
