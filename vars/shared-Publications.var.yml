@@ -26,7 +26,8 @@ extensions:
       shortname: "{{ service_name | lower }}-theme-{{ Environment }}"
       description: "Page templates and public assets for {{ service_name }}-{{ Environment }}"
       type: "s3"
-      url: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip "
+      url: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip"
+
   PROD:
     <<: *default_extensions
   STAGING:
