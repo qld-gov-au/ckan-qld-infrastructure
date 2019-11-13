@@ -7,11 +7,19 @@ enable_datastore: "yes"
 public_tld: data.qld.gov.au
 
 DefaultCKANSource: &CKANSource "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip" #ckan_2_8
-DefaultCookbookRevision: &CookbookRevision  "2.2.0-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
+DefaultCookbookRevision: &CookbookRevision  "3.0.0-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
 
 #yaml anchors https://confluence.atlassian.com/bitbucket/yaml-anchors-960154027.html
 extensions:
   default: &default_extensions
+    CKANExtXLoader: &CKANExtXLoader
+      name: "ckanext-xloader-{{ Environment }}"
+      shortname: "ckanext-xloader"
+      description: "CKAN Express Loader Extension"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-xloader.git"
+      revision: "0.4.0"
+
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
       shortname: "ckanext-qgov"
@@ -157,4 +165,3 @@ basic_facts:
     CmsOrigin: "staging.squizedge.net"
     CKANSource: *CKANSource
     CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
-
