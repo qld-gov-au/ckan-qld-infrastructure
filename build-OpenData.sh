@@ -9,7 +9,6 @@ run-deployment () {
   PARALLEL=1 ./opsworks-deploy.sh update_custom_cookbooks $STACK_NAME
   ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-web
   ./opsworks-deploy.sh execute_recipes $STACK_NAME ${INSTANCE_SHORTNAME}-solr datashades::solr-deploy
-  ./opsworks-deploy.sh execute_recipes $STACK_NAME ${INSTANCE_SHORTNAME}-datapusher datashades::datapusher-deploy
   PARALLEL=1 ./opsworks-deploy.sh configure $STACK_NAME
 }
 
