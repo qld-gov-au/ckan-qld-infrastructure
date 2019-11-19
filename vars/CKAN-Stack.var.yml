@@ -4,6 +4,10 @@ ProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdProduction', region=re
 NonProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdNonProduction', region=region) }}"
 ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', region=region) }}"
 
+solr5: "http://archive.apache.org/dist/lucene/solr/5.5.5/solr-5.5.5.zip"
+solr6: "http://archive.apache.org/dist/lucene/solr/6.6.6/solr-6.6.6.zip"
+solr7: "http://archive.apache.org/dist/lucene/solr/7.7.2/solr-7.7.2.zip"
+
 common_stack: &common_stack
   state: "{{ state | default('present')}}"
   region: "{{ region }}"
@@ -43,6 +47,7 @@ common_stack: &common_stack
     CookbookRevision: "{{ CookbookRevision }}"
     LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
     AttachmentsBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}" #/config/CKAN/PROD/app/opendata/s3AttachmentBucket
+    SolrSource: "{{ solr5 }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
@@ -91,6 +96,7 @@ cloudformation_stacks:
       Environment: DEV
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
+      SolrSource: "{{ solr6 }}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
