@@ -96,7 +96,7 @@ cloudformation_stacks:
       Environment: DEV
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
-      SolrSource: "{{ solr6 }}"
+      SolrSource: "{{ solr7 }}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
