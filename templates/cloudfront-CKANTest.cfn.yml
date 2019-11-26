@@ -80,6 +80,7 @@ Resources:
           Id: 'WebOrigin'
           CustomOriginConfig:
             OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
+            OriginReadTimeout: 60
         PriceClass: PriceClass_All
         WebACLId:
           Fn::ImportValue: !Ref WebACLId
