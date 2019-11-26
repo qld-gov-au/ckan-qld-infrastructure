@@ -560,7 +560,7 @@ Resources:
       LoadBalancerName: !Sub "${Environment}-${ApplicationName}ELB"
       CrossZone: true
       HealthCheck:
-        Target: "HTTP:80/"
+        Target: "HTTP:80/api/action/status_show"
         HealthyThreshold: 2
         UnhealthyThreshold: 6
         Interval: 30
