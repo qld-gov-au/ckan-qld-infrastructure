@@ -28,6 +28,14 @@ extensions:
       url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
       version: "develop"
 
+    CKANExtS3Filestore: &CKANExtS3Filestore
+      name: "ckanext-s3filestore-{{ Environment }}"
+      shortname: "ckanext-s3filestore"
+      description: "CKAN Extension to keep uploaded files in S3"
+      type: "git"
+      url: "https://github.com/bstutsky/ckanext-s3filestore.git"
+      version: "0.1.1"
+
     OpwxAppCKANTheme: &OpwxAppCKANTheme
       name: "{{ service_name }} {{ Environment }} theme"
       shortname: "{{ service_name | lower }}-theme-{{ Environment }}"
