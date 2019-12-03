@@ -266,6 +266,7 @@ Resources:
           Action:
             - s3:AbortMultipartUpload
             - s3:ListMultipartUploadParts
+            - s3:ListBucket
             - s3:*Upload*
             - s3:GetObject
             - s3:GetObjectAcl
@@ -283,9 +284,9 @@ Resources:
             - !Sub "arn:aws:s3:::${AttachmentsBucketName}/*"
         - Effect: Allow
           Action:
-            - s3:ListBucket
+            - s3:ListAllMyBuckets
           Resource:
-            - !Sub "arn:aws:s3:::${AttachmentsBucketName}"
+            - !Sub "arn:aws:s3:::"
 
   EBSTaggingPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -560,7 +561,7 @@ Resources:
       LoadBalancerName: !Sub "${Environment}-${ApplicationName}ELB"
       CrossZone: true
       HealthCheck:
-        Target: "HTTP:80/"
+        Target: "HTTP:80/api/action/status_show"
         HealthyThreshold: 2
         UnhealthyThreshold: 6
         Interval: 30

@@ -119,7 +119,7 @@ Conditions:
       - !Ref WebEC2Count
   ProvisionDataPusher:
     Fn::Equals:
-      - "legacy-datapusher"
+      - "yes"
       - !Ref EnableDataStore
 
 Resources:

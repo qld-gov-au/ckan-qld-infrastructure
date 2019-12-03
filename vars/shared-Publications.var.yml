@@ -38,11 +38,19 @@ extensions:
     <<: *default_extensions
     CKANExtQGOV:
       <<: *CKANExtQGOV
-      revision: "develop"
+      version: "develop"
+
+    CKANExtS3Filestore: &CKANExtS3Filestore
+      name: "ckanext-s3filestore-{{ Environment }}"
+      shortname: "ckanext-s3filestore"
+      description: "CKAN Extension to keep uploaded files in S3"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
+      version: "develop"
 
 
 DefaultCKANSource: &CKANSource "{{ ckan_2_8 }}"
-DefaultCookbookRevision: &CookbookRevision  "3.0.0-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
+DefaultCookbookRevision: &CookbookRevision  "3.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
