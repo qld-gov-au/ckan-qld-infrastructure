@@ -7,7 +7,7 @@ enable_datastore: "yes"
 public_tld: data.qld.gov.au
 
 DefaultCKANSource: &CKANSource "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip" #ckan_2_8
-DefaultCookbookRevision: &CookbookRevision  "3.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
+DefaultCookbookRevision: &CookbookRevision  "3.1.2-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
 
 #yaml anchors https://confluence.atlassian.com/bitbucket/yaml-anchors-960154027.html
 extensions:
@@ -26,7 +26,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
-      revision: "2.0.4"
+      version: "2.0.4"
 
     CKANExtDCAT: &CKANExtDCAT
       name: "ckanext-dcat-{{ Environment }}"
@@ -109,7 +109,15 @@ extensions:
 
     CKANExtQGOV:
       <<: *CKANExtQGOV
-      revision: "develop"
+      version: "develop"
+
+    CKANExtS3Filestore: &CKANExtS3Filestore
+      name: "ckanext-s3filestore-{{ Environment }}"
+      shortname: "ckanext-s3filestore"
+      description: "CKAN Extension to keep uploaded files in S3"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
+      version: "develop"
 
     CKANExtDataQld:
       <<: *CKANExtDataQld
