@@ -25,6 +25,14 @@ extensions:
       url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
       version: "2.0.4"
 
+    CKANExtS3Filestore: &CKANExtS3Filestore
+      name: "ckanext-s3filestore-{{ Environment }}"
+      shortname: "ckanext-s3filestore"
+      description: "CKAN Extension to keep uploaded files in S3"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
+      version: "v0.2.0-qgov"
+
     CKANExtDCAT: &CKANExtDCAT
       name: "ckanext-dcat-{{ Environment }}"
       shortname: "ckanext-dcat"
@@ -108,12 +116,8 @@ extensions:
       <<: *CKANExtQGOV
       version: "develop"
 
-    CKANExtS3Filestore: &CKANExtS3Filestore
-      name: "ckanext-s3filestore-{{ Environment }}"
-      shortname: "ckanext-s3filestore"
-      description: "CKAN Extension to keep uploaded files in S3"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
+    CKANExtS3Filestore:
+      <<: *CKANExtS3Filestore
       version: "develop"
 
     CKANExtDataQld:
