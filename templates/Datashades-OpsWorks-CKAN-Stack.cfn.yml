@@ -36,7 +36,10 @@ Parameters:
     Default: http://archive.apache.org/dist/lucene/solr/5.5.5/solr-5.5.5.zip
     Type: String
   CKANSource:
-    Description: URL for zip archive.
+    Description: URL for Git repository or zip archive.
+    Type: String
+  CKANRevision:
+    Description: Branch/tag name in repository to checkout.
     Type: String
   ApplicationName:
     Description: Name of the application (ie. GI or Services, etc)
@@ -519,8 +522,9 @@ Resources:
       Domains:
         - !Ref SiteDomain #list 0 is used for site_url
       AppSource:
-        Type: archive
+        Type: git
         Url: !Ref CKANSource
+        Revision: !Ref CKANRevision
       Description: "CKAN 2.8"
       EnableSsl: false
       Name: !Sub "${ApplicationName}-${Environment}"

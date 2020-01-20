@@ -17,7 +17,8 @@ common_stack: &common_stack
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name | lower }}"
     ApplicationTitle: "{{ title }}"
-    CKANSource: "{{ CKANSource }}"
+    CKANSource: "{{ CKANSource | default('https://github.com/qld-gov-au/ckan.git') }}"
+    CKANRevision: "{{ CKANRevision | default('1d6c264ec3ae6cc95e11a3d5725d07dd3f09bd27') }}"
     PublicStackZoneTLD: "{{ PublicStackZoneTLD }}"
     PublicTLD: "{{ public_tld }}"
     EmailDomain: "{{ RootDomain }}"
@@ -44,7 +45,7 @@ common_stack: &common_stack
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     SSMKey: "{{ SSMKey | default('') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
-    CookbookRevision: "{{ CookbookRevision }}"
+    CookbookRevision: "{{ CookbookRevision | default('3.1.3') }}"
     LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
     AttachmentsBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}" #/config/CKAN/PROD/app/opendata/s3AttachmentBucket
     SolrSource: "{{ solr7 }}"
@@ -94,6 +95,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: DEV
+      CookbookRevision: "{{ CookbookRevision | default('develop') }}"
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
     tags:
