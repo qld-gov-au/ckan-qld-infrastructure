@@ -6,9 +6,6 @@ enable_datastore: "yes"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: data.qld.gov.au
 
-DefaultCKANSource: &CKANSource "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip" #ckan_2_8
-DefaultCookbookRevision: &CookbookRevision  "3.1.2" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
-
 #yaml anchors https://confluence.atlassian.com/bitbucket/yaml-anchors-960154027.html
 extensions:
   default: &default_extensions
@@ -152,8 +149,6 @@ basic_facts:
     SiteDomain: "www.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "oss.squizedge.net"
-    CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -161,8 +156,6 @@ basic_facts:
     SiteDomain: "staging.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "staging.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "staging.squizedge.net"
-    CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -170,8 +163,6 @@ basic_facts:
     SiteDomain: "training.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "training.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "staging.squizedge.net"
-    CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -179,5 +170,3 @@ basic_facts:
     SiteDomain: "dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "staging.squizedge.net"
-    CKANSource: *CKANSource
-    CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
