@@ -57,6 +57,13 @@ extensions:
       <<: *CKANExtS3Filestore
       version: "develop"
 
+    CKANExtSSMConfig:
+      name: "ckanext-ssm-config-{{ Environment }}"
+      shortname: "ckanext-ssm-config"
+      description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
+      version: "develop"
 
 
 basic_facts:
