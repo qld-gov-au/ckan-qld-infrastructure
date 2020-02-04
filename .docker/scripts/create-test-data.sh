@@ -22,8 +22,8 @@ paster create-test-data -c ${CKAN_INI_FILE}
 
 echo "Updating annakarenina to use department-of-health Organisation:"
 package_owner_org_update=$( \
-    wget -O- --header="Authorization: ${API_KEY}" \
-    --post-data "id=annakarenina&organization_id=department-of-health" \
+    curl -L -s --header "Authorization: ${API_KEY}" \
+    --data "id=annakarenina&organization_id=department-of-health" \
     ${CKAN_ACTION_URL}/package_owner_org_update
 )
 echo ${package_owner_org_update}
