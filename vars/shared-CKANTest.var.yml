@@ -36,12 +36,21 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
       version: "v0.2.0-qgov"
 
+    CKANExtSSMConfig: &CKANExtSSMConfig
+      name: "ckanext-ssm-config-{{ Environment }}"
+      shortname: "ckanext-ssm-config"
+      description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
+      version: "0.0.1"
+
     OpwxAppCKANTheme: &OpwxAppCKANTheme
       name: "{{ service_name }} {{ Environment }} theme"
       shortname: "{{ service_name | lower }}-theme-{{ Environment }}"
       description: "Page templates and public assets for {{ service_name }}-{{ Environment }}"
       type: "s3"
       url: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip "
+
   DEV:
     <<: *default_extensions
 
@@ -57,6 +66,9 @@ extensions:
       <<: *CKANExtS3Filestore
       version: "develop"
 
+    CKANExtSSMConfig:
+      <<: *CKANExtSSMConfig
+      version: "develop"
 
 
 basic_facts:
