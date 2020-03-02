@@ -29,7 +29,6 @@
     - set_fact:
         ACMCertificateARNForDefaultRegion: "{{ acm.ansible_facts.cloudformation[acm_stack_name].stack_outputs.AcmCert }}"
 
-
     - name: kms alias fact
       aws_kms_facts:
         filters:
@@ -47,3 +46,21 @@
     - include_vars: vars/CKAN-Stack.var.yml
   roles:
     - ansible_cloudformation
+
+  tasks:
+
+    - name: Get stack params
+      set_fact:
+        stack_name: "{{ item.name }}"
+      when: item.template_parameters.Environment == Environment
+      with_items: "{{ cloudformation_stacks }}"
+
+    - name: Get current stack facts
+      cloudformation_facts:
+        region: "{{ region }}"
+        stack_name: "{{ stack_name }}"
+        stack_resources: true
+      register: opsworks_facts
+
+    - name: Enable CloudWatch Logs on OpsWorks web layer
+      command: "aws opsworks update-layer --region us-east-1 --layer-id '{{opsworks_facts.ansible_facts.cloudformation[stack_name].stack_outputs.WebLayer}}' --cloud-watch-logs-configuration 'Enabled=true,LogStreams=[{LogGroupName=ckan-worker,File=/var/log/ckan/*.log}]'"
