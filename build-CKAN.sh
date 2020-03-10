@@ -42,6 +42,11 @@ run-deployment () {
 if [ $# -ge 3 ]; then
   if [ "$3" = "deploy" ]; then
     run-deployment
+  elif [ "$3" = "setup" ]; then
+    PARALLEL=1 ./opsworks-deploy.sh setup $STACK_NAME
+  elif [ "$3" = "configure" ]; then
+    PARALLEL=1 ./opsworks-deploy.sh update_custom_cookbooks $STACK_NAME
+    PARALLEL=1 ./opsworks-deploy.sh configure $STACK_NAME
   else
     # run custom playbook
     run-playbook "$3" "$4"
