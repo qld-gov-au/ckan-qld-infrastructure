@@ -1,4 +1,4 @@
-FROM amazeeio/python:2.7-ckan-v0.23.1
+FROM amazeeio/python:2.7-ckan-v1.3.1
 
 WORKDIR /app
 
