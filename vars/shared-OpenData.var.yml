@@ -60,10 +60,10 @@ extensions:
     CKANExtValidation: &CKANExtValidation
       name: "ckanext-validation-{{ Environment }}"
       shortname: "ckanext-validation"
-      description: "CKAN Extension for Data Requests"
+      description: "CKAN Extension for validating Data Packages"
       type: "git"
-      url: "https://github.com/frictionlessdata/ckanext-validation.git"
-      version: "v0.0.7"
+      url: "https://github.com/qld-gov-au/ckanext-validation.git"
+      version: "v0.0.8-qgov.1"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
@@ -130,7 +130,6 @@ extensions:
 
     CKANExtValidation:
       <<: *CKANExtValidation
-      url: "https://github.com/qld-gov-au/ckanext-validation.git"
       version: "develop"
 
     CKANExtDataQld:
