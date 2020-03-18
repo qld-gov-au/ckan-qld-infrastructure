@@ -18,7 +18,7 @@ common_stack: &common_stack
     ApplicationId: "{{ service_name | lower }}"
     ApplicationTitle: "{{ title }}"
     CKANSource: "{{ CKANSource | default('https://github.com/qld-gov-au/ckan.git') }}"
-    CKANRevision: "{{ CKANRevision | default('db42570c22642dc43000bb92be5a8387989a00fa') }}"
+    CKANRevision: "{{ CKANRevision | default('ckan-2.8.4-qgov.2') }}"
     PublicStackZoneTLD: "{{ PublicStackZoneTLD }}"
     PublicTLD: "{{ public_tld }}"
     EmailDomain: "{{ RootDomain }}"
@@ -95,6 +95,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: DEV
+      CKANRevision: "{{ CKANRevision | default('qgov-master') }}"
       CookbookRevision: "{{ CookbookRevision | default('develop') }}"
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
