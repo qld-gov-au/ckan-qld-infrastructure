@@ -95,6 +95,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: DEV
+      CKANRevision: "{{ CKANRevision | default('qgov-master') }}"
       CookbookRevision: "{{ CookbookRevision | default('develop') }}"
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
