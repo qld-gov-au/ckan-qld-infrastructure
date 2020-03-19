@@ -23,7 +23,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
-      version: "2.1.0"
+      version: "3.0.0"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       name: "ckanext-s3filestore-{{ Environment }}"
@@ -60,10 +60,10 @@ extensions:
     CKANExtValidation: &CKANExtValidation
       name: "ckanext-validation-{{ Environment }}"
       shortname: "ckanext-validation"
-      description: "CKAN Extension for Data Requests"
+      description: "CKAN Extension for validating Data Packages"
       type: "git"
-      url: "https://github.com/frictionlessdata/ckanext-validation.git"
-      version: "v0.0.7"
+      url: "https://github.com/qld-gov-au/ckanext-validation.git"
+      version: "v0.0.8-qgov.1"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
@@ -103,7 +103,7 @@ extensions:
       description: "CKAN Extension for YTP Comments"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
-      version: "2.0.2-qgov"
+      version: "2.1.0-qgov"
 
   PROD:
     <<: *default_extensions
@@ -126,6 +126,10 @@ extensions:
 
     CKANExtS3Filestore:
       <<: *CKANExtS3Filestore
+      version: "develop"
+
+    CKANExtValidation:
+      <<: *CKANExtValidation
       version: "develop"
 
     CKANExtDataQld:
