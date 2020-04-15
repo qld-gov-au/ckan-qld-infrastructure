@@ -530,6 +530,10 @@ Resources:
       Shortname: !Sub "${ApplicationId}-web"
       StackId: !Ref OpsWorksStack
       Type: custom
+      VolumeConfigurations:
+        - MountPoint: "/mnt/local_data"
+          NumberOfDisks: 1
+          Size: 32
 
   OpwxAppCKAN:
     Type: AWS::OpsWorks::App
