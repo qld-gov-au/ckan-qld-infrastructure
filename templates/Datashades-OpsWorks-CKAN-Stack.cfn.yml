@@ -502,6 +502,10 @@ Resources:
       Shortname: !Sub "${ApplicationId}-solr"
       StackId: !Ref OpsWorksStack
       Type: custom
+      VolumeConfigurations:
+        - MountPoint: "/mnt/local_data"
+          NumberOfDisks: 1
+          Size: 32
 
   OpsWorksWebLayer:
     Type: AWS::OpsWorks::Layer
