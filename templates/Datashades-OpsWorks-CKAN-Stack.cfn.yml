@@ -23,14 +23,6 @@ Parameters:
     Type: String
     MinLength: 1
     MaxLength: 64
-  DataPusherURL:
-    Description: Repository URL for CKAN DataPusher
-    Default: https://github.com/ckan/datapusher.git
-    Type: String
-  DataPusherRevision:
-    Description: Branch/tag name in repository to checkout.
-    Default: "0.0.14"
-    Type: String
   SolrSource:
     Description: URL for zip archive.
     Default: http://archive.apache.org/dist/lucene/solr/5.5.5/solr-5.5.5.zip
@@ -455,30 +447,6 @@ Resources:
       VpcId:
         Fn::ImportValue: !Ref StackVPC
 
-  OpsWorksDataPusherLayer:
-    Type: AWS::OpsWorks::Layer
-    Properties:
-      AutoAssignElasticIps: false
-      AutoAssignPublicIps: false
-      CustomRecipes:
-        Shutdown:
-          - "datashades::datapusher-shutdown"
-        Setup:
-          - "datashades::datapusher-setup"
-        Configure:
-          - "datashades::datapusher-configure"
-        Deploy:
-          - "datashades::datapusher-deploy"
-      CustomSecurityGroupIds:
-        - Fn::ImportValue: !Ref AdminSG
-        - Fn::ImportValue: !Ref DatabaseSG
-      EnableAutoHealing: true
-      InstallUpdatesOnBoot: true
-      Name: !Sub "${ApplicationName}-DataPusher"
-      Shortname: !Sub "${ApplicationId}-datapusher"
-      StackId: !Ref OpsWorksStack
-      Type: custom
-
   OpsWorksSolrLayer:
     Type: AWS::OpsWorks::Layer
     Properties:
@@ -502,6 +470,10 @@ Resources:
       Shortname: !Sub "${ApplicationId}-solr"
       StackId: !Ref OpsWorksStack
       Type: custom
+      VolumeConfigurations:
+        - MountPoint: "/mnt/local_data"
+          NumberOfDisks: 1
+          Size: 32
 
   OpsWorksWebLayer:
     Type: AWS::OpsWorks::Layer
@@ -548,20 +520,6 @@ Resources:
       EnableSsl: false
       Name: !Sub "${ApplicationName}-${Environment}"
       Shortname: !Sub "${ApplicationId}-${Environment}"
-      StackId: !Ref OpsWorksStack
-      Type: other
-
-  OpwxAppDataPusher:
-    Type: AWS::OpsWorks::App
-    Properties:
-      AppSource:
-        Type: git
-        Url: !Ref DataPusherURL
-        Revision: !Ref DataPusherRevision
-      Description: "CKAN DataPusher"
-      EnableSsl: false
-      Name: !Sub "${ApplicationName}-${Environment}-DataPusher"
-      Shortname: !Sub "${ApplicationId}-${Environment}-datapusher"
       StackId: !Ref OpsWorksStack
       Type: other
 
@@ -639,12 +597,6 @@ Outputs:
     Description: OpsWorks Stack Id
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksStack"
-
-  DataPusherLayer:
-    Value: !Ref OpsWorksDataPusherLayer
-    Description: DataPusher Layer Id
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksDataPusherLayer"
 
   SolrLayer:
     Value: !Ref OpsWorksSolrLayer

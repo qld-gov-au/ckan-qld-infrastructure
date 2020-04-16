@@ -7,7 +7,6 @@ common_stack: &common_stack
   template_jinja: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml.j2"
   template_parameters: &common_stack_template_parameters
     OpsWorksStackID: "{{ Environment }}{{ service_name }}OpsWorksStack"
-    DataPusherLayerID: "{{ Environment }}{{ service_name }}OpsWorksDataPusherLayer"
     SolrLayerID: "{{ Environment }}{{ service_name }}OpsWorksSolrLayer"
     WebLayerID: "{{ Environment }}{{ service_name }}OpsWorksWebLayer"
     AppSubnets: "{{ Environment }}CKANAppSubnet"
