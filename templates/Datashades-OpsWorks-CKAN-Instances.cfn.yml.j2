@@ -31,8 +31,6 @@ Metadata:
         default: How many web instances do you want?
       OpsWorksStackID:
         default: What OpsWorks stack do you want to provision instances into?
-      DataPusherLayerID:
-        default: What is the DataPusher Layer ID of the stack?
       SolrLayerID:
         default: What is the Solr Layer ID of the stack?
       WebLayerID:
@@ -98,9 +96,6 @@ Parameters:
   OpsWorksStackID:
     Description: The exported name of the OpsWorks Stack ID.
     Type: String
-  DataPusherLayerID:
-    Description: The exported name of the OpsWorks DataPusher Stack Layer ID.
-    Type: String
   SolrLayerID:
     Description: The exported name of the OpsWorks Solr Stack Layer ID.
     Type: String
@@ -117,10 +112,6 @@ Conditions:
     Fn::Equals:
       - 2
       - !Ref WebEC2Count
-  ProvisionDataPusher:
-    Fn::Equals:
-      - "nonexistent"
-      - !Ref EnableDataStore
 
 Resources:
   OpswxEC2Services1:
@@ -155,42 +146,6 @@ Resources:
       InstanceType: !Ref ServicesEC2Size
       LayerIds:
         - Fn::ImportValue: !Ref SolrLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-
-  OpswxEC2Services2:
-    Condition: ProvisionDataPusher
-    Type: AWS::OpsWorks::Instance
-    Properties:
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endif %}
-      RootDeviceType: ebs
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref ServicesEC2Size
-      LayerIds:
-        - Fn::ImportValue: !Ref DataPusherLayerID
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
