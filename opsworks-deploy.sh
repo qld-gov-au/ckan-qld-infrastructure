@@ -60,7 +60,7 @@ if [ "$PARALLEL" = "true" ]; then
   DEPLOYMENT_ID=$(aws opsworks create-deployment $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET $COMMAND_SNIPPET --output text)
   wait_for_deployment $DEPLOYMENT_ID || exit 1
 else
-  INSTANCE_IDS=$(aws opsworks describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Instances[].{Id: InstanceId, Status: Status}[?Status=='online']|[].Id" --output text) || exit 1
+  INSTANCE_IDS=$(aws opsworks describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Instances[].{Id: InstanceId, Status: Status}[?Status=='online'||Status=='setup_failed']|[].Id" --output text) || exit 1
   echo "Target instance(s): $INSTANCE_IDS"
   for instance in $INSTANCE_IDS; do
     DEPLOYMENT_ID=$(aws opsworks create-deployment $REGION_SNIPPET $STACK_SNIPPET --instance-id $instance $COMMAND_SNIPPET --output text)
