@@ -1,44 +1,13 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Creates instances for OpsWorks CKAN NFS Stack.'
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      - Label:
-          default: OpsWorks Stack Details
-        Parameters:
-          - Environment
-          - OpsWorksStackID
-          - SolrLayerID
-          - WebLayerID
-
-      - Label:
-          default: Stack Instance Details
-        Parameters:
-          - ServicesEC2Size
-          - WebEC2Size
-          - WebEC2Count
-          - AppSubnets
-
-    ParameterLabels:
-      Environment:
-        default: What version is this OpsWorks stack (eg STAGING)?
-      ServicesEC2Size:
-        default: What instance size do you want to use for Service Instances?
-      WebEC2Size:
-        default: What instance size do you want to use for Web Instances?
-      WebEC2Count:
-        default: How many web instances do you want?
-      OpsWorksStackID:
-        default: What OpsWorks stack do you want to provision instances into?
-      SolrLayerID:
-        default: What is the Solr Layer ID of the stack?
-      WebLayerID:
-        default: What is the Web Layer ID of the stack?
-      AppSubnets:
-        default: What base name are the application layer subnet IDs exported under?
 
 Parameters:
+  ApplicationId:
+    Description: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+    Type: String
+    ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
+    AllowedPattern: '[-_a-z0-9]*'
   Environment:
     Description: Select a stack version.
     Type: String
@@ -178,6 +147,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
+      Hostname: !Sub "${ApplicationId}-web1"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
@@ -189,8 +159,6 @@ Resources:
   OpswxEC2Web2:
     Condition: 2PlusWebInstances
     Type: AWS::OpsWorks::Instance
-    DependsOn:
-      - OpswxEC2Web1 # if we try to start both at once, OpsWorks can get confused and give them the same name, which breaks things
     Properties:
 {% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
@@ -216,6 +184,38 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
+      Hostname: !Sub "${ApplicationId}-web2"
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref WebEC2Size
+      SubnetId:
+        Fn::ImportValue: !Sub "${AppSubnets}C"
+      LayerIds:
+        - Fn::ImportValue: !Ref WebLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+
+  OpswxEC2Web3:
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      AutoScalingType: load
+      Hostname: !Sub "${ApplicationId}-web1a"
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref WebEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref WebLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+
+  OpswxEC2Web4:
+    Condition: 2PlusWebInstances
+    Type: AWS::OpsWorks::Instance
+    DependsOn:
+      - OpswxEC2Web3
+    Properties:
+      AutoScalingType: load
+      Hostname: !Sub "${ApplicationId}-web2a"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
