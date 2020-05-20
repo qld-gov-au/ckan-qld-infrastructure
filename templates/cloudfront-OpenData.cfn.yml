@@ -65,10 +65,9 @@ Resources:
           #  TargetOriginId: 'WebOrigin'
           #  MinTTL: 120
           #  ViewerProtocolPolicy: allow-all
-          
-          
+
           #The next 3 rules are for testing ONLY. As the connection to Squiz is currently working they're not needed
-          
+
           #- PathPattern: /oss-squizedge-net* #oss.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
           #  TargetOriginId: 'CmsOrigin'
           #  AllowedMethods:
@@ -190,7 +189,7 @@ Resources:
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
-          - PathPattern: /__data/* #Squiz data that may be needed. 
+          - PathPattern: /__data/* #Squiz data that may be needed.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -682,6 +681,7 @@ Resources:
           Id: 'WebOrigin'
           CustomOriginConfig:
             OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
+            OriginReadTimeout: 60
         - DomainName:
             !Ref CmsOrigin
           Id: 'CmsOrigin'

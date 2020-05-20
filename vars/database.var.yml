@@ -49,7 +49,7 @@ cloudformation_stacks:
       MultiAZ: "true"
     tags:
       <<: *common_stack_tags
-      PowerManaged: "No"
+      PowerManaged: "Yes"
 
   - <<: *common_stack
     name: CKAN-TRAINING-RDS

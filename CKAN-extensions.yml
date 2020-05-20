@@ -2,6 +2,8 @@
 - name: Cloudformation Playbook
   hosts: local
   connection: local
+  vars_files:
+    - vars/CKAN-extensions.var.yml
   pre_tasks:
     - name: get basic_facts
       set_fact:
@@ -14,7 +16,7 @@
       with_dict: "{{ basic_fact }}"
       when: basic_fact is defined
 
-    - name: set Extenions
+    - name: set EnvExtensions
       set_fact: EnvExtensions={{ extensions[Environment] }}
 
   roles:

@@ -7,29 +7,75 @@ enable_datastore: "yes"
 public_tld: data.qld.gov.au
 
 legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip"
-ckan_2_7: "https://github.com/ckan/ckan/archive/ckan-2.7.3.zip"
-ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip"
 
+#yaml anchors https://confluence.atlassian.com/bitbucket/yaml-anchors-960154027.html
 extensions:
-  default:  &default_extensions
+  default: &default_extensions
+    CKANExtXLoader: &CKANExtXLoader
+      name: "ckanext-xloader-{{ Environment }}"
+      shortname: "ckanext-xloader"
+      description: "CKAN Express Loader Extension"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-xloader.git"
+      version: "0.6.0-qgov"
+
+    CKANExtQGOV: &CKANExtQGOV
+      name: "ckanext-qgov-{{ Environment }}"
+      shortname: "ckanext-qgov"
+      description: "CKAN Extension for Queensland Government Open Data"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
+      version: "3.0.0"
+
+    CKANExtS3Filestore: &CKANExtS3Filestore
+      name: "ckanext-s3filestore-{{ Environment }}"
+      shortname: "ckanext-s3filestore"
+      description: "CKAN Extension to keep uploaded files in S3"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
+      version: "v0.2.0-qgov"
+
+    CKANExtSSMConfig: &CKANExtSSMConfig
+      name: "ckanext-ssm-config-{{ Environment }}"
+      shortname: "ckanext-ssm-config"
+      description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
+      version: "0.0.1"
+
     OpwxAppCKANTheme: &OpwxAppCKANTheme
       name: "{{ service_name }} {{ Environment }} theme"
       shortname: "{{ service_name | lower }}-theme-{{ Environment }}"
       description: "Page templates and public assets for {{ service_name }}-{{ Environment }}"
       type: "s3"
       url: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip "
+
   DEV:
     <<: *default_extensions
 
+    CKANExtXLoader:
+      <<: *CKANExtXLoader
+      version: develop
+
+    CKANExtQGOV:
+      <<: *CKANExtQGOV
+      version: "develop"
+
+    CKANExtS3Filestore:
+      <<: *CKANExtS3Filestore
+      version: "develop"
+
+    CKANExtSSMConfig:
+      <<: *CKANExtSSMConfig
+      version: "develop"
 
 
 basic_facts:
-  - Environment: DEV #dev == test 0_0
+  #dev == test 0_0 - this just means that it shares DEV resources (RDS, EFS, Elasticache, Route 53 zone)
+  - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
-    BaseDomain: "test.data.qld.gov.au"
     Domain: "www.test.data.qld.gov.au,test.data.qld.gov.au"
     CmsOrigin: ""
     SiteDomain: "test.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CKANSource: "{{ ckan_2_8 }}"
     CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop

@@ -7,8 +7,6 @@ enable_datastore: "no"
 public_tld: publications.qld.gov.au
 
 legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip"
-ckan_2_7: "https://github.com/ckan/ckan/archive/ckan-2.7.3.zip"
-ckan_2_8: "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip"
 
 
 extensions:
@@ -19,14 +17,31 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
-      version: "2.0.4"
+      version: "3.0.0"
+
+    CKANExtS3Filestore: &CKANExtS3Filestore
+      name: "ckanext-s3filestore-{{ Environment }}"
+      shortname: "ckanext-s3filestore"
+      description: "CKAN Extension to keep uploaded files in S3"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
+      version: "v0.2.0-qgov"
+
+    CKANExtSSMConfig: &CKANExtSSMConfig
+      name: "ckanext-ssm-config-{{ Environment }}"
+      shortname: "ckanext-ssm-config"
+      description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
+      version: "0.0.1"
 
     OpwxAppCKANTheme: &OpwxAppCKANTheme
       name: "{{ service_name }} {{ Environment }} theme"
       shortname: "{{ service_name | lower }}-theme-{{ Environment }}"
       description: "Page templates and public assets for {{ service_name }}-{{ Environment }}"
       type: "s3"
-      url: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip "
+      url: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip"
+
   PROD:
     <<: *default_extensions
   STAGING:
@@ -37,11 +52,17 @@ extensions:
     <<: *default_extensions
     CKANExtQGOV:
       <<: *CKANExtQGOV
-      revision: "develop"
+      version: "develop"
+
+    CKANExtS3Filestore:
+      <<: *CKANExtS3Filestore
+      version: "develop"
+
+    CKANExtSSMConfig:
+      <<: *CKANExtSSMConfig
+      version: "develop"
 
 
-CKANSource: &CKANSource "{{ ckan_2_7 }}"
-CookbookRevision: &CookbookRevision  "2.1.2-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -49,9 +70,6 @@ basic_facts:
     SiteDomain: "www.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
-    CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
-
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -59,8 +77,6 @@ basic_facts:
     SiteDomain: "staging.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "staging.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
-    CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -68,8 +84,6 @@ basic_facts:
     SiteDomain: "training.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "training.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
-    CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -77,5 +91,3 @@ basic_facts:
     SiteDomain: "dev.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "dev.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
-    CKANSource: *CKANSource
-    CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop

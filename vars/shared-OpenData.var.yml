@@ -6,19 +6,40 @@ enable_datastore: "yes"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: data.qld.gov.au
 
-CKANSource: &CKANSource "https://github.com/ckan/ckan/archive/ckan-2.8.3.zip" #ckan_2_8
-CookbookRevision: &CookbookRevision  "2.1.1-qgov" #https://github.com/qld-gov-au/opswx-ckan-cookbook/tags
-
 #yaml anchors https://confluence.atlassian.com/bitbucket/yaml-anchors-960154027.html
 extensions:
   default: &default_extensions
+    CKANExtXLoader: &CKANExtXLoader
+      name: "ckanext-xloader-{{ Environment }}"
+      shortname: "ckanext-xloader"
+      description: "CKAN Express Loader Extension"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-xloader.git"
+      version: "0.6.0-qgov"
+
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
-      revision: "2.0.4"
+      version: "3.0.0"
+
+    CKANExtS3Filestore: &CKANExtS3Filestore
+      name: "ckanext-s3filestore-{{ Environment }}"
+      shortname: "ckanext-s3filestore"
+      description: "CKAN Extension to keep uploaded files in S3"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
+      version: "v0.2.0-qgov"
+
+    CKANExtSSMConfig: &CKANExtSSMConfig
+      name: "ckanext-ssm-config-{{ Environment }}"
+      shortname: "ckanext-ssm-config"
+      description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
+      version: "0.0.1"
 
     CKANExtDCAT: &CKANExtDCAT
       name: "ckanext-dcat-{{ Environment }}"
@@ -32,26 +53,30 @@ extensions:
       name: "ckanext-scheming-{{ Environment }}"
       shortname: "ckanext-scheming"
       description: "CKAN Extension for Scheming"
+      type: "git"
       url: "https://github.com/ckan/ckanext-scheming.git"
       version: "release-1.2.0"
 
     CKANExtValidation: &CKANExtValidation
       name: "ckanext-validation-{{ Environment }}"
       shortname: "ckanext-validation"
-      description: "CKAN Extension for Data Requests"
-      url: "https://github.com/frictionlessdata/ckanext-validation.git"
-      version: "v0.0.7"
+      description: "CKAN Extension for validating Data Packages"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-validation.git"
+      version: "v0.0.8-qgov.1"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
       shortname: "ckanext-data-qld"
       description: "CKAN Extension for Queensland Government Open Data"
+      type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "v1.3.0"
+      version: "1.3.2"
 
     CKANExtDataQldTheme: &CKANExtDataQldTheme
       name: "ckanext-data-qld-theme-{{ Environment }}"
       shortname: "ckanext-data-qld-theme"
+      type: "git"
       description: "CKAN Extension for Queensland Government Open Data theme"
       url: "https://github.com/qld-gov-au/ckanext-data-qld-theme.git"
       version: "master"
@@ -60,6 +85,7 @@ extensions:
       name: "ckanext-odi-certificates-{{ Environment }}"
       shortname: "ckanext-odi-certificates"
       description: "CKAN Extension for ODI Certificates"
+      type: "git"
       url: "https://github.com/qld-gov-au/ckanext-odi-certificates.git"
       version: "1.0.1"
 
@@ -67,6 +93,7 @@ extensions:
       name: "ckanext-datarequests-{{ Environment }}"
       shortname: "ckanext-datarequests"
       description: "CKAN Extension for Data Requests"
+      type: "git"
       url: "https://github.com/qld-gov-au/ckanext-datarequests.git"
       version: "2.0.1-qgov"
 
@@ -74,8 +101,10 @@ extensions:
       name: "ckanext-ytp-comments-{{ Environment }}"
       shortname: "ckanext-ytp-comments"
       description: "CKAN Extension for YTP Comments"
+      type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
-      version: "2.0.1-qgov"
+      version: "2.1.0-qgov"
+
   PROD:
     <<: *default_extensions
 
@@ -87,9 +116,21 @@ extensions:
 
   DEV:
     <<: *default_extensions
+    CKANExtXLoader:
+      <<: *CKANExtXLoader
+      version: "develop"
+
     CKANExtQGOV:
       <<: *CKANExtQGOV
-      revision: "develop"
+      version: "develop"
+
+    CKANExtS3Filestore:
+      <<: *CKANExtS3Filestore
+      version: "develop"
+
+    CKANExtValidation:
+      <<: *CKANExtValidation
+      version: "develop"
 
     CKANExtDataQld:
       <<: *CKANExtDataQld
@@ -111,6 +152,9 @@ extensions:
       <<: *CKANExtYTP
       version: "develop"
 
+    CKANExtSSMConfig:
+      <<: *CKANExtSSMConfig
+      version: "develop"
 
 
 basic_facts:
@@ -120,8 +164,6 @@ basic_facts:
     SiteDomain: "www.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "oss.squizedge.net"
-    CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -129,8 +171,6 @@ basic_facts:
     SiteDomain: "staging.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "staging.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "staging.squizedge.net"
-    CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -138,8 +178,6 @@ basic_facts:
     SiteDomain: "training.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "training.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "staging.squizedge.net"
-    CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -147,6 +185,3 @@ basic_facts:
     SiteDomain: "dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "staging.squizedge.net"
-    CKANSource: *CKANSource
-    CookbookRevision: *CookbookRevision
-

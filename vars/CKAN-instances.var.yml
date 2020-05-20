@@ -4,9 +4,9 @@ common_stack: &common_stack
   region: "{{ region }}"
   disable_rollback: true
   template: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml"
+  template_jinja: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml.j2"
   template_parameters: &common_stack_template_parameters
     OpsWorksStackID: "{{ Environment }}{{ service_name }}OpsWorksStack"
-    DataPusherLayerID: "{{ Environment }}{{ service_name }}OpsWorksDataPusherLayer"
     SolrLayerID: "{{ Environment }}{{ service_name }}OpsWorksSolrLayer"
     WebLayerID: "{{ Environment }}{{ service_name }}OpsWorksWebLayer"
     AppSubnets: "{{ Environment }}CKANAppSubnet"
@@ -38,7 +38,7 @@ cloudformation_stacks:
       WebEC2Count: 2
     tags:
       <<: *common_stack_tags
-      PowerManaged: "No"
+      PowerManaged: "Yes"
 
   - <<: *common_stack
     name: "{{ service_name }}-TRAINING-OpsWorks-instances"

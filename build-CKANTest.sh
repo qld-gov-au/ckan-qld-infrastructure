@@ -1,21 +1,26 @@
 #!/bin/bash
 #deploy CKAN Test base infrastructure
 
+INSTANCE_NAME=CKANTest
+INSTANCE_SHORTNAME=`echo $INSTANCE_NAME |tr '[A-Z]' '[a-z]'`
+STACK_NAME="${INSTANCE_NAME}_$bamboo_deploy_environment"
+
 run-all-playbooks () {
   #ensure we die if any function fails
   set -e
 
   run-shared-resource-playbooks
   run-playbook "CloudFormation" "vars/acm.var.yml"
-  run-playbook "database-config"
+  if [ "$SKIP_CKAN_DB" != "true" ]; then
+    run-playbook "database-config"
+  fi
+  run-playbook "CloudFormation" "vars/s3_buckets.var.yml"
   run-playbook "CKAN-Stack"
-  run-playbook "CloudFormation" "vars/CKAN-extensions.var.yml"
+  run-playbook "CKAN-extensions"
   run-playbook "CloudFormation" "vars/CKAN-instances.var.yml"
   run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
   run-playbook "cloudfront"
-  run-playbook "opsworks-deployment" "Deployment_Type=update_custom_cookbooks"
-  run-playbook "opsworks-deployment" "vars/CKAN-deployment.var.yml"
-  run-playbook "opsworks-deployment" "Deployment_Type=configure"
+  run-deployment
 }
 
-. ./build-CKAN.sh vars/shared-CKANTest.var.yml $bamboo_deploy_environment $@
+. ./build-CKAN.sh vars/shared-$INSTANCE_NAME.var.yml $bamboo_deploy_environment $@
