@@ -18,7 +18,7 @@ common_stack: &common_stack
     ApplicationId: "{{ service_name | lower }}"
     ApplicationTitle: "{{ title }}"
     CKANSource: "{{ CKANSource | default('https://github.com/qld-gov-au/ckan.git') }}"
-    CKANRevision: "{{ CKANRevision | default('ckan-2.8.4-qgov.4') }}"
+    CKANRevision: "{{ CKANRevision | default('ckan-2.8.5-qgov.1') }}"
     PublicStackZoneTLD: "{{ PublicStackZoneTLD }}"
     PublicTLD: "{{ public_tld }}"
     EmailDomain: "{{ RootDomain }}"
