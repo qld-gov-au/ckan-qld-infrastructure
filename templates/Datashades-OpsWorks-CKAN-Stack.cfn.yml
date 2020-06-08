@@ -502,6 +502,19 @@ Resources:
       Shortname: !Sub "${ApplicationId}-web"
       StackId: !Ref OpsWorksStack
       Type: custom
+      LoadBasedAutoScaling:
+        Enable: Yes
+        UpScaling:
+          CpuThreshold: 80
+          IgnoreMetricsTime: 20
+          InstanceCount: 1
+          ThresholdsWaitTime: 5
+        DownScaling:
+          CpuThreshold: 30
+          IgnoreMetricsTime: 20
+          InstanceCount: 1
+          ThresholdsWaitTime: 10
+
       VolumeConfigurations:
         - MountPoint: "/mnt/local_data"
           NumberOfDisks: 1
