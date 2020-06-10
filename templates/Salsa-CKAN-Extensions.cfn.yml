@@ -99,14 +99,6 @@ Parameters:
     Description: Branch/tag name in repository to checkout.
     Default: master
     Type: String
-  HarvestExtensionSource:
-    Description: URL for Harvest extension
-    Default: https://github.com/ckan/ckanext-harvest
-    Type: String
-  HarvestExtensionRevision:
-    Description: Branch/tag name in repository to checkout.
-    Default: master
-    Type: String
 
 Resources:
   CKANExtDataQld:
@@ -225,21 +217,6 @@ Resources:
       EnableSsl: false
       Name: !Sub "ckanext-ytp-comments-${Environment}"
       Shortname: ckanext-ytp-comments
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStack
-      Type: other
-
-  CKANExtHarvest:
-    Type: AWS::OpsWorks::App
-    Properties:
-      AppSource:
-        Type: git
-        Url: !Ref HarvestExtensionSource
-        Revision: !Ref HarvestExtensionRevision
-      Description: CKAN Extension for Harvest
-      EnableSsl: false
-      Name: !Sub "ckanext-harvest-${Environment}"
-      Shortname: ckanext-harvest
       StackId:
         Fn::ImportValue: !Ref OpsWorksStack
       Type: other
