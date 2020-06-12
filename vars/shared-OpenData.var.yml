@@ -105,6 +105,14 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
       version: "2.1.0-qgov"
 
+    CKANExtHarvest: &CKANExtHarvest
+      name: "ckanext-harvest-{{ Environment }}"
+      shortname: "ckanext-harvest"
+      description: "CKAN Extension for Harvesting"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-harvest.git"
+      version: "v1.2.0"
+
   PROD:
     <<: *default_extensions
 
