@@ -58,5 +58,5 @@ cloudformation_stacks:
       WebEC2Size: t3.micro
     tags:
       <<: *common_stack_tags
-      PowerManaged: "Yes"
+      PowerManaged: "No"
 

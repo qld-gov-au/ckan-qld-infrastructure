@@ -75,4 +75,4 @@ cloudformation_stacks:
       MultiAZ: "false"
     tags:
       <<: *common_stack_tags
-      PowerManaged: "Yes"
+      PowerManaged: "No"
