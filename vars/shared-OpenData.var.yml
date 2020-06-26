@@ -85,6 +85,30 @@ extensions:
       url: "https://github.com/ckan/ckanext-harvest.git"
       version: "v1.2.0"
 
+    CKANExtArchiver: &CKANExtArchiver
+      name: "ckanext-archiver-{{ Environment }}"
+      shortname: "ckanext-archiver"
+      description: "CKAN Extension for Archiving needed for ckanext-qa"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-archiver.git"
+      version: "master"
+
+    CKANExtQa: &CKANExtQa
+      name: "ckanext-qa-{{ Environment }}"
+      shortname: "ckanext-qa"
+      description: "CKAN Extension for Quality Assurance"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-qa.git"
+      version: "master"
+
+    CKANExtReport: &CKANExtReport
+      name: "ckanext-report-{{ Environment }}"
+      shortname: "ckanext-report"
+      description: "CKAN Extension for Reporting"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-report.git"
+      version: "master"
+
   PROD:
     <<: *default_extensions
 
@@ -121,6 +145,17 @@ extensions:
       version: "develop"
 
 
+    CKANExtArchiver:
+      <<: *CKANExtArchiver
+     version: "develop"
+
+    CKANExtQa:
+      <<: *CKANExtQa
+      version: "develop"
+
+    CKANExtReport:
+      <<: *CKANExtReport
+      version: "develop"
 
 basic_facts:
   - Environment: PROD
