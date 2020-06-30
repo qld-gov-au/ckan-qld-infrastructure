@@ -190,7 +190,7 @@ extensions:
 
     CKANExtArchiver:
       <<: *CKANExtArchiver
-     version: "develop"
+      version: "develop"
 
     CKANExtQa:
       <<: *CKANExtQa
