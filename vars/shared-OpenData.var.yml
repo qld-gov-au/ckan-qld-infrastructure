@@ -113,6 +113,15 @@ extensions:
       url: "https://github.com/ckan/ckanext-harvest.git"
       version: "v1.2.0"
 
+    #report must be installed before archiver due to dependancy issues, but in ckan load order it must be last for archiver to override its templates
+    CKANExtReport: &CKANExtReport
+      name: "ckanext-report-{{ Environment }}"
+      shortname: "ckanext-report"
+      description: "CKAN Extension for Reporting"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-report.git"
+      version: "master"
+
     CKANExtArchiver: &CKANExtArchiver
       name: "ckanext-archiver-{{ Environment }}"
       shortname: "ckanext-archiver"
@@ -129,13 +138,6 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-qa.git"
       version: "2.0.0"
 
-    CKANExtReport: &CKANExtReport
-      name: "ckanext-report-{{ Environment }}"
-      shortname: "ckanext-report"
-      description: "CKAN Extension for Reporting"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-report.git"
-      version: "0.1"
 
   PROD:
     <<: *default_extensions
@@ -188,16 +190,16 @@ extensions:
       <<: *CKANExtSSMConfig
       version: "develop"
 
+    CKANExtReport:
+      <<: *CKANExtReport
+      version: "develop"
+
     CKANExtArchiver:
       <<: *CKANExtArchiver
       version: "develop"
 
     CKANExtQa:
       <<: *CKANExtQa
-      version: "develop"
-
-    CKANExtReport:
-      <<: *CKANExtReport
       version: "develop"
 
 basic_facts:
