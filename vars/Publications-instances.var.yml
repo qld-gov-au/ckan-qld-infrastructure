@@ -57,6 +57,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: DEV
       ServicesEC2Size: t3.micro
+      WebEC2Size: t3.micro
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
