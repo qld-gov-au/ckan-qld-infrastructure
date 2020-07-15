@@ -66,6 +66,7 @@ else
     DEPLOYMENT_ID=$(aws opsworks create-deployment $REGION_SNIPPET $STACK_SNIPPET --instance-id $instance $COMMAND_SNIPPET --output text)
     wait_for_deployment $DEPLOYMENT_ID || exit 1
     # wait for load balancer health checks to complete
+    # TODO Use 'aws elb describe-instance-health' to properly monitor
     sleep 60
   done
 fi
