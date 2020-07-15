@@ -25,6 +25,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: PROD
+      WebEC2Size: t3.medium
       WebEC2Count: 2
     tags:
       <<: *common_stack_tags
