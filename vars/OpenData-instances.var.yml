@@ -35,6 +35,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: STAGING
+      ServicesEC2Size: t3.micro
       WebEC2Count: 2
     tags:
       <<: *common_stack_tags
@@ -45,6 +46,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: TRAINING
+      ServicesEC2Size: t3.micro
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
