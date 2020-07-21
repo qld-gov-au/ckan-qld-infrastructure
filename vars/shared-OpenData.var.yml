@@ -196,7 +196,7 @@ extensions:
 
     CKANExtArchiver:
       <<: *CKANExtArchiver
-      version: "convertToUploader"
+      version: "develop"
 
     CKANExtQa:
       <<: *CKANExtQa
