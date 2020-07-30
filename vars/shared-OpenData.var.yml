@@ -31,7 +31,7 @@ extensions:
       description: "CKAN Extension to keep uploaded files in S3"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
-      version: "v0.2.0-qgov"
+      version: "0.3.0-qgov"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       name: "ckanext-ssm-config-{{ Environment }}"
@@ -71,7 +71,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "2.0.0"
+      version: "3.0.0"
 
     CKANExtDataQldTheme: &CKANExtDataQldTheme
       name: "ckanext-data-qld-theme-{{ Environment }}"
@@ -79,7 +79,7 @@ extensions:
       type: "git"
       description: "CKAN Extension for Queensland Government Open Data theme"
       url: "https://github.com/qld-gov-au/ckanext-data-qld-theme.git"
-      version: "2.0.0"
+      version: "3.0.0"
 
     CKANExtODICertificates: &CKANExtODICertificates
       name: "ckanext-odi-certificates-{{ Environment }}"
@@ -95,7 +95,7 @@ extensions:
       description: "CKAN Extension for Data Requests"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-datarequests.git"
-      version: "2.1.0-qgov"
+      version: "2.1.1-qgov"
 
     CKANExtYTP: &CKANExtYTP
       name: "ckanext-ytp-comments-{{ Environment }}"
@@ -103,7 +103,7 @@ extensions:
       description: "CKAN Extension for YTP Comments"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
-      version: "2.2.0-qgov"
+      version: "2.3.0-qgov"
 
     CKANExtHarvest: &CKANExtHarvest
       name: "ckanext-harvest-{{ Environment }}"
@@ -112,6 +112,31 @@ extensions:
       type: "git"
       url: "https://github.com/ckan/ckanext-harvest.git"
       version: "v1.2.0"
+
+    CKANExtReport: &CKANExtReport
+      name: "ckanext-report-{{ Environment }}"
+      shortname: "ckanext-report"
+      description: "CKAN Extension for Reporting"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-report.git"
+      version: "0.1"
+
+    CKANExtArchiver: &CKANExtArchiver
+      name: "ckanext-archiver-{{ Environment }}"
+      shortname: "ckanext-archiver"
+      description: "CKAN Extension for Archiving needed for ckanext-qa"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-archiver.git"
+      version: "2.1.0-qgov.1"
+
+    CKANExtQa: &CKANExtQa
+      name: "ckanext-qa-{{ Environment }}"
+      shortname: "ckanext-qa"
+      description: "CKAN Extension for Quality Assurance"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-qa.git"
+      version: "2.0.2-qgov"
+
 
   PROD:
     <<: *default_extensions
@@ -164,6 +189,17 @@ extensions:
       <<: *CKANExtSSMConfig
       version: "develop"
 
+    CKANExtReport:
+      <<: *CKANExtReport
+      version: "develop"
+
+    CKANExtArchiver:
+      <<: *CKANExtArchiver
+      version: "develop"
+
+    CKANExtQa:
+      <<: *CKANExtQa
+      version: "develop"
 
 basic_facts:
   - Environment: PROD

@@ -1,0 +1,65 @@
+---
+common_stack: &common_stack
+  state: "{{ state | default('present')}}"
+  region: "{{ region }}"
+  disable_rollback: true
+  template: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml"
+  template_jinja: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml.j2"
+  template_parameters: &common_stack_template_parameters
+    ApplicationId: "{{ service_name_lower }}"
+    OpsWorksStackID: "{{ Environment }}{{ service_name }}OpsWorksStack"
+    SolrLayerID: "{{ Environment }}{{ service_name }}OpsWorksSolrLayer"
+    WebLayerID: "{{ Environment }}{{ service_name }}OpsWorksWebLayer"
+    AppSubnets: "{{ Environment }}CKANAppSubnet"
+    EnableDataStore: "{{ enable_datastore | default('no') }}"
+  tags: &common_stack_tags
+    Environment: "{{ Environment }}"
+    Service: "{{ service_name }}"
+    Division: "{{ Division }}"
+    Owner: "{{ Owner }}"
+    Version: "1.0"
+
+cloudformation_stacks:
+  - <<: *common_stack
+    name: "{{ service_name }}-PROD-OpsWorks-instances"
+    template_parameters:
+      <<: *common_stack_template_parameters
+      Environment: PROD
+      WebEC2Size: t3.medium
+      WebEC2Count: 2
+    tags:
+      <<: *common_stack_tags
+      PowerManaged: "No"
+
+  - <<: *common_stack
+    name: "{{ service_name }}-STAGING-OpsWorks-instances"
+    template_parameters:
+      <<: *common_stack_template_parameters
+      Environment: STAGING
+      ServicesEC2Size: t3.micro
+      WebEC2Count: 2
+    tags:
+      <<: *common_stack_tags
+      PowerManaged: "Yes"
+
+  - <<: *common_stack
+    name: "{{ service_name }}-TRAINING-OpsWorks-instances"
+    template_parameters:
+      <<: *common_stack_template_parameters
+      Environment: TRAINING
+      ServicesEC2Size: t3.micro
+    tags:
+      <<: *common_stack_tags
+      PowerManaged: "Yes"
+
+  - <<: *common_stack
+    name: "{{ service_name }}-DEV-OpsWorks-instances"
+    template_parameters:
+      <<: *common_stack_template_parameters
+      Environment: DEV
+      ServicesEC2Size: t3.micro
+      WebEC2Size: t3.small
+    tags:
+      <<: *common_stack_tags
+      PowerManaged: "No"
+
