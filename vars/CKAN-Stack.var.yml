@@ -18,7 +18,7 @@ common_stack: &common_stack
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name | lower }}"
     ApplicationTitle: "{{ title }}"
-    CKANSource: "{{ CKANSource | default('https://github.com/qld-gov-au/ckan.git') }}"
+    CKANSource: "{{ CKANSource | default('https://github.com/qld-gov-au/ckan.git@' + ckan_tag) }}"
     CKANRevision: "{{ CKANRevision | default(ckan_tag) }}"
     PublicStackZoneTLD: "{{ PublicStackZoneTLD }}"
     PublicTLD: "{{ public_tld }}"
@@ -96,7 +96,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: DEV
-      CKANSource: "{{ CKANSource | default('https://github.com/qld-gov-au/ckan.git') }}"
+      CKANSource: "{{ CKANSource | default('https://github.com/qld-gov-au/ckan.git@qgov-master') }}"
       CKANRevision: "{{ CKANRevision | default('qgov-master') }}"
       CookbookRevision: "{{ CookbookRevision | default('develop') }}"
       GTMContainerId: "{{ NonProductionGTMId }}"
