@@ -30,7 +30,7 @@ Resources:
       CorsConfiguration:
         CorsRules:
           - AllowedOrigins: ['*']
-            AllowedMethods: [GET]
+            AllowedMethods: [GET, HEAD]
       LifecycleConfiguration:
               Rules:
               - Id: "VersionExpiry"
