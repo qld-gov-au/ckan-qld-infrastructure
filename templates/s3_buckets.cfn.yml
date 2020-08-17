@@ -27,6 +27,10 @@ Resources:
       BucketName: !Ref AttachmentsBucketName
       VersioningConfiguration:
         Status: Enabled
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins: ['*']
+            AllowedMethods: [GET, HEAD]
       LifecycleConfiguration:
               Rules:
               - Id: "VersionExpiry"
