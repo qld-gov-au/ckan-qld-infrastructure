@@ -29,7 +29,8 @@ if [ "$LAYER_NAME" = "" ]; then
 else
   LAYER_ID=$(aws opsworks describe-layers $REGION_SNIPPET $STACK_SNIPPET --query "Layers[].{LayerId: LayerId, Shortname: Shortname}[?Shortname=='$LAYER_NAME']|[0].LayerId" --output text)
   MESSAGE="$MESSAGE, layer $LAYER_ID"
-  INSTANCE_IDENTIFIER_SNIPPET="--layer-id $LAYER_ID"
+  LAYER_SNIPPET="--layer-id $LAYER_ID"
+  INSTANCE_IDENTIFIER_SNIPPET="$LAYER_SNIPPET"
 fi
 
 echo "$MESSAGE"
@@ -57,7 +58,7 @@ for truthy in `echo "y t T 1" |xargs echo`; do
   fi
 done
 if [ "$PARALLEL" = "true" ]; then
-  DEPLOYMENT_ID=$(aws opsworks create-deployment $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET $COMMAND_SNIPPET --output text)
+  DEPLOYMENT_ID=$(aws opsworks create-deployment $REGION_SNIPPET $STACK_SNIPPET $LAYER_SNIPPET $COMMAND_SNIPPET --output text)
   wait_for_deployment $DEPLOYMENT_ID || exit 1
 else
   INSTANCE_IDS=$(aws opsworks describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Instances[].{Id: InstanceId, Status: Status}[?Status=='online'||Status=='setup_failed']|[].Id" --output text) || exit 1
