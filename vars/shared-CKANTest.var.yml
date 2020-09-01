@@ -201,7 +201,7 @@ extensions:
       version: "master"
 
 basic_facts:
-  - Environment: STAGING
+  - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.test.data.qld.gov.au,test.data.qld.gov.au"
     SiteDomain: "test.data.qld.gov.au" #CKAN SiteDomain
