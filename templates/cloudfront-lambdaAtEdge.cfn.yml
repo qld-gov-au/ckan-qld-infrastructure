@@ -57,7 +57,7 @@ Resources:
               }
           };
       Role: !GetAtt LambdaEdgeFunctionRole.Arn
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Handler: index.handler
       Timeout: 5
 

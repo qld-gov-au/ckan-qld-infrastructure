@@ -6,8 +6,6 @@ enable_datastore: "yes"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: data.qld.gov.au
 
-legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip"
-
 #yaml anchors https://confluence.atlassian.com/bitbucket/yaml-anchors-960154027.html
 extensions:
   default: &default_extensions
@@ -17,7 +15,7 @@ extensions:
       description: "CKAN Express Loader Extension"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-xloader.git"
-      version: "0.6.0-qgov"
+      version: "0.6.2-qgov"
 
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
@@ -33,7 +31,7 @@ extensions:
       description: "CKAN Extension to keep uploaded files in S3"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
-      version: "v0.3.0-qgov"
+      version: "0.4.0-qgov"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       name: "ckanext-ssm-config-{{ Environment }}"
@@ -43,39 +41,176 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
       version: "0.0.1"
 
-    OpwxAppCKANTheme: &OpwxAppCKANTheme
-      name: "{{ service_name }} {{ Environment }} theme"
-      shortname: "{{ service_name | lower }}-theme-{{ Environment }}"
-      description: "Page templates and public assets for {{ service_name }}-{{ Environment }}"
-      type: "s3"
-      url: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip "
+    CKANExtDCAT: &CKANExtDCAT
+      name: "ckanext-dcat-{{ Environment }}"
+      shortname: "ckanext-dcat"
+      description: "CKAN Extension for DCAT"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-dcat.git"
+      version: "v0.0.9"
+
+    CKANExtScheming: &CKANExtScheming
+      name: "ckanext-scheming-{{ Environment }}"
+      shortname: "ckanext-scheming"
+      description: "CKAN Extension for Scheming"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-scheming.git"
+      version: "release-1.2.0"
+
+    CKANExtValidation: &CKANExtValidation
+      name: "ckanext-validation-{{ Environment }}"
+      shortname: "ckanext-validation"
+      description: "CKAN Extension for validating Data Packages"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-validation.git"
+      version: "v0.0.8-qgov.1"
+
+    CKANExtDataQld: &CKANExtDataQld
+      name: "ckanext-data-qld-{{ Environment }}"
+      shortname: "ckanext-data-qld"
+      description: "CKAN Extension for Queensland Government Open Data"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
+      version: "3.0.0"
+
+    CKANExtDataQldTheme: &CKANExtDataQldTheme
+      name: "ckanext-data-qld-theme-{{ Environment }}"
+      shortname: "ckanext-data-qld-theme"
+      type: "git"
+      description: "CKAN Extension for Queensland Government Open Data theme"
+      url: "https://github.com/qld-gov-au/ckanext-data-qld-theme.git"
+      version: "3.0.1"
+
+    CKANExtODICertificates: &CKANExtODICertificates
+      name: "ckanext-odi-certificates-{{ Environment }}"
+      shortname: "ckanext-odi-certificates"
+      description: "CKAN Extension for ODI Certificates"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-odi-certificates.git"
+      version: "1.0.1"
+
+    CKANExtDataRequests: &CKANExtDataRequests
+      name: "ckanext-datarequests-{{ Environment }}"
+      shortname: "ckanext-datarequests"
+      description: "CKAN Extension for Data Requests"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-datarequests.git"
+      version: "2.1.1-qgov"
+
+    CKANExtYTP: &CKANExtYTP
+      name: "ckanext-ytp-comments-{{ Environment }}"
+      shortname: "ckanext-ytp-comments"
+      description: "CKAN Extension for YTP Comments"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
+      version: "2.3.0-qgov"
+
+    CKANExtHarvest: &CKANExtHarvest
+      name: "ckanext-harvest-{{ Environment }}"
+      shortname: "ckanext-harvest"
+      description: "CKAN Extension for Harvesting"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-harvest.git"
+      version: "v1.3.0"
+
+    CKANExtReport: &CKANExtReport
+      name: "ckanext-report-{{ Environment }}"
+      shortname: "ckanext-report"
+      description: "CKAN Extension for Reporting"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-report.git"
+      version: "0.2"
+
+    CKANExtArchiver: &CKANExtArchiver
+      name: "ckanext-archiver-{{ Environment }}"
+      shortname: "ckanext-archiver"
+      description: "CKAN Extension for Archiving needed for ckanext-qa"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-archiver.git"
+      version: "2.1.1-qgov"
+
+    CKANExtQa: &CKANExtQa
+      name: "ckanext-qa-{{ Environment }}"
+      shortname: "ckanext-qa"
+      description: "CKAN Extension for Quality Assurance"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-qa.git"
+      version: "2.0.3-qgov"
+
+  PROD:
+    <<: *default_extensions
+
+  TRAINING:
+    <<: *default_extensions
+
+  STAGING:
+    <<: *default_extensions
 
   DEV:
     <<: *default_extensions
-
     CKANExtXLoader:
       <<: *CKANExtXLoader
-      version: develop
+      version: "master"
 
     CKANExtQGOV:
       <<: *CKANExtQGOV
-      version: "develop"
+      version: "master"
 
     CKANExtS3Filestore:
       <<: *CKANExtS3Filestore
-      version: "develop"
+      version: "master"
+
+    CKANExtValidation:
+      <<: *CKANExtValidation
+      version: "master"
+
+    CKANExtDataQld:
+      <<: *CKANExtDataQld
+      version: "master"
+
+    CKANExtDataQldTheme:
+      <<: *CKANExtDataQldTheme
+      version: "master"
+
+    CKANExtODICertificates:
+      <<: *CKANExtODICertificates
+      version: "master"
+
+    CKANExtDataRequests:
+      <<: *CKANExtDataRequests
+      version: "master"
+
+    CKANExtYTP:
+      <<: *CKANExtYTP
+      version: "master"
 
     CKANExtSSMConfig:
       <<: *CKANExtSSMConfig
-      version: "develop"
+      version: "master"
 
+    CKANExtReport:
+      <<: *CKANExtReport
+      version: "master"
+
+    CKANExtArchiver:
+      <<: *CKANExtArchiver
+      version: "master"
+
+    CKANExtQa:
+      <<: *CKANExtQa
+      version: "master"
 
 basic_facts:
-  #dev == test 0_0 - this just means that it shares DEV resources (RDS, EFS, Elasticache, Route 53 zone)
-  - Environment: DEV
+  - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.test.data.qld.gov.au,test.data.qld.gov.au"
-    CmsOrigin: ""
     SiteDomain: "test.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CookbookRevision: develop #https://github.com/qld-gov-au/opswx-ckan-cookbook/commits/develop
+    CmsOrigin: "staging.squizedge.net"
+
+  - Environment: DEV
+    PublicStackZoneTLD: "{{ public_tld }}"
+    Domain: "www.test-dev.data.qld.gov.au,test-dev.data.qld.gov.au"
+    SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
+    RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "staging.squizedge.net"
