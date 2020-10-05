@@ -16,7 +16,7 @@ Parameters:
     Description: Platform environment
     Type: String
   environment:
-    Description: Platform environment, all lowercase, eg 'opendata'
+    Description: Platform environment, all lowercase, eg 'dev'
     Type: String
   Platform:
     Description: Name of the platform ie GI, Services, Static,etc
