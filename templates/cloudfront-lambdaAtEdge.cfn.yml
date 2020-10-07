@@ -61,6 +61,11 @@ Resources:
       Handler: index.handler
       Timeout: 5
 
+  # This function strips the name of an S3 bucket out of the URL,
+  # before passing the request upstream. This is needed because
+  # CloudFront can only add a prefix to the request, not remove one.
+  # We want eg '/ckan-opendata-attachments-prod/resources/foo' to serve
+  # the 'resources/foo' object from bucket 'ckan-opendata-attachments-prod'.
   LambdaEdgeOriginFunction9cd5bfa:
     Type: 'AWS::Lambda::Function'
     Properties:
