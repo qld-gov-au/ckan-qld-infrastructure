@@ -15,14 +15,14 @@ Parameters:
   Environment:
     Description: Platform environment
     Type: String
-  environment:
-    Description: Platform environment, all lowercase, eg 'dev'
-    Type: String
   Platform:
     Description: Name of the platform ie GI, Services, Static,etc
     Type: String
   LogBucketName:
     Description: Name of the S3 logging bucket.
+    Type: String
+  AttachmentBucketName:
+    Description: Name of the S3 bucket for uploaded files.
     Type: String
   WebACLId:
     Description: WAF web ACL Id.
@@ -32,9 +32,6 @@ Parameters:
     Type: String
   Service:
     Description: for Tagging Distribution
-    Type: String
-  ApplicationId:
-    Description: Lowercase name of the application eg 'opendata'
     Type: String
   Division:
     Description: for Tagging Distribution
@@ -660,7 +657,7 @@ Resources:
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: !Sub "/ckan-${ApplicationId}-attachments-${environment}/*" # S3 uploaded files
+          - PathPattern: !Sub "/${AttachmentBucketName}/*" # S3 uploaded files
             TargetOriginId: 'S3Origin'
             AllowedMethods:
               - GET
@@ -719,7 +716,7 @@ Resources:
               - "TLSv1.1"
               - "TLSv1.2"
         - Id: 'S3Origin'
-          DomainName: !Sub "ckan-${ApplicationId}-attachments-${environment}.s3-${Region}.amazonaws.com"
+          DomainName: !Sub "${AttachmentBucketName}.s3-${Region}.amazonaws.com"
           S3OriginConfig:
             OriginAccessIdentity: ""
         PriceClass: PriceClass_All
