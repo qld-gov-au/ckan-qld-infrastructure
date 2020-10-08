@@ -21,8 +21,14 @@ Parameters:
   LogBucketName:
     Description: Name of the S3 logging bucket.
     Type: String
+  AttachmentBucketName:
+    Description: Name of the S3 bucket for uploaded files.
+    Type: String
   WebACLId:
-    Description: WAF web ACL Id .
+    Description: WAF web ACL Id.
+    Type: String
+  Region:
+    Description: The AWS region for non-global resources like S3 buckets.
     Type: String
   Service:
     Description: for Tagging Distribution
@@ -36,11 +42,15 @@ Parameters:
   Version:
     Description: for Tagging Distribution
     Type: String
-  LambdaAtEdgeOriginRequestVersion:
+  LambdaAtEdgeViewerRequestVersion:
     Description: Lambda at Edge which is located in us-east-1
+    Type: String
+  LambdaAtEdgeOriginRequestVersion:
+    Description: Lambda at Edge function for updating requests to the origin
     Type: String
 
 Resources:
+
   DistributionConfig:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -56,7 +66,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /dataset/*/resource/*/download/*
             Compress: true
             ForwardedValues:
@@ -68,11 +78,8 @@ Resources:
             ViewerProtocolPolicy: allow-all
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
         DefaultCacheBehavior:
-          LambdaFunctionAssociations:
-            - EventType: 'viewer-request'
-              LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
           AllowedMethods:
             - GET
             - HEAD
@@ -90,6 +97,9 @@ Resources:
               - "*"
           TargetOriginId: 'WebOrigin'
           ViewerProtocolPolicy: redirect-to-https
+          LambdaFunctionAssociations:
+            - EventType: 'viewer-request'
+              LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
         DefaultRootObject: /
         Enabled: true
         Logging:
@@ -103,6 +113,10 @@ Resources:
             CustomOriginConfig:
               OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
               OriginReadTimeout: 60
+          - Id: 'S3Origin'
+            DomainName: !Sub "${AttachmentBucketName}.s3-${Region}.amazonaws.com"
+            S3OriginConfig:
+              OriginAccessIdentity: ""
         PriceClass: PriceClass_All
         WebACLId:
           Fn::ImportValue: !Ref WebACLId
