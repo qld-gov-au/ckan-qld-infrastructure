@@ -17,9 +17,12 @@ cloudformation_stacks:
       ACMCertificateARN: "{{ ACMCertificateARNForUsEast1 }}"
       Domain: "{{ Domain }}"
       LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
+      AttachmentBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}"
+      Region: "{{ region }}"
       Service: "{{ service_name }}"
       Division: "{{ Division }}"
       Owner: "{{ Owner }}"
+      LambdaAtEdgeViewerRequestVersion: "{{ LambdaAtEdgeViewerRequestVersion }}"
       LambdaAtEdgeOriginRequestVersion: "{{ LambdaAtEdgeOriginRequestVersion }}"
       Version: "1.0"
     tags:
