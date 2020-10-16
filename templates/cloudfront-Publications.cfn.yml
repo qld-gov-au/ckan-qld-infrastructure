@@ -79,6 +79,26 @@ Resources:
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+          - PathPattern: !Sub "/${AttachmentBucketName}/*" # S3 uploaded files
+            TargetOriginId: 'S3Origin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: false
+            DefaultTTL: 3600
+            MaxTTL: 3600
+            MinTTL: 0
+            ForwardedValues:
+              QueryString: true
+            ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'origin-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
         DefaultCacheBehavior:
           AllowedMethods:
             - GET
