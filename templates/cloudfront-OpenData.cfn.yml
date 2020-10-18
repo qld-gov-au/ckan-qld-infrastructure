@@ -716,7 +716,7 @@ Resources:
               - "TLSv1.1"
               - "TLSv1.2"
         - Id: 'S3Origin'
-          DomainName: !Sub "${AttachmentBucketName}.s3-${Region}.amazonaws.com"
+          DomainName: !Sub "${AttachmentBucketName}.s3.${Region}.amazonaws.com"
           S3OriginConfig:
             OriginAccessIdentity: ""
         PriceClass: PriceClass_All
