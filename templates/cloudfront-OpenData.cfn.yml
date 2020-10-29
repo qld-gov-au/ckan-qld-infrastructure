@@ -21,8 +21,14 @@ Parameters:
   LogBucketName:
     Description: Name of the S3 logging bucket.
     Type: String
+  AttachmentBucketName:
+    Description: Name of the S3 bucket for uploaded files.
+    Type: String
   WebACLId:
-    Description: WAF web ACL Id .
+    Description: WAF web ACL Id.
+    Type: String
+  Region:
+    Description: The AWS region for non-global resources like S3 buckets.
     Type: String
   Service:
     Description: for Tagging Distribution
@@ -36,8 +42,11 @@ Parameters:
   Version:
     Description: for Tagging Distribution
     Type: String
-  LambdaAtEdgeOriginRequestVersion:
+  LambdaAtEdgeViewerRequestVersion:
     Description: Lambda at Edge which is located in us-east-1
+    Type: String
+  LambdaAtEdgeOriginRequestVersion:
+    Description: Lambda at Edge function for updating requests to the origin
     Type: String
 
 Resources:
@@ -155,7 +164,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /_resources/* #Resources in Squiz such as PDF documents
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -188,7 +197,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /__data/* #Squiz data that may be needed.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -221,7 +230,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /__lib/* #Provides content for the Squiz CMS functionally in _admin
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -242,7 +251,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /__fudge/* #Provides content for the Squiz CMS functionally in _admin
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -263,7 +272,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: / #The homepage
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -296,7 +305,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /home* #The homepage
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -329,7 +338,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /_admin* #The Squiz admin interface on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -362,7 +371,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /_edit* #The Squiz edit interface of the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -395,7 +404,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /_login* #The Squiz login page on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -416,7 +425,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /_editplusapi* #The Squiz editplusapi on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -449,7 +458,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /_nocache* #Squiz nocache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -482,7 +491,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /_noproxycache* #Squiz noproxycache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -515,7 +524,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /_recache* #Squiz recache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -548,7 +557,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /_performance* #Squiz performance page on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -581,7 +590,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /article #Not sure if this page exists but just in case, a top level article page
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -614,7 +623,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /article/* #sub pages of article, also including things like /articles/blahblah/_admin
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
@@ -647,6 +656,22 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+          - PathPattern: !Sub "/${AttachmentBucketName}/*" # S3 uploaded files
+            TargetOriginId: 'S3Origin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            Compress: false
+            DefaultTTL: 3600
+            MaxTTL: 3600
+            MinTTL: 0
+            ForwardedValues:
+              QueryString: true
+            ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'origin-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
         DefaultCacheBehavior:
           AllowedMethods:
@@ -668,7 +693,7 @@ Resources:
           ViewerProtocolPolicy: redirect-to-https
           LambdaFunctionAssociations:
             - EventType: 'viewer-request'
-              LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+              LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
         DefaultRootObject: home
         Enabled: true
         Logging:
@@ -690,6 +715,10 @@ Resources:
             OriginSSLProtocols:
               - "TLSv1.1"
               - "TLSv1.2"
+        - Id: 'S3Origin'
+          DomainName: !Sub "${AttachmentBucketName}.s3.${Region}.amazonaws.com"
+          S3OriginConfig:
+            OriginAccessIdentity: ""
         PriceClass: PriceClass_All
         WebACLId:
           Fn::ImportValue: !Ref WebACLId
