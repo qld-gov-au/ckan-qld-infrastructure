@@ -133,7 +133,7 @@ Resources:
       PreferredMaintenanceWindow: "sat:17:00-sat:17:30"
       PreferredBackupWindow: "16:00-16:30"
       AutoMinorVersionUpgrade: true
-      AllowMajorVersionUpgrade: false
+      AllowMajorVersionUpgrade: true
       BackupRetentionPeriod: "20"
       CopyTagsToSnapshot: true
       VPCSecurityGroups:
