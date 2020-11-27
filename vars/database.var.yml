@@ -12,6 +12,7 @@ common_stack: &common_stack
     DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
     DBPrivileges: "ALL"
     PubliclyAccessible: "false"
+    PreferredMaintenanceWindow: "wed:19:00-wed:19:45"
     Platform: CKAN
     Subnets: "{{ Environment }}CKANDBSubnet"
     VPC: "CKANVpc-{{ Environment }}"
@@ -32,6 +33,7 @@ cloudformation_stacks:
       DBAllocatedStorage: "600"
       DBClass: db.m5.large
       StorageEncrypted: "True"
+      PreferredMaintenanceWindow: "sat:17:00-sat:17:30"
       Environment: PROD
       MultiAZ: "true"
     tags:
