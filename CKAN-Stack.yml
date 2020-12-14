@@ -63,4 +63,4 @@
       register: opsworks_facts
 
     - name: Enable CloudWatch Logs on OpsWorks web layer
-      command: "aws opsworks update-layer --region us-east-1 --layer-id '{{opsworks_facts.ansible_facts.cloudformation[stack_name].stack_outputs.WebLayer}}' --cloud-watch-logs-configuration 'Enabled=true, LogStreams=[{LogGroupName=ckan-worker, File=/var/log/ckan/*.log}, {LogGroupName=httpd, File=/var/log/httpd/*/*.log}, {LogGroupName=solr, File=/var/log/solr/*.log}]'"
+      command: "aws opsworks update-layer --region us-east-1 --layer-id '{{opsworks_facts.ansible_facts.cloudformation[stack_name].stack_outputs.WebLayer}}' --cloud-watch-logs-configuration 'Enabled=true, LogStreams=[{LogGroupName={{service_name}}_{{Enviroment}}_ckan-worker, File=/var/log/ckan/*.log}, {LogGroupName={{service_name}}_{{Enviroment}}_httpd, File=/var/log/httpd/*/*.log}, {LogGroupName={{service_name}}_{{Enviroment}}_solr, File=/var/log/solr/*.log}]'"
