@@ -7,7 +7,7 @@ ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', regi
 solr5: "http://archive.apache.org/dist/lucene/solr/5.5.5/solr-5.5.5.zip"
 solr6: "http://archive.apache.org/dist/lucene/solr/6.6.6/solr-6.6.6.zip"
 solr7: "http://archive.apache.org/dist/lucene/solr/7.7.2/solr-7.7.2.zip"
-ckan_tag: "ckan-2.8.5-qgov.2"
+ckan_tag: "ckan-2.8.5-qgov.3"
 
 common_stack: &common_stack
   state: "{{ state | default('present')}}"
@@ -98,6 +98,8 @@ cloudformation_stacks:
       Environment: DEV
       CKANSource: "{{ CKANSource | default('https://github.com/qld-gov-au/ckan.git@qgov-master') }}"
       CKANRevision: "{{ CKANRevision | default('qgov-master') }}"
+      CookbookURL: "{{ CookbookURL | default('https://github.com/qld-gov-au/opswx-ckan-cookbook.git') }}"
+      CookbookURLType: "{{ CookbookURLType | default('git')}}"
       CookbookRevision: "{{ CookbookRevision | default('develop') }}"
       GTMContainerId: "{{ NonProductionGTMId }}"
       AnalyticsId: "{{ NonProductionAnalyticsId }}"
