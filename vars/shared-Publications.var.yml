@@ -6,9 +6,6 @@ enable_datastore: "no"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: publications.qld.gov.au
 
-legacy_theme: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip"
-
-
 extensions:
   default:  &default_extensions
     CKANExtQGOV: &CKANExtQGOV
@@ -35,12 +32,24 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
       version: "0.0.1"
 
-    OpwxAppCKANTheme: &OpwxAppCKANTheme
-      name: "{{ service_name }} {{ Environment }} theme"
-      shortname: "{{ service_name | lower }}-theme-{{ Environment }}"
-      description: "Page templates and public assets for {{ service_name }}-{{ Environment }}"
-      type: "s3"
-      url: "https://s3.amazonaws.com/osssio-ckanpub-test-deploy/{{ service_name }}-{{ Environment }}/CKAN-theme.zip"
+    # install Open Data extension under a different name,
+    # which signals to the cookbook that we only want
+    # the Publications-relevant parts
+    CKANExtDataQld: &CKANExtDataQld
+      name: "ckanext-publications-qld-{{ Environment }}"
+      shortname: "ckanext-publications-qld"
+      description: "CKAN Extension for Queensland Government Publications"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
+      version: "3.0.2"
+
+    CKANExtPublicationsTheme: &CKANExtPublicationsTheme
+      name: "ckanext-publications-qld-theme-{{ Environment }}"
+      shortname: "ckanext-publications-qld-theme"
+      type: "git"
+      description: "CKAN Extension for Queensland Government Publications theme"
+      url: "https://github.com/qld-gov-au/ckanext-publications-qld-theme.git"
+      version: "1.0.0"
 
   PROD:
     <<: *default_extensions
@@ -61,20 +70,12 @@ extensions:
       <<: *CKANExtSSMConfig
       version: "develop"
 
-    CKANExtDataQld: &CKANExtDataQld
-      name: "ckanext-publications-qld-{{ Environment }}"
-      shortname: "ckanext-publications-qld"
-      description: "CKAN Extension for Queensland Government Publications"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
+    CKANExtDataQld:
+      <<: *CKANExtDataQld
       version: "develop"
 
     CKANExtPublicationsTheme:
-      name: "ckanext-publications-qld-theme-{{ Environment }}"
-      shortname: "ckanext-publications-qld-theme"
-      type: "git"
-      description: "CKAN Extension for Queensland Government Publications theme"
-      url: "https://github.com/qld-gov-au/ckanext-publications-qld-theme.git"
+      <<: *CKANExtPublicationsTheme
       version: "develop"
 
 
