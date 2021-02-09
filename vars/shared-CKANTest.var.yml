@@ -15,7 +15,7 @@ extensions:
       description: "CKAN Express Loader Extension"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-xloader.git"
-      version: "0.6.2-qgov"
+      version: "0.7.1-qgov"
 
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
@@ -31,7 +31,7 @@ extensions:
       description: "CKAN Extension to keep uploaded files in S3"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
-      version: "0.5.1-qgov"
+      version: "0.6.0-qgov"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       name: "ckanext-ssm-config-{{ Environment }}"
@@ -63,7 +63,7 @@ extensions:
       description: "CKAN Extension for validating Data Packages"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation.git"
-      version: "v0.0.8-qgov.1"
+      version: "v0.0.8-qgov.2"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
@@ -71,7 +71,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "3.0.1"
+      version: "3.0.2"
 
     CKANExtDataQldTheme: &CKANExtDataQldTheme
       name: "ckanext-data-qld-theme-{{ Environment }}"
@@ -79,7 +79,7 @@ extensions:
       type: "git"
       description: "CKAN Extension for Queensland Government Open Data theme"
       url: "https://github.com/qld-gov-au/ckanext-data-qld-theme.git"
-      version: "3.0.1"
+      version: "3.0.2"
 
     CKANExtODICertificates: &CKANExtODICertificates
       name: "ckanext-odi-certificates-{{ Environment }}"
@@ -127,7 +127,7 @@ extensions:
       description: "CKAN Extension for Archiving needed for ckanext-qa"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-archiver.git"
-      version: "2.1.1-qgov"
+      version: "2.1.1-qgov.2"
 
     CKANExtQa: &CKANExtQa
       name: "ckanext-qa-{{ Environment }}"
