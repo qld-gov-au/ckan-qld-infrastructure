@@ -3,6 +3,7 @@ import os
 import six
 import yaml
 
+extensions_file = os.environ.get('EXTENSIONS_FILE', 'extensions.yml')
 target_environment = os.environ.get('ENV', 'DEV')
 requirement_list = ''
 extensions = yaml.safe_load(open('extensions.yml'))['extensions'][target_environment]
