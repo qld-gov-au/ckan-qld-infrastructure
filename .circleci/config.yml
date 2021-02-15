@@ -37,7 +37,7 @@ jobs:
     environment:
       DEPLOY_ENV: DEV
     steps:
-      <<: *steps_config
+      - *steps_config
 
   build_staging:
     <<: *container_config
@@ -45,7 +45,7 @@ jobs:
     environment:
       DEPLOY_ENV: STAGING
     steps:
-      <<: *steps_config
+      - *steps_config
 
 workflows:
   version: 2
