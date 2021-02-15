@@ -3,6 +3,7 @@ FROM amazeeio/python:2.7-ckan-v0.23.1
 WORKDIR /app
 
 ARG SITE_URL
+ARG DEPLOY_ENV
 ENV SITE_URL="${SITE_URL}"
 ENV DEPLOY_ENV="${DEPLOY_ENV}"
 
