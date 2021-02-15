@@ -14,27 +14,42 @@ aliases:
   - &step_setup_remote_docker
       setup_remote_docker
 
+  - &steps_config
+    - attach_workspace:
+        at: /workspace
+    - checkout
+    - *step_setup_remote_docker
+    - run: .circleci/build.sh
+    - run: .circleci/test.sh
+    - run:
+        name: Process artifacts
+        command: .circleci/process-artifacts.sh
+        when: always
+    - store_artifacts:
+        path: /tmp/artifacts
+        when: always
+
+
 jobs:
   build:
     <<: *container_config
     parallelism: 1
+    environment:
+      DEPLOY_ENV: DEV
     steps:
-      - attach_workspace:
-          at: /workspace
-      - checkout
-      - *step_setup_remote_docker
-      - run: .circleci/build.sh
-      - run: .circleci/test.sh
-      - run:
-          name: Process artifacts
-          command: .circleci/process-artifacts.sh
-          when: always
-      - store_artifacts:
-          path: /tmp/artifacts
-          when: always
+      <<: *steps_config
+
+  build_staging:
+    <<: *container_config
+    parallelism: 1
+    environment:
+      DEPLOY_ENV: STAGING
+    steps:
+      <<: *steps_config
 
 workflows:
   version: 2
   main:
     jobs:
       - build
+      - build_staging
