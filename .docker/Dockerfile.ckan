@@ -26,7 +26,7 @@ COPY .docker/test.ini /app/ckan/default/production.ini
 
 COPY .docker/scripts /app/scripts
 
-COPY vars/shared-CKANTest.var.yml /app/scripts/extensions.yml
+COPY vars/shared-OpenData.var.yml /app/scripts/extensions.yml
 
 RUN fix-permissions /app/ckan \
     && chmod +x /app/scripts/init.sh \
