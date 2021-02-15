@@ -9,7 +9,7 @@ set -e
 pip install -r "/app/requirements.txt"
 pip install -r "/app/requirements-dev.txt"
 #python setup.py develop
-python generate-ext-requirements.py
+python $(dirname $0)/generate-ext-requirements.py
 pip install -r "/app/requirements-ext.txt"
 
 # Validate that the extension was installed correctly.
