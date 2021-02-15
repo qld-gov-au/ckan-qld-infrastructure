@@ -57,16 +57,45 @@ Resources:
               }
           };
       Role: !GetAtt LambdaEdgeFunctionRole.Arn
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Handler: index.handler
       Timeout: 5
 
-  #verisons are hard coded, if you need two versions, leave the old one in, but be aware that cloudformation does not like having two versions which are the same so it might get cranky.
+  # This function strips the name of an S3 bucket out of the URL,
+  # before passing the request upstream. This is needed because
+  # CloudFront can only add a prefix to the request, not remove one.
+  # We want eg '/ckan-opendata-attachments-prod/resources/foo' to serve
+  # the 'resources/foo' object from bucket 'ckan-opendata-attachments-prod'.
+  LambdaEdgeOriginFunction9cd5bfa:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile:  |
+          'use strict';
+          exports.handler = (event, context, callback) => {
+              const request = event.Records[0].cf.request;
+              const s3_pattern = new RegExp('^/ckan-[a-z]+-attachments-[a-z]+/')
+              if (s3_pattern.test(request.uri)) {
+                request.uri = request.uri.replace(s3_pattern, '/');
+              }
+              callback( null, request );
+          };
+      Role: !GetAtt LambdaEdgeFunctionRole.Arn
+      Runtime: nodejs12.x
+      Handler: index.handler
+      Timeout: 5
+
+  #versions are hard coded, if you need two versions, leave the old one in, but be aware that cloudformation does not like having two versions which are the same so it might get cranky.
   #current version as of 6/9/2019
   VersionedLambdaFunction48e660f3: #change name if changing lambda code and update cloudfront link
     Type: 'AWS::Lambda::Version'
     Properties:
       FunctionName: !Ref LambdaEdgeFunction48e660f
+
+  LambdaOriginFunctionVersion9cd5bfa:
+    Type: 'AWS::Lambda::Version'
+    Properties:
+      FunctionName: !Ref LambdaEdgeOriginFunction9cd5bfa
 
   LambdaEdgeFunctionRole:
     Type: "AWS::IAM::Role"
@@ -92,3 +121,6 @@ Outputs:
   VersionedLambdaFunction48e660f3:
     Value: !Ref VersionedLambdaFunction48e660f3
   #don't forget add the new version to output the value for cross region referencing. Note cfn import's don't work cross region so we can't lock it sadly
+
+  LambdaEdgeOriginFunctionVersion9cd5bfa:
+    Value: !Ref LambdaOriginFunctionVersion9cd5bfa

@@ -39,7 +39,8 @@
       register: acmUsEast1
 
     - set_fact:
-        LambdaAtEdgeOriginRequestVersion: "{{ lambdaAtEdgeStack.ansible_facts.cloudformation[lambdaAtEdgestack_name].stack_outputs.VersionedLambdaFunction48e660f3 }}"
+        LambdaAtEdgeViewerRequestVersion: "{{ lambdaAtEdgeStack.ansible_facts.cloudformation[lambdaAtEdgestack_name].stack_outputs.VersionedLambdaFunction48e660f3 }}"
+        LambdaAtEdgeOriginRequestVersion: "{{ lambdaAtEdgeStack.ansible_facts.cloudformation[lambdaAtEdgestack_name].stack_outputs.LambdaEdgeOriginFunctionVersion9cd5bfa }}"
         ACMCertificateARNForUsEast1: "{{ acmUsEast1.ansible_facts.cloudformation[acm_stack_name].stack_outputs.AcmCert }}"
 
     - include_vars: vars/cloudfront.var.yml

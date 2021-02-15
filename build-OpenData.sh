@@ -16,9 +16,8 @@ run-all-playbooks () {
   fi
   run-playbook "CloudFormation" "vars/s3_buckets.var.yml"
   run-playbook "CKAN-Stack"
-  run-playbook "CloudFormation" "vars/Salsa-CKAN-extensions.var.yml"
   run-playbook "CKAN-extensions"
-  run-playbook "CloudFormation" "vars/CKAN-instances.var.yml"
+  run-playbook "CloudFormation" "vars/${INSTANCE_NAME}-instances.var.yml"
   run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
   run-playbook "cloudfront"
   run-deployment

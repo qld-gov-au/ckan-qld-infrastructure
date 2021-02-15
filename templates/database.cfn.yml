@@ -86,6 +86,9 @@ Parameters:
   StorageEncrypted:
     Description: Set for encrypted disk
     Type: String
+  PreferredMaintenanceWindow:
+    Description: The weekly time range during which system maintenance can occur, in UTC.
+    Type: String
   Environment:
     Description: Database environment
     Type: String
@@ -130,10 +133,10 @@ Resources:
       MasterUserPassword: !Ref DBPassword
       MasterUsername: !Ref DBUsername
       PubliclyAccessible: !Ref PubliclyAccessible
-      PreferredMaintenanceWindow: "sat:17:00-sat:17:30"
+      PreferredMaintenanceWindow: !Ref PreferredMaintenanceWindow
       PreferredBackupWindow: "16:00-16:30"
       AutoMinorVersionUpgrade: true
-      AllowMajorVersionUpgrade: false
+      AllowMajorVersionUpgrade: true
       BackupRetentionPeriod: "20"
       CopyTagsToSnapshot: true
       VPCSecurityGroups:
