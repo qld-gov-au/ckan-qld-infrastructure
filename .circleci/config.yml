@@ -14,7 +14,7 @@ aliases:
   - &step_setup_remote_docker
       setup_remote_docker
 
-  - &steps_config
+  - steps: &steps_config
     - attach_workspace:
         at: /workspace
     - checkout
@@ -36,16 +36,14 @@ jobs:
     parallelism: 1
     environment:
       DEPLOY_ENV: DEV
-    steps:
-      - *steps_config
+    steps: *steps_config
 
   build_staging:
     <<: *container_config
     parallelism: 1
     environment:
       DEPLOY_ENV: STAGING
-    steps:
-      - *steps_config
+    steps: *steps_config
 
 workflows:
   version: 2
