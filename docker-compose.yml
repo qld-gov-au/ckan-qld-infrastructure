@@ -30,6 +30,7 @@ services:
       dockerfile: .docker/Dockerfile.ckan
       args:
         SITE_URL: http://ckan-qld-infrastructure.docker.amazee.io
+        VARS_TYPE:
         DEPLOY_ENV:
     depends_on:
       - postgres

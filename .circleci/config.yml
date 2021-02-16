@@ -31,17 +31,35 @@ aliases:
 
 
 jobs:
-  build:
+  OpenData_DEV:
     <<: *container_config
     parallelism: 1
     environment:
+      VARS_TYPE: OpenData
       DEPLOY_ENV: DEV
     steps: *steps_config
 
-  build_staging:
+  OpenData_STAGING:
     <<: *container_config
     parallelism: 1
     environment:
+      VARS_TYPE: OpenData
+      DEPLOY_ENV: STAGING
+    steps: *steps_config
+
+  Publications_DEV:
+    <<: *container_config
+    parallelism: 1
+    environment:
+      VARS_TYPE: Publications
+      DEPLOY_ENV: DEV
+    steps: *steps_config
+
+  Publications_STAGING:
+    <<: *container_config
+    parallelism: 1
+    environment:
+      VARS_TYPE: Publications
       DEPLOY_ENV: STAGING
     steps: *steps_config
 
@@ -49,5 +67,7 @@ workflows:
   version: 2
   main:
     jobs:
-      - build
-      - build_staging
+      - OpenData_DEV
+      - Publications_DEV
+      - OpenData_STAGING
+      - Publications_STAGING
