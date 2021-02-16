@@ -3,7 +3,9 @@ FROM amazeeio/python:2.7-ckan-21.2.1
 WORKDIR /app
 
 ARG SITE_URL
+ARG DEPLOY_ENV
 ENV SITE_URL="${SITE_URL}"
+ENV DEPLOY_ENV="${DEPLOY_ENV}"
 
 ENV DOCKERIZE_VERSION v0.6.1
 RUN apk add --no-cache curl && curl -s -L -O https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz \
@@ -25,6 +27,8 @@ RUN . /app/ckan/default/bin/activate \
 COPY .docker/test.ini /app/ckan/default/production.ini
 
 COPY .docker/scripts /app/scripts
+
+COPY vars/shared-OpenData.var.yml /app/scripts/extensions.yml
 
 RUN fix-permissions /app/ckan \
     && chmod +x /app/scripts/init.sh \
