@@ -77,4 +77,8 @@ workflows:
       - OpenData_DEV
       - Publications_DEV
       - OpenData_STAGING
+          requires:
+            - OpenData_DEV
       - Publications_STAGING
+          requires:
+            - Publications_DEV
