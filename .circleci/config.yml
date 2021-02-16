@@ -66,6 +66,13 @@ jobs:
 workflows:
   version: 2
   main:
+    triggers:
+      - schedule:
+          cron: "0 0 1 * *"
+          filters:
+            branches:
+              only:
+                - master
     jobs:
       - OpenData_DEV
       - Publications_DEV
