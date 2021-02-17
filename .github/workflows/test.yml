@@ -6,46 +6,89 @@ on:
   push:
   schedule:
     - cron: "0 0 1 * *"
+env:
+  CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
+  CKAN_DATASTORE_WRITE_URL: postgresql://datastore_write:pass@postgres/datastore_test
+  CKAN_DATASTORE_READ_URL: postgresql://datastore_read:pass@postgres/datastore_test
+  CKAN_SOLR_URL: http://solr:8983/solr/ckan
+  CKAN_REDIS_URL: redis://redis:6379/1
 
 jobs:
+  lint:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+      - name: Install requirements
+        run: pip install flake8 pycodestyle
+      - name: Check syntax
+        run: flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics --exclude ckan
+
   test:
+    needs: lint
     strategy:
       matrix:
+        # Not ready for 2.9 yet
+        # ckan-version: [2.9, 2.9-py2, 2.8]
+        ckan-version: [2.8]
         application: [OpenData, Publications]
         target_environment: [DEV, STAGING]
       fail-fast: false
 
     name: ${{ matrix.application }} ${{ matrix.target_environment }} infrastructure build
     runs-on: ubuntu-18.04
+    container:
+      image: openknowledge/ckan-dev:${{ matrix.ckan-version }}
     timeout-minutes: 30
+    services:
+      solr:
+        image: ckan/ckan-solr-dev:${{ matrix.ckan-version }}
+      postgres:
+        image: ckan/ckan-postgres-dev:${{ matrix.ckan-version }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+          image: redis:3
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
 
     steps:
-      - name: Install tools
-        timeout-minutes: 3
+      - name: Update CKAN version
         run: |
-          # if sudo doesn't exist, assume we're root and don't need it
-          SUDO=$(which sudo || true)
-          $SUDO apt-get update
-          which docker-compose > /dev/null || \
-            ($SUDO apt-get install -y docker-compose)
-          which ahoy > /dev/null || \
-            ($SUDO wget -q https://github.com/devinci-code/ahoy/releases/download/1.1.0/ahoy-`uname -s`-amd64 -O /usr/local/bin/ahoy \
-              && $SUDO chmod +x /usr/local/bin/ahoy)
-          which composer > /dev/null || \
-            ($SUDO apt-get install -y php && wget -O composer-setup.php https://getcomposer.org/installer && $SUDO php composer-setup.php)
-          which pygmy > /dev/null || \
-            ($SUDO apt-get install -y ruby && $SUDO gem install pygmy)
+          cd /srv/app/src/ckan
+          git remote set-url origin https://github.com/qld-gov-au/ckan.git
+          # Extracting the version would be better, but would require
+          # Jinja rendering as well as YAML parsing
+          git checkout qgov-master
 
       - uses: actions/checkout@v2
         timeout-minutes: 2
 
-      - name: Build containers
-        timeout-minutes: 15
-        run: .circleci/build.sh
+      - name: Install requirements
+        run: |
+          pip install -r "/app/requirements.txt"
+          pip install -r "/app/requirements-dev.txt"
+          EXTENSIONS_FILE=vars/shared-$VARS_TYPE.var.yml python .docker/scripts/generate-ext-requirements.py
+          pip install --force-reinstall -r "/app/requirements-ext.txt"
 
-      - name: Run integration tests
-        timeout-minutes: 15
-        run: .circleci/test.sh
+      - name: Setup extension (CKAN >= 2.9)
+        if: ${{ matrix.ckan-version != '2.7' && matrix.ckan-version != '2.8' }}
+        run: |
+          ckan -c test-$VARS_TYPE.ini db init
+          ckan -c test-$VARS_TYPE.ini datastore set-permissions | sudo -u postgres psql -p $PG_PORT
+      - name: Setup extension (CKAN < 2.9)
+        if: ${{ matrix.ckan-version == '2.7' || matrix.ckan-version == '2.8' }}
+        run: |
+          paster --plugin=ckan db init -c test-$VARS_TYPE.ini
+          paster datastore set-permissions -c test-$VARS_TYPE.ini | sudo -u postgres psql -p $PG_PORT
+
+      - name: Run all tests
+        run: |
+          nosetests
+          behave ${*:-test/features}
