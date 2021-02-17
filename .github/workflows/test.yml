@@ -17,6 +17,7 @@ jobs:
 
     name: ${{ matrix.application }} ${{ matrix.target_environment }} infrastructure build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
@@ -24,6 +25,7 @@ jobs:
 
     steps:
       - name: Install tools
+        timeout-minutes: 3
         run: |
           # if sudo doesn't exist, assume we're root and don't need it
           SUDO=$(which sudo || true)
@@ -39,9 +41,12 @@ jobs:
             ($SUDO apt-get install -y ruby && $SUDO gem install pygmy)
 
       - uses: actions/checkout@v2
+        timeout-minutes: 2
 
       - name: Build containers
+        timeout-minutes: 15
         run: .circleci/build.sh
 
       - name: Run integration tests
+        timeout-minutes: 15
         run: .circleci/test.sh
