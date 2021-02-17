@@ -1,0 +1,33 @@
+---
+#based on https://raw.githubusercontent.com/ckan/ckanext-scheming/master/.github/workflows/test.yml
+# alternative https://github.com/ckan/ckan/blob/master/contrib/cookiecutter/ckan_extension/%7B%7Bcookiecutter.project%7D%7D/.github/workflows/test.yml
+name: Tests
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 0 1 * *"
+    - branches: master
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        application: [OpenData, Publications]
+        target_environment: [DEV, STAGING]
+      fail-fast: false
+
+    name: ${{ matrix.application }} ${{ matrix.target_environment }} infrastructure build
+    runs-on: ubuntu-latest
+    env:
+      VARS_TYPE: ${{ matrix.application }}
+      DEPLOY_ENV: ${{ matrix.target_environment }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - Name: Build containers
+        run: .circleci/build.sh
+
+      - Name: Run integration tests
+        run: .circleci/test.sh
