@@ -3,7 +3,7 @@
 # alternative https://github.com/ckan/ckan/blob/master/contrib/cookiecutter/ckan_extension/%7B%7Bcookiecutter.project%7D%7D/.github/workflows/test.yml
 name: Tests
 on:
-  pull_request:
+  push:
   schedule:
     - cron: "0 0 1 * *"
 
