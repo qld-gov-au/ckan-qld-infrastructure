@@ -73,8 +73,8 @@ jobs:
 
       - name: Install requirements
         run: |
-          pip install -r "/app/requirements.txt"
-          pip install -r "/app/requirements-dev.txt"
+          pip install -r "requirements.txt"
+          pip install -r "requirements-dev.txt"
           EXTENSIONS_FILE=vars/shared-$VARS_TYPE.var.yml python .docker/scripts/generate-ext-requirements.py
           pip install --force-reinstall -r "/app/requirements-ext.txt"
 
