@@ -3,7 +3,6 @@
 # alternative https://github.com/ckan/ckan/blob/master/contrib/cookiecutter/ckan_extension/%7B%7Bcookiecutter.project%7D%7D/.github/workflows/test.yml
 name: Tests
 on:
-  push:
   pull_request:
   schedule:
     - cron: "0 0 1 * *"
@@ -21,6 +20,7 @@ jobs:
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
+      COMPOSE_INTERACTIVE_NO_CLI: 1
 
     steps:
       - name: Install tools
