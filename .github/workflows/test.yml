@@ -65,6 +65,7 @@ jobs:
           git remote set-url origin https://github.com/qld-gov-au/ckan.git
           # Extracting the version would be better, but would require
           # Jinja rendering as well as YAML parsing
+          git fetch
           git checkout qgov-master
 
       - uses: actions/checkout@v2
