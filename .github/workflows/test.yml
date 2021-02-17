@@ -32,9 +32,9 @@ jobs:
             ($SUDO apt-get install -y docker-compose)
           which ahoy > /dev/null || \
             ($SUDO wget -q https://github.com/devinci-code/ahoy/releases/download/1.1.0/ahoy-`uname -s`-amd64 -O /usr/local/bin/ahoy \
-              && chmod +x /usr/local/bin/ahoy)
+              && $SUDO chmod +x /usr/local/bin/ahoy)
           which composer > /dev/null || \
-            ($SUDO apt-get install -y php && $SUDO wget -O composer-setup.php https://getcomposer.org/installer && $SUDO php composer-setup.php)
+            ($SUDO apt-get install -y php && wget -O composer-setup.php https://getcomposer.org/installer && $SUDO php composer-setup.php)
           which pygmy > /dev/null || \
             ($SUDO apt-get install -y ruby && $SUDO gem install pygmy)
 
