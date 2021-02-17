@@ -76,7 +76,7 @@ jobs:
           pip install -r "requirements.txt"
           pip install -r "requirements-dev.txt"
           EXTENSIONS_FILE=vars/shared-$VARS_TYPE.var.yml python .docker/scripts/generate-ext-requirements.py
-          pip install --force-reinstall -r "/app/requirements-ext.txt"
+          pip install --force-reinstall -r "/tmp/requirements-ext.txt"
 
       - name: Setup extension (CKAN >= 2.9)
         if: ${{ matrix.ckan-version != '2.7' && matrix.ckan-version != '2.8' }}
