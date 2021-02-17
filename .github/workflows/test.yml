@@ -23,6 +23,21 @@ jobs:
       DEPLOY_ENV: ${{ matrix.target_environment }}
 
     steps:
+      - name: Install tools
+        run: |
+          # if sudo doesn't exist, assume we're root and don't need it
+          SUDO=$(which sudo || true)
+          $SUDO apt-get update
+          which docker-compose > /dev/null || \
+            ($SUDO apt-get install -y docker-compose)
+          which ahoy > /dev/null || \
+            ($SUDO wget -q https://github.com/devinci-code/ahoy/releases/download/1.1.0/ahoy-`uname -s`-amd64 -O /usr/local/bin/ahoy \
+              && chmod +x /usr/local/bin/ahoy)
+          which composer > /dev/null || \
+            ($SUDO apt-get install -y php && $SUDO wget -O composer-setup.php https://getcomposer.org/installer && $SUDO php composer-setup.php)
+          which pygmy > /dev/null || \
+            ($SUDO apt-get install -y ruby && $SUDO gem install pygmy)
+
       - uses: actions/checkout@v2
 
       - name: Build containers
