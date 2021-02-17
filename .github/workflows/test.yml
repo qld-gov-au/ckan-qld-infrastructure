@@ -25,8 +25,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - Name: Build containers
+      - name: Build containers
         run: .circleci/build.sh
 
-      - Name: Run integration tests
+      - name: Run integration tests
         run: .circleci/test.sh
