@@ -31,13 +31,13 @@ COPY .docker/scripts /app/scripts
 
 COPY vars/shared-$VARS_TYPE.var.yml /app/scripts/extensions.yml
 
-RUN fix-permissions /app/ckan \
+RUN chmod -R ug+rwX /app/ckan \
     && chmod +x /app/scripts/init.sh \
     && chmod +x /app/scripts/init-ext.sh \
     && chmod +x /app/scripts/serve.sh
 
 # Add current extension and files.
-#COPY ckanext /app/ckanext #this is all in one project pulling in all requirments dev files, there is no ckanext in this project
+#COPY ckanext /app/ckanext #this is all in one project pulling in all requirements dev files, there is no ckanext in this project
 COPY requirements.txt requirements-dev.txt /app/
 
 # Init current extension.

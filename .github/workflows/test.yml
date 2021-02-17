@@ -21,7 +21,6 @@ jobs:
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
-      COMPOSE_INTERACTIVE_NO_CLI: 1
 
     steps:
       - name: Install tools
