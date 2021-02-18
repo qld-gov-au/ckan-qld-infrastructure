@@ -103,11 +103,11 @@ jobs:
         if: failure()
         run: |
           # need to ensure there are no unusual filename characters
-          zip -r screenshots.zip test/screenshots
+          tar cvzf screenshots.tgz test/screenshots
 
       - name: Upload screenshots
         if: failure()
         uses: actions/upload-artifact@v2
         with:
           name: Screenshots
-          path: screenshots.zip
+          path: screenshots.tgz
