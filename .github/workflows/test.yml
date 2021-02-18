@@ -15,7 +15,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -26,18 +26,17 @@ jobs:
       - name: Check syntax
         run: flake8 . --count --statistics
 
-  test:
+  sanity-check: &default_containers
     needs: lint
     strategy:
       matrix:
         # Not ready for 2.9 yet
-        # ckan-version: [2.9, 2.9-py2, 2.8]
-        ckan-version: [2.8]
-        application: [OpenData, Publications]
-        target_environment: [DEV, STAGING]
+        ckan-version: ['2.8']
       fail-fast: false
 
-    name: ${{ matrix.application }} ${{ matrix.target_environment }} infrastructure build
+    name: Start CKAN without extensions
+    env:
+      CKAN_VERSION: ${{ matrix.ckan-version }}
     runs-on: ubuntu-18.04
     container:
       image: openknowledge/ckan-dev:${{ matrix.ckan-version }}
@@ -56,12 +55,12 @@ jobs:
           image: redis:3
       chrome:
         image: selenium/standalone-chrome:3.141.59-oxygen
-    env:
-      VARS_TYPE: ${{ matrix.application }}
-      DEPLOY_ENV: ${{ matrix.target_environment }}
+        options:
+          -v /dev/shm:/dev/shm
 
     steps:
-      - name: Update CKAN version
+      - &use_qgov_ckan
+        name: Update CKAN version
         run: |
           cd /srv/app/src/ckan
           git remote set-url origin https://github.com/qld-gov-au/ckan.git
@@ -71,12 +70,53 @@ jobs:
           git checkout qgov-master
 
       - uses: actions/checkout@v2
-        timeout-minutes: 2
 
-      - name: Install requirements
+      - &install_base_requirements
+        name: Install requirements
         run: |
           pip install -r "requirements.txt"
           pip install -r "requirements-dev.txt"
+
+      - name: Prepare CKAN configuration
+        run: |
+          ln -s /srv/app/src/ckan/test-core.ini test.ini
+          ln -s /srv/app/src/ckan/who.ini
+
+      - &initialise_ckan
+        name: Initialise CKAN
+        run: |
+          if [ "$CKAN_VERSION" = "2.7" ] || [ "$CKAN_VERSION" = "2.7" ]; then
+            ckan -c /srv/app/src/ckan/test.ini db init
+          else
+            paster --plugin=ckan db init -c /srv/app/src/ckan/test.ini
+          fi
+
+  test:
+    <<: *default_containers
+    needs: sanity-check
+    strategy:
+      matrix:
+        # Not ready for 2.9 yet
+        # ckan-version: ['2.9', '2.9-py2', '2.8']
+        ckan-version: ['2.8']
+        application: [OpenData, Publications]
+        target_environment: [DEV, STAGING]
+      fail-fast: false
+
+    name: ${{ matrix.application }} ${{ matrix.target_environment }} infrastructure build
+    env:
+      VARS_TYPE: ${{ matrix.application }}
+      DEPLOY_ENV: ${{ matrix.target_environment }}
+
+    steps:
+      - *use_qgov_ckan
+
+      - uses: actions/checkout@v2
+
+      - *install_base_requirements
+
+      - name: Install ${{ matrix.application }} requirements
+        run: |
           EXTENSIONS_FILE=vars/shared-$VARS_TYPE.var.yml python .docker/scripts/generate-ext-requirements.py
           pip install --force-reinstall -r "/tmp/requirements-ext.txt"
 
@@ -85,14 +125,7 @@ jobs:
           cp .docker/test-$VARS_TYPE.ini test.ini
           ln -s /srv/app/src/ckan/who.ini
 
-      - name: Setup extension (CKAN >= 2.9)
-        if: ${{ matrix.ckan-version != '2.7' && matrix.ckan-version != '2.8' }}
-        run: |
-          ckan -c test.ini db init
-      - name: Setup extension (CKAN < 2.9)
-        if: ${{ matrix.ckan-version == '2.7' || matrix.ckan-version == '2.8' }}
-        run: |
-          paster --plugin=ckan db init -c test.ini
+      - *initialise_ckan
 
       - name: Run all tests
         run: |
