@@ -181,5 +181,5 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v2
         with:
-          name: Screenshots
+          name: Screenshots-${{ matrix.application }}-${{ matrix.target_environment}}
           path: screenshots.tgz
