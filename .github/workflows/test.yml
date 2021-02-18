@@ -99,9 +99,15 @@ jobs:
           nosetests
           behave ${*:-test/features}
 
+      - name: Gather screenshots
+        if: failure()
+        run: |
+          # need to ensure there are no unusual filename characters
+          zip -r screenshots.zip test/screenshots
+
       - name: Upload screenshots
         if: failure()
         uses: actions/upload-artifact@v2
         with:
           name: Screenshots
-          path: test/screenshots
+          path: screenshots.zip
