@@ -7,6 +7,8 @@ on:
   schedule:
     - cron: "0 0 1 * *"
 env:
+  CKAN_SITE_URL: http://ckan:3000
+  CKAN_PORT: 3000
   CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
   CKAN_DATASTORE_WRITE_URL: postgresql://datastore_write:pass@postgres/datastore_test
   CKAN_DATASTORE_READ_URL: postgresql://datastore_read:pass@postgres/datastore_test
@@ -165,6 +167,12 @@ jobs:
           else
             paster --plugin=ckan db init -c /srv/app/src/ckan/test.ini
           fi
+
+      - name: Add 'ckan' to hosts file
+        run: |
+          # if sudo doesn't exist, assume we're root and don't need it
+          SUDO=$(which sudo || true)
+          echo "127.0.0.1 ckan" | $SUDO tee -a /etc/hosts
 
       - name: Run all tests
         run: |
