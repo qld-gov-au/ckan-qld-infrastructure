@@ -98,3 +98,9 @@ jobs:
         run: |
           nosetests
           behave ${*:-test/features}
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v2
+        with:
+          name: Screenshots
+          path: /tmp/artifacts
