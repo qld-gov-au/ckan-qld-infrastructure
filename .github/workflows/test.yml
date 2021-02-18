@@ -26,13 +26,13 @@ jobs:
       - name: Check syntax
         run: flake8 . --count --statistics
 
-  sanity-check: &default_containers
+  sanity-check: #&default_containers
     needs: lint
     strategy:
       matrix:
         # Not ready for 2.9 yet
         ckan-version: ['2.8']
-      fail-fast: false
+      fail-fast: true
 
     name: Start CKAN without extensions
     env:
@@ -59,7 +59,7 @@ jobs:
           -v /dev/shm:/dev/shm
 
     steps:
-      - &use_qgov_ckan
+      - #&use_qgov_ckan
         name: Update CKAN version
         run: |
           cd /srv/app/src/ckan
@@ -71,7 +71,7 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - &install_base_requirements
+      - #&install_base_requirements
         name: Install requirements
         run: |
           pip install -r "requirements.txt"
@@ -82,7 +82,7 @@ jobs:
           ln -s /srv/app/src/ckan/test-core.ini test.ini
           ln -s /srv/app/src/ckan/who.ini
 
-      - &initialise_ckan
+      - #&initialise_ckan
         name: Initialise CKAN
         run: |
           if [ "$CKAN_VERSION" = "2.7" ] || [ "$CKAN_VERSION" = "2.7" ]; then
@@ -107,13 +107,45 @@ jobs:
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
+    runs-on: ubuntu-18.04
+    container:
+      image: openknowledge/ckan-dev:${{ matrix.ckan-version }}
+    timeout-minutes: 30
+    services:
+      solr:
+        image: ckan/ckan-solr-dev:${{ matrix.ckan-version }}
+      postgres:
+        image: ckan/ckan-postgres-dev:${{ matrix.ckan-version }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+          image: redis:3
+      chrome:
+        image: selenium/standalone-chrome:3.141.59-oxygen
+        options:
+          -v /dev/shm:/dev/shm
 
     steps:
-      - *use_qgov_ckan
+      - #*use_qgov_ckan
+        name: Update CKAN version
+        run: |
+          cd /srv/app/src/ckan
+          git remote set-url origin https://github.com/qld-gov-au/ckan.git
+          # Extracting the version would be better, but would require
+          # Jinja rendering as well as YAML parsing
+          git fetch
+          git checkout qgov-master
 
       - uses: actions/checkout@v2
 
-      - *install_base_requirements
+      - #*install_base_requirements
+        name: Install requirements
+        run: |
+          pip install -r "requirements.txt"
+          pip install -r "requirements-dev.txt"
 
       - name: Install ${{ matrix.application }} requirements
         run: |
@@ -125,7 +157,14 @@ jobs:
           cp .docker/test-$VARS_TYPE.ini test.ini
           ln -s /srv/app/src/ckan/who.ini
 
-      - *initialise_ckan
+      - #*initialise_ckan
+        name: Initialise CKAN
+        run: |
+          if [ "$CKAN_VERSION" = "2.7" ] || [ "$CKAN_VERSION" = "2.7" ]; then
+            ckan -c /srv/app/src/ckan/test.ini db init
+          else
+            paster --plugin=ckan db init -c /srv/app/src/ckan/test.ini
+          fi
 
       - name: Run all tests
         run: |
