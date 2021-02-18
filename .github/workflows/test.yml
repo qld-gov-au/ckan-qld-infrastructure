@@ -92,7 +92,7 @@ jobs:
           fi
 
   test:
-    <<: *default_containers
+    #<<: *default_containers
     needs: sanity-check
     strategy:
       matrix:
