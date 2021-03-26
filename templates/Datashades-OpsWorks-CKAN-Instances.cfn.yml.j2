@@ -21,34 +21,14 @@ Parameters:
     Description: Select EC2 Instance Size.
     Type: String
     Default: t3.small
-    AllowedValues:
-      - t3.micro
-      - t3.small
-      - t3.medium
-      - t3.large
-      - m3.medium
-      - m5.large
-      - m5.xlarge
-      - m5.2xlarge
-      - m5.4xlarge
-      - m4.10xlarge
-      - m5.12xlarge
   WebEC2Size:
     Description: Select EC2 Instance Size.
     Type: String
     Default: t3.small
-    AllowedValues:
-      - t3.micro
-      - t3.small
-      - t3.medium
-      - t3.large
-      - m3.medium
-      - m5.large
-      - m5.xlarge
-      - m5.2xlarge
-      - m5.4xlarge
-      - m4.10xlarge
-      - m5.12xlarge
+  BatchEC2Size:
+    Description: Select EC2 Instance Size for background jobs.
+    Type: String
+    Default: t3.small
   EnableDataStore:
     Description: Whether or not to support the DataStore.
     Type: String
@@ -66,10 +46,13 @@ Parameters:
     Description: The exported name of the OpsWorks Stack ID.
     Type: String
   SolrLayerID:
-    Description: The exported name of the OpsWorks Solr Stack Layer ID.
+    Description: The exported name of the OpsWorks Solr Layer ID.
     Type: String
   WebLayerID:
-    Description: The exported name of the OpsWorks Web Stack Layer ID.
+    Description: The exported name of the OpsWorks web Layer ID.
+    Type: String
+  BatchLayerID:
+    Description: The exported name of the OpsWorks batch layer ID.
     Type: String
   AppSubnets:
     Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'. Only needed for HA configurations.
@@ -225,3 +208,53 @@ Resources:
         - Fn::ImportValue: !Ref WebLayerID
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
+
+  OpswxEC2Batch1:
+    Type: AWS::OpsWorks::Instance
+    Properties:
+{% if item.tags["PowerManaged"] == "Yes" %}
+      AutoScalingType: timer
+      # Monday-Friday 06:00-20:00 GMT+10
+      TimeBasedAutoScaling:
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+        {{ day }}:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endfor %}
+
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endif %}
+      Hostname: !Sub "${ApplicationId}-batch1"
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref BatchEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref BatchLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+
+  OpswxEC2Batch2:
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      AutoScalingType: load
+      Hostname: !Sub "${ApplicationId}-batch1a"
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref BatchEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref BatchLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+

@@ -514,7 +514,50 @@ Resources:
           IgnoreMetricsTime: 20
           InstanceCount: 1
           ThresholdsWaitTime: 10
+      VolumeConfigurations:
+        - MountPoint: "/mnt/local_data"
+          NumberOfDisks: 1
+          Size: 32
 
+  OpsWorksBatchLayer:
+    Type: AWS::OpsWorks::Layer
+    Properties:
+      AutoAssignElasticIps: false
+      AutoAssignPublicIps: false
+      CustomRecipes:
+        Setup:
+          - "datashades::ckanbatch-setup"
+        Deploy:
+          - "datashades::ckanbatch-deploy"
+        Configure:
+          - "datashades::ckanbatch-configure"
+        Shutdown:
+          - "datashades::ckanbatch-shutdown"
+      CustomSecurityGroupIds:
+        - Fn::ImportValue: !Ref AdminSG
+        - Fn::ImportValue: !Ref AppSG
+      CustomInstanceProfileArn:
+        Fn::GetAtt:
+          - WebInstanceRoleProfile
+          - Arn
+      EnableAutoHealing: true
+      InstallUpdatesOnBoot: true
+      Name: !Sub "${ApplicationName}-Batch"
+      Shortname: !Sub "${ApplicationId}-batch"
+      StackId: !Ref OpsWorksStack
+      Type: custom
+      LoadBasedAutoScaling:
+        Enable: Yes
+        UpScaling:
+          CpuThreshold: 80
+          IgnoreMetricsTime: 20
+          InstanceCount: 1
+          ThresholdsWaitTime: 5
+        DownScaling:
+          CpuThreshold: 30
+          IgnoreMetricsTime: 20
+          InstanceCount: 1
+          ThresholdsWaitTime: 10
       VolumeConfigurations:
         - MountPoint: "/mnt/local_data"
           NumberOfDisks: 1
@@ -622,6 +665,12 @@ Outputs:
     Description: Web Layer Id
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksWebLayer"
+
+  BatchLayer:
+    Value: !Ref OpsWorksBatchLayer
+    Description: Batch Layer Id
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}OpsWorksBatchLayer"
 
   CKANApp:
     Value: !Ref OpwxAppCKAN
