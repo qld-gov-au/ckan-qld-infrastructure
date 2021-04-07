@@ -38,6 +38,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: STAGING
       WebEC2Count: 2
+      BatchEC2Size: t3.micro
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -48,6 +49,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: TRAINING
       ServicesEC2Size: t3.micro
+      WebEC2Size: t3.micro
       BatchEC2Size: t3.micro
     tags:
       <<: *common_stack_tags
@@ -59,7 +61,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: DEV
       ServicesEC2Size: t3.micro
-      WebEC2Size: t3.small
+      WebEC2Size: t3.micro
       BatchEC2Size: t3.micro
     tags:
       <<: *common_stack_tags
