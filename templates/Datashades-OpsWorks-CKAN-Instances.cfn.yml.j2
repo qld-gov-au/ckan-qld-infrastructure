@@ -21,14 +21,51 @@ Parameters:
     Description: Select EC2 Instance Size.
     Type: String
     Default: t3.small
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - m3.medium
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m4.10xlarge
+      - m5.12xlarge
   WebEC2Size:
     Description: Select EC2 Instance Size.
     Type: String
     Default: t3.small
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - m3.medium
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m4.10xlarge
+      - m5.12xlarge
   BatchEC2Size:
     Description: Select EC2 Instance Size for background jobs.
     Type: String
     Default: t3.small
+    AllowedValues:
+      - none
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - m3.medium
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m4.10xlarge
+      - m5.12xlarge
   EnableDataStore:
     Description: Whether or not to support the DataStore.
     Type: String
@@ -61,9 +98,10 @@ Parameters:
 
 Conditions:
   2PlusWebInstances:
-    Fn::Equals:
-      - 2
-      - !Ref WebEC2Count
+    !Equals [!Ref WebEC2Count, 2]
+
+  BatchLayerNeeded:
+    !Not [!Equals [!Ref BatchEC2Size, none]]
 
 Resources:
   OpswxEC2Services1:
@@ -210,6 +248,7 @@ Resources:
         Fn::ImportValue: !Ref OpsWorksStackID
 
   OpswxEC2Batch1:
+    Condition: BatchLayerNeeded
     Type: AWS::OpsWorks::Instance
     Properties:
 {% if item.tags["PowerManaged"] == "Yes" %}
@@ -246,6 +285,7 @@ Resources:
         Fn::ImportValue: !Ref OpsWorksStackID
 
   OpswxEC2Batch2:
+    Condition: BatchLayerNeeded
     Type: AWS::OpsWorks::Instance
     Properties:
       AutoScalingType: load
