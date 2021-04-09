@@ -115,7 +115,6 @@ Resources:
 {% for hour in range(20, 24) %}
           "{{ hour }}": "on"
 {% endfor %}
-
 {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
         {{ day }}:
 {% for hour in range(0, 10) %}
@@ -125,7 +124,6 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endfor %}
-
         Friday:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
@@ -152,7 +150,6 @@ Resources:
 {% for hour in range(20, 24) %}
           "{{ hour }}": "on"
 {% endfor %}
-
 {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
         {{ day }}:
 {% for hour in range(0, 10) %}
@@ -162,7 +159,6 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endfor %}
-
         Friday:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
@@ -189,7 +185,6 @@ Resources:
 {% for hour in range(20, 24) %}
           "{{ hour }}": "on"
 {% endfor %}
-
 {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
         {{ day }}:
 {% for hour in range(0, 10) %}
@@ -199,7 +194,6 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endfor %}
-
         Friday:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
@@ -259,7 +253,6 @@ Resources:
 {% for hour in range(20, 24) %}
           "{{ hour }}": "on"
 {% endfor %}
-
 {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
         {{ day }}:
 {% for hour in range(0, 10) %}
@@ -269,7 +262,6 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endfor %}
-
         Friday:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
@@ -297,4 +289,3 @@ Resources:
         - Fn::ImportValue: !Ref BatchLayerID
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
-
