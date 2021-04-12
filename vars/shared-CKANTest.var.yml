@@ -154,7 +154,7 @@ extensions:
 
     CKANExtQGOV:
       <<: *CKANExtQGOV
-      version: "master"
+      version: "QOL-7905-ckan-2.9"
 
     CKANExtS3Filestore:
       <<: *CKANExtS3Filestore
@@ -190,7 +190,7 @@ extensions:
 
     CKANExtReport:
       <<: *CKANExtReport
-      version: "master"
+      version: "Zharktas-py3_to_qld-gov-au"
 
     CKANExtArchiver:
       <<: *CKANExtArchiver
@@ -213,4 +213,5 @@ basic_facts:
     Domain: "www.test-dev.data.qld.gov.au,test-dev.data.qld.gov.au"
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
+    CKANRevision: "ckan-2.9.2"
     CmsOrigin: "staging.squizedge.net"
