@@ -36,10 +36,9 @@ run-deployment () {
   PARALLEL=1 ./opsworks-deploy.sh update_custom_cookbooks $STACK_NAME || exit 1
   ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-web & WEB_PID=$!
   PARALLEL=1 ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-batch & BATCH_PID=$!
-  ./opsworks-deploy.sh execute_recipes $STACK_NAME ${INSTANCE_SHORTNAME}-solr datashades::solr-deploy & SOLR_PID=$!
   wait $WEB_PID || exit 1
   wait $BATCH_PID || exit 1
-  wait $SOLR_PID || exit 1
+  ./opsworks-deploy.sh execute_recipes $STACK_NAME ${INSTANCE_SHORTNAME}-solr datashades::solr-deploy || exit 1
   PARALLEL=1 ./opsworks-deploy.sh configure $STACK_NAME || exit 1
 }
 
