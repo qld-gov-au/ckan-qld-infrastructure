@@ -12,7 +12,7 @@ STACK_NAME="$2"
 LAYER_NAME="$3"
 RECIPE_NAME="$4"
 
-MESSAGE="Running $COMMAND"
+MESSAGE="[$COMMAND"
 if [ "$RECIPE_NAME" = "" ]; then
   COMMAND_SNIPPET="--command Name=$COMMAND"
 else
@@ -22,21 +22,24 @@ fi
 REGION_SNIPPET="--region us-east-1"
 
 STACK_ID=$(aws opsworks describe-stacks $REGION_SNIPPET --query "Stacks[].{StackId:StackId, Name: Name}[?Name=='$STACK_NAME'] | [0].StackId" --output text)
-MESSAGE="$MESSAGE on stack $STACK_ID"
+MESSAGE="$MESSAGE on stack $STACK_NAME"
 STACK_SNIPPET="--stack-id $STACK_ID"
 if [ "$LAYER_NAME" = "" ]; then
   INSTANCE_IDENTIFIER_SNIPPET="$STACK_SNIPPET"
 else
   LAYER_ID=$(aws opsworks describe-layers $REGION_SNIPPET $STACK_SNIPPET --query "Layers[].{LayerId: LayerId, Shortname: Shortname}[?Shortname=='$LAYER_NAME']|[0].LayerId" --output text)
-  MESSAGE="$MESSAGE, layer $LAYER_ID"
+  echo "Layer name $LAYER_NAME resolves to $LAYER_ID"
+  MESSAGE="$MESSAGE, layer $LAYER_NAME"
   LAYER_SNIPPET="--layer-id $LAYER_ID"
   INSTANCE_IDENTIFIER_SNIPPET="$LAYER_SNIPPET"
 fi
 
-echo "$MESSAGE"
+MESSAGE="$MESSAGE]"
+echo "$MESSAGE: starting..."
 
 wait_for_deployment () {
   DEPLOYMENT_ID=$1
+  echo "$MESSAGE: waiting for deployment $DEPLOYMENT_ID..."
   STATUS=$(aws opsworks describe-deployments $REGION_SNIPPET --deployment-id $DEPLOYMENT_ID --query "Deployments|[0].Status" --output text) || exit 1
   for retry in `seq 1 90`; do
     if [ "$STATUS" = "running" ]; then
@@ -46,22 +49,22 @@ wait_for_deployment () {
     fi
   done
   if [ "$STATUS" != "successful" ]; then
-    echo "Failed to deploy, status $STATUS - aborting"
+    echo "Failed to deploy $DEPLOYMENT_ID, status $STATUS - aborting"
     exit 1
   fi
 }
 
 for truthy in `echo "y t T 1" |xargs echo`; do
   if [ "$PARALLEL" = "$truthy" ]; then
-    echo "Parallel enabled, will deploy to entire stack/layer simultaneously"
+    echo "$MESSAGE: Parallel enabled, will deploy to entire stack/layer simultaneously"
     PARALLEL=true
   fi
 done
 INSTANCE_IDS=$(aws opsworks describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Instances[].{Id: InstanceId, Status: Status}[?Status=='online'||Status=='setup_failed']|[].Id" --output text) || exit 1
 if [ "$INSTANCE_IDS" = "" ]; then
-  echo "No eligible instance(s) for deployment"
+  echo "No eligible instance(s) in $INSTANCE_IDENTIFIER_SNIPPET"
 else
-  echo "Target instance(s): $INSTANCE_IDS"
+  echo "Target instance(s) in $INSTANCE_IDENTIFIER_SNIPPET: $INSTANCE_IDS"
   if [ "$PARALLEL" = "true" ]; then
     DEPLOYMENT_ID=$(aws opsworks create-deployment $REGION_SNIPPET $STACK_SNIPPET $LAYER_SNIPPET $COMMAND_SNIPPET --output text)
     wait_for_deployment $DEPLOYMENT_ID || exit 1
@@ -74,5 +77,5 @@ else
       sleep 60
     done
   fi
-  echo "Deployment successful"
+  echo "$MESSAGE: success"
 fi

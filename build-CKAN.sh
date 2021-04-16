@@ -34,8 +34,10 @@ run-shared-resource-playbooks () {
 
 run-deployment () {
   PARALLEL=1 ./opsworks-deploy.sh update_custom_cookbooks $STACK_NAME || exit 1
-  ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-web || exit 1
-  PARALLEL=1 ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-batch || exit 1
+  ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-web & WEB_PID=$!
+  PARALLEL=1 ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-batch & BATCH_PID=$!
+  wait $WEB_PID || exit 1
+  wait $BATCH_PID || exit 1
   ./opsworks-deploy.sh execute_recipes $STACK_NAME ${INSTANCE_SHORTNAME}-solr datashades::solr-deploy || exit 1
   PARALLEL=1 ./opsworks-deploy.sh configure $STACK_NAME || exit 1
 }
