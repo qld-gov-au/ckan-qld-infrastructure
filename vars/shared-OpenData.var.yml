@@ -137,6 +137,14 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-qa.git"
       version: "2.0.3-qgov.3"
 
+    CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
+      name: "ckanext-resource-type-validation-{{ Environment }}"
+      shortname: "ckanext-resource-type-validation"
+      description: "CKAN Extension for checking uploaded resource types"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-resource-type-validation.git"
+      version: "1.0.0"
+
   PROD:
     <<: *default_extensions
 
@@ -201,11 +209,7 @@ extensions:
       version: "develop"
 
     CKANExtResourceTypeValidation:
-      name: "ckanext-resource-type-validation-{{ Environment }}"
-      shortname: "ckanext-resource-type-validation"
-      description: "CKAN Extension for checking uploaded resource types"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-resource-type-validation.git"
+      <<: *CKANExtResourceTypeValidation
       version: "develop"
 
 basic_facts:
