@@ -13,7 +13,7 @@ RUN apk add --no-cache curl && curl -s -L -O https://github.com/jwilder/dockeriz
     && rm dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz
 
 # Install CKAN.
-ENV CKAN_VERSION 2.8.3
+ENV CKAN_VERSION 2.8.7
 RUN . /app/ckan/default/bin/activate \
     && cd /app/ckan/default \
     && pip install setuptools==36.1 \
@@ -36,7 +36,7 @@ RUN fix-permissions /app/ckan \
     && chmod +x /app/scripts/serve.sh
 
 # Add current extension and files.
-#COPY ckanext /app/ckanext #this is all in one project pulling in all requirments dev files, there is no ckanext in this project
+#COPY ckanext /app/ckanext #this is all in one project pulling in all requirements dev files, there is no ckanext in this project
 COPY requirements.txt requirements-dev.txt /app/
 
 # Init current extension.
