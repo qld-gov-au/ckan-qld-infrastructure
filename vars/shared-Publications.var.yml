@@ -90,6 +90,14 @@ extensions:
       <<: *CKANExtResourceTypeValidation
       version: "main"
 
+    CKANExtCSRFFilter: &CKANExtCSRFFilter
+      name: "ckanext-csrf-filter-{{ Environment }}"
+      shortname: "ckanext-csrf-filter"
+      description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
+      version: "develop"
+
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
