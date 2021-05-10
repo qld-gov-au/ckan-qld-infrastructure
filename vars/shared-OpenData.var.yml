@@ -145,6 +145,14 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-resource-type-validation.git"
       version: "1.0.0"
 
+    CKANExtCSRFFilter: &CKANExtCSRFFilter
+      name: "ckanext-csrf-filter-{{ Environment }}"
+      shortname: "ckanext-csrf-filter"
+      description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
+      version: "1.0.0"
+
   PROD:
     <<: *default_extensions
 
@@ -212,12 +220,8 @@ extensions:
       <<: *CKANExtResourceTypeValidation
       version: "develop"
 
-    CKANExtCSRFFilter: &CKANExtCSRFFilter
-      name: "ckanext-csrf-filter-{{ Environment }}"
-      shortname: "ckanext-csrf-filter"
-      description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
+    CKANExtCSRFFilter:
+      <<: *CKANExtCSRFFilter
       version: "develop"
 
 basic_facts:
