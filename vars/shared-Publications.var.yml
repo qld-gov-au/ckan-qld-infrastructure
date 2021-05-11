@@ -49,7 +49,7 @@ extensions:
       type: "git"
       description: "CKAN Extension for Queensland Government Publications theme"
       url: "https://github.com/qld-gov-au/ckanext-publications-qld-theme.git"
-      version: "1.0.2"
+      version: "1.0.3"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"
