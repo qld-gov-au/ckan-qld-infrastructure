@@ -14,7 +14,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
-      version: "3.2.0"
+      version: "3.3.0"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       name: "ckanext-s3filestore-{{ Environment }}"
@@ -22,7 +22,7 @@ extensions:
       description: "CKAN Extension to keep uploaded files in S3"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
-      version: "0.6.1-qgov"
+      version: "0.6.2-qgov"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       name: "ckanext-ssm-config-{{ Environment }}"
@@ -30,7 +30,7 @@ extensions:
       description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
-      version: "0.0.1"
+      version: "0.0.2"
 
     # install Open Data extension under a different name,
     # which signals to the cookbook that we only want
@@ -49,7 +49,7 @@ extensions:
       type: "git"
       description: "CKAN Extension for Queensland Government Publications theme"
       url: "https://github.com/qld-gov-au/ckanext-publications-qld-theme.git"
-      version: "1.0.2"
+      version: "1.0.3"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"
@@ -58,6 +58,14 @@ extensions:
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-resource-type-validation.git"
       version: "1.0.0"
+
+    CKANExtCSRFFilter: &CKANExtCSRFFilter
+      name: "ckanext-csrf-filter-{{ Environment }}"
+      shortname: "ckanext-csrf-filter"
+      description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
+      version: "1.0.1"
 
   PROD:
     <<: *default_extensions
@@ -89,6 +97,10 @@ extensions:
     CKANExtResourceTypeValidation:
       <<: *CKANExtResourceTypeValidation
       version: "main"
+
+    CKANExtCSRFFilter:
+      <<: *CKANExtCSRFFilter
+      version: "develop"
 
 basic_facts:
   - Environment: PROD
