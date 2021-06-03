@@ -42,6 +42,12 @@ jobs:
       - uses: actions/checkout@v2
         timeout-minutes: 2
 
+      # Our config file is actually compatible with either version,
+      # but we have to specify a version, and using the wrong one fails.
+      # CircleCI uses the alpha version, which seems like a bad idea.
+      - name: Patch Ahoy API version
+        run: sed -i 's/ahoyapi: v2/ahoyapi: v1/' .ahoy.yml
+
       - name: Build containers
         timeout-minutes: 15
         run: .circleci/build.sh
