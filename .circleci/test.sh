@@ -4,9 +4,6 @@
 #
 set -e
 
-echo "==> Lint code"
-ahoy lint
-
 echo "==> Run Unit tests"
 ahoy test-unit
 
