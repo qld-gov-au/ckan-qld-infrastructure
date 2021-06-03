@@ -46,7 +46,8 @@ jobs:
       # but we have to specify a version, and using the wrong one fails.
       # CircleCI uses the alpha version, which seems like a bad idea.
       - name: Patch Ahoy API version
-        run: sed -i 's/ahoyapi: v2/ahoyapi: v1/' .ahoy.yml
+        run: |
+          sed -i 's/ahoyapi: v2/ahoyapi: v1/' .ahoy.yml
 
       - name: Build containers
         timeout-minutes: 15
