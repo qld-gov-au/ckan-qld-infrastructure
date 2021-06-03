@@ -43,7 +43,7 @@ jobs:
         timeout-minutes: 2
 
       - name: Lint code
-        run: flake8
+        run: ahoy lint
 
       - name: Build containers
         timeout-minutes: 15
