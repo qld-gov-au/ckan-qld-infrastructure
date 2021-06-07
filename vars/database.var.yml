@@ -31,7 +31,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       DBAllocatedStorage: "600"
-      DBClass: db.m6g.large
+      DBClass: db.m5.large
       StorageEncrypted: "True"
       PreferredMaintenanceWindow: "sat:17:00-sat:17:30"
       Environment: PROD
@@ -45,7 +45,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       DBAllocatedStorage: '300'
-      DBClass: db.m6g.large
+      DBClass: db.m5.large
       StorageEncrypted: "True"
       Environment: STAGING
       MultiAZ: "true"
