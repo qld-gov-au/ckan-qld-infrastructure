@@ -20,6 +20,7 @@ aliases:
     - checkout
     - *step_setup_remote_docker
     - run: .circleci/build.sh
+    - run: ahoy lint
     - run: .circleci/test.sh
     - run:
         name: Process artifacts
