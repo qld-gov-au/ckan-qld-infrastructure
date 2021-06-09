@@ -3,6 +3,7 @@ FROM amazeeio/python:2.7-ckan-21.5.0
 ENV WORKDIR=/app
 
 ARG SITE_URL
+ARG VARS_TYPE
 ARG DEPLOY_ENV
 ENV SITE_URL="${SITE_URL}"
 ENV DEPLOY_ENV="${DEPLOY_ENV}"
@@ -26,11 +27,11 @@ RUN . ${APP_DIR}/bin/activate \
     && deactivate \
     && ln -s /app/ckan /usr/lib/ckan
 
-COPY .docker/test.ini /app/ckan/default/production.ini
+COPY .docker/test-$VARS_TYPE.ini /app/ckan/default/production.ini
 
 COPY .docker/scripts /app/scripts
 
-COPY vars/shared-OpenData.var.yml /app/scripts/extensions.yml
+COPY vars/shared-$VARS_TYPE.var.yml /app/scripts/extensions.yml
 
 RUN fix-permissions /app/ckan \
     && chmod +x /app/scripts/*.sh
