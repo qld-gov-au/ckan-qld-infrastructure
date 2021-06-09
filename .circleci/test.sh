@@ -4,8 +4,11 @@
 #
 set -e
 
+echo "==> Lint code"
+ahoy lint || exit 1
+
 echo "==> Run Unit tests"
-ahoy test-unit
+ahoy test-unit || exit 1
 
 echo "==> Run BDD tests"
-ahoy test-bdd
+ahoy test-bdd || exit 1
