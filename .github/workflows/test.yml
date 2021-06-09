@@ -11,8 +11,8 @@ jobs:
   test:
     strategy:
       matrix:
-        application: [OpenData]
-        target_environment: [DEV]
+        application: [OpenData, Publications]
+        target_environment: [DEV, STAGING]
       fail-fast: false
 
     name: ${{ matrix.application }} ${{ matrix.target_environment }} infrastructure build
