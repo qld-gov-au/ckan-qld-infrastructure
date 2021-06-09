@@ -30,7 +30,10 @@ commands:
   up:
     usage: Build and start Docker containers.
     cmd: |
+      echo "Preparing containers for $VARS_TYPE"
       docker-compose up -d "$@"
+      sleep 10
+      docker-compose logs
       ahoy cli "dockerize -wait tcp://ckan:3000 -timeout 1m"
       if docker-compose logs | grep -q "\[Error\]"; then docker-compose logs; exit 1; fi
       if docker-compose logs | grep -q "Exception"; then docker-compose logs; exit 1; fi
@@ -74,7 +77,7 @@ commands:
     usage: Install a site.
     cmd: |
       ahoy title "Installing a fresh site"
-      docker cp -L .docker/test.ini $(docker-compose ps -q ckan):/app/ckan/default/production.ini
+      docker cp -L .docker/test-$VARS_TYPE.ini $(docker-compose ps -q ckan):/app/ckan/default/production.ini
       ahoy cli "/app/scripts/init.sh"
 
   clean:

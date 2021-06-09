@@ -10,6 +10,6 @@ extensions = yaml.safe_load(open(extensions_file))['extensions'][target_environm
 for key, value in six.iteritems(extensions):
     requirement_list += '-e git+{}@{}#egg={}\n'.format(value['url'], value['version'], value['shortname'])
 
-requirement_file = open('/app/requirements-ext.txt', 'w')
+requirement_file = open('/tmp/requirements-ext.txt', 'w')
 requirement_file.write(requirement_list)
 requirement_file.close()

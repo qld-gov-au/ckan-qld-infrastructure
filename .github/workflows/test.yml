@@ -11,51 +11,25 @@ jobs:
   test:
     strategy:
       matrix:
-        application: [OpenData]
-        target_environment: [DEV]
+        application: [OpenData, Publications]
+        target_environment: [DEV, STAGING]
       fail-fast: false
 
     name: ${{ matrix.application }} ${{ matrix.target_environment }} infrastructure build
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    container: integratedexperts/ci-builder
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
 
     steps:
-      - name: Install tools
-        timeout-minutes: 3
-        run: |
-          # if sudo doesn't exist, assume we're root and don't need it
-          SUDO=$(which sudo || true)
-          $SUDO apt-get update
-          which docker-compose > /dev/null || \
-            ($SUDO apt-get install -y docker-compose)
-          which ahoy > /dev/null || \
-            ($SUDO wget -q https://github.com/devinci-code/ahoy/releases/download/1.1.0/ahoy-`uname -s`-amd64 -O /usr/local/bin/ahoy \
-              && $SUDO chmod +x /usr/local/bin/ahoy)
-          which composer > /dev/null || \
-            ($SUDO apt-get install -y php && wget -O composer-setup.php https://getcomposer.org/installer && $SUDO php composer-setup.php)
-          which pygmy > /dev/null || \
-            ($SUDO apt-get install -y ruby && $SUDO gem install pygmy)
-
       - uses: actions/checkout@v2
         timeout-minutes: 2
 
-      # Our config file is actually compatible with either version,
-      # but we have to specify a version, and using the wrong one fails.
-      # CircleCI uses the alpha version, which seems like a bad idea.
-      - name: Patch Ahoy API version
-        run: |
-          sed -i 's/ahoyapi: v2/ahoyapi: v1/' .ahoy.yml
-
-      - name: Build containers
-        timeout-minutes: 15
+      - name: Build
         run: .circleci/build.sh
+        timeout-minutes: 10
 
-      - name: Lint code
-        run: ahoy lint
-
-      - name: Run integration tests
-        timeout-minutes: 15
+      - name: Test
         run: .circleci/test.sh
+        timeout-minutes: 15
