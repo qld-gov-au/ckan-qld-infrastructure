@@ -2,8 +2,8 @@
 # @see https://flake8.pycqa.org/en/latest/user/configuration.html?highlight=.flake8
 
 exclude =
-    ckan
-    scripts
+    library
+    lookup_plugins
 
 # Extended output format.
 format = pylint
@@ -17,3 +17,4 @@ max-complexity = 10
 ignore =
     E501
     C901
+    W503
