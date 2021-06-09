@@ -30,6 +30,7 @@ commands:
   up:
     usage: Build and start Docker containers.
     cmd: |
+      echo "Preparing containers for $ARGS_TYPE"
       docker-compose up -d "$@"
       sleep 10
       docker-compose logs
