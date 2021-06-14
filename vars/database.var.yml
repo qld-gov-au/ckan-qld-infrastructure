@@ -45,7 +45,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       DBAllocatedStorage: '300'
-      DBClass: db.m5.large
+      DBClass: db.t3.large
       StorageEncrypted: "True"
       Environment: STAGING
       MultiAZ: "true"
