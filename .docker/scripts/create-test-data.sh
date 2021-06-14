@@ -6,9 +6,8 @@
 set -e
 
 CKAN_ACTION_URL=http://ckan:3000/api/action
-CKAN_INI=/app/ckan/default/production.ini
 
-. /app/ckan/default/bin/activate
+. ${APP_DIR}/bin/activate
 
 ckan_cli () {
     if (which ckan > /dev/null); then
