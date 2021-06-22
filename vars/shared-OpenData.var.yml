@@ -237,7 +237,7 @@ basic_facts:
     Domain: "www.staging.data.qld.gov.au,staging.data.qld.gov.au" #Cloudfront Alt Domains
     SiteDomain: "staging.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "staging.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "staging.squizedge.net"
+    CmsOrigin: "oss.squizedge.net"
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
