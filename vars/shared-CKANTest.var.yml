@@ -127,7 +127,7 @@ extensions:
       description: "CKAN Extension for Archiving needed for ckanext-qa"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-archiver.git"
-      version: "2.1.1-qgov.5"
+      version: "2.1.1-qgov.6"
 
     CKANExtQa: &CKANExtQa
       name: "ckanext-qa-{{ Environment }}"
