@@ -79,7 +79,7 @@ extensions:
       type: "git"
       description: "CKAN Extension for Queensland Government Open Data theme"
       url: "https://github.com/qld-gov-au/ckanext-data-qld-theme.git"
-      version: "3.0.6"
+      version: "3.0.7"
 
     CKANExtODICertificates: &CKANExtODICertificates
       name: "ckanext-odi-certificates-{{ Environment }}"
@@ -95,7 +95,7 @@ extensions:
       description: "CKAN Extension for Data Requests"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-datarequests.git"
-      version: "2.1.2-qgov"
+      version: "2.1.3-qgov"
 
     CKANExtYTP: &CKANExtYTP
       name: "ckanext-ytp-comments-{{ Environment }}"
@@ -127,7 +127,7 @@ extensions:
       description: "CKAN Extension for Archiving needed for ckanext-qa"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-archiver.git"
-      version: "2.1.1-qgov.5"
+      version: "2.1.1-qgov.6"
 
     CKANExtQa: &CKANExtQa
       name: "ckanext-qa-{{ Environment }}"
