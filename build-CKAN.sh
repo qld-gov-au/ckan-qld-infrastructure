@@ -1,6 +1,8 @@
 #!/bin/bash
 #deploy CKAN base infrastructure
 
+set -e
+
 VARS_FILE="$1"
 ENVIRONMENT="$2"
 ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS Environment=$ENVIRONMENT"
@@ -33,13 +35,20 @@ run-shared-resource-playbooks () {
 }
 
 run-deployment () {
-  PARALLEL=1 ./opsworks-deploy.sh update_custom_cookbooks $STACK_NAME || exit 1
+  PARALLEL=1 ./opsworks-deploy.sh update_custom_cookbooks $STACK_NAME
   ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-web & WEB_PID=$!
   PARALLEL=1 ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-batch & BATCH_PID=$!
-  wait $WEB_PID || exit 1
-  wait $BATCH_PID || exit 1
-  ./opsworks-deploy.sh execute_recipes $STACK_NAME ${INSTANCE_SHORTNAME}-solr datashades::solr-deploy || exit 1
-  PARALLEL=1 ./opsworks-deploy.sh configure $STACK_NAME || exit 1
+  wait $WEB_PID
+  wait $BATCH_PID
+  STOPPED_INSTANCES=$(./opsworks-deploy.sh get_stopped_instances $STACK_NAME ${INSTANCE_SHORTNAME}-solr)
+  if [ "$STOPPED_INSTANCES" = "" ]; then
+    ./opsworks-deploy.sh execute_recipes $STACK_NAME ${INSTANCE_SHORTNAME}-solr datashades::solr-deploy || exit 1
+  else
+    ./opsworks-deploy.sh start $STACK_NAME ${INSTANCE_SHORTNAME}-solr
+    ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-solr
+    ./opsworks-deploy.sh stop $STACK_NAME ${INSTANCE_SHORTNAME}-solr "$STOPPED_INSTANCES"
+  fi
+  PARALLEL=1 ./opsworks-deploy.sh configure $STACK_NAME
 }
 
 if [ $# -ge 3 ]; then
