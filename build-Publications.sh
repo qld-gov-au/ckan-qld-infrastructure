@@ -1,6 +1,9 @@
 #!/bin/bash
 #deploy Publications base infrastructure
 
+if [ "$bamboo_deploy_environment" = "" ]; then
+  echo "Missing bamboo_deploy_environment" >&2
+fi
 INSTANCE_NAME=Publications
 INSTANCE_SHORTNAME=`echo $INSTANCE_NAME |tr '[A-Z]' '[a-z]'`
 STACK_NAME="${INSTANCE_NAME}_$bamboo_deploy_environment"

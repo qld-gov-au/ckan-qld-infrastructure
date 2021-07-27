@@ -1,6 +1,9 @@
 #!/bin/bash
 #deploy Open Data base infrastructure
 
+if [ "$bamboo_deploy_environment" = "" ]; then
+  echo "Missing bamboo_deploy_environment" >&2
+fi
 INSTANCE_NAME=OpenData
 INSTANCE_SHORTNAME=`echo $INSTANCE_NAME |tr '[A-Z]' '[a-z]'`
 STACK_NAME="${INSTANCE_NAME}_$bamboo_deploy_environment"
