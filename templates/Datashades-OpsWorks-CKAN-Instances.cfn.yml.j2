@@ -129,6 +129,42 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
+      Hostname: !Sub "${ApplicationId}-solr1"
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref ServicesEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref SolrLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+
+  OpswxEC2Services2:
+    Condition: 2PlusWebInstances
+    Type: AWS::OpsWorks::Instance
+    Properties:
+{% if item.tags["PowerManaged"] == "Yes" %}
+      AutoScalingType: timer
+      # Monday-Friday 06:00-20:00 GMT+10
+      TimeBasedAutoScaling:
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+        {{ day }}:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endfor %}
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endif %}
+      Hostname: !Sub "${ApplicationId}-solr2"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
