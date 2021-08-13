@@ -5,10 +5,10 @@
 set -e
 
 echo "==> Lint code"
-ahoy lint || exit 1
+ahoy lint
 
 echo "==> Run Unit tests"
-ahoy test-unit || exit 1
+ahoy test-unit
 
 echo "==> Run BDD tests"
-ahoy test-bdd || exit 1
+ahoy test-bdd || (ahoy logs; exit 1)
