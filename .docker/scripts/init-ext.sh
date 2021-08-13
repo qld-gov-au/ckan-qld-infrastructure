@@ -9,7 +9,7 @@ if [ "$VENV_DIR" != "" ]; then
 fi
 pip install -r "requirements.txt"
 pip install -r "requirements-dev.txt"
-EXTENSIONS_FILE=$APP_DIR/scripts/extensions.yml $APP_DIR/bin/python $(dirname $0)/generate-ext-requirements.py
+EXTENSIONS_FILE=$APP_DIR/scripts/extensions.yml python $(dirname $0)/generate-ext-requirements.py
 pip install --force-reinstall -r "/tmp/requirements-ext.txt"
 
 if [ "$VENV_DIR" != "" ]; then
