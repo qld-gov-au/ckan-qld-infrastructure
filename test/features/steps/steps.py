@@ -20,7 +20,7 @@ def log_in(context):
     context.execute_steps(u"""
         When I go to homepage
         And I click the link with text that contains "Log in"
-        And I log in directly"
+        And I log in directly
     """)
 
 
