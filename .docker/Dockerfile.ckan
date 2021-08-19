@@ -1,4 +1,4 @@
-FROM amazeeio/python:2.7-ckan-21.7.0
+FROM amazeeio/python:2.7-ckan-21.8.0
 
 ENV WORKDIR=/app
 
