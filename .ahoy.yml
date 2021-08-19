@@ -123,7 +123,7 @@ commands:
       ahoy start-mailmock &
       sleep 5 &&
       # Run generic tests
-      ahoy cli "behave --tags ~OpenData,~Publications ${*:-test/features}" || \
+      ahoy cli "behave --tags ~OpenData --tags ~Publications ${*:-test/features}" || \
       [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       # Run app-specific tests
       ahoy cli "behave --tags $VARS_TYPE ${*:-test/features}" || \
