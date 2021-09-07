@@ -5,7 +5,7 @@ NonProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdNonProduction'
 ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', region=region) }}"
 
 solr7: "http://archive.apache.org/dist/lucene/solr/7.7.2/solr-7.7.2.zip"
-ckan_tag: "ckan-2.8.8-qgov.4"
+ckan_tag: "ckan-2.8.8-qgov.5"
 ckan_qgov_branch: "qgov-master-2.8.8"
 
 common_stack: &common_stack
