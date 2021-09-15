@@ -1,5 +1,6 @@
 *.pyc
 *.retry
+templates/cloudfront.cfn.yml
 templates/security_groups.cfn.yml
 templates/Datashades-OpsWorks-CKAN-Extensions.cfn.yml
 templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml

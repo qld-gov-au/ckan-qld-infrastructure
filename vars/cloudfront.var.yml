@@ -1,5 +1,5 @@
 ---
-template: "templates/cloudfront-{{ service_name }}.cfn.yml"
+template: "templates/cloudfront.cfn.yml"
 
 cloudformation_stacks:
   - name: "{{ service_name }}-{{ Environment }}-CLOUDFRONT"
@@ -8,6 +8,7 @@ cloudformation_stacks:
     region: "{{ region }}"
     disable_rollback: 'true'
     template: "{{ template }}"
+    template_jinja: "{{ template }}.j2"
     template_parameters:
       WebOrigin: "{{ Environment }}{{ service_name }}WebElbDNSName"
       CmsOrigin: "{{ CmsOrigin }}"
