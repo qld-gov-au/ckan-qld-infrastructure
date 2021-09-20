@@ -506,11 +506,13 @@ Resources:
         Enable: Yes
         UpScaling:
           CpuThreshold: 80
+          MemoryThreshold: 80
           IgnoreMetricsTime: 20
           InstanceCount: 1
           ThresholdsWaitTime: 5
         DownScaling:
           CpuThreshold: 30
+          MemoryThreshold: 30
           IgnoreMetricsTime: 20
           InstanceCount: 1
           ThresholdsWaitTime: 10
