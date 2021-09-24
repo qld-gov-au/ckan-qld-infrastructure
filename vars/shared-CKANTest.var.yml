@@ -23,7 +23,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
-      version: "3.3.0"
+      version: "3.3.1"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       name: "ckanext-s3filestore-{{ Environment }}"
@@ -71,7 +71,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "3.0.3"
+      version: "3.0.4"
 
     CKANExtDataQldTheme: &CKANExtDataQldTheme
       name: "ckanext-data-qld-theme-{{ Environment }}"

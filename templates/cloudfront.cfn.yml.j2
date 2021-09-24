@@ -57,24 +57,32 @@ Resources:
       DistributionConfig:
         Aliases: !Ref Domain
         CacheBehaviors:
-          # The following rules for sending traffic to CKAN are not needed. Commenting out for now but could be removed in the future.
-          #- PathPattern: /assets/*
-          #  Compress: true
-          #  ForwardedValues:
-          #    QueryString: true
-          #  TargetOriginId: 'WebOrigin'
-          #  MinTTL: 1800
-          #  ViewerProtocolPolicy: redirect-to-https
-          #- PathPattern: /dataset/*/resource/*/download/*
-          #  Compress: true
-          #  ForwardedValues:
-          #    Cookies:
-          #      Forward: all
-          #    QueryString: true
-          #  TargetOriginId: 'WebOrigin'
-          #  MinTTL: 120
-          #  ViewerProtocolPolicy: allow-all
 
+{% if CmsOrigin == "" %}
+          - PathPattern: /assets/*
+            Compress: true
+            ForwardedValues:
+              QueryString: true
+            TargetOriginId: 'WebOrigin'
+            MinTTL: 1800
+            ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+          - PathPattern: /dataset/*/resource/*/download/*
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+            TargetOriginId: 'WebOrigin'
+            MinTTL: 120
+            ViewerProtocolPolicy: allow-all
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+
+{% else %}
           #The next 3 rules are for testing ONLY. As the connection to Squiz is currently working they're not needed
 
           #- PathPattern: /oss-squizedge-net* #oss.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
@@ -130,7 +138,7 @@ Resources:
           #    QueryString: true
           #    Headers:
           #      - "*"
-          #	ViewerProtocolPolicy: redirect-to-https
+          #  ViewerProtocolPolicy: redirect-to-https
           #Everything that isn't the below rules for CMS resources should go to CKAN
           - PathPattern: /index.* #If anyone reaches the homepage on an "index" url
             TargetOriginId: 'CmsOrigin'
@@ -657,6 +665,8 @@ Resources:
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+{% endif %}
+
           - PathPattern: !Sub "/${AttachmentBucketName}/*" # S3 uploaded files
             TargetOriginId: 'S3Origin'
             AllowedMethods:
@@ -694,7 +704,13 @@ Resources:
           LambdaFunctionAssociations:
             - EventType: 'viewer-request'
               LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+
+{% if CmsOrigin == "" %}
+        DefaultRootObject: /
+{% else %}
         DefaultRootObject: home
+{% endif %}
+
         Enabled: true
         Logging:
           Bucket: !Sub "${LogBucketName}.s3.amazonaws.com"
@@ -707,6 +723,8 @@ Resources:
           CustomOriginConfig:
             OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
             OriginReadTimeout: 60
+
+{% if CmsOrigin != "" %}
         - DomainName:
             !Ref CmsOrigin
           Id: 'CmsOrigin'
@@ -715,6 +733,8 @@ Resources:
             OriginSSLProtocols:
               - "TLSv1.1"
               - "TLSv1.2"
+{% endif %}
+
         - Id: 'S3Origin'
           DomainName: !Sub "${AttachmentBucketName}.s3.${Region}.amazonaws.com"
           S3OriginConfig:
@@ -728,7 +748,7 @@ Resources:
           AcmCertificateArn:
             Ref: ACMCertificateARN
           SslSupportMethod: sni-only
-          MinimumProtocolVersion: TLSv1.1_2016
+          MinimumProtocolVersion: TLSv1.2_2021
         Comment:
           Fn::Sub:
             - "${Environment}-${Platform} ${Domain}"
