@@ -14,6 +14,7 @@ if [ "$VENV_DIR" != "" ]; then
 fi
 ckan_cli db clean
 ckan_cli db init
+. $APP_DIR/scripts/init-${VARS_TYPE}.sh
 ckan_cli user add "${CKAN_USER_NAME}"\
  fullname="${CKAN_DISPLAY_NAME}"\
  email="${CKAN_USER_EMAIL}"\
