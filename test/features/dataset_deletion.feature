@@ -44,9 +44,7 @@ Feature: Dataset deletion
         And I wait for 10 seconds
         Then I should see "Data and Resources"
 
-    # apply both annotations, so it will run but only after running the creation test
     @OpenData
-    @Publications
     Scenario: Sysadmin deletes a dataset
         Given "SysAdmin" as the persona
         When I log in
@@ -60,6 +58,19 @@ Feature: Dataset deletion
         Then I should not see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"
         Then I press the element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary']"
         And I wait for 10 seconds
+        Then I should not see "Dataset deletion"
+        And I go to "/ckan-admin/trash"
+        Then I should see "Dataset deletion"
+        Then I press the element with xpath "//button[@name='purge-packages']"
+
+    @Publications
+    Scenario: Sysadmin deletes a dataset
+        Given "SysAdmin" as the persona
+        When I log in
+        And I go to "/dataset/edit/dataset-deletion"
+        Then I should see an element with xpath "//a[@data-module='confirm-action']"
+        Then I press the element with xpath "//a[@data-module='confirm-action']"
+        And I wait for 5 seconds
         Then I should not see "Dataset deletion"
         And I go to "/ckan-admin/trash"
         Then I should see "Dataset deletion"
