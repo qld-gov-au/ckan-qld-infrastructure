@@ -15,7 +15,7 @@ Feature: Dataset deletion
         Then I select "NO" from "de_identified_data"
         Then I press "save"
         And I wait for 10 seconds
-        Then I execute the script "document.getElementById('field-image-url').value='http://ckanext-data-qld.docker.amazee.io/'"
+        Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
         Then I fill in "name" with "res1"
         Then I fill in "description" with "description"
         Then I fill in "size" with "1024"
@@ -37,7 +37,7 @@ Feature: Dataset deletion
         Then I fill in "author_email" with "test@test.com"
         Then I press "save"
         And I wait for 10 seconds
-        Then I execute the script "document.getElementById('field-image-url').value='http://ckanext-data-qld.docker.amazee.io/'"
+        Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
         Then I fill in "name" with "res1"
         Then I fill in "description" with "description"
         Then I press the element with xpath "//button[@value='go-metadata']"
