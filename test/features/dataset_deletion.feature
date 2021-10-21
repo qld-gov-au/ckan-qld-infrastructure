@@ -45,6 +45,9 @@ Feature: Dataset deletion
         And I wait for 10 seconds
         Then I should see "Data and Resources"
 
+    # apply both annotations, so it will run but only after running the creation test
+    @OpenData
+    @Publications
     Scenario: Sysadmin deletes a dataset
         Given "SysAdmin" as the persona
         When I log in

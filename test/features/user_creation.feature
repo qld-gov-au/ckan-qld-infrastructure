@@ -1,4 +1,5 @@
 @user_creation
+@OpenData
 Feature: User creation
 
     Scenario: SysAdmin can create 'Excluded display name words' in ckan admin config
