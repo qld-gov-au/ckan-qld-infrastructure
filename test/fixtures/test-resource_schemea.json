@@ -1,0 +1,37 @@
+{
+    "primaryKey": "id",
+    "fields": [
+        {
+            "name": "id",
+            "title": "Measurement identifier",
+            "type": "integer"
+        },
+        {
+            "name": "location",
+            "title": "Measurement location code",
+            "type": "string",
+            "constraints": {
+                "enum": ["A", "B", "C", "D"]
+            }
+        },
+        {
+            "name": "date",
+            "title": "Measurement date",
+            "type": "date",
+            "format": "%d/%m/%Y"
+        },
+        {
+            "name": "measurement",
+            "title": "Measure of the oblique fractal impedance at noon",
+            "type": "number",
+            "constraints": {
+                "required": true
+            }
+        },
+        {
+            "name": "observations",
+            "title": "Extra observations",
+            "type": "string"
+        }
+    ]
+}
