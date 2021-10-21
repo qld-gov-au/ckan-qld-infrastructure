@@ -1,4 +1,5 @@
 @resource_freshness
+@OpenData
 Feature: Resource freshness
 
     Scenario Outline: An editor, admin or sysadmin user, when I go to the dataset new page, the text 'Next update due' should not be visible

@@ -1,4 +1,5 @@
 @schema_metadata
+@OpenData
 Feature: SchemaMetadata
 
 
