@@ -32,6 +32,7 @@ Feature: Login Redirection
         Then I should see an element with xpath "//span[contains(string(), 'Private')]"
 
     @private_dataset
+    @OpenData
     Scenario: As an unauthenticated user, when I visit the URL of a private dataset I see the login page
         Given "Unauthenticated" as the persona
         When I visit "/dataset/annakarenina"
@@ -45,6 +46,7 @@ Feature: Login Redirection
         And I should not see an element with xpath "//h1[contains(string(), 'Login')]"
 
     @private_dataset
+    @OpenData
     Scenario: As an unauthenticated organisation member, when I visit the URL of a private dataset I see the login page. Upon logging in I am taken to the private dataset
         Given "TestOrgMember" as the persona
         When I visit "/dataset/annakarenina"
