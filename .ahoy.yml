@@ -107,7 +107,7 @@ commands:
   lint:
     usage: Lint code.
     cmd: |
-      ahoy cli "flake8 ${@:-ckanext}" || \
+      ahoy cli "flake8 ${@:-roles}" || \
       [ "${ALLOW_LINT_FAIL:-0}" -eq 1 ]
 
   test-unit:
