@@ -73,5 +73,5 @@ Feature: Dataset deletion
         And I wait for 5 seconds
         Then I should not see "Dataset deletion"
         And I go to "/ckan-admin/trash"
-        Then I should see "Dataset deletion"
+        Then I should see "Purge deleted datasets forever and irreversibly"
         Then I press the element with xpath "//button[@name='purge-packages']"
