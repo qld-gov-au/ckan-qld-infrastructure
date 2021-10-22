@@ -4,7 +4,9 @@ from behaving import environment as benv
 from behaving.web.steps.browser import named_browser
 
 # Path to the root of the project.
-ROOT_PATH = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../'))
+ROOT_PATH = os.path.realpath(os.path.join(
+    os.path.dirname(os.path.realpath(__file__)),
+    '../../'))
 
 # Base URL for relative paths resolution.
 BASE_URL = 'http://ckan:3000/'
@@ -43,6 +45,31 @@ PERSONAS = {
     'TestOrgMember': {
         'name': u'test_org_member',
         'email': u'test_org_member@localhost',
+        'password': u'Password123!'
+    },
+    'DataRequestOrgAdmin': {
+        'name': u'dr_admin',
+        'email': u'dr_admin@localhost',
+        'password': u'Password123!'
+    },
+    'DataRequestOrgEditor': {
+        'name': u'dr_editor',
+        'email': u'dr_editor@localhost',
+        'password': u'Password123!'
+    },
+    'DataRequestOrgMember': {
+        'name': u'dr_member',
+        'email': u'dr_member@localhost',
+        'password': u'Password123!'
+    },
+    'ReportingOrgAdmin': {
+        'name': u'report_admin',
+        'email': u'report_admin@localhost',
+        'password': u'Password123!'
+    },
+    'ReportingOrgEditor': {
+        'name': u'report_editor',
+        'email': u'report_editor@localhost',
         'password': u'Password123!'
     }
 }

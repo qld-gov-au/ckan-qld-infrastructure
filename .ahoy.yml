@@ -107,7 +107,7 @@ commands:
   lint:
     usage: Lint code.
     cmd: |
-      ahoy cli "flake8 ${@:-ckanext}" || \
+      ahoy cli "flake8 ${@:-roles}" || \
       [ "${ALLOW_LINT_FAIL:-0}" -eq 1 ]
 
   test-unit:
@@ -119,7 +119,7 @@ commands:
   test-bdd:
     usage: Run BDD tests.
     cmd: |
-      ahoy start-ckan-job-worker &
+      ahoy start-ckan-job-workers
       ahoy start-mailmock &
       sleep 5 &&
       # Run generic tests
@@ -129,7 +129,7 @@ commands:
       ahoy cli "behave --tags $VARS_TYPE ${*:-test/features}" || \
       [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       ahoy stop-mailmock
-      ahoy stop-ckan-job-worker
+      ahoy stop-ckan-job-workers
 
   start-mailmock:
     usage: Starts email mock server used for email BDD tests
@@ -143,14 +143,36 @@ commands:
       ahoy title 'Stopping mailmock'
       ahoy cli "killall -2 mailmock"
 
-  start-ckan-job-worker:
-    usage: Starts CKAN background job worker
+  start-ckan-job-workers:
+    usage: Starts CKAN background job workers
     cmd: |
-      ahoy title 'Starting CKAN background job worker'
+      ahoy title 'Starting CKAN background job workers'
+      ahoy start-ckan-job-worker-default &
+      ahoy start-ckan-job-worker-priority &
+      ahoy start-ckan-job-worker-bulk &
+
+  start-ckan-job-worker-default:
+    usage: Starts default CKAN background job worker
+    cmd: |
+      ahoy title 'Starting default CKAN background job worker'
       ahoy cli "ckan_cli jobs clear && \
                 ckan_cli jobs worker"
 
-  stop-ckan-job-worker:
+  start-ckan-job-worker-priority:
+    usage: Starts CKAN background job worker for priority tasks
+    cmd: |
+      ahoy title 'Starting CKAN background job worker priority'
+      ahoy cli "ckan_cli jobs clear priority && \
+                ckan_cli jobs worker priority"
+
+  start-ckan-job-worker-bulk:
+    usage: Starts CKAN background job worker for low-priority tasks
+    cmd: |
+      ahoy title 'Starting CKAN background job worker bulk'
+      ahoy cli "ckan_cli jobs clear bulk && \
+                ckan_cli jobs worker bulk"
+
+  stop-ckan-job-workers:
     usage: Stops CKAN background job worker
     cmd: |
       ahoy title 'Stopping CKAN background job worker'
@@ -187,7 +209,7 @@ entrypoint:
   - "-c"
   - "-e"
   - |
-    export LAGOON_LOCALDEV_URL=http://ckan-qld-infrastructure.docker.amazee.io
+    export LAGOON_LOCALDEV_URL=http://$PROJECT.docker.amazee.io
     [ -f .env ] && [ -s .env ] && export $(grep -v '^#' .env | xargs) && if [ -f .env.local ] && [ -s .env.local ]; then export $(grep -v '^#' .env.local | xargs); fi
     bash -e -c "$0" "$@"
   - "{{cmd}}"
