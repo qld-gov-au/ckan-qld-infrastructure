@@ -3,17 +3,17 @@
 # alternative https://github.com/ckan/ckan/blob/master/contrib/cookiecutter/ckan_extension/%7B%7Bcookiecutter.project%7D%7D/.github/workflows/test.yml
 name: Tests
 on:
-  push:
-  schedule:
-    - cron: "0 0 1 * *"
+  pull_request:
+    branches:
+      - master
 
 jobs:
   test:
     strategy:
       matrix:
         application: [OpenData, Publications]
-        target_environment: [DEV]
-      fail-fast: false
+        target_environment: [STAGING]
+      fail-fast: true
 
     name: ${{ matrix.application }} ${{ matrix.target_environment }} infrastructure build
     runs-on: ubuntu-latest

@@ -41,7 +41,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Publications"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "3.0.2"
+      version: "4.0.0"
 
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
       name: "ckanext-publications-qld-theme-{{ Environment }}"
