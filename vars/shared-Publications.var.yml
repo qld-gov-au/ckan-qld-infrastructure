@@ -96,7 +96,7 @@ extensions:
 
     CKANExtResourceTypeValidation:
       <<: *CKANExtResourceTypeValidation
-      version: "main"
+      version: "develop"
 
     CKANExtCSRFFilter:
       <<: *CKANExtCSRFFilter
