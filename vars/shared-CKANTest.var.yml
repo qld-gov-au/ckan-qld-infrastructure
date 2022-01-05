@@ -143,7 +143,7 @@ extensions:
       description: "CKAN Extension for checking uploaded resource types"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-resource-type-validation.git"
-      version: "1.0.0"
+      version: "1.0.1"
 
     CKANExtCSRFFilter: &CKANExtCSRFFilter
       name: "ckanext-csrf-filter-{{ Environment }}"
@@ -218,7 +218,7 @@ extensions:
 
     CKANExtResourceTypeValidation:
       <<: *CKANExtResourceTypeValidation
-      version: "develop"
+      version: "main"
 
     CKANExtCSRFFilter:
       <<: *CKANExtCSRFFilter
