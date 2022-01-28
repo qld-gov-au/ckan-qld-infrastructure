@@ -2,7 +2,6 @@ from behave import step
 from behaving.personas.steps import *  # noqa: F401, F403
 from behaving.web.steps import *  # noqa: F401, F403
 from behaving.web.steps.url import when_i_visit_url
-from behaving.mail.steps import *
 import email
 import quopri
 import random
