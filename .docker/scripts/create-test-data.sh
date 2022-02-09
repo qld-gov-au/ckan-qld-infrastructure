@@ -65,7 +65,7 @@ curl -LsH "Authorization: ${API_KEY}" \
 ckan_cli create-test-data hierarchy
 
 # Creating basic test data which has datasets with resources
-ckan_cli create-test-data
+ckan_cli create-test-data basic
 
 # Datasets need to be assigned to an organisation
 
