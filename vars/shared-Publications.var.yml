@@ -11,7 +11,7 @@ extensions:
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
       shortname: "ckanext-qgov"
-      description: "CKAN Extension for Queensland Government Open Data"
+      description: "CKAN Extension for Queensland Government sites"
       type: "git"
       url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
       version: "4.0.0"
@@ -31,17 +31,6 @@ extensions:
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
       version: "0.0.2"
-
-    # install Open Data extension under a different name,
-    # which signals to the cookbook that we only want
-    # the Publications-relevant parts
-    CKANExtDataQld: &CKANExtDataQld
-      name: "ckanext-publications-qld-{{ Environment }}"
-      shortname: "ckanext-publications-qld"
-      description: "CKAN Extension for Queensland Government Publications"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "4.0.1"
 
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
       name: "ckanext-publications-qld-theme-{{ Environment }}"
@@ -84,10 +73,6 @@ extensions:
 
     CKANExtSSMConfig:
       <<: *CKANExtSSMConfig
-      version: "develop"
-
-    CKANExtDataQld:
-      <<: *CKANExtDataQld
       version: "develop"
 
     CKANExtPublicationsTheme:
