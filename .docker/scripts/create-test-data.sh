@@ -3,6 +3,7 @@
 # Create some example content for extension BDD tests.
 #
 set -e
+set -x
 
 CKAN_ACTION_URL=http://ckan:3000/api/action
 
