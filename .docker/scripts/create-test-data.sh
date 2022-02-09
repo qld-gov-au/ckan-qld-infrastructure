@@ -38,7 +38,7 @@ echo "Creating ${TEST_ORG_TITLE} Organisation:"
 
 TEST_ORG=$( \
     curl -LsH "Authorization: ${API_KEY}" \
-    --data "name=${TEST_ORG_NAME}&title=${TEST_ORG_TITLE}" \
+    --data '{"name": "'${TEST_ORG_NAME}'", "title": "'${TEST_ORG_TITLE}'"}' \
     ${CKAN_ACTION_URL}/organization_create
 )
 
@@ -47,15 +47,15 @@ TEST_ORG_ID=$(echo $TEST_ORG | sed -r 's/^(.*)"id": "(.*)",(.*)/\2/')
 echo "Assigning test users to ${TEST_ORG_TITLE} Organisation:"
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${TEST_ORG_ID}&object=test_org_admin&object_type=user&capacity=admin" \
+    --data '{"id": "'${TEST_ORG_ID}'", "object": "test_org_admin", "object_type": "user", "capacity": "admin"}' \
     ${CKAN_ACTION_URL}/member_create
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${TEST_ORG_ID}&object=test_org_editor&object_type=user&capacity=editor" \
+    --data '{"id": "'${TEST_ORG_ID}'", "object": "test_org_editor", "object_type": "user", "capacity": "editor"}' \
     ${CKAN_ACTION_URL}/member_create
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${TEST_ORG_ID}&object=test_org_member&object_type=user&capacity=member" \
+    --data '{"id": "'${TEST_ORG_ID}'", "object": "test_org_member", "object_type": "user", "capacity": "member"}' \
     ${CKAN_ACTION_URL}/member_create
 ##
 # END.
@@ -74,7 +74,7 @@ echo "Assigning test Datasets to Organisation..."
 echo "Updating annakarenina to use ${TEST_ORG_TITLE} organisation:"
 package_owner_org_update=$( \
     curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=annakarenina&organization_id=${TEST_ORG_NAME}" \
+    --data '{"id": "annakarenina", "organization_id": "'${TEST_ORG_NAME}'"}' \
     ${CKAN_ACTION_URL}/package_owner_org_update
 )
 echo ${package_owner_org_update}
@@ -82,7 +82,7 @@ echo ${package_owner_org_update}
 echo "Updating warandpeace to use ${TEST_ORG_TITLE} organisation:"
 package_owner_org_update=$( \
     curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=warandpeace&organization_id=${TEST_ORG_NAME}" \
+    --data '{"id": "warandpeace", "organization_id": "'${TEST_ORG_NAME}'"}' \
     ${CKAN_ACTION_URL}/package_owner_org_update
 )
 echo ${package_owner_org_update}
@@ -104,7 +104,7 @@ echo "Creating ${DR_ORG_TITLE} Organisation:"
 
 DR_ORG=$( \
     curl -LsH "Authorization: ${API_KEY}" \
-    --data "name=${DR_ORG_NAME}&title=${DR_ORG_TITLE}" \
+    --data '"name": "'${DR_ORG_NAME}'", "title": "'${DR_ORG_TITLE}'"}' \
     ${CKAN_ACTION_URL}/organization_create
 )
 
@@ -113,22 +113,22 @@ DR_ORG_ID=$(echo $DR_ORG | sed -r 's/^(.*)"id": "(.*)",(.*)/\2/')
 echo "Assigning test users to ${DR_ORG_TITLE} Organisation:"
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${DR_ORG_ID}&object=dr_admin&object_type=user&capacity=admin" \
+    --data '{"id": "'${DR_ORG_ID}'", "object": "dr_admin", "object_type": "user", "capacity": "admin"}' \
     ${CKAN_ACTION_URL}/member_create
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${DR_ORG_ID}&object=dr_editor&object_type=user&capacity=editor" \
+    --data '{"id": "'${DR_ORG_ID}'", "object": "dr_editor", "object_type": "user", "capacity": "editor"}' \
     ${CKAN_ACTION_URL}/member_create
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${DR_ORG_ID}&object=dr_member&object_type=user&capacity=member" \
+    --data '{"id": "'${DR_ORG_ID}'", "object": "dr_member", "object_type": "user", "capacity": "member"}' \
     ${CKAN_ACTION_URL}/member_create
 
 
 echo "Creating test Data Request:"
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "title=Test Request&description=This is an example&organization_id=${TEST_ORG_ID}" \
+    --data '{"title": "Test Request", "description": "This is an example", "organization_id": "'${TEST_ORG_ID}'"}' \
     ${CKAN_ACTION_URL}/create_datarequest
 
 REPORT_ORG_NAME=reporting
@@ -143,7 +143,7 @@ echo "Creating ${REPORT_ORG_TITLE} Organisation:"
 
 REPORT_ORG=$( \
     curl -LsH "Authorization: ${API_KEY}" \
-    --data "name=${REPORT_ORG_NAME}&title=${REPORT_ORG_TITLE}" \
+    --data '{"name": "'${REPORT_ORG_NAME}'", "title": "'${REPORT_ORG_TITLE}'"}' \
     ${CKAN_ACTION_URL}/organization_create
 )
 
@@ -152,25 +152,25 @@ REPORT_ORG_ID=$(echo $REPORT_ORG | sed -r 's/^(.*)"id": "(.*)",(.*)/\2/')
 echo "Assigning test users to ${REPORT_ORG_TITLE} Organisation:"
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${REPORT_ORG_ID}&object=report_admin&object_type=user&capacity=admin" \
+    --data '{"id": "'${REPORT_ORG_ID}'", "object": "report_admin", "object_type": "user", "capacity": "admin"}' \
     ${CKAN_ACTION_URL}/member_create
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${REPORT_ORG_ID}&object=report_editor&object_type=user&capacity=editor" \
+    --data '{"id": "'${REPORT_ORG_ID}'", "object": "report_editor", "object_type": "user", "capacity": "editor"}' \
     ${CKAN_ACTION_URL}/member_create
 
 echo "Creating test dataset for reporting:"
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "name=reporting&description=Dataset for reporting&owner_org=${REPORT_ORG_ID}&\
-update_frequency=near-realtime&author_email=report_admin@localhost&version=1.0&license_id=cc-by-4\
-&data_driven_application=NO&security_classification=PUBLIC&notes=test&de_identified_data=NO"\
+    --data '{"name": "reporting", "description": "Dataset for reporting", "owner_org": "'${REPORT_ORG_ID}'", \
+"update_frequency": "near-realtime", "author_email": "report_admin@localhost", "version": "1.0", "license_id": "cc-by-4",\
+"data_driven_application": "NO", "security_classification": "PUBLIC", "notes": "test", "de_identified_data": "NO"}'\
     ${CKAN_ACTION_URL}/package_create
 
 echo "Creating test Data Request for reporting:"
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data "title=Reporting Request&description=Data Request for reporting&organization_id=${REPORT_ORG_ID}" \
+    --data '{"title": "Reporting Request", "description": "Data Request for reporting", "organization_id": "'${REPORT_ORG_ID}'"}' \
     ${CKAN_ACTION_URL}/create_datarequest
 
 
