@@ -105,7 +105,7 @@ echo "Creating ${DR_ORG_TITLE} Organisation:"
 
 DR_ORG=$( \
     curl -LsH "Authorization: ${API_KEY}" \
-    --data '"name": "'"${DR_ORG_NAME}"'", "title": "'"${DR_ORG_TITLE}"'"}' \
+    --data '{"name": "'"${DR_ORG_NAME}"'", "title": "'"${DR_ORG_TITLE}"'"}' \
     ${CKAN_ACTION_URL}/organization_create
 )
 
