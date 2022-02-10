@@ -37,7 +37,7 @@ jobs:
       - name: Retrieve screenshots
         if: failure()
         run: .circleci/process-artifacts.sh
-        timeout-minutes: 3
+        timeout-minutes: 1
 
       - name: Upload screenshots
         if: failure()
