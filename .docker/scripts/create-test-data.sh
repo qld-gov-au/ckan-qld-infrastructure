@@ -163,8 +163,8 @@ curl -LsH "Authorization: ${API_KEY}" \
 echo "Creating test dataset for reporting:"
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"name": "reporting", "description": "Dataset for reporting", "owner_org": "'"${REPORT_ORG_ID}"'", \
-"update_frequency": "near-realtime", "author_email": "report_admin@localhost", "version": "1.0", "license_id": "cc-by-4",\
+    --data '{"name": "reporting", "description": "Dataset for reporting", "owner_org": "'"${REPORT_ORG_ID}"'",
+"update_frequency": "near-realtime", "author_email": "report_admin@localhost", "version": "1.0", "license_id": "cc-by-4",
 "data_driven_application": "NO", "security_classification": "PUBLIC", "notes": "test", "de_identified_data": "NO"}'\
     ${CKAN_ACTION_URL}/package_create
 
