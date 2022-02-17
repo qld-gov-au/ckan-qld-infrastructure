@@ -4,7 +4,7 @@ common_stack: &common_stack
   region: "{{ region }}"
   disable_rollback: true
   template: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml"
-  template_jinja: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml.j2"
+  template_jinja: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.j2.yml"
   template_parameters: &common_stack_template_parameters
     ApplicationId: "{{ service_name_lower }}"
     OpsWorksStackID: "{{ Environment }}{{ service_name }}OpsWorksStack"
