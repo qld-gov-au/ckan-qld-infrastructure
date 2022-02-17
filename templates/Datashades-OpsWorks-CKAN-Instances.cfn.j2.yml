@@ -240,28 +240,28 @@ Resources:
   OpswxEC2Services1:
     Type: AWS::OpsWorks::Instance
     Properties:
-      {% if item.tags["PowerManaged"] == "Yes" %}
+{% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
         Sunday:
-          {% for hour in range(20, 24) %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-          {% endfor %}
-        {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-        {% for hour in range(0, 10) %}
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for hour in range(20, 24) %}
+{% endfor %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% endfor %}
+{% endfor %}
+{% endfor %}
         Friday:
-        {% for hour in range(0, 10) %}
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-      {% endif %}
+{% endfor %}
+{% endif %}
       Hostname: !Sub "${ApplicationId}-solr1"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
@@ -289,28 +289,28 @@ Resources:
     DependsOn:
       - OpswxEC2Services1
     Properties:
-      {% if item.tags["PowerManaged"] == "Yes" %}
+{% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
         Sunday:
-        {% for hour in range(20, 24) %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-        {% for hour in range(0, 10) %}
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for hour in range(20, 24) %}
+{% endfor %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% endfor %}
+{% endfor %}
+{% endfor %}
         Friday:
-        {% for hour in range(0, 10) %}
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-      {% endif %}
+{% endfor %}
+{% endif %}
       Hostname: !Sub "${ApplicationId}-web1"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
@@ -324,28 +324,28 @@ Resources:
     Condition: 2PlusWebInstances
     Type: AWS::OpsWorks::Instance
     Properties:
-      {% if item.tags["PowerManaged"] == "Yes" %}
+{% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
         Sunday:
-        {% for hour in range(20, 24) %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-        {% for hour in range(0, 10) %}
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for hour in range(20, 24) %}
+{% endfor %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% endfor %}
+{% endfor %}
+{% endfor %}
         Friday:
-        {% for hour in range(0, 10) %}
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-      {% endif %}
+{% endfor %}
+{% endif %}
       Hostname: !Sub "${ApplicationId}-web2"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
@@ -374,28 +374,28 @@ Resources:
     Condition: 3PlusWebInstances
     Type: AWS::OpsWorks::Instance
     Properties:
-      {% if item.tags["PowerManaged"] == "Yes" %}
+{% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
         Sunday:
-        {% for hour in range(20, 24) %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-        {% for hour in range(0, 10) %}
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for hour in range(20, 24) %}
+{% endfor %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% endfor %}
+{% endfor %}
+{% endfor %}
         Friday:
-        {% for hour in range(0, 10) %}
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-      {% endif %}
+{% endfor %}
+{% endif %}
       Hostname: !Sub "${ApplicationId}-web3"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
@@ -429,28 +429,28 @@ Resources:
     Condition: 4PlusWebInstances
     Type: AWS::OpsWorks::Instance
     Properties:
-      {% if item.tags["PowerManaged"] == "Yes" %}
+{% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
         Sunday:
-        {% for hour in range(20, 24) %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-        {% for hour in range(0, 10) %}
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for hour in range(20, 24) %}
+{% endfor %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% endfor %}
+{% endfor %}
+{% endfor %}
         Friday:
-        {% for hour in range(0, 10) %}
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-      {% endif %}
+{% endfor %}
+{% endif %}
       Hostname: !Sub "${ApplicationId}-web4"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
@@ -467,28 +467,28 @@ Resources:
     Condition: 5PlusWebInstances
     Type: AWS::OpsWorks::Instance
     Properties:
-      {% if item.tags["PowerManaged"] == "Yes" %}
+{% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
         Sunday:
-        {% for hour in range(20, 24) %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-        {% for hour in range(0, 10) %}
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for hour in range(20, 24) %}
+{% endfor %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% endfor %}
+{% endfor %}
+{% endfor %}
         Friday:
-        {% for hour in range(0, 10) %}
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-      {% endif %}
+{% endfor %}
+{% endif %}
       Hostname: !Sub "${ApplicationId}-web5"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
@@ -504,28 +504,28 @@ Resources:
     Condition: 6PlusWebInstances
     Type: AWS::OpsWorks::Instance
     Properties:
-      {% if item.tags["PowerManaged"] == "Yes" %}
+{% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
         Sunday:
-        {% for hour in range(20, 24) %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-        {% for hour in range(0, 10) %}
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for hour in range(20, 24) %}
+{% endfor %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% endfor %}
+{% endfor %}
+{% endfor %}
         Friday:
-        {% for hour in range(0, 10) %}
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-      {% endif %}
+{% endfor %}
+{% endif %}
       Hostname: !Sub "${ApplicationId}-web6"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
@@ -541,28 +541,28 @@ Resources:
     Condition: BatchLayerNeeded
     Type: AWS::OpsWorks::Instance
     Properties:
-      {% if item.tags["PowerManaged"] == "Yes" %}
+{% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
       TimeBasedAutoScaling:
         Sunday:
-        {% for hour in range(20, 24) %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-        {% for hour in range(0, 10) %}
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% for hour in range(20, 24) %}
+{% endfor %}
+{% for hour in range(20, 24) %}
           "{{ hour }}": "on"
-        {% endfor %}
-        {% endfor %}
+{% endfor %}
+{% endfor %}
         Friday:
-        {% for hour in range(0, 10) %}
+{% for hour in range(0, 10) %}
           "{{ hour }}": "on"
-        {% endfor %}
-      {% endif %}
+{% endfor %}
+{% endif %}
       Hostname: !Sub "${ApplicationId}-batch1"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
