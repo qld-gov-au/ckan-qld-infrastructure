@@ -236,7 +236,7 @@ Conditions:
     - '6'
 
 Resources:
-  OpswxEC2Services1:
+  OpswxEC2Services1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Type: AWS::OpsWorks::Instance
     Properties:
 {% if item.tags["PowerManaged"] == "Yes" %}
@@ -270,7 +270,7 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
-  OpswxEC2Services2:
+  OpswxEC2Services2{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Condition: 2PlusServiceInstances
     Type: AWS::OpsWorks::Instance
     Properties:
@@ -296,7 +296,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-solr2"
+      Hostname: !Sub "${ApplicationId}-{% if item.tags["PowerManaged"] == "Yes" %}-PowerManaged{% else %}-AlwaysOn{% endif %}-solr2"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
@@ -305,10 +305,11 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
-  OpswxEC2Web1:
+  OpswxEC2Web1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Type: AWS::OpsWorks::Instance
     DependsOn:
-      - OpswxEC2Services1
+      - OpswxEC2Services1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}
+
     Properties:
 {% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
@@ -332,7 +333,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-web1"
+      Hostname: !Sub "${ApplicationId}-web1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
@@ -341,7 +342,7 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
-  OpswxEC2Web2:
+  OpswxEC2Web2{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Condition: 2PlusWebInstances
     Type: AWS::OpsWorks::Instance
     Properties:
@@ -367,7 +368,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-web2"
+      Hostname: !Sub "${ApplicationId}-web2{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
@@ -391,7 +392,7 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
-  OpswxEC2Web3PowerManaged:
+  OpswxEC2Web3{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% else %}AlwaysOn{% endif %}:
     Condition: 3PlusWebInstances
     Type: AWS::OpsWorks::Instance
     Properties:
@@ -417,7 +418,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-web3"
+      Hostname: !Sub "${ApplicationId}-web3{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
@@ -446,7 +447,7 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
-  OpswxEC2Web4PowerManaged:
+  OpswxEC2Web4{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Condition: 4PlusWebInstances
     Type: AWS::OpsWorks::Instance
     Properties:
@@ -472,7 +473,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-web4"
+      Hostname: !Sub "${ApplicationId}-web4{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
@@ -484,7 +485,7 @@ Resources:
         Fn::ImportValue: !Ref OpsWorksStackID
 
 
-  OpswxEC2Web5PowerManaged:
+  OpswxEC2Web5{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Condition: 5PlusWebInstances
     Type: AWS::OpsWorks::Instance
     Properties:
@@ -510,7 +511,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-web5"
+      Hostname: !Sub "${ApplicationId}-web5{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
@@ -521,7 +522,7 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
-  OpswxEC2Web6PowerManaged:
+  OpswxEC2Web6{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Condition: 6PlusWebInstances
     Type: AWS::OpsWorks::Instance
     Properties:
@@ -547,7 +548,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-web6"
+      Hostname: !Sub "${ApplicationId}-web6{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
@@ -558,7 +559,7 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
-  OpswxEC2Batch1:
+  OpswxEC2Batch1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Condition: BatchLayerNeeded
     Type: AWS::OpsWorks::Instance
     Properties:
@@ -584,7 +585,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-batch1"
+      Hostname: !Sub "${ApplicationId}-{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged-{% else %}AlwaysOn-{% endif %}batch1"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref BatchEC2Size
@@ -594,7 +595,7 @@ Resources:
         Fn::ImportValue: !Ref OpsWorksStackID
 
   OpswxEC2Batch2:
-    Condition: BatchLayerNeeded
+    Condition: 2PlusBatchInstances
     Type: AWS::OpsWorks::Instance
     Properties:
       AutoScalingType: load
@@ -608,7 +609,7 @@ Resources:
         Fn::ImportValue: !Ref OpsWorksStackID
 
 
-  OpswxEC2Batch2Managed:
+  OpswxEC2Batch2NonLoad{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Condition: BatchLayerNeeded
     Type: AWS::OpsWorks::Instance
     Properties:
@@ -634,7 +635,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-batch2"
+      Hostname: !Sub "${ApplicationId}-{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged-{% else %}AlwaysOn-{% endif %}batch2"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref BatchEC2Size
