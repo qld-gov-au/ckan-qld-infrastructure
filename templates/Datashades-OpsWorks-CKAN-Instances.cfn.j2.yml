@@ -123,7 +123,6 @@ Parameters:
 Conditions:
   2PlusServiceInstances:
     !Equals [ !Ref ServicesEC2Count, 2 ]
-
   2PlusWebInstances:
     Fn::Or:
     - Fn::Equals:
@@ -182,7 +181,7 @@ Conditions:
   BatchLayerNeeded: #batch is background
     !Not [!Equals [!Ref BatchEC2Size, none]]
   2PlusBatchInstances:
-     Fn::Or:
+    Fn::Or:
     - Fn::Equals:
       - Ref: BatchEC2Count
       - '2'
@@ -275,6 +274,28 @@ Resources:
     Condition: 2PlusServiceInstances
     Type: AWS::OpsWorks::Instance
     Properties:
+{% if item.tags["PowerManaged"] == "Yes" %}
+      AutoScalingType: timer
+      # Monday-Friday 06:00-20:00 GMT+10
+      TimeBasedAutoScaling:
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endfor %}
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endif %}
       Hostname: !Sub "${ApplicationId}-solr2"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
@@ -573,11 +594,47 @@ Resources:
         Fn::ImportValue: !Ref OpsWorksStackID
 
   OpswxEC2Batch2:
-    Condition: 2PlusBatchInstances
+    Condition: BatchLayerNeeded
     Type: AWS::OpsWorks::Instance
     Properties:
       AutoScalingType: load
       Hostname: !Sub "${ApplicationId}-batch1a"
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref BatchEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref BatchLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+
+
+  OpswxEC2Batch2Managed:
+    Condition: BatchLayerNeeded
+    Type: AWS::OpsWorks::Instance
+    Properties:
+{% if item.tags["PowerManaged"] == "Yes" %}
+      AutoScalingType: timer
+      # Monday-Friday 06:00-20:00 GMT+10
+      TimeBasedAutoScaling:
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endfor %}
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endif %}
+      Hostname: !Sub "${ApplicationId}-batch2"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref BatchEC2Size
