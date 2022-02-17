@@ -85,7 +85,7 @@ Parameters:
       - m4.10xlarge
       - m5.12xlarge
   BatchEC2Count:
-    Description: The number of EC2 instances to create in the batch layer, background jobs.
+    Description: The number of active EC2 instances to create in the batch layer, background jobs.
     Type: Number
     Default: 1
     MinValue: 0
@@ -98,7 +98,7 @@ Parameters:
       - "yes"
       - "no"
   WebEC2Count:
-    Description: The number of EC2 instances to create in the web layer.
+    Description: The number of active EC2 instances to create in the web layer.
     Type: Number
     Default: 1
     MinValue: 1
@@ -128,51 +128,25 @@ Conditions:
     - Fn::Equals:
       - Ref: WebEC2Count
       - '2'
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '3'
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '4'
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '5'
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '6'
+    - !Condition 3PlusWebInstances
   3PlusWebInstances:
     Fn::Or:
     - Fn::Equals:
       - Ref: WebEC2Count
       - '3'
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '4'
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '5'
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '6'
+    - !Condition 4PlusWebInstances
   4PlusWebInstances:
     Fn::Or:
     - Fn::Equals:
       - Ref: WebEC2Count
       - '4'
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '5'
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '6'
+    - !Condition 5PlusWebInstances
   5PlusWebInstances:
     Fn::Or:
     - Fn::Equals:
       - Ref: WebEC2Count
       - '5'
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '6'
+    - !Condition 6PlusWebInstances
   6PlusWebInstances:
     Fn::Equals:
     - Ref: WebEC2Count
@@ -185,82 +159,35 @@ Conditions:
     - Fn::Equals:
       - Ref: BatchEC2Count
       - '2'
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '3'
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '4'
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '5'
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '6'
+    - !Condition 3PlusBatchInstances
   3PlusBatchInstances:
     Fn::Or:
     - Fn::Equals:
       - Ref: BatchEC2Count
       - '3'
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '4'
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '5'
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '6'
+    - !Condition 4PlusBatchInstances
   4PlusBatchInstances:
     Fn::Or:
     - Fn::Equals:
       - Ref: BatchEC2Count
       - '4'
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '5'
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '6'
+    - !Condition 5PlusBatchInstances
   5PlusBatchInstances:
     Fn::Or:
     - Fn::Equals:
       - Ref: BatchEC2Count
       - '5'
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '6'
+    - !Condition 6PlusBatchInstances
   6PlusBatchInstances:
     Fn::Equals:
     - Ref: BatchEC2Count
     - '6'
 
 Resources:
+  #solr 1
   OpswxEC2Services1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Type: AWS::OpsWorks::Instance
     Properties:
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endif %}
       Hostname: !Sub "${ApplicationId}-solr1"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
@@ -269,11 +196,6 @@ Resources:
         - Fn::ImportValue: !Ref SolrLayerID
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
-
-  OpswxEC2Services2{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
-    Condition: 2PlusServiceInstances
-    Type: AWS::OpsWorks::Instance
-    Properties:
 {% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
@@ -296,43 +218,52 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-{% if item.tags["PowerManaged"] == "Yes" %}-PowerManaged{% else %}-AlwaysOn{% endif %}-solr2"
+
+  #solr 2
+  OpswxEC2Services2{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
+    Condition: 2PlusServiceInstances
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      Hostname: !Sub "${ApplicationId}{% if item.tags["PowerManaged"] == "Yes" %}-PowerManaged{% endif %}-solr2"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
+      SubnetId:
+        Fn::ImportValue: !Sub "${AppSubnets}B"
       LayerIds:
         - Fn::ImportValue: !Ref SolrLayerID
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
+  {% if item.tags["PowerManaged"] == "Yes" %}
+      AutoScalingType: timer
+      # Monday-Friday 06:00-20:00 GMT+10
+      TimeBasedAutoScaling:
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endfor %}
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endif %}
 
+  #web1
   OpswxEC2Web1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
     Type: AWS::OpsWorks::Instance
     DependsOn:
       - OpswxEC2Services1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}
 
     Properties:
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endif %}
       Hostname: !Sub "${ApplicationId}-web1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
@@ -341,11 +272,6 @@ Resources:
         - Fn::ImportValue: !Ref WebLayerID
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
-
-  OpswxEC2Web2{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
-    Condition: 2PlusWebInstances
-    Type: AWS::OpsWorks::Instance
-    Properties:
 {% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
@@ -368,62 +294,65 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-web2{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
+
+{% set subnetLetters = ["C","A","B"] %}
+{% for loopingTimes in range(2, 7) %}
+  OpswxEC2Web{{ loopingTimes }}{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% else %}AlwaysOn{% endif %}:
+    Condition: {{ loopingTimes }}PlusWebInstances
+    DependsOn:
+      - OpswxEC2Services1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}
+
+    Type: AWS::OpsWorks::Instance
+    Properties:
+      Hostname: !Sub "${ApplicationId}-web{{ loopingTimes }}{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
       SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}C"
+        Fn::ImportValue: !Sub "${AppSubnets}{{ subnetLetters[ loopingTimes % 3 ] }}"
+
       LayerIds:
         - Fn::ImportValue: !Ref WebLayerID
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
+{% if item.tags["PowerManaged"] == "Yes" %}
+      AutoScalingType: timer
+      # Monday-Friday 06:00-20:00 GMT+10
+      TimeBasedAutoScaling:
+        Sunday:
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
+{{ day }}:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% for hour in range(20, 24) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endfor %}
+        Friday:
+{% for hour in range(0, 10) %}
+          "{{ hour }}": "on"
+{% endfor %}
+{% endif %}
 
+{% endfor %}
+
+
+#legacy load servers
   OpswxEC2Web3:
     Type: AWS::OpsWorks::Instance
+    DependsOn:
+      - OpswxEC2Services1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}
+
     Properties:
       AutoScalingType: load
       Hostname: !Sub "${ApplicationId}-web1a"
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
-      LayerIds:
-        - Fn::ImportValue: !Ref WebLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-
-  OpswxEC2Web3{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% else %}AlwaysOn{% endif %}:
-    Condition: 3PlusWebInstances
-    Type: AWS::OpsWorks::Instance
-    Properties:
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endif %}
-      Hostname: !Sub "${ApplicationId}-web3{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
-      RootDeviceType: ebs
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref WebEC2Size
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}C"
       LayerIds:
         - Fn::ImportValue: !Ref WebLayerID
       StackId:
@@ -447,155 +376,12 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
-  OpswxEC2Web4{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
-    Condition: 4PlusWebInstances
-    Type: AWS::OpsWorks::Instance
-    Properties:
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endif %}
-      Hostname: !Sub "${ApplicationId}-web4{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
-      RootDeviceType: ebs
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref WebEC2Size
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}C"
-      LayerIds:
-        - Fn::ImportValue: !Ref WebLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-
-
-  OpswxEC2Web5{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
-    Condition: 5PlusWebInstances
-    Type: AWS::OpsWorks::Instance
-    Properties:
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endif %}
-      Hostname: !Sub "${ApplicationId}-web5{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
-      RootDeviceType: ebs
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref WebEC2Size
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}C"
-      LayerIds:
-        - Fn::ImportValue: !Ref WebLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-
-  OpswxEC2Web6{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
-    Condition: 6PlusWebInstances
-    Type: AWS::OpsWorks::Instance
-    Properties:
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endif %}
-      Hostname: !Sub "${ApplicationId}-web6{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}"
-      RootDeviceType: ebs
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref WebEC2Size
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}C"
-      LayerIds:
-        - Fn::ImportValue: !Ref WebLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-
-  OpswxEC2Batch1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
-    Condition: BatchLayerNeeded
-    Type: AWS::OpsWorks::Instance
-    Properties:
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endif %}
-      Hostname: !Sub "${ApplicationId}-{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged-{% else %}AlwaysOn-{% endif %}batch1"
-      RootDeviceType: ebs
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref BatchEC2Size
-      LayerIds:
-        - Fn::ImportValue: !Ref BatchLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
 
   OpswxEC2Batch2:
-    Condition: 2PlusBatchInstances
+    Condition: BatchLayerNeeded
+    DependsOn:
+      - OpswxEC2Services1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}
+
     Type: AWS::OpsWorks::Instance
     Properties:
       AutoScalingType: load
@@ -608,11 +394,26 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
+#OpswxEC2Batch1PowerManaged ~ OpswxEC2Batch6PowerManaged
+#OpswxEC2Batch1AlwaysOn ~ OpswxEC2Batch6AlwaysOn
+{% for loopingTimes in range(1, 7) %}
+  OpswxEC2Batch{{ loopingTimes }}{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% else %}AlwaysOn{% endif %}:
+    Condition: {{ loopingTimes }}PlusBatchInstances
+    DependsOn:
+      - OpswxEC2Services1{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}
 
-  OpswxEC2Batch2NonLoad{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged{% endif %}:
-    Condition: BatchLayerNeeded
     Type: AWS::OpsWorks::Instance
     Properties:
+      Hostname: !Sub "${ApplicationId}-{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged-{% else %}AlwaysOn-{% endif %}batch{{ loopingTimes }}"
+      RootDeviceType: ebs
+      InstallUpdatesOnBoot: true
+      InstanceType: !Ref BatchEC2Size
+      LayerIds:
+        - Fn::ImportValue: !Ref BatchLayerID
+      StackId:
+        Fn::ImportValue: !Ref OpsWorksStackID
+      SubnetId:
+        Fn::ImportValue: !Sub "${AppSubnets}{{ subnetLetters[ loopingTimes % 3 ] }}"
 {% if item.tags["PowerManaged"] == "Yes" %}
       AutoScalingType: timer
       # Monday-Friday 06:00-20:00 GMT+10
@@ -635,11 +436,5 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% endif %}
-      Hostname: !Sub "${ApplicationId}-{% if item.tags["PowerManaged"] == "Yes" %}PowerManaged-{% else %}AlwaysOn-{% endif %}batch2"
-      RootDeviceType: ebs
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref BatchEC2Size
-      LayerIds:
-        - Fn::ImportValue: !Ref BatchLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
+
+{% endfor %}
