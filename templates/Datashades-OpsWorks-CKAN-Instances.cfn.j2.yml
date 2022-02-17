@@ -125,7 +125,7 @@ Conditions:
     !Equals [ !Ref ServicesEC2Count, 2 ]
 
   2PlusWebInstances:
-     Fn::Or:
+    Fn::Or:
     - Fn::Equals:
       - Ref: WebEC2Count
       - '2'
