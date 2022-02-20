@@ -154,6 +154,12 @@ Conditions:
 
   BatchLayerNeeded: #batch is background
     !Not [!Equals [!Ref BatchEC2Size, none]]
+  1PlusBatchInstances:
+    Fn::Or:
+    - Fn::Equals:
+      - Ref: BatchEC2Count
+      - '1'
+    - !Condition 2PlusBatchInstances
   2PlusBatchInstances:
     Fn::Or:
     - Fn::Equals:
@@ -205,7 +211,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
+        {{ day }}:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
 {% endfor %}
@@ -228,8 +234,8 @@ Resources:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}B"
+#      SubnetId:
+#        Fn::ImportValue: !Sub "${AppSubnets}B" #todo, can only change if hostname also is changed
       LayerIds:
         - Fn::ImportValue: !Ref SolrLayerID
       StackId:
@@ -243,7 +249,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
+        {{ day }}:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
 {% endfor %}
@@ -281,7 +287,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
+        {{ day }}:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
 {% endfor %}
@@ -324,7 +330,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
+        {{ day }}:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
 {% endfor %}
@@ -423,7 +429,7 @@ Resources:
           "{{ hour }}": "on"
 {% endfor %}
 {% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-{{ day }}:
+        {{ day }}:
 {% for hour in range(0, 10) %}
           "{{ hour }}": "on"
 {% endfor %}
