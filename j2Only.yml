@@ -15,4 +15,4 @@
       when: basic_fact is defined
 
   roles:
-    - ansible_cloudformation_jina_only
+    - ansible_cloudformation_jinja_only
