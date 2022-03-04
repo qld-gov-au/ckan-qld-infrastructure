@@ -170,7 +170,7 @@ extensions:
 
     CKANExtQGOV:
       <<: *CKANExtQGOV
-      version: "QOL-7905-ckan-2.9"
+      version: "master"
 
     CKANExtS3Filestore:
       <<: *CKANExtS3Filestore
