@@ -63,7 +63,7 @@ extensions:
       description: "CKAN Extension for validating Data Packages"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation.git"
-      version: "0.0.8-qgov.3"
+      version: "0.0.8-qgov.4"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
@@ -119,7 +119,7 @@ extensions:
       description: "CKAN Extension for Reporting"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-report.git"
-      version: "0.2"
+      version: "0.3"
 
     CKANExtArchiver: &CKANExtArchiver
       name: "ckanext-archiver-{{ Environment }}"
@@ -170,7 +170,7 @@ extensions:
 
     CKANExtQGOV:
       <<: *CKANExtQGOV
-      version: "QOL-7905-ckan-2.9"
+      version: "master"
 
     CKANExtS3Filestore:
       <<: *CKANExtS3Filestore
@@ -206,7 +206,7 @@ extensions:
 
     CKANExtReport:
       <<: *CKANExtReport
-      version: "Zharktas-py3_to_qld-gov-au"
+      version: "master"
 
     CKANExtArchiver:
       <<: *CKANExtArchiver
