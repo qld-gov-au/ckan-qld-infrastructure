@@ -1,7 +1,5 @@
-
 @reporting
 @OpenData
-
 Feature: AdminReporting
 
     Scenario: As an admin user of my organisation, I can view 'My Reports' tab in the dashboard and show the 'Admin Report' with filters and table columns
