@@ -63,7 +63,7 @@ extensions:
       description: "CKAN Extension for validating Data Packages"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation.git"
-      version: "0.0.8-qgov.4"
+      version: "v0.0.8-qgov.4"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
@@ -103,7 +103,7 @@ extensions:
       description: "CKAN Extension for YTP Comments"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
-      version: "2.5.0-qgov"
+      version: "2.5.0-qgov.2"
 
     CKANExtHarvest: &CKANExtHarvest
       name: "ckanext-harvest-{{ Environment }}"
@@ -182,11 +182,7 @@ extensions:
 
     CKANExtDataQld:
       <<: *CKANExtDataQld
-      version: "master"
-
-    CKANExtDataQldTheme:
-      <<: *CKANExtDataQldTheme
-      version: "master"
+      version: "QOL-7939-ckan-2.9"
 
     CKANExtODICertificates:
       <<: *CKANExtODICertificates
@@ -237,5 +233,5 @@ basic_facts:
     Domain: "www.test-dev.data.qld.gov.au,test-dev.data.qld.gov.au"
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CKANRevision: "ckan-2.9.4-qgov.2"
+    CKANRevision: "ckan-2.9.4-qgov.3"
     CmsOrigin: "staging.squizedge.net"
