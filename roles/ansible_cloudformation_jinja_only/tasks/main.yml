@@ -1,0 +1,18 @@
+---
+
+# The individual stacks effectively inherit and override the common stack.
+#
+# - For simple values, we first check the individual stack, then use the
+# 'default' filter to get the common value if not provided.
+# - For dictionary values, we first get the common dict, then use the
+# 'combine' filter to override with values from the individual stack.
+#
+# The net effect is that the common and individual stacks have the same
+# structure, but any values in the individual stacks take priority.
+
+- name: Compile Jinja2 template if required
+  template:
+    src: "{{ item.template_jinja }}"
+    dest: "{{ item.template }}"
+  when: item.template_parameters is defined and item.template_parameters.Environment == Environment and item.template_jinja is defined
+  with_items: "{{ cloudformation_stacks }}"

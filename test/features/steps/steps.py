@@ -2,7 +2,6 @@ from behave import step
 from behaving.personas.steps import *  # noqa: F401, F403
 from behaving.web.steps import *  # noqa: F401, F403
 from behaving.web.steps.url import when_i_visit_url
-from behaving.mail.steps import *
 import email
 import quopri
 import random
@@ -13,12 +12,20 @@ def get_current_url(context):
     context.browser.evaluate_script("document.documentElement.clientWidth")
 
 
-@step('I go to homepage')
+@step(u'I go to homepage')
 def go_to_home(context):
     when_i_visit_url(context, '/')
 
 
-@step('I log in')
+@step(u'I go to register page')
+def go_to_register_page(context):
+    context.execute_steps(u"""
+        When I go to homepage
+        And I click the link with text that contains "Register"
+    """)
+
+
+@step(u'I log in')
 def log_in(context):
     assert context.persona
     context.execute_steps(u"""
@@ -28,7 +35,7 @@ def log_in(context):
     """)
 
 
-@step('I log in directly')
+@step(u'I log in directly')
 def log_in_directly(context):
     """
     This differs to the `log_in` function above by logging in directly to a page where the user login form is presented
@@ -45,7 +52,14 @@ def log_in_directly(context):
     """)
 
 
-@step('I fill in title with random text')
+@step(u'I should see a login link')
+def login_link_visible(context):
+    context.execute_steps(u"""
+        Then I should see an element with xpath "//h1[contains(string(), 'Login')]"
+    """)
+
+
+@step(u'I fill in title with random text')
 def title_random_text(context):
 
     assert context.persona
@@ -54,17 +68,27 @@ def title_random_text(context):
     """.format(random.randrange(1000)))
 
 
-@step('I go to organisation page')
+@step(u'I go to dataset page')
+def go_to_dataset_page(context):
+    when_i_visit_url(context, '/dataset')
+
+
+@step(u'I go to dataset "{name}"')
+def go_to_dataset(context, name):
+    when_i_visit_url(context, '/dataset/' + name)
+
+
+@step(u'I edit the "{name}" dataset')
+def edit_dataset(context, name):
+    when_i_visit_url(context, '/dataset/edit/{}'.format(name))
+
+
+@step(u'I go to organisation page')
 def go_to_organisation_page(context):
     when_i_visit_url(context, '/organization')
 
 
-@step('I go to register page')
-def go_to_register_page(context):
-    when_i_visit_url(context, '/user/register')
-
-
-@step('I log in and go to the data requests page')
+@step(u'I log in and go to the data requests page')
 def log_in_go_to_datarequest_page(context):
     assert context.persona
     context.execute_steps(u"""
@@ -73,14 +97,13 @@ def log_in_go_to_datarequest_page(context):
     """)
 
 
-@step('I go to the data requests page')
+@step(u'I go to the data requests page')
 def go_to_datarequest_page(context):
     when_i_visit_url(context, '/datarequest')
 
 
-@step('I log in and create a datarequest')
+@step(u'I log in and create a datarequest')
 def log_in_create_a_datarequest(context):
-
     assert context.persona
     context.execute_steps(u"""
         When I log in and go to the data requests page
@@ -88,7 +111,7 @@ def log_in_create_a_datarequest(context):
     """)
 
 
-@step('I create a datarequest')
+@step(u'I create a datarequest')
 def create_datarequest(context):
 
     assert context.persona
@@ -101,19 +124,9 @@ def create_datarequest(context):
     """)
 
 
-@step('I go to my reports page')
+@step(u'I go to my reports page')
 def go_to_reporting_page(context):
     when_i_visit_url(context, '/dashboard/reporting')
-
-
-@step('I go to dataset page')
-def go_to_dataset_page(context):
-    when_i_visit_url(context, '/dataset')
-
-
-@step(u'I go to dataset "{name}"')
-def go_to_dataset(context, name):
-    when_i_visit_url(context, '/dataset/' + name)
 
 
 @step(u'I go to dataset "{name}" comments')
@@ -179,12 +192,12 @@ def submit_reply_with_comment(context, comment):
         "document.querySelector('.comment-wrapper form .form-actions input[type=\"submit\"]').click();")
 
 
-@step('I create a dataset with license {license} and resource file {file}')
+@step(u'I create a dataset with license {license} and resource file {file}')
 def create_dataset_json(context, license, file):
     create_dataset(context, license, 'JSON', file)
 
 
-@step('I create a dataset with license {license} and {file_format} resource file {file}')
+@step(u'I create a dataset with license {license} and {file_format} resource file {file}')
 def create_dataset(context, license, file_format, file):
     assert context.persona
     context.execute_steps(u"""
@@ -205,7 +218,7 @@ def create_dataset(context, license, file_format, file):
 
 
 # The default behaving step does not convert base64 emails
-# Modifed the default step to decode the payload from base64
+# Modified the default step to decode the payload from base64
 @step(u'I should receive a base64 email at "{address}" containing "{text}"')
 def should_receive_base64_email_containing_text(context, address, text):
     def filter_contents(mail):
@@ -220,3 +233,17 @@ def should_receive_base64_email_containing_text(context, address, text):
         return text in decoded_payload
 
     assert context.mail.user_messages(address, filter_contents)
+
+
+@step(u'I log in and go to admin config page')
+def log_in_go_to_admin_config(context):
+    assert context.persona
+    context.execute_steps(u"""
+        When I log in
+        And I go to admin config page
+    """)
+
+
+@step(u'I go to admin config page')
+def go_to_admin_config(context):
+    when_i_visit_url(context, '/ckan-admin/config')

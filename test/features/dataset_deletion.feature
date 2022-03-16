@@ -53,8 +53,8 @@ Feature: Dataset deletion
         Then I press the element with xpath "//a[@data-module='confirm-action']"
         And I wait for 5 seconds
         Then I should see "Briefly describe the reason for deleting this dataset"
-        Then I should see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"
-        When I type "it should be longer than 10 character" to "deletion_reason"
+        And I should see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"
+        When I type "it should be longer than 10 characters" to "deletion_reason"
         Then I should not see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"
         Then I press the element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary']"
         And I wait for 10 seconds
