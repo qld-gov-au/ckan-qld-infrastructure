@@ -25,9 +25,9 @@ Feature: Data Validation
         When I fill in "author_email" with "test@me.com"
         Then I select "NO" from "de_identified_data"
         When I press "Add Data"
-        And I execute the script "document.getElementById('field-image-url').value='http://example.com/external-data.csv'"
+        And I execute the script "document.getElementById('field-image-url').value='https://example.com'"
         And I fill in "name" with "Test Resource"
-        And I execute the script "document.getElementById('field-format').value='JSON'"
+        And I execute the script "document.getElementById('field-format').value='HTML'"
         And I fill in "description" with "Test Resource Description"
         And I fill in "size" with "1mb"
         And I execute the script "document.getElementById('field-schema-upload').parentNode.parentNode.setAttribute('style', '')"
@@ -36,4 +36,4 @@ Feature: Data Validation
         When I wait for 1 seconds
         And I click the link with text that contains "Test Resource"
         And I click the link with text that contains "View Schema File"
-        Then the browser's URL should contain "/schema/show/"
+        Then I should see "Measure of the oblique fractal impedance at noon"
