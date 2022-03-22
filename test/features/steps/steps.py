@@ -120,7 +120,7 @@ def create_datarequest(context):
         And I click the link with text that contains "Add data request"
         And I fill in title with random text
         And I fill in "description" with "Test description"
-        And I press the element with xpath "//button[contains(string(), 'Create data request')]"
+        And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
     """)
 
 
@@ -190,6 +190,24 @@ def submit_reply_with_comment(context, comment):
         "document.querySelector('.comment-wrapper form textarea[name=\"comment\"]').value = '%s';" % comment)
     context.browser.execute_script(
         "document.querySelector('.comment-wrapper form .form-actions input[type=\"submit\"]').click();")
+
+
+@step(u'I create a dataset with title "{title}"')
+def create_dataset_titled(context, title):
+    context.execute_steps(u"""
+        When I visit "dataset/new"
+        And I fill in "title" with "{title}"
+        And I fill in "notes" with "Description"
+        And I fill in "version" with "1.0"
+        And I fill in "author_email" with "test@me.com"
+        And I select "NO" from "de_identified_data"
+        And I press "Add Data"
+        And I execute the script "document.getElementById('field-image-url').value='https://example.com'"
+        And I fill in "name" with "Test Resource"
+        And I select "HTML" from "format"
+        And I fill in "description" with "Test Resource Description"
+        And I press "Finish"
+    """.format(title=title))
 
 
 @step(u'I create a dataset with license {license} and resource file {file}')
