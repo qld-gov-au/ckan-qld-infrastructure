@@ -176,10 +176,6 @@ extensions:
       <<: *CKANExtDataQld
       version: "develop"
 
-    CKANExtDataQldTheme:
-      <<: *CKANExtDataQldTheme
-      version: "develop"
-
     CKANExtODICertificates:
       <<: *CKANExtODICertificates
       version: "develop"
