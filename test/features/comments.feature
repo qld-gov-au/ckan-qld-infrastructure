@@ -22,7 +22,7 @@ Feature: Comments
         Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
         Then I submit a comment with subject "Test subject" and comment "This is a test comment"
         Then I should see "This is a test comment" within 10 seconds
-        And I should see an element with xpath "//div[contains(@class, 'comment-wrapper highlight') and contains(string(), 'This is a test comment')]"
+        And I should see an element with xpath "//div[contains(@class, 'comment-wrapper') and contains(string(), 'This is a test comment')]"
 
     @comment-add @datarequest
     Scenario: When a logged-in user submits a comment on a Data Request the comment should then be visible on the Comments tab of the Data Request
@@ -59,17 +59,16 @@ Feature: Comments
         When I log in
         And I go to data request "Test Request" comments
         Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
-        Then I submit a comment with subject "Test subject" and comment "Go fuck yourself!"
+        Then I submit a comment with subject "Test subject" and comment "He had sheep, and oxen, and he asses, and menservants, and maidservants, and she asses, and camels."
         Then I should see "Comment blocked due to profanity" within 5 seconds
 
     @comment-report
     Scenario: When a logged-in user reports a comment on a Dataset the comment should be marked as reported and an email sent to the admins of the organisation
-        Given "CKANUser" as the persona
+        Given "TestOrgEditor" as the persona
         When I log in
-        Then I go to dataset "warandpeace" comments
-        And I press the element with xpath "//a[contains(string(), 'Report')]"
+        And I go to dataset "warandpeace" comments
+        And I press the element with xpath "//a[contains(@class, 'flag-comment')][1]"
         Then I should see "Reported" within 5 seconds
-        When I wait for 3 seconds
         Then I should receive a base64 email at "test_org_admin@localhost" containing "This comment has been flagged as inappropriate by a user"
 
     @comment-report @datarequest
@@ -77,9 +76,10 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         And I go to data request "Test Request" comments
-        And I press the element with xpath "//a[contains(string(), 'Report')]"
+        And I submit a comment with subject "Test reporting" and comment "Testing comment reporting"
+        Then I should see "Testing comment reporting" within 10 seconds
+        And I press the element with xpath "//a[contains(@class, 'flag-comment')][1]"
         Then I should see "Reported" within 5 seconds
-        When I wait for 3 seconds
         Then I should receive a base64 email at "test_org_admin@localhost" containing "This comment has been flagged as inappropriate by a user"
 
     @comment-reply
