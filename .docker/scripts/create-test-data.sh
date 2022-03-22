@@ -40,8 +40,8 @@ fi
 echo "Adding ckan.datarequests.closing_circumstances:"
 
 curl -LsH "Authorization: ${API_KEY}" \
-    --header "Content-Type: application/json" \
-    --data '{"ckan.datarequests.closing_circumstances":"Released as open data|nominate_dataset\nOpen dataset already exists|nominate_dataset\nPartially released|nominate_dataset\nTo be released as open data at a later date|nominate_approximate_date\nData openly available elsewhere\nNot suitable for release as open data\nRequested data not available/cannot be compiled\nRequestor initiated closure"}' \
+    --data '{"ckan.datarequests.closing_circumstances":
+        "Released as open data|nominate_dataset\nOpen dataset already exists|nominate_dataset\nPartially released|nominate_dataset\nTo be released as open data at a later date|nominate_approximate_date\nData openly available elsewhere\nNot suitable for release as open data\nRequested data not available/cannot be compiled\nRequestor initiated closure"}' \
     ${CKAN_ACTION_URL}/config_option_update
 
 ##
