@@ -15,6 +15,7 @@ Feature: Dataset APIs
         And I fill in "notes" with "Testing dataset creation"
         And I fill in "version" with "1.0"
         And I fill in "author_email" with "test@me.com"
+        And I select "NO" from "de_identified_data"
         And I press "Add Data"
         And I press the element with xpath "//form[@id='resource-edit']//a[string() = 'Link']"
         And I fill in "name" with "Test"
