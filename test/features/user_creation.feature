@@ -1,5 +1,4 @@
 @user_creation
-@OpenData
 Feature: User creation
 
     Scenario: SysAdmin can create 'Excluded display name words' in ckan admin config
@@ -15,7 +14,8 @@ Feature: User creation
         Given "SysAdmin" as the persona
         When I log in
         When I go to "/user/register"
-        Then I should see "Displayed name"
+        Then I should see an element with xpath "//input[@name='fullname']"
+        And I should see "Displayed name"
         Then I fill in "name" with "publisher_user"
         Then I fill in "fullname" with "gov user"
         And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
@@ -27,7 +27,8 @@ Feature: User creation
     Scenario: Non logged-in user register to the site.
         Given "Unauthenticated" as the persona
         When I go to register page
-        Then I should see "Displayed name"
+        Then I should see an element with xpath "//input[@name='fullname']"
+        And I should see "Displayed name"
         Then I fill in "name" with "publisher_user"
         Then I fill in "fullname" with "gov user"
         And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
