@@ -225,5 +225,5 @@ basic_facts:
     Domain: "www.test-dev.data.qld.gov.au,test-dev.data.qld.gov.au"
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CKANRevision: "ckan-2.9.4-qgov.3"
+    CKANRevision: "ckan-2.9.4-qgov.4"
     CmsOrigin: "staging.squizedge.net"
