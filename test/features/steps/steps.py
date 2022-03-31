@@ -76,7 +76,6 @@ def add_resource(context, name, url):
         And I press the element with xpath "//form[@id='resource-edit']//a[string() = 'Link']"
         And I fill in "name" with "{}"
         And I fill in "url" with "{}"
-        And I select "HTML" from "format"
         And I fill in "description" with "description"
         And I fill in "size" with "1024"
         And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
