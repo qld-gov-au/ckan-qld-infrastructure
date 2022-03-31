@@ -76,7 +76,7 @@ def add_resource(context, name, url):
         And I execute the script "document.getElementById('field-image-url').value='{url}'"
         And I fill in "name" with "{name}"
         And I fill in "description" with "description"
-        And I fill in "size" with "1024"
+        And I execute the script "size_field = document.getElementById('field-size'); if (size_field) size_field.value = '1024';"
         And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
     """.format(name=name, url=url))
 
