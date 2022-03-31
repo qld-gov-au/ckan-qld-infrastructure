@@ -2,7 +2,7 @@
 Feature: Dataset deletion
 
     @OpenData
-    Scenario: Sysadmin creates a dataset
+    Scenario: Sysadmin creates and deletes a dataset
         Given "SysAdmin" as the persona
         When I log in
         And I go to "/dataset/new"
@@ -24,8 +24,23 @@ Feature: Dataset deletion
         And I wait for 10 seconds
         Then I should see "Data and Resources"
 
+        When I go to "/dataset/edit/dataset-deletion"
+        Then I press the element with xpath "//a[string()='Delete' and @data-module='confirm-action']"
+        And I wait for 5 seconds
+        Then I should see "Briefly describe the reason for deleting this dataset"
+        And I should see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"
+        When I type "it should be longer than 10 characters" to "deletion_reason"
+        Then I should not see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"
+        Then I press the element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary']"
+        And I wait for 5 seconds
+        Then I should see "Dataset has been deleted"
+        And I should not see "Dataset deletion"
+        When I go to "/ckan-admin/trash"
+        Then I should see "Dataset deletion"
+        Then I press the element with xpath "//form[contains(@id, 'form-purge-package')]//*[contains(text(), 'Purge')]"
+
     @Publications
-    Scenario: Sysadmin creates a dataset
+    Scenario: Sysadmin creates and deletes a dataset
         Given "SysAdmin" as the persona
         When I log in
         And I go to "/dataset/new"
@@ -44,18 +59,8 @@ Feature: Dataset deletion
         And I wait for 10 seconds
         Then I should see "Data and Resources"
 
-    @OpenData
-    Scenario: Sysadmin deletes a dataset
-        Given "SysAdmin" as the persona
-        When I log in
-        And I go to "/dataset/edit/dataset-deletion"
-        Then I should see an element with xpath "//a[@data-module='confirm-action']"
-        Then I press the element with xpath "//a[@data-module='confirm-action']"
-        And I wait for 5 seconds
-        Then I should see "Briefly describe the reason for deleting this dataset"
-        And I should see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"
-        When I type "it should be longer than 10 characters" to "deletion_reason"
-        Then I should not see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"
+        When I go to "/dataset/edit/dataset-deletion"
+        Then I press the element with xpath "//a[string()='Delete' and @data-module='confirm-action']"
         Then I press the element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary']"
         And I wait for 5 seconds
         Then I should see "Dataset has been deleted"
@@ -63,16 +68,3 @@ Feature: Dataset deletion
         When I go to "/ckan-admin/trash"
         Then I should see "Dataset deletion"
         Then I press the element with xpath "//form[contains(@id, 'form-purge-package')]//*[contains(text(), 'Purge')]"
-
-    @Publications
-    Scenario: Sysadmin deletes a dataset
-        Given "SysAdmin" as the persona
-        When I log in
-        And I go to "/dataset/edit/dataset-deletion"
-        Then I should see an element with xpath "//a[@data-module='confirm-action']"
-        Then I press the element with xpath "//a[@data-module='confirm-action']"
-        And I wait for 5 seconds
-        Then I should not see "Dataset deletion"
-        And I go to "/ckan-admin/trash"
-        Then I should see "Purge deleted datasets forever and irreversibly"
-        Then I press the element with xpath "//button[@name='purge-packages']"

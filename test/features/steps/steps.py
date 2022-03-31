@@ -265,7 +265,7 @@ def submit_reply_with_comment(context, comment):
 @step(u'I create a dataset with title "{title}"')
 def create_dataset_titled(context, title):
     context.execute_steps(u"""
-        When I visit "dataset/new"
+        When I visit "/dataset/new"
         And I fill in "title" with "{title}"
         And I fill in "notes" with "Description"
         And I fill in "version" with "1.0"
@@ -289,7 +289,7 @@ def create_dataset_json(context, license, file):
 def create_dataset(context, license, file_format, file):
     assert context.persona
     context.execute_steps(u"""
-        When I visit "dataset/new"
+        When I visit "/dataset/new"
         And I fill in title with random text
         And I fill in "notes" with "Description"
         And I fill in "version" with "1.0"

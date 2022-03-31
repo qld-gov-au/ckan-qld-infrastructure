@@ -1,7 +1,7 @@
 @config
 Feature: Config
 
-    Scenario: Assert that configuration values are removed
+    Scenario: Assert that configuration values are customised
         Given "SysAdmin" as the persona
         When I log in and go to admin config page
         Then I should see "Intro Text"
