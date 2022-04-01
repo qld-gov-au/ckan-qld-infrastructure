@@ -40,11 +40,11 @@ COPY . ${APP_DIR}/
 
 COPY .docker/scripts ${APP_DIR}/scripts
 
-COPY .docker/scripts/ckan_cli ./docker/scripts/add-user-if-needed ${VENV_DIR}/bin/
+COPY .docker/scripts/ckan_cli ${VENV_DIR}/bin/
 
 COPY vars/shared-$VARS_TYPE.var.yml $APP_DIR/scripts/extensions.yml
 
-RUN chmod +x ${APP_DIR}/scripts/*.sh ${VENV_DIR}/bin/ckan_cli ${VENV_DIR}/bin/add-user-if-needed
+RUN chmod +x ${APP_DIR}/scripts/*.sh ${VENV_DIR}/bin/ckan_cli
 
 # Init current extension.
 RUN ${APP_DIR}/scripts/init-ext.sh
