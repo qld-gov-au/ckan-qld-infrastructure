@@ -16,6 +16,7 @@ Feature: Resource UI
         | Domain ending with numbers | http://example.com.1.2.3.4 |
         | Domain ending with private | http://example.com.private |
 
+    @Publications
     Scenario: Link resource with missing or invalid protocol should use HTTP
         Given "SysAdmin" as the persona
         When I resize the browser to 1024x2048
