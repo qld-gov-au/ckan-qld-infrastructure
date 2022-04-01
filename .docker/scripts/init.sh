@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 ##
-# Initialise CKAN instance.
+# Initialise CKAN data for testing.
 #
 set -e
 
@@ -13,3 +13,4 @@ ckan_cli db init
 
 # Create some base test data
 . $APP_DIR/scripts/create-test-data.sh
+. $APP_DIR/scripts/create-test-data-$VARS_TYPE.sh
