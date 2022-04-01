@@ -25,7 +25,7 @@ Feature: Dataset deletion
         Then I should see "Data and Resources"
 
         When I go to "/dataset/edit/dataset-deletion"
-        Then I press the element with xpath "//a[string()='Delete' and @data-module='confirm-action']"
+        Then I press the element with xpath "//a[@data-module='confirm-action']"
         And I wait for 5 seconds
         Then I should see "Briefly describe the reason for deleting this dataset"
         And I should see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"

@@ -64,6 +64,21 @@ Feature: Theme customisations
         And I press "Create Account"
         Then I should see "Password: Must contain at least one number, lowercase letter, capital letter, and symbol"
 
+    @OpenData
+    Scenario: As a publisher, when I create a resource with an API entry, I can download it in various formats
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I resize the browser to 1024x2048
+        And I create a dataset with license "other-open" and "CSV" resource file "csv_resource.csv"
+        And I wait for 10 seconds
+        And I click the link with text that contains "Test Resource"
+        Then I should see an element with xpath "//a[contains(@class, 'resource-btn') and contains(@href, '/download/csv_resource.csv') and contains(string(), '(CSV)')]"
+        When I press the element with xpath "//button[@data-toggle='dropdown']"
+        Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(string(), 'CSV')]"
+        Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=tsv') and contains(string(), 'TSV')]"
+        Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=json') and contains(string(), 'JSON')]"
+        Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=xml') and contains(string(), 'XML')]"
+
     @Publications
     Scenario: Menu items are present and correct
         When I go to "/dataset"
