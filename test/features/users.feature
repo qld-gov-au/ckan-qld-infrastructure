@@ -1,23 +1,16 @@
 @users
 Feature: User APIs
 
-    Scenario: User autocomplete is accessible to sysadmins
-        Given "SysAdmin" as the persona
+    Scenario Outline: User autocomplete is accessible to admins
+        Given "<Admin>" as the persona
         When I log in
         And I search the autocomplete API for user "admin"
         Then I should see an element with xpath "//*[contains(string(), '"name": "admin"')]"
 
-    Scenario: User autocomplete is accessible to organisation admins
-        Given "Organisation Admin" as the persona
-        When I log in
-        And I search the autocomplete API for user "admin"
-        Then I should see an element with xpath "//*[contains(string(), '"name": "admin"')]"
-
-    Scenario: User autocomplete is accessible to group admins
-        Given "Group Admin" as the persona
-        When I log in
-        And I search the autocomplete API for user "admin"
-        Then I should see an element with xpath "//*[contains(string(), '"name": "admin"')]"
+        Examples: Admins
+            | SysAdmin            |
+            | TestOrgAdmin        |
+            | Group Admin         |
 
     Scenario: User autocomplete is not accessible to non-admins
         Given "Publisher" as the persona
@@ -32,23 +25,16 @@ Feature: User APIs
         And I should not see an element with xpath "//*[contains(string(), '"name": "admin"')]"
 
 
-    Scenario: User list is accessible to sysadmins
-        Given "SysAdmin" as the persona
+    Scenario Outline: User list is accessible to admins
+        Given "<Admin>" as the persona
         When I log in
         And I go to the user list API
         Then I should see an element with xpath "//*[contains(string(), '"success": true,') and contains(string(), '"name": "admin"')]"
 
-    Scenario: User list is accessible to organisation admins
-        Given "Organisation Admin" as the persona
-        When I log in
-        And I go to the user list API
-        Then I should see an element with xpath "//*[contains(string(), '"success": true,') and contains(string(), '"name": "admin"')]"
-
-    Scenario: User list is accessible to group admins
-        Given "Group Admin" as the persona
-        When I log in
-        And I go to the user list API
-        Then I should see an element with xpath "//*[contains(string(), '"success": true,') and contains(string(), '"name": "admin"')]"
+        Examples: Admins
+            | SysAdmin            |
+            | TestOrgAdmin        |
+            | Group Admin         |
 
     Scenario: User list is not accessible to non-admins
         Given "Publisher" as the persona
@@ -61,23 +47,16 @@ Feature: User APIs
         Then I should see an element with xpath "//*[contains(string(), '"success": false,') and contains(string(), 'requires an authenticated user')]"
 
 
-    Scenario: User detail is accessible to sysadmins
-        Given "SysAdmin" as the persona
+    Scenario: User detail is accessible to admins
+        Given "<Admin>" as the persona
         When I log in
         And I go to the "admin" user API
         Then I should see an element with xpath "//*[contains(string(), '"success": true,') and contains(string(), '"name": "admin"')]"
 
-    Scenario: User detail is accessible to organisation admins
-        Given "Organisation Admin" as the persona
-        When I log in
-        And I go to the "editor" user API
-        Then I should see an element with xpath "//*[contains(string(), '"success": true,') and contains(string(), '"name": "editor"')]"
-
-    Scenario: User detail is accessible to group admins
-        Given "Group Admin" as the persona
-        When I log in
-        And I go to the "editor" user API
-        Then I should see an element with xpath "//*[contains(string(), '"success": true,') and contains(string(), '"name": "editor"')]"
+        Examples: Admins
+            | SysAdmin            |
+            | TestOrgAdmin        |
+            | Group Admin         |
 
     Scenario: User detail for self is accessible to non-admins
         Given "Publisher" as the persona
@@ -96,23 +75,16 @@ Feature: User APIs
         Then I should see an element with xpath "//*[contains(string(), '"success": false,') and contains(string(), 'requires an authenticated user')]"
 
 
-    Scenario: User profile page is accessible to sysadmins
-        Given "SysAdmin" as the persona
+    Scenario: User profile page is accessible to admins
+        Given "<Admin>" as the persona
         When I log in
         And I go to the "admin" profile page
         Then I should see an element with xpath "//h1[string() = 'Administrator']"
 
-    Scenario: User profile page is accessible to organisation admins
-        Given "Organisation Admin" as the persona
-        When I log in
-        And I go to the "editor" profile page
-        Then I should see an element with xpath "//h1[string() = 'Publisher']"
-
-    Scenario: User profile page is accessible to group admins
-        Given "Organisation Admin" as the persona
-        When I log in
-        And I go to the "editor" profile page
-        Then I should see an element with xpath "//h1[string() = 'Publisher']"
+        Examples: Admins
+            | SysAdmin            |
+            | TestOrgAdmin        |
+            | Group Admin         |
 
     Scenario: User profile page for self is accessible to non-admins
         Given "Publisher" as the persona
