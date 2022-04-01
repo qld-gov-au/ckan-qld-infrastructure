@@ -15,14 +15,14 @@ Feature: SchemaMetadata
         And I go to "/dataset/new"
         Then I should not see an element with id "field-maintainer_email"
 
-    Scenario: When I create resource without a description, I should see the following error  Description: Missing value
+    Scenario: When I create resource without a description, I should see an error for the missing description
         Given "SysAdmin" as the persona
         When I log in
         And I go to "/dataset/new_resource/warandpeace"
         And I press the element with xpath "//button[contains(string(), 'Add')]"
         Then I should see "Description: Missing value"
 
-    Scenario: When I create resource without a name, I should see the following error  Name: Missing value
+    Scenario: When I create resource without a name, I should see an error for the missing name
         Given "SysAdmin" as the persona
         When I log in
         When I visit "/dataset/new_resource/warandpeace"
