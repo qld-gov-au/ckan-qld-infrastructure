@@ -33,7 +33,7 @@ jobs:
 
       - name: Test
         run: .circleci/test.sh
-        timeout-minutes: 25
+        timeout-minutes: 30
 
       - name: Retrieve screenshots
         if: failure()
