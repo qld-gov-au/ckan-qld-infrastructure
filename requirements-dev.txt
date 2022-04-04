@@ -1,5 +1,4 @@
 behave==1.2.6
-behave-parallel==1.2.4a1
 behaving==2.0.0
 Appium-Python-Client<=0.52
 ckanapi==4.3
@@ -11,3 +10,4 @@ pytest-ckan
 PyYAML>=1.0
 splinter>=0.13.0,<0.17
 
+git+https://github.com/hugeinc/behave-parallel.git@release-1.2.2#egg=behave-parallel
