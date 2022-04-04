@@ -18,6 +18,7 @@ Feature: SchemaMetadata
     Scenario: When I create resource without a description, I should see an error for the missing description
         Given "SysAdmin" as the persona
         When I log in
+        And I resize the browser to 1024x2048
         And I go to "/dataset/new_resource/warandpeace"
         And I press the element with xpath "//button[contains(string(), 'Add')]"
         Then I should see "Description: Missing value"
@@ -25,6 +26,7 @@ Feature: SchemaMetadata
     Scenario: When I create resource without a name, I should see an error for the missing name
         Given "SysAdmin" as the persona
         When I log in
+        And I resize the browser to 1024x2048
         When I visit "/dataset/new_resource/warandpeace"
         And I press the element with xpath "//button[contains(string(), 'Add')]"
         Then I should see "Name: Missing value"
