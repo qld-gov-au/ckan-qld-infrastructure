@@ -15,21 +15,15 @@ Feature: SchemaMetadata
         And I go to "/dataset/new"
         Then I should not see an element with id "field-maintainer_email"
 
-    Scenario: When I create resource without a description, I should see an error for the missing description
+    Scenario: When I create a resource without a name or description, I should see errors
         Given "SysAdmin" as the persona
         When I log in
         And I resize the browser to 1024x2048
         And I go to "/dataset/new_resource/warandpeace"
-        And I press the element with xpath "//button[contains(string(), 'Add')]"
-        Then I should see "Description: Missing value"
-
-    Scenario: When I create resource without a name, I should see an error for the missing name
-        Given "SysAdmin" as the persona
-        When I log in
-        And I resize the browser to 1024x2048
-        When I visit "/dataset/new_resource/warandpeace"
+        And I execute the script "document.getElementById('field-image-url').value='https://example.com'"
         And I press the element with xpath "//button[contains(string(), 'Add')]"
         Then I should see "Name: Missing value"
+        And I should see "Description: Missing value"
 
     Scenario: When viewing the HTML source code of a dataset page, the structured data script is visible
         Given "SysAdmin" as the persona
