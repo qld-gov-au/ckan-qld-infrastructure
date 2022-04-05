@@ -16,3 +16,6 @@ PASTER_PLUGIN=ckanext-report ckan_cli report initdb
 
 # Initialise the QA database tables
 PASTER_PLUGIN=ckanext-qa ckan_cli qa init
+
+#Initiialise the Harvester database tables
+PASTER_PLUGIN=ckanext-harvest ckan_cli harvester initdb
