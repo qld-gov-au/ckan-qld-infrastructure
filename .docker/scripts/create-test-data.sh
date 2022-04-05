@@ -34,17 +34,6 @@ if [ "$API_KEY" = "None" ]; then
 fi
 
 ##
-# BEGIN: Add sysadmin config values.
-# This needs to be done before closing datarequests as they require the below config values
-#
-echo "Adding ckan.datarequests.closing_circumstances:"
-
-curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"ckan.datarequests.closing_circumstances":
-        "Released as open data|nominate_dataset\r\nOpen dataset already exists|nominate_dataset\r\nPartially released|nominate_dataset\r\nTo be released as open data at a later date|nominate_approximate_date\r\nData openly available elsewhere\r\nNot suitable for release as open data\r\nRequested data not available/cannot be compiled\r\nRequestor initiated closure"}' \
-    ${CKAN_ACTION_URL}/config_option_update
-
-##
 # BEGIN: Create a test organisation with test users for admin, editor and member
 #
 TEST_ORG_NAME=test-organisation
@@ -90,6 +79,12 @@ ckan_cli create-test-data hierarchy
 # Creating basic test data which has datasets with resources
 ckan_cli create-test-data basic
 
+add_user_if_needed organisation_admin "Organisation Admin" organisation_admin@localhost
+add_user_if_needed editor "Publisher" publisher@localhost
+add_user_if_needed foodie "Foodie" foodie@localhost
+add_user_if_needed group_admin "Group Admin" group_admin@localhost
+add_user_if_needed walker "Walker" walker@localhost
+
 # Datasets need to be assigned to an organisation
 
 echo "Assigning test Datasets to Organisation..."
@@ -109,6 +104,54 @@ package_owner_org_update=$( \
     ${CKAN_ACTION_URL}/package_owner_org_update
 )
 echo ${package_owner_org_update}
+
+echo "Updating organisation_admin to have admin privileges in the department-of-health Organisation:"
+organisation_admin_update=$( \
+    curl -LsH "Authorization: ${API_KEY}" \
+    --data '{"id": "department-of-health", "username": "organisation_admin", "role": "admin"}' \
+    ${CKAN_ACTION_URL}/organization_member_create
+)
+echo ${organisation_admin_update}
+
+echo "Updating publisher to have editor privileges in the department-of-health Organisation:"
+publisher_update=$( \
+    curl -LsH "Authorization: ${API_KEY}" \
+    --data '{"id": "department-of-health", "username": "editor", "role": "editor"}' \
+    ${CKAN_ACTION_URL}/organization_member_create
+)
+echo ${publisher_update}
+
+echo "Updating foodie to have admin privileges in the food-standards-agency Organisation:"
+foodie_update=$( \
+    curl -LsH "Authorization: ${API_KEY}" \
+    --data '{"id": "food-standards-agency", "username": "foodie", "role": "admin"}' \
+    ${CKAN_ACTION_URL}/organization_member_create
+)
+echo ${foodie_update}
+
+echo "Creating non-organisation group:"
+group_create=$( \
+    curl -LsH "Authorization: ${API_KEY}" \
+    --data '{"name": "silly-walks"}' \
+    ${CKAN_ACTION_URL}/group_create
+)
+echo ${group_create}
+
+echo "Updating group_admin to have admin privileges in the silly-walks group:"
+group_admin_update=$( \
+    curl -LsH "Authorization: ${API_KEY}" \
+    --data '{"id": "silly-walks", "username": "group_admin", "role": "admin"}' \
+    ${CKAN_ACTION_URL}/group_member_create
+)
+echo ${group_admin_update}
+
+echo "Updating walker to have editor privileges in the silly-walks group:"
+walker_update=$( \
+    curl -LsH "Authorization: ${API_KEY}" \
+    --data '{"id": "silly-walks", "username": "walker", "role": "editor"}' \
+    ${CKAN_ACTION_URL}/group_member_create
+)
+echo ${walker_update}
 
 ##
 # BEGIN: Create a Data Request organisation with test users for admin, editor and member and default data requests
@@ -207,6 +250,17 @@ curl -LsH "Authorization: ${API_KEY}" \
 ##
 # END.
 #
+
+##
+# BEGIN: Add sysadmin config values.
+# This needs to be done before closing datarequests as they require the below config values
+#
+echo "Adding ckan.datarequests.closing_circumstances:"
+
+curl -LsH "Authorization: ${API_KEY}" \
+    --data '{"ckan.datarequests.closing_circumstances":
+        "Released as open data|nominate_dataset\r\nOpen dataset already exists|nominate_dataset\r\nPartially released|nominate_dataset\r\nTo be released as open data at a later date|nominate_approximate_date\r\nData openly available elsewhere\r\nNot suitable for release as open data\r\nRequested data not available/cannot be compiled\r\nRequestor initiated closure"}' \
+    ${CKAN_ACTION_URL}/config_option_update
 
 echo "Creating config value for resource formats:"
 
