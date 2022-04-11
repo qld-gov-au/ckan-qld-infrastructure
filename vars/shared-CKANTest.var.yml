@@ -71,7 +71,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "6.0.2"
+      version: "6.0.3"
 
     CKANExtODICertificates: &CKANExtODICertificates
       name: "ckanext-odi-certificates-{{ Environment }}"
@@ -111,7 +111,7 @@ extensions:
       description: "CKAN Extension for Data Qld Harvesting Enhancements for Geoscience"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-harvester-data-qld-geoscience"
-      version: "v0.0.2" #CHANGEME
+      version: "v0.0.3"
 
     CKANExtReport: &CKANExtReport
       name: "ckanext-report-{{ Environment }}"
