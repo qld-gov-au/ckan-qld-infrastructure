@@ -38,6 +38,12 @@ Resources:
                 NoncurrentVersionExpirationInDays: '960'
                 AbortIncompleteMultipartUpload:
                   DaysAfterInitiation: 7
+              - Id: "ArchiveVersionExpiry"
+                Status: Enabled
+                Prefix: storage/uploads/archive
+                NoncurrentVersionExpirationInDays: '30'
+                AbortIncompleteMultipartUpload:
+                  DaysAfterInitiation: 7
               - Id: "IntelligentTieringTransition"
                 Status: Enabled
                 Transitions:
