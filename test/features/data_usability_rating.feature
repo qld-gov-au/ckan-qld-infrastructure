@@ -8,8 +8,8 @@ Feature: Data usability rating
         And I resize the browser to 1024x2048
         And I create a dataset with license "other-open" and "<Format>" resource file "<Filename>"
         Then I wait for 10 seconds
-        When I reload
-        Then I should see "Data usability rating"
+        When I press the element with xpath "//ol[contains(@class, 'breadcrumb')]//a[starts-with(@href, '/dataset/')]"
+        Then I should see "Data usability rating" within 2 seconds
         And I should see an element with xpath "//div[contains(@class, 'qa openness-<Score>')]"
 
         Examples: Formats
