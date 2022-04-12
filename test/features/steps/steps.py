@@ -301,7 +301,7 @@ def create_dataset(context, license, file_format, file):
         And I fill in "name" with "Test Resource"
         And I execute the script "document.getElementById('field-format').value={file_format}"
         And I fill in "description" with "Test Resource Description"
-        And I press "Finish"
+        And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
     """.format(license=license, file=file, file_format=file_format))
 
 
