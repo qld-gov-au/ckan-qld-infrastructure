@@ -36,6 +36,10 @@ commands:
     usage: Build and start Docker containers.
     cmd: |
       echo "Preparing containers for $VARS_TYPE"
+      CKAN_VERSION=$(python retrieve-ckan-version.py)
+      if [ "$CKAN_VERSION" != "" ]; then
+        export CKAN_VERSION
+      fi
       docker-compose up -d "$@"
       sleep 10
       docker-compose logs
