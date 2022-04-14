@@ -115,3 +115,4 @@ basic_facts:
     SiteDomain: "dev.publications.qld.gov.au" #CKAN SiteDomain
     RootDomain: "dev.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: ""
+    CKANRevision: "ckan-2.9.5-qgov.2"

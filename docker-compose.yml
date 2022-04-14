@@ -26,6 +26,7 @@ services:
         SITE_URL: "http://${PROJECT}.docker.amazee.io"
         VARS_TYPE:
         DEPLOY_ENV:
+        CKAN_VERSION:
     depends_on:
       - postgres
       - solr
