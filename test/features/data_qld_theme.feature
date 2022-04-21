@@ -116,3 +116,10 @@ Feature: Theme customisations
         When I go to "/nonexistent"
         Then I should see an element with xpath "//div[contains(string(), 'was not found') or contains(string(), 'could not be found')]"
         And I should not see "Sorry, the page you were looking for could not be found."
+
+    Scenario: When I go to the header URL, I can see the list of necessary assets
+        When I go to "/header.html"
+        Then I should see an element with xpath "//a[@href='/user/login' and contains(string(), 'Log in')]"
+        And I should see an element with xpath "//a[@href='/user/register' and contains(string(), 'Register')]"
+        And I should see an element with xpath "//a[@href='/datarequest' and contains(string(), 'Request data')]"
+        And I should not see "not found"
