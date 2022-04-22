@@ -79,7 +79,7 @@ def request_reset(context):
     """)
 
 
-@step(u'I fill in "{name}" with "{value"} if present')
+@step(u'I fill in "{name}" with "{value}" if present')
 def fill_in_field_if_present(context, name, value):
     context.execute_steps(u"""
         When I execute the script "field = document.getElementById('field-{0}'); if (field) field.value = '{1}';"
