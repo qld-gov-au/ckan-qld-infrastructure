@@ -121,5 +121,4 @@ Feature: Theme customisations
         When I go to "/header.html"
         Then I should see an element with xpath "//a[@href='/user/login' and contains(string(), 'Log in')]"
         And I should see an element with xpath "//a[@href='/user/register' and contains(string(), 'Register')]"
-        And I should see an element with xpath "//a[@href='/datarequest' and contains(string(), 'Request data')]"
         And I should not see "not found"
