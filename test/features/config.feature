@@ -13,5 +13,11 @@ Feature: Config
     Scenario: Assert that Data Request configuration values are available
         Given "SysAdmin" as the persona
         When I log in and go to admin config page
-        Then I should see "Suggested Description"
+        Then I should see "Data Request Suggested Description"
         And I should see an element with id "field-ckanext.data_qld.datarequest_suggested_description"
+        And I should see "Data Request Closing Circumstances"
+        And I should see an element with id "field-ckan.datarequests.closing_circumstances"
+        And I should see "Comments - custom profanity list (one word per line)"
+        And I should see an element with id "field-ckan-comments-profanity-list"
+        And I should see "Resource formats"
+        And I should see an element with id "field-ckanext.data_qld.resource_formats"

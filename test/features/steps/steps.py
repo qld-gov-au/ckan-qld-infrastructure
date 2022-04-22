@@ -100,6 +100,29 @@ def go_to_dataset(context, name):
     when_i_visit_url(context, '/dataset/' + name)
 
 
+@step(u'I go to dataset "{name}" comments')
+def go_to_dataset_comments(context, name):
+    context.execute_steps(u"""
+        When I go to dataset "%s"
+        And I click the link with text that contains "Comments"
+    """ % (name))
+
+
+@step(u'I should see the add comment form')
+def comment_form_visible(context):
+    context.execute_steps(u"""
+        Then I should see an element with xpath "//textarea[@name='comment']"
+    """)
+
+
+@step(u'I should not see the add comment form')
+def comment_form_not_visible(context):
+    context.execute_steps(u"""
+        Then I should not see an element with xpath "//input[@name='subject']"
+        And I should not see an element with xpath "//textarea[@name='comment']"
+    """)
+
+
 @step(u'I edit the "{name}" dataset')
 def edit_dataset(context, name):
     when_i_visit_url(context, '/dataset/edit/{}'.format(name))
@@ -202,14 +225,6 @@ def create_datarequest(context):
 @step(u'I go to my reports page')
 def go_to_reporting_page(context):
     when_i_visit_url(context, '/dashboard/reporting')
-
-
-@step(u'I go to dataset "{name}" comments')
-def go_to_dataset_comments(context, name):
-    context.execute_steps(u"""
-        When I go to dataset "%s"
-        And I click the link with text that contains "Comments"
-    """ % (name))
 
 
 @step(u'I go to data request "{subject}"')
