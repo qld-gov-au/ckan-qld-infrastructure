@@ -12,14 +12,14 @@ Feature: Dataset deletion
         Then I select "False" from "private"
         Then I fill in "version" with "1"
         Then I fill in "author_email" with "test@test.com"
-        Then I select "NO" from "de_identified_data"
+        Then I fill in "de_identified_data" with "NO" if present
         And I press the element with xpath "//form[contains(@class, 'dataset-form')]//button[contains(@class, 'btn-primary')]"
         And I wait for 10 seconds
         Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
         Then I fill in "name" with "res1"
         Then I fill in "description" with "description"
-        Then I fill in "size" with "1024"
-        Then I select "Resource NOT visible/Pending acknowledgement" from "resource_visibility"
+        Then I fill in "size" with "1024" if present
+        Then I fill in "resource_visibility" with "Resource NOT visible/Pending acknowledgement" if present
         Then I press the element with xpath "//button[@value='go-metadata']"
         And I wait for 10 seconds
         Then I should see "Data and Resources"

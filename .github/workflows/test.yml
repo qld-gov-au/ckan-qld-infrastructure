@@ -45,4 +45,4 @@ jobs:
         with:
           name: ${{ matrix.application }} ${{ matrix.target_environment }} screenshots
           path: /tmp/artifacts/behave/screenshots
-        timeout-minutes: 3
+        timeout-minutes: 1
