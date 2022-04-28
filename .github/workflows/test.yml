@@ -28,7 +28,7 @@ jobs:
 
       - name: Build
         run: .circleci/build.sh
-        timeout-minutes: 15
+        timeout-minutes: 20
 
       - name: Test
         run: .circleci/test.sh
