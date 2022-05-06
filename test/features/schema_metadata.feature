@@ -38,10 +38,8 @@ Feature: SchemaMetadata
         Then I should see an element with id "field-de_identified_data"
         Then I should see an element with xpath "//select[@id='field-de_identified_data']/option[@value='YES']"
         Then I should see an element with xpath "//select[@id='field-de_identified_data']/option[@value='NO']"
-        Then I should see an element with xpath "//select[@id='field-de_identified_data']/option[@value='']"
         Then I should not see an element with xpath "//select[@id='field-de_identified_data']/option[@selected='' and  @value='YES']"
         Then I should not see an element with xpath "//select[@id='field-de_identified_data']/option[@selected='' and  @value='NO']"
-        Then I should not see an element with xpath "//select[@id='field-de_identified_data']/option[@selected='' and  @value='']"
 
         Examples: Users
             | User          |
