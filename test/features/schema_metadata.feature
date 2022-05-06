@@ -18,7 +18,6 @@ Feature: SchemaMetadata
     Scenario: When I create a resource without a name or description, I should see errors
         Given "SysAdmin" as the persona
         When I log in
-        And I resize the browser to 1024x2048
         And I go to "/dataset/new_resource/warandpeace"
         And I execute the script "document.getElementById('field-image-url').value='https://example.com'"
         And I press the element with xpath "//button[contains(string(), 'Add')]"

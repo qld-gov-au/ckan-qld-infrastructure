@@ -4,7 +4,7 @@ Feature: Theme customisations
         When I go to homepage
         Then I should see an element with xpath "//link[contains(@href,'https://fonts.googleapis.com/css?family=Lato')]"
 
-    Scenario: Organisation is in fact spelled Organisation (as opposed to Organization) 
+    Scenario: Organisation is in fact spelled Organisation (as opposed to Organization)
         When I go to organisation page
         Then I should see "Organisation"
         And I should not see "Organization"
@@ -68,7 +68,6 @@ Feature: Theme customisations
     Scenario: As a publisher, when I create a resource with an API entry, I can download it in various formats
         Given "TestOrgEditor" as the persona
         When I log in
-        And I resize the browser to 1024x2048
         And I create a dataset with license "other-open" and "CSV" resource file "csv_resource.csv"
         And I wait for 10 seconds
         And I click the link with text that contains "Test Resource"
