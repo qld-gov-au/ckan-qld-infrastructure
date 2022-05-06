@@ -5,7 +5,6 @@ Feature: Data usability rating
     Scenario Outline: As a publisher, when I create a resource with an open license, I can verify the openness score is correct
         Given "TestOrgEditor" as the persona
         When I log in
-        And I resize the browser to 1024x2048
         And I create a dataset with license "other-open" and "<Format>" resource file "<Filename>"
         Then I wait for 10 seconds
         When I press the element with xpath "//ol[contains(@class, 'breadcrumb')]//a[starts-with(@href, '/dataset/')]"
