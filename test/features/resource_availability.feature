@@ -2,106 +2,22 @@
 @OpenData
 Feature: Re-identification risk governance acknowledgement or Resource visibility
 
-
-    Scenario: Sysadmin creates dataset with Contains de-identified data is YES
+    Scenario: Sysadmin creates datasets with de_identified_data, resource_visible and governance_acknowledgement values to test resource visibility feature
         Given "SysAdmin" as the persona
         When I log in
-        And I go to "/dataset/new"
-        Then I fill in "title" with "Contains de-identified data - YES"
-        Then I fill in "notes" with "notes"
-        Then I execute the script "document.getElementById('field-organizations').value=jQuery('#field-organizations option').filter(function () { return $(this).html() == 'Test Organisation'; }).attr('value')"
-        Then I select "False" from "private"
-        Then I fill in "version" with "1"
-        Then I fill in "author_email" with "test@test.com"
-        Then I select "YES" from "de_identified_data"
-        And I press the element with xpath "//form[contains(@class, 'dataset-form')]//button[contains(@class, 'btn-primary')]"
-        And I wait for 10 seconds
-        Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
-        And I fill in "name" with "res1"
-        And I select "HTML" from "format"
-        And I fill in "description" with "description"
-        And I fill in "size" with "1024"
-        And I select "Resource NOT visible/Pending acknowledgement" from "resource_visibility"
-        And I press the element with xpath "//button[@value='go-metadata']"
-        And I wait for 10 seconds
-        Then I should see "Data and Resources"
+        And I create resource_availability test data with title:"Contains de-identified data YES visibility TRUE acknowledgment NO" de_identified_data:"YES" resource_name:"Hide Resource" resource_visible:"TRUE" governance_acknowledgement:"NO"
+        And I create resource_availability test data with title:"Contains de-identified data NO visibility TRUE acknowledgment NO" de_identified_data:"NO" resource_name:"Show Resource" resource_visible:"TRUE" governance_acknowledgement:"NO"
+        And I create resource_availability test data with title:"Contains de-identified data NO visibility FALSE acknowledgment NO" de_identified_data:"NO" resource_name:"Hide Resource" resource_visible:"FALSE" governance_acknowledgement:"NO"
+        And I create resource_availability test data with title:"Contains de-identified data YES visibility TRUE acknowledgment YES" de_identified_data:"NO" resource_name:"Show Resource" resource_visible:"TRUE" governance_acknowledgement:"NO"
 
 
-    Scenario: Sysadmin creates dataset with Contains de-identified data is NO
-        Given "SysAdmin" as the persona
-        When I log in
-        And I go to "/dataset/new"
-        Then I fill in "title" with "Contains de-identified data - NO"
-        Then I fill in "notes" with "notes"
-        Then I execute the script "document.getElementById('field-organizations').value=jQuery('#field-organizations option').filter(function () { return $(this).html() == 'Test Organisation'; }).attr('value')"
-        Then I select "False" from "private"
-        Then I fill in "version" with "1"
-        Then I fill in "author_email" with "test@test.com"
-        Then I select "NO" from "de_identified_data"
-        And I press the element with xpath "//form[contains(@class, 'dataset-form')]//button[contains(@class, 'btn-primary')]"
-        And I wait for 10 seconds
-        Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
-        And I fill in "name" with "res1"
-        And I select "HTML" from "format"
-        And I fill in "description" with "description"
-        And I fill in "size" with "1024"
-        And I select "Resource NOT visible/Pending acknowledgement" from "resource_visibility"
-        And I press the element with xpath "//button[@value='go-metadata']"
-        And I wait for 10 seconds
-        Then I should see "Data and Resources"
-
-
-    Scenario Outline: When a user creates a resource for a dataset with Contains de-identified data is YES, re-identification risks must be assessed and data can be hidden from the public.
+    Scenario Outline: Organisation users should see a hidden resource when de-identified data is YES and Resource visibility is TRUE and Acknowledgement is NO
         Given "<User>" as the persona
         When I log in
-
-        ###
-        # Create resource that available for non-logged in user.
-        ###
-        And I go to "/dataset/new_resource/contains-de-identified-data-yes"
-
-        # Check field visibility, xpath element start with 1.
-        Then I should see an element with id "field-resource_visibility"
-        And I should see an element with xpath "//select[@id='field-resource_visibility']/option[2][@disabled]"
-
-        # Create the resource, with error.
-        Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
-        And I fill in "name" with "resource created by <User> and is available"
-        And I select "HTML" from "format"
-        And I fill in "description" with "description"
-        And I fill in "size" with "1024"
-        And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
-        And I wait for 10 seconds
-        Then I should see "This dataset has been recorded as containing de-identified data."
-
-        # Create the resource, with success.
-        When I select "Appropriate steps have been taken to minimise personal information re-identification risk prior to publishing" from "resource_visibility"
-        And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
-        And I wait for 10 seconds
-        Then I should see "resource created by <User> and is available"
-        When I press the element with xpath "//a[@title='resource created by <User> and is available']"
-        Then I should see "Re-identification risk governance acknowledgement/Resource visibility"
-
-        ###
-        # Create resource that NOT available for non-logged in user.
-        ###
-        And I go to "/dataset/new_resource/contains-de-identified-data-yes"
-
-        Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
-        And I fill in "name" with "resource created by <User> and is NOT available"
-        And I select "HTML" from "format"
-        And I fill in "description" with "description"
-        And I fill in "size" with "1024"
-        And I select "Resource NOT visible/Pending acknowledgement" from "resource_visibility"
-        And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
-        And I wait for 10 seconds
-        Then I should see "resource created by <User> and is NOT available"
-
-        # Verify the result as non-logged in user.
-        Given "Unauthenticated" as the persona
-        And I go to "/dataset/contains-de-identified-data-yes"
-        Then I should see "resource created by <User> and is available"
-        Then I should not see "resource created by <User> and is NOT available"
+        And I go to "/dataset/contains-de-identified-data-yes-visibility-true-acknowledgment-no"
+        And I press the element with xpath "//a[@title='Hide Resource']"
+        Then I should see an element with xpath "//th[contains(text(), 'Resource visible')]"
+        And I should see an element with xpath "//th[contains(text(), 'Re-identification risk governance completed?')]"
 
         Examples: Users
             | User          |
@@ -109,69 +25,77 @@ Feature: Re-identification risk governance acknowledgement or Resource visibilit
             | TestOrgAdmin  |
             | TestOrgEditor |
 
+    Scenario: Unauthenticated user should not see a hidden resource when de-identified data is YES and Resource visibility is TRUE and Acknowledgement is NO
+        When I go to "/dataset/contains-de-identified-data-yes-visibility-true-acknowledged-no"
+        Then I should not see an element with xpath "//a[@title='Hide Resource']"
 
-    Scenario Outline: When a user creates a resource for a dataset with Contains de-identified data is NO, re-identification risks do not need to be assessed, but data can still be hidden from the public.
+    Scenario Outline: Organisation users should see a visible resource when de-identified data is NO and Resource visibility is TRUE and Acknowledgement is NO
+        Given "<User>" as the persona
+        And I log in
+        And I go to "/dataset/contains-de-identified-data-no-visibility-true-acknowledgment-no"
+        And I press the element with xpath "//a[@title='Show Resource']"
+        Then I should see an element with xpath "//th[contains(text(), 'Resource visible')]"
+        And I should see an element with xpath "//th[contains(text(), 'Re-identification risk governance completed?')]"
+
+        Examples: Users
+            | User          |
+            | SysAdmin      |
+            | TestOrgAdmin  |
+            | TestOrgEditor |
+
+    Scenario: Unauthenticated user should see a visible resource when de-identified data is NO and Resource visibility is TRUE and Acknowledgement is NO
+        When I go to "/dataset/contains-de-identified-data-no-visibility-true-acknowledgment-no"
+        And I press the element with xpath "//a[@title='Show Resource']"
+        Then I should not see an element with xpath "//th[contains(text(), 'Resource visible')]"
+        And I should not see an element with xpath "//th[contains(text(), 'Re-identification risk governance completed?')]"
+
+    Scenario Outline: Organisation users should see a hidden resource when de-identified data is NO and Resource visibility is FALSE and Acknowledgement is NO
         Given "<User>" as the persona
         When I log in
+        And I go to "/dataset/contains-de-identified-data-no-visibility-false-acknowledgment-no"
+        And I press the element with xpath "//a[@title='Hide Resource']"
+        Then I should see an element with xpath "//th[contains(text(), 'Resource visible')]"
+        And I should see an element with xpath "//th[contains(text(), 'Re-identification risk governance completed?')]"
 
-        ###
-        # Create resource that available for non-logged in user.
-        ###
-        And I go to "/dataset/new_resource/contains-de-identified-data-no"
+        Examples: Users
+            | User          |
+            | SysAdmin      |
+            | TestOrgAdmin  |
+            | TestOrgEditor |
 
-        # Check field visibility, xpath element start with 1.
-        Then I should see an element with id "field-resource_visibility"
-        And I should see an element with xpath "//select[@id='field-resource_visibility']/option[3][@disabled]"
+    Scenario: Unauthenticated user should not see a hidden visible resource when de-identified data is NO and Resource visibility is FALSE and Acknowledgement is NO
+        When I go to "/dataset/contains-de-identified-data-no-visibility-false-acknowledgment-no"
+        Then I should not see an element with xpath "//a[@title='Hide Resource']"
 
-        # Create the resource, with success.
-        Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
-        And I fill in "name" with "resource created by <User> and is available"
-        And I select "HTML" from "format"
-        And I fill in "description" with "description"
-        And I fill in "size" with "1024"
-        And I select "Resource visible and re-identification risk governance acknowledgement not required" from "resource_visibility"
-        And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
-        And I wait for 10 seconds
-        Then I should see "resource created by <User> and is available"
 
-        ###
-        # Create resource that available for non-logged in user with resource_visibility blank.
-        ###
-        And I go to "/dataset/new_resource/contains-de-identified-data-no"
+    Scenario Outline: Organisation users should see a visible resource when de-identified data is YES and Resource visibility is TRUE and Acknowledgement is YES
+        Given "<User>" as the persona
+        When I log in
+        And I go to "/dataset/contains-de-identified-data-yes-visibility-true-acknowledgment-yes"
+        And I press the element with xpath "//a[@title='Show Resource']"
+        Then I should see an element with xpath "//th[contains(text(), 'Resource visible')]"
+        And I should see an element with xpath "//th[contains(text(), 'Re-identification risk governance completed?')]"
 
-        # Create the resource, with success.
-        Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
-        And I fill in "name" with "resource created by <User> and is available with blank resource_visibility"
-        And I select "HTML" from "format"
-        And I fill in "description" with "description"
-        And I fill in "size" with "1024"
-        And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
-        And I wait for 10 seconds
-        Then I should see "resource created by <User> and is available with blank resource_visibility"
+        Examples: Users
+            | User          |
+            | SysAdmin      |
+            | TestOrgAdmin  |
+            | TestOrgEditor |
 
-        ###
-        # Create resource that NOT available for non-logged in user.
-        ###
-        And I go to "/dataset/new_resource/contains-de-identified-data-no"
+    Scenario: Unauthenticated user should see a visible resource when de-identified data is YES and Resource visibility is TRUE and Acknowledgement is YES
+        When I go to "/dataset/contains-de-identified-data-yes-visibility-true-acknowledgment-yes"
+        And I press the element with xpath "//a[@title='Show Resource']"
+        Then I should not see an element with xpath "//th[contains(text(), 'Resource visible')]"
+        And I should not see an element with xpath "//th[contains(text(), 'Re-identification risk governance completed?')]"
 
-        Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
-        And I fill in "name" with "resource created by <User> and is NOT available"
-        And I select "HTML" from "format"
-        And I fill in "description" with "description"
-        And I fill in "size" with "1024"
-        And I select "Resource NOT visible/Pending acknowledgement" from "resource_visibility"
-        And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
-        And I wait for 10 seconds
-        Then I should see "resource created by <User> and is NOT available"
 
-        # Verify the result as non-logged in user.
-        Given "Unauthenticated" as the persona
-        When I go to "/dataset/contains-de-identified-data-no"
-        Then I should see "resource created by <User> and is available"
-        And I should see "resource created by <User> and is available with blank resource_visibility"
-        And I should not see "resource created by <User> and is NOT available"
-        Then I press the element with xpath "//a[@title='resource created by <User> and is available']"
-        And I should not see "Re-identification risk governance acknowledgement/Resource visibility"
+    Scenario Outline: Create resource and verify default values are set correct for resource visibility
+        Given "<User>" as the persona
+        When I create a resource with name "Resource created by <User> with default values" and URL "https://example.com"
+        And I press the element with xpath "//a[@title='Resource created by <User> with default values']"
+        Then I should not see "Visibility/Governance Acknowledgment"
+        And I should see an element with xpath "//th[contains(text(), 'Resource visible')]/following-sibling::td[contains(text(), 'TRUE')]"
+        And I should see an element with xpath "//th[contains(text(), 'Re-identification risk governance completed?')]/following-sibling::td[contains(text(), 'NO')]"
 
         Examples: Users
             | User          |
