@@ -29,7 +29,7 @@ Feature: Organization APIs
         Then I should see an element with xpath "//*[contains(string(), '"success": false,') and contains(string(), 'Authorization Error')]"
 
     Scenario: Organisation overview is accessible to everyone
-        When I go to "/organization"
+        When I go to organisation page
         Then I should see "Department of Health"
         When I view the "department-of-health" organisation API "not including" users
         Then I should see an element with xpath "//*[contains(string(), '"success": true,') and contains(string(), '"name": "department-of-health"')]"
