@@ -14,7 +14,6 @@ Feature: Data Validation
         | TestOrgAdmin      |
         | TestOrgEditor     |
 
-
      Scenario: As any user, I can view the 'Data Schema' link in the 'Additional Info' table of the resource read-view page
        Given "SysAdmin" as the persona
         When I log in

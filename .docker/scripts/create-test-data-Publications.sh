@@ -16,7 +16,7 @@ curl -LsH "Authorization: ${API_KEY}" \
 
 # Create test dataset with our standard fields
 curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"name": "test-dataset", "owner_org": "'"${TEST_ORG_ID}"'"}' \
+    --data '{"name": "test-dataset", "owner_org": "'"${TEST_ORG_ID}"'", "is_private": true}' \
     ${CKAN_ACTION_URL}/package_create
 
 if [ "$VENV_DIR" != "" ]; then
