@@ -26,6 +26,7 @@ services:
         SITE_URL: "http://${PROJECT}.docker.amazee.io"
         VARS_TYPE:
         DEPLOY_ENV:
+        CKAN_REPO:
         CKAN_VERSION:
     depends_on:
       - postgres
@@ -92,6 +93,11 @@ services:
     networks:
       - amazeeio-network
       - default
+    extra_hosts:
+      # point some unnecessary domains at localhost
+      - "www.googletagmanager.com:127.0.0.1"
+      - "fonts.gstatic.com:127.0.0.1"
+      - "gravatar.com:127.0.0.1"
 
 volumes:
   solr-data: {}

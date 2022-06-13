@@ -20,11 +20,12 @@ Feature: User APIs
         Then I should see an element with xpath "//body//div[contains(string(), 'Internal server error')]"
         And I should not see an element with xpath "//*[contains(string(), '"name": "admin"')]"
 
+    @unauthenticated
     Scenario: User autocomplete is not accessible anonymously
+        Given "Unauthenticated" as the persona
         When I search the autocomplete API for user "admin"
         Then I should see an element with xpath "//body//div[contains(string(), 'Internal server error')]"
         And I should not see an element with xpath "//*[contains(string(), '"name": "admin"')]"
-
 
     Scenario Outline: User list is accessible to admins
         Given "<Persona>" as the persona
@@ -44,10 +45,11 @@ Feature: User APIs
         And I go to the user list API
         Then I should see an element with xpath "//*[contains(string(), '"success": false,') and contains(string(), 'Authorization Error')]"
 
+    @unauthenticated
     Scenario: User list is not accessible anonymously
+        Given "Unauthenticated" as the persona
         When I go to the user list API
         Then I should see an element with xpath "//*[contains(string(), '"success": false,') and contains(string(), 'requires an authenticated user')]"
-
 
     Scenario Outline: User detail is accessible to admins
         Given "<Persona>" as the persona
@@ -73,10 +75,11 @@ Feature: User APIs
         And I go to the "admin" user API
         Then I should see an element with xpath "//*[contains(string(), '"success": false,') and contains(string(), 'Authorization Error')]"
 
+    @unauthenticated
     Scenario: User detail is not accessible anonymously
+        Given "Unauthenticated" as the persona
         When I go to the "editor" user API
         Then I should see an element with xpath "//*[contains(string(), '"success": false,') and contains(string(), 'requires an authenticated user')]"
-
 
     Scenario Outline: User profile page is accessible to admins
         Given "<Persona>" as the persona
@@ -102,10 +105,11 @@ Feature: User APIs
         And I go to the "admin" profile page
         Then I should see an element with xpath "//*[contains(string(), 'Not authorised to see this page')]"
 
+    @unauthenticated
     Scenario: User profile page is not accessible anonymously
+        Given "Unauthenticated" as the persona
         When I go to the "editor" profile page
         Then I should see an element with xpath "//*[contains(string(), 'Not authorised to see this page')]"
-
 
     Scenario: Dashboard page is accessible to non-admins
         Given "Publisher" as the persona
@@ -113,7 +117,7 @@ Feature: User APIs
         And I go to the dashboard
         Then I should see an element with xpath "//h2[contains(string(), 'News feed')]"
 
-
+    @email
     Scenario: As a registered user, when I have locked my account with too many failed logins, I can reset my password to unlock it
         Given "Walker" as the persona
         When I lock my account
@@ -132,7 +136,6 @@ Feature: User APIs
         And I fill in "password2" with "$password"
         And I press the element with xpath "//button[@class='btn btn-primary']"
         Then I log in
-
 
     Scenario: Register user password must be 10 characters or longer and contain number, lowercase, capital, and symbol
         When I go to register page

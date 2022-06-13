@@ -1,10 +1,14 @@
 Feature: Theme customisations
 
+    @unauthenticated
     Scenario: Lato font is implemented on homepage
+        Given "Unauthenticated" as the persona
         When I go to homepage
         Then I should see an element with xpath "//link[contains(@href,'https://fonts.googleapis.com/css?family=Lato')]"
 
+    @unauthenticated
     Scenario: Organisation is in fact spelled Organisation (as opposed to Organization)
+        Given "Unauthenticated" as the persona
         When I go to organisation page
         Then I should see "Organisation"
         And I should not see "Organization"
@@ -35,11 +39,14 @@ Feature: Theme customisations
         And I should see "Some description or other"
         And I should see an element with xpath "//a[string() = 'read more' and contains(@href, '/organization/about/org-with-description')]"
 
+    @unauthenticated
     Scenario: Explore button does not exist on dataset detail page
+        Given "Unauthenticated" as the persona
         When I go to dataset page
         And I click the link with text that contains "A Wonderful Story"
         Then I should not see "Explore"
 
+    @unauthenticated
     Scenario: Explore button does not exist on dataset detail page
         When I go to organisation page
         Then I should see "Organisations are Queensland Government departments, other agencies or legislative entities responsible for publishing open data on this portal."
@@ -108,7 +115,9 @@ Feature: Theme customisations
         And I should see an element with xpath "//li[contains(@class, 'active')]/a[contains(string(), 'Gazettes') and @href='/gazettes-current']"
         And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'Contact') and @href='https://www.qld.gov.au/contact-us']"
 
+    @unauthenticated
     Scenario: When I encounter a 'resource not found' error page, it has a custom message
+        Given "Unauthenticated" as the persona
         When I go to "/dataset/nonexistent/resource/nonexistent"
         Then I should see "Sorry, the page you were looking for could not be found."
 
@@ -116,7 +125,9 @@ Feature: Theme customisations
         Then I should see an element with xpath "//div[contains(string(), 'was not found') or contains(string(), 'could not be found')]"
         And I should not see "Sorry, the page you were looking for could not be found."
 
+    @unauthenticated
     Scenario: When I go to the header URL, I can see the list of necessary assets
+        Given "Unauthenticated" as the persona
         When I go to "/header.html"
         Then I should see an element with xpath "//a[@href='/user/login' and contains(string(), 'Log in')]"
         And I should see an element with xpath "//a[@href='/user/register' and contains(string(), 'Register')]"
