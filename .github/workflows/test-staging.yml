@@ -22,6 +22,7 @@ jobs:
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
+      CKAN_REPO: qld-gov-au/ckan
 
     steps:
       - uses: actions/checkout@v2
