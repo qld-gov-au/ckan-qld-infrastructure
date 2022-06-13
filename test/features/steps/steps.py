@@ -181,8 +181,9 @@ def create_dataset_titled(context, title):
         And I press "Add Data"
         And I execute the script "document.getElementById('field-image-url').value='https://example.com'"
         And I fill in "name" with "Test Resource"
-        And I select "HTML" from "format"
+        And I execute the script "document.getElementById('field-format').value='HTML'"
         And I fill in "description" with "Test Resource Description"
+        And I fill in "size" with "1024" if present
         And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
     """.format(title=title))
 
@@ -212,10 +213,15 @@ def create_dataset(context, license, file_format, file):
     """.format(license=license, file=file, file_format=file_format))
 
 
-# The default behaving step does not convert base64 emails
-# Modified the default step to decode the payload from base64
 @step(u'I should receive a base64 email at "{address}" containing "{text}"')
 def should_receive_base64_email_containing_text(context, address, text):
+    should_receive_base64_email_containing_texts(context, address, text, None)
+
+
+@step(u'I should receive a base64 email at "{address}" containing both "{text}" and "{text2}"')
+def should_receive_base64_email_containing_texts(context, address, text, text2):
+    # The default behaving step does not convert base64 emails
+    # Modified the default step to decode the payload from base64
     def filter_contents(mail):
         mail = email.message_from_string(mail)
         payload = mail.get_payload()
@@ -225,7 +231,7 @@ def should_receive_base64_email_containing_text(context, address, text):
             payload_bytes += b'='  # do fix the padding error issue
         decoded_payload = payload_bytes.decode('base64')
         print('decoded_payload: ', decoded_payload)
-        return text in decoded_payload
+        return text in decoded_payload and (not text2 or text2 in decoded_payload)
 
     assert context.mail.user_messages(address, filter_contents)
 
