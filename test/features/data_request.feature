@@ -1,5 +1,5 @@
-@config
 @OpenData
+@datarequest
 Feature: Data Request
 
     @unauthenticated

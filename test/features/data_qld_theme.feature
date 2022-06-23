@@ -137,3 +137,10 @@ Feature: Theme customisations
         Then I should see an element with xpath "//a[@href='/user/login' and contains(string(), 'Log in')]"
         And I should see an element with xpath "//a[@href='/user/register' and contains(string(), 'Register')]"
         And I should not see "not found"
+
+    @unauthenticated
+    Scenario: When I go to the robots file, I can see a custom disallow block
+        Given "Unauthenticated" as the persona
+        When I go to "/robots.txt"
+        Then I should see "Disallow: /"
+        And I should not see "Allow:"
