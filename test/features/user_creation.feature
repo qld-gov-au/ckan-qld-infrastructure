@@ -1,14 +1,6 @@
 @user_creation
 Feature: User creation
 
-    Scenario: SysAdmin can create 'Excluded display name words' in ckan admin config
-        Given "SysAdmin" as the persona
-        When I log in
-        Then I go to "/ckan-admin/config"
-        Then I should see "Excluded display name words"
-        Then I fill in "ckanext.data_qld.excluded_display_name_words" with "gov"
-        And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
-
     Scenario: SysAdmin create a new user to the site.
         Given "SysAdmin" as the persona
         When I log in
