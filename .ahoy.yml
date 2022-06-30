@@ -115,6 +115,13 @@ commands:
       ahoy cli "flake8 ${@:-roles}" || \
       [ "${ALLOW_LINT_FAIL:-0}" -eq 1 ]
 
+  copy-local-files:
+    usage: Update files from local repo.
+    cmd: |
+      docker cp . $(docker-compose ps -q ckan):/app/
+      docker cp .docker/scripts/ckan_cli $(docker-compose ps -q ckan):/app/ckan/default/bin/
+      ahoy cli 'chmod u+x $VENV_DIR/bin/ckan_cli; cp .docker/test-$VARS_TYPE.ini $CKAN_INI'
+
   test-unit:
     usage: Run unit tests.
     cmd: |
@@ -128,7 +135,9 @@ commands:
       ahoy start-mailmock &
       sleep 5 &&
       # Run generic tests
-      ahoy cli "behave -k --tags ~OpenData --tags ~Publications ${*:-test/features}" || \
+      BEHAVE_COMMAND="behave -k --tags=-OpenData,-Publications ${*:-test/features}"
+      echo "Args: ${*:-test/features}, command: $BEHAVE_COMMAND"
+      ahoy cli "$BEHAVE_COMMAND" || \
       [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       # Run app-specific tests
       ahoy cli "behave -k --tags $VARS_TYPE ${*:-test/features}" || \
