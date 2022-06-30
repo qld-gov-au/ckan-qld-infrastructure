@@ -27,12 +27,16 @@ Feature: Resource freshness
             | TestOrgAdmin  |
             | TestOrgEditor |
 
-    Scenario Outline: An editor, admin or sysadmin user, when I go to the edit dataset page, the text 'Next update due' should be visible
+    Scenario Outline: As a user with editing privileges, when I set a 'monthly' update frequently, I should still be able to update the dataset via the API
         Given "<User>" as the persona
         When I log in
-        And I go to "/dataset/edit/warandpeace"
+        And I go to "/dataset/edit/test-dataset"
         And I select "monthly" from "update_frequency"
         Then I should see "Next update due"
+        When I fill in "next_update_due" with "01/01/1970"
+        And I press the element with xpath "//form[contains(@class, 'dataset-form')]//button[contains(@class, 'btn-primary')]"
+        And I wait for 3 seconds
+        Then I should be able to patch dataset "test-dataset" via the API
 
         Examples: Users
             | User          |
