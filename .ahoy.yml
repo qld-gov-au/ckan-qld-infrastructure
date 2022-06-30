@@ -135,7 +135,7 @@ commands:
       ahoy start-mailmock &
       sleep 5 &&
       # Run generic tests
-      BEHAVE_COMMAND="behave -k --tags=-OpenData,-Publications ${*:-test/features}"
+      BEHAVE_COMMAND="behave -k --tags=-OpenData --tags=-Publications ${*:-test/features}"
       echo "Args: ${*:-test/features}, command: $BEHAVE_COMMAND"
       ahoy cli "$BEHAVE_COMMAND" || \
       [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
