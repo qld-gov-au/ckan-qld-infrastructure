@@ -8,4 +8,5 @@ flake8==3.8.3
 mock
 pytest-ckan
 PyYAML>=1.0
+setuptools==44.1.1
 splinter>=0.13.0,<0.17
