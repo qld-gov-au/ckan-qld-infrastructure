@@ -66,7 +66,7 @@ Feature: Engagement Reporting
         And I press the element with xpath "//a[contains(string(), 'Close')]"
         And I select "To be released as open data at a later date" from "close_circumstance"
         And I fill in "approx_publishing_date" with "01/01/1970"
-        And I press the element with xpath "//button[contains(string(), 'Close data request')]"
+        And I press the element with xpath "//button[contains(@class, 'btn-danger') and @name='close']"
         And I should see an element with xpath "//i[contains(@class, 'icon-lock')]"
 
         When I go to my reports page

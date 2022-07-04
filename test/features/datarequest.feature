@@ -69,7 +69,7 @@ Feature: Data Request
         When I log in and create a datarequest
         And I press the element with xpath "//a[contains(string(), 'Close')]"
         And I select "Requestor initiated closure" from "close_circumstance"
-        And I press the element with xpath "//button[contains(string(), 'Close data request')]"
+        And I press the element with xpath "//button[contains(@class, 'btn-danger') and @name='close']"
         Then I should see an element with xpath "//a[contains(string(), 'Re-open')]"
         When I press the element with xpath "//a[contains(string(), 'Re-open')]"
         Then I should see an element with xpath "//i[contains(@class, 'icon-unlock')]"
