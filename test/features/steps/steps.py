@@ -396,9 +396,10 @@ def go_to_datarequest_page(context):
 def go_to_data_request(context, subject):
     context.execute_steps(u"""
         When I go to the data requests page
-        And I click the link with text "%s"
-        Then I should see "%s" within 5 seconds
-    """ % (subject, subject))
+        And I fill in "q" with "{0}"
+        And I click the link with text "{0}"
+        Then I should see "{0}" within 5 seconds
+    """.format(subject))
 
 
 @step(u'I log in and create a datarequest')
