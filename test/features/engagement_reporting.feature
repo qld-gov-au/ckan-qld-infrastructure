@@ -29,22 +29,8 @@ Feature: Engagement Reporting
         And I click the link with text that contains "Engagement Report"
         And I press the element with xpath "//button[contains(string(), 'Show')]"
         Then I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-title') and string()='Data requests' and position()=1]"
-        Then I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-data') and string()='3' and position()=2]"
-
-        When I create a datarequest
-        And I go to my reports page
-        And I click the link with text that contains "Engagement Report"
-        And I press the element with xpath "//button[contains(string(), 'Show')]"
-        Then I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-title') and string()='Data requests' and position()=1]"
-        Then I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-data') and string()='4' and position()=2]"
-
-    Scenario: As an admin user of my organisation, when I view my engagement report, I can verify the numbers are correct and increment
-        Given "ReportingOrgAdmin" as the persona
-        When I log in
-        And I go to my reports page
-        And I click the link with text that contains "Engagement Report"
-        And I press the element with xpath "//button[contains(string(), 'Show')]"
-        Then I should see an element with xpath "//tr[@id='dataset-followers']/td[contains(@class, 'metric-title') and string()='Dataset followers' and position()=1]"
+        And I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-data') and string()='25' and position()=2]"
+        And I should see an element with xpath "//tr[@id='dataset-followers']/td[contains(@class, 'metric-title') and string()='Dataset followers' and position()=1]"
         And I should see an element with xpath "//tr[@id='dataset-followers']/td[contains(@class, 'metric-data') and string()='0' and position()=2]"
         And I should see an element with xpath "//tr[@id='dataset-comments']/td[contains(@class, 'metric-title') and string()='Dataset comments' and position()=1]"
         And I should see an element with xpath "//tr[@id='dataset-comments']/td[contains(@class, 'metric-data') and string()='0' and position()=2]"
@@ -69,9 +55,14 @@ Feature: Engagement Reporting
         And I press the element with xpath "//button[contains(@class, 'btn-danger') and @name='close']"
         And I should see an element with xpath "//i[contains(@class, 'icon-lock')]"
 
+        And I create a datarequest
+
         When I go to my reports page
         And I click the link with text that contains "Engagement Report"
-        Then I should see an element with xpath "//tr[@id='dataset-followers']/td[contains(@class, 'metric-title') and string()='Dataset followers' and position()=1]"
+        And I press the element with xpath "//button[contains(string(), 'Show')]"
+        Then I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-title') and string()='Data requests' and position()=1]"
+        And I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-data') and string()='26' and position()=2]"
+        And I should see an element with xpath "//tr[@id='dataset-followers']/td[contains(@class, 'metric-title') and string()='Dataset followers' and position()=1]"
         And I should see an element with xpath "//tr[@id='dataset-followers']/td[contains(@class, 'metric-data') and string()='1' and position()=2]"
         And I should see an element with xpath "//tr[@id='dataset-comments']/td[contains(@class, 'metric-title') and string()='Dataset comments' and position()=1]"
         And I should see an element with xpath "//tr[@id='dataset-comments']/td[contains(@class, 'metric-data') and string()='1' and position()=2]"
