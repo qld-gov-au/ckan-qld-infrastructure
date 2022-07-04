@@ -118,7 +118,7 @@ Feature: Datarequest-circumstances
         Then I execute the script "$('#field-accepted_dataset_id').val($('#field-accepted_dataset_id option:eq(1)').attr('value'))"
         And I press the element with xpath "//button[contains(@class, 'btn-danger') and @name='close']"
         Then I should see "Accepted dataset" within 1 seconds
-        And I should see "A Wonderful Story" within 1 seconds
+        And I should see "data_request_dataset" within 1 seconds
 
         Examples: Users
         | User                  |
