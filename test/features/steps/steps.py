@@ -387,7 +387,7 @@ def log_in_go_to_datarequest_page(context):
     """)
 
 
-@step(u'I go to the data requests page containing "{keyword"}')
+@step(u'I go to the data requests page containing "{keyword}"')
 def go_to_datarequest_page_search(context, keyword):
     when_i_visit_url(context, '/datarequest?q={}'.format(keyword))
 
