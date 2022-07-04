@@ -400,7 +400,7 @@ def go_to_datarequest_page(context):
 @step(u'I go to data request "{subject}"')
 def go_to_data_request(context, subject):
     context.execute_steps(u"""
-        When I go to the data requests page containing {0}
+        When I go to the data requests page containing "{0}"
         And I click the link with text "{0}"
         Then I should see "{0}" within 5 seconds
     """.format(subject))
