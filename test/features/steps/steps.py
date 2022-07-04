@@ -387,6 +387,11 @@ def log_in_go_to_datarequest_page(context):
     """)
 
 
+@step(u'I go to the data requests page containing "{keyword"}')
+def go_to_datarequest_page_search(context, keyword):
+    when_i_visit_url(context, '/datarequest?q={}'.format(keyword))
+
+
 @step(u'I go to the data requests page')
 def go_to_datarequest_page(context):
     when_i_visit_url(context, '/datarequest')
@@ -395,8 +400,7 @@ def go_to_datarequest_page(context):
 @step(u'I go to data request "{subject}"')
 def go_to_data_request(context, subject):
     context.execute_steps(u"""
-        When I go to the data requests page
-        And I fill in "q" with "{0}"
+        When I go to the data requests page containing {0}
         And I click the link with text "{0}"
         Then I should see "{0}" within 5 seconds
     """.format(subject))
