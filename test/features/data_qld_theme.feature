@@ -86,6 +86,11 @@ Feature: Theme customisations
         Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=xml') and contains(string(), 'XML')]"
 
     @Publications
+    Scenario: Homepage 'Publish in the Gazettes' link is correct
+        When I go to homepage
+        Then I should see an element with xpath "//a[@href='https://www.forgov.qld.gov.au/information-and-communication-technology/communication-and-publishing/website-and-digital-publishing/queensland-government-gazette/publish-in-the-gazette' and string()='Publish in the Gazettes']"
+
+    @Publications
     Scenario: Menu items are present and correct
         When I go to "/dataset"
         Then I should see an element with xpath "//li[contains(@class, 'active')]/a[contains(string(), 'Publication') and (@href='/dataset' or @href='/dataset/')]"
@@ -132,3 +137,10 @@ Feature: Theme customisations
         Then I should see an element with xpath "//a[@href='/user/login' and contains(string(), 'Log in')]"
         And I should see an element with xpath "//a[@href='/user/register' and contains(string(), 'Register')]"
         And I should not see "not found"
+
+    @unauthenticated
+    Scenario: When I go to the robots file, I can see a custom disallow block
+        Given "Unauthenticated" as the persona
+        When I go to "/robots.txt"
+        Then I should see "Disallow: /"
+        And I should not see "Allow:"
