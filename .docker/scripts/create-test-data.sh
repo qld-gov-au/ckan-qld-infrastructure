@@ -190,6 +190,13 @@ curl -LsH "Authorization: ${API_KEY}" \
     --data '{"id": "'"${DR_ORG_ID}"'", "object": "dr_member", "object_type": "user", "capacity": "member"}' \
     ${CKAN_ACTION_URL}/member_create
 
+echo "Creating test dataset for data request organisation:"
+
+curl -LsH "Authorization: ${API_KEY}" \
+    --data '{"name": "data_request_dataset", "description": "Dataset for data requests", "owner_org": "'"${DR_ORG_ID}"'",
+"update_frequency": "near-realtime", "author_email": "dr_admin@localhost", "version": "1.0", "license_id": "cc-by-4",
+"data_driven_application": "NO", "security_classification": "PUBLIC", "notes": "test", "de_identified_data": "NO"}'\
+    ${CKAN_ACTION_URL}/package_create
 
 echo "Creating test Data Request:"
 

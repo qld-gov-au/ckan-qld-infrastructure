@@ -103,7 +103,6 @@ def add_resource(context, name, url):
 
 @step(u'I fill in title with random text')
 def title_random_text(context):
-
     assert context.persona
     context.execute_steps(u"""
         When I fill in "title" with "Test Title {0}"
@@ -338,12 +337,15 @@ def submit_comment_with_subject_and_comment(context, subject, comment):
     :param comment:
     :return:
     """
-    context.browser.execute_script(
-        "document.querySelector('form#comment_form input[name=\"subject\"]').value = '%s';" % subject)
-    context.browser.execute_script(
-        "document.querySelector('form#comment_form textarea[name=\"comment\"]').value = '%s';" % comment)
-    context.browser.execute_script(
-        "document.querySelector('form#comment_form .form-actions input[type=\"submit\"]').click();")
+    context.browser.execute_script("""
+        document.querySelector('form#comment_form input[name="subject"]').value = '%s';
+        """ % subject)
+    context.browser.execute_script("""
+        document.querySelector('form#comment_form textarea[name="comment"]').value = '%s';
+        """ % comment)
+    context.browser.execute_script("""
+        document.querySelector('form#comment_form .form-actions input[type="submit"]').click();
+        """)
 
 
 @step(u'I submit a reply with comment "{comment}"')
@@ -355,10 +357,12 @@ def submit_reply_with_comment(context, comment):
     :param comment:
     :return:
     """
-    context.browser.execute_script(
-        "document.querySelector('.comment-wrapper form textarea[name=\"comment\"]').value = '%s';" % comment)
-    context.browser.execute_script(
-        "document.querySelector('.comment-wrapper form .form-actions input[type=\"submit\"]').click();")
+    context.browser.execute_script("""
+        document.querySelector('.comment-wrapper form textarea[name="comment"]').value = '%s';
+        """ % comment)
+    context.browser.execute_script("""
+        document.querySelector('.comment-wrapper form .form-actions input[type="submit"]').click();
+        """)
 
 
 # ckanext-qgov
@@ -383,6 +387,11 @@ def log_in_go_to_datarequest_page(context):
     """)
 
 
+@step(u'I go to the data requests page containing "{keyword}"')
+def go_to_datarequest_page_search(context, keyword):
+    when_i_visit_url(context, '/datarequest?q={}'.format(keyword))
+
+
 @step(u'I go to the data requests page')
 def go_to_datarequest_page(context):
     when_i_visit_url(context, '/datarequest')
@@ -391,10 +400,10 @@ def go_to_datarequest_page(context):
 @step(u'I go to data request "{subject}"')
 def go_to_data_request(context, subject):
     context.execute_steps(u"""
-        When I go to the data requests page
-        And I click the link with text "%s"
-        Then I should see "%s" within 5 seconds
-    """ % (subject, subject))
+        When I go to the data requests page containing "{0}"
+        And I click the link with text "{0}"
+        Then I should see "{0}" within 5 seconds
+    """.format(subject))
 
 
 @step(u'I log in and create a datarequest')
