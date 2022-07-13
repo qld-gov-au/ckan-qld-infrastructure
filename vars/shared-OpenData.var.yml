@@ -111,8 +111,7 @@ extensions:
       description: "CKAN Extension for Data Qld Harvesting Enhancements"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-harvester-data-qld-geoscience"
-      version: "v0.0.5"
-
+      version: "v0.0.6"
 
     CKANExtReport: &CKANExtReport
       name: "ckanext-report-{{ Environment }}"
@@ -223,6 +222,10 @@ extensions:
 
     CKANExtCSRFFilter:
       <<: *CKANExtCSRFFilter
+      version: "develop"
+
+    CKANExtHarvestDataQldGeoScience:
+      <<: *CKANExtHarvestDataQldGeoScience
       version: "develop"
 
 basic_facts:
