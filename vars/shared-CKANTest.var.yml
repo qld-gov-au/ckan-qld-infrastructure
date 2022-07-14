@@ -224,10 +224,6 @@ extensions:
       <<: *CKANExtCSRFFilter
       version: "main"
 
-    CKANExtHarvestDataQldGeoScience:
-      <<: *CKANExtHarvestDataQldGeoScience
-      version: "master"
-
 basic_facts:
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
