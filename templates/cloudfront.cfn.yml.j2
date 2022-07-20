@@ -665,6 +665,72 @@ Resources:
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+          - PathPattern: /logout* #SSO
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+          - PathPattern: /oauth-account-manager* #SSO
+            TargetOriginId: 'CmsOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            Compress: true
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              Cookies:
+                Forward: all
+              QueryString: true
+              Headers:
+                - "Accept"
+                - "Accept-Charset"
+                - "Accept-Datetime"
+                - "Accept-Encoding"
+                - "Accept-Language"
+                - "Authorization"
+                - "Origin"
+                - "Accept"
+                - "Host"
+                - "Referer"
+            ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
 {% endif %}
 
           - PathPattern: !Sub "/${AttachmentBucketName}/*" # S3 uploaded files
