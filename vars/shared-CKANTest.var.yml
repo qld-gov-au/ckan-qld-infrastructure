@@ -22,7 +22,7 @@ extensions:
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
-      url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
+      url: "https://github.com/qld-gov-au/ckanext-qgov.git"
       version: "5.0.3"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
