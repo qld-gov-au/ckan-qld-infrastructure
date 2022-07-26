@@ -186,7 +186,7 @@ extensions:
 
     CKANExtHarvestDataQldGeoScience:
       <<: *CKANExtHarvestDataQldGeoScience
-      version: "develop"
+      version: "master"
 
     CKANExtODICertificates:
       <<: *CKANExtODICertificates
