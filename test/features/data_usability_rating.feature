@@ -17,4 +17,5 @@ Feature: Data usability rating
             | TXT    | txt_resource.txt   | 1     |
             | XLS    | xls_resource.xls   | 2     |
             | CSV    | csv_resource.csv   | 3     |
+            | JSON   | csv_resource.csv   | 3     |
             | RDF    | rdf_resource.rdf   | 4     |
