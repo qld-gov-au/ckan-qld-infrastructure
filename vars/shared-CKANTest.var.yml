@@ -47,7 +47,7 @@ extensions:
       description: "CKAN Extension for DCAT"
       type: "git"
       url: "https://github.com/ckan/ckanext-dcat.git"
-      version: "v1.1.3"
+      version: "v1.2.0"
 
     CKANExtScheming: &CKANExtScheming
       name: "ckanext-scheming-{{ Environment }}"
