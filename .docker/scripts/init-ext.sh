@@ -28,6 +28,7 @@ install_requirements () {
 if [ "$VENV_DIR" != "" ]; then
   . ${VENV_DIR}/bin/activate
 fi
+install_requirements . dev-requirements requirements-dev
 EXTENSIONS_FILE=$APP_DIR/scripts/extensions.yml python $(dirname $0)/generate-ext-requirements.py
 pip install --force-reinstall -r "/tmp/requirements-ext.txt"
 for extension in . `ls -d $VENV_DIR/src/ckanext-*`; do
