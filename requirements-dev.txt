@@ -8,6 +8,6 @@ flake8==3.8.3
 mock
 pika>=1.1.0,<1.3.0
 pytest-ckan
-PyYAML>=1.0
+pyyaml==5.4.1
 setuptools==44.1.1
 splinter>=0.13.0,<0.17
