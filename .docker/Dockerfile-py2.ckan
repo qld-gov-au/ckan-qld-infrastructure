@@ -11,7 +11,7 @@ ENV SITE_URL="${SITE_URL}"
 ENV DEPLOY_ENV="${DEPLOY_ENV}"
 ENV VENV_DIR=/app/ckan/default
 ENV APP_DIR=/app
-ENV CKAN_INI=/app/ckan/default/production.ini
+ENV CKAN_INI=.docker/test-$VARS_TYPE.ini
 
 WORKDIR "${APP_DIR}"
 
@@ -34,8 +34,6 @@ RUN . ${VENV_DIR}/bin/activate \
     && deactivate \
     && ln -s ${APP_DIR}/ckan /usr/lib/ckan \
     && fix-permissions ${APP_DIR}/ckan
-
-COPY .docker/test-$VARS_TYPE.ini $CKAN_INI
 
 COPY . ${APP_DIR}/
 
