@@ -17,7 +17,7 @@ Feature: Data Request
     Scenario: Data requests submitted without a description will produce an error message
         Given "SysAdmin" as the persona
         When I log in and go to the data requests page
-        And I press the element with xpath "//a[contains(@class, 'btn-primary')]"
+        And I press the element with xpath "//a[contains(@class, 'btn-primary') and contains(string(), 'Add data request')]"
         And I fill in "title" with "Test data request"
         And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
         Then I should see an element with the css selector "div.error-explanation.alert.alert-error" within 2 seconds
