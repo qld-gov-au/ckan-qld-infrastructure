@@ -86,7 +86,7 @@ commands:
     usage: Install a site.
     cmd: |
       ahoy title "Installing a fresh site"
-      ahoy cli "./scripts/init.sh"
+      ahoy cli '$APP_DIR/scripts/init.sh'
 
   clean:
     usage: Remove containers and all build files.

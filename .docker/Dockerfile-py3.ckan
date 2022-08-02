@@ -12,7 +12,7 @@ ENV DEPLOY_ENV="${DEPLOY_ENV}"
 ENV VENV_DIR=/app/ckan/default
 ENV SRC_DIR=/app/ckan/default/src
 ENV APP_DIR=/app
-ENV CKAN_INI=.docker/test-$VARS_TYPE.ini
+ENV CKAN_INI=/app/test.ini
 
 WORKDIR "${APP_DIR}"
 
@@ -31,12 +31,14 @@ RUN mkdir -p ${VENV_DIR} \
     && pip install -e "git+https://github.com/${CKAN_REPO}.git@${CKAN_VERSION}#egg=ckan" \
     && pip install -r "${SRC_DIR}/ckan/requirements.txt" \
                    -r "${SRC_DIR}/ckan/dev-requirements.txt" \
-    && ln -s "${SRC_DIR}/ckan/who.ini" "${VENV_DIR}/who.ini" \
+    && ln -s "${SRC_DIR}/ckan/who.ini" "$APP_DIR/who.ini" \
     && deactivate \
     && ln -s ${APP_DIR}/ckan /usr/lib/ckan \
     && fix-permissions ${APP_DIR}/ckan
 
 COPY . ${APP_DIR}/
+
+COPY .docker/test-$VARS_TYPE.ini ${APP_DIR}/test.ini
 
 COPY .docker/scripts ${APP_DIR}/scripts
 
