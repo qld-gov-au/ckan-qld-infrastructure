@@ -30,6 +30,7 @@ Feature: Resource freshness
     Scenario Outline: As a user with editing privileges, when I set a 'monthly' update frequently, I should still be able to update the dataset via the API
         Given "<User>" as the persona
         When I log in
+        Then I should be able to patch dataset "test-dataset" via the API
         And I go to "/dataset/edit/test-dataset"
         And I select "monthly" from "update_frequency"
         Then I should see "Next update due"

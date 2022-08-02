@@ -10,16 +10,18 @@ jobs:
     strategy:
       matrix:
         application: [OpenData, Publications]
+        python-version: [py2, py3]
         target_environment: [DEV]
       fail-fast: false
 
-    name: ${{ matrix.application }} ${{ matrix.target_environment }} infrastructure build
+    name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} infrastructure build
     runs-on: ubuntu-latest
     container: integratedexperts/ci-builder
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
       CKAN_REPO: qld-gov-au/ckan
+      PYTHON_VERSION: ${{ matrix.python-version }}
 
     steps:
       - uses: actions/checkout@v2
@@ -42,6 +44,6 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.application }} ${{ matrix.target_environment }} screenshots
+          name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} screenshots
           path: /tmp/artifacts/behave/screenshots
         timeout-minutes: 1

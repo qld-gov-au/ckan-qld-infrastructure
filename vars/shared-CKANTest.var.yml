@@ -22,8 +22,8 @@ extensions:
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
-      url: "https://github.com/qld-gov-au/ckan-ex-qgov.git"
-      version: "5.0.2"
+      url: "https://github.com/qld-gov-au/ckanext-qgov.git"
+      version: "5.0.4"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       name: "ckanext-s3filestore-{{ Environment }}"
@@ -31,7 +31,7 @@ extensions:
       description: "CKAN Extension to keep uploaded files in S3"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
-      version: "0.7.7-qgov.2"
+      version: "0.7.7-qgov.3"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       name: "ckanext-ssm-config-{{ Environment }}"
@@ -47,7 +47,7 @@ extensions:
       description: "CKAN Extension for DCAT"
       type: "git"
       url: "https://github.com/ckan/ckanext-dcat.git"
-      version: "v1.1.3"
+      version: "v1.2.0"
 
     CKANExtScheming: &CKANExtScheming
       name: "ckanext-scheming-{{ Environment }}"
@@ -63,7 +63,7 @@ extensions:
       description: "CKAN Extension for validating Data Packages"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation.git"
-      version: "v0.0.8-qgov.4"
+      version: "v0.0.8-qgov.5"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
@@ -71,7 +71,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "6.3.4"
+      version: "6.3.5"
 
     CKANExtODICertificates: &CKANExtODICertificates
       name: "ckanext-odi-certificates-{{ Environment }}"
@@ -87,7 +87,7 @@ extensions:
       description: "CKAN Extension for Data Requests"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-datarequests.git"
-      version: "2.2.1-qgov"
+      version: "2.2.1-qgov.3"
 
     CKANExtYTP: &CKANExtYTP
       name: "ckanext-ytp-comments-{{ Environment }}"
@@ -95,7 +95,7 @@ extensions:
       description: "CKAN Extension for YTP Comments"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
-      version: "2.5.0-qgov.2"
+      version: "2.5.0-qgov.7"
 
     CKANExtHarvest: &CKANExtHarvest
       name: "ckanext-harvest-{{ Environment }}"
@@ -111,7 +111,7 @@ extensions:
       description: "CKAN Extension for Data Qld Harvesting Enhancements for Geoscience"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-harvester-data-qld-geoscience"
-      version: "v0.0.5"
+      version: "v0.0.6"
 
     CKANExtReport: &CKANExtReport
       name: "ckanext-report-{{ Environment }}"
@@ -119,7 +119,7 @@ extensions:
       description: "CKAN Extension for Reporting"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-report.git"
-      version: "0.3"
+      version: "0.3.1-qgov.1"
 
     CKANExtArchiver: &CKANExtArchiver
       name: "ckanext-archiver-{{ Environment }}"
@@ -127,7 +127,7 @@ extensions:
       description: "CKAN Extension for Archiving needed for ckanext-qa"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-archiver.git"
-      version: "2.1.1-qgov.8"
+      version: "2.1.1-qgov.11"
 
     CKANExtQa: &CKANExtQa
       name: "ckanext-qa-{{ Environment }}"
@@ -135,7 +135,7 @@ extensions:
       description: "CKAN Extension for Quality Assurance"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-qa.git"
-      version: "2.0.3-qgov.4"
+      version: "2.0.3-qgov.6"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"
@@ -143,7 +143,7 @@ extensions:
       description: "CKAN Extension for checking uploaded resource types"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-resource-type-validation.git"
-      version: "1.0.2"
+      version: "1.0.3"
 
     CKANExtCSRFFilter: &CKANExtCSRFFilter
       name: "ckanext-csrf-filter-{{ Environment }}"
@@ -151,7 +151,7 @@ extensions:
       description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
-      version: "1.1.4"
+      version: "1.1.5"
 
   PROD:
     <<: *default_extensions
@@ -186,7 +186,7 @@ extensions:
 
     CKANExtHarvestDataQldGeoScience:
       <<: *CKANExtHarvestDataQldGeoScience
-      version: "develop"
+      version: "master"
 
     CKANExtODICertificates:
       <<: *CKANExtODICertificates
