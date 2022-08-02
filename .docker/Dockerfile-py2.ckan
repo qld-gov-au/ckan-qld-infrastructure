@@ -27,7 +27,6 @@ RUN apk add --no-cache curl build-base postgresql-client \
 RUN . ${VENV_DIR}/bin/activate \
     && pip install setuptools==36.1 \
     && pip install -e "git+https://github.com/${CKAN_REPO}.git@${CKAN_VERSION}#egg=ckan" \
-    && sed -i "s/psycopg2==2.4.5/psycopg2==2.7.7/g" "${SRC_DIR}/ckan/requirements.txt" \
     && ((test -f "${SRC_DIR}/ckan/requirements-py2.txt" && \
         pip install -r "${SRC_DIR}/ckan/requirements-py2.txt") || \
         pip install -r "${SRC_DIR}/ckan/requirements.txt") \
@@ -37,9 +36,9 @@ RUN . ${VENV_DIR}/bin/activate \
     && ln -s ${APP_DIR}/ckan /usr/lib/ckan \
     && fix-permissions ${APP_DIR}/ckan
 
-COPY . ${APP_DIR}/
+COPY .docker/test-$VARS_TYPE.ini $CKAN_INI
 
-COPY .docker/test-$VARS_TYPE.ini ${APP_DIR}/test.ini
+COPY . ${APP_DIR}/
 
 COPY .docker/scripts ${APP_DIR}/scripts
 

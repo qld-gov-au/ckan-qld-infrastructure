@@ -36,9 +36,9 @@ RUN mkdir -p ${VENV_DIR} \
     && ln -s ${APP_DIR}/ckan /usr/lib/ckan \
     && fix-permissions ${APP_DIR}/ckan
 
-COPY . ${APP_DIR}/
+COPY .docker/test-$VARS_TYPE.ini $CKAN_INI
 
-COPY .docker/test-$VARS_TYPE.ini ${APP_DIR}/test.ini
+COPY . ${APP_DIR}/
 
 COPY .docker/scripts ${APP_DIR}/scripts
 
