@@ -1,0 +1,55 @@
+FROM amazeeio/python:2.7-ckan-21.8.0
+
+ARG SITE_URL=http://ckan:3000/
+ARG CKAN_REPO=qld-gov-au/ckan
+ARG CKAN_VERSION=ckan-2.9.5-qgov.8
+ARG VARS_TYPE
+ARG DEPLOY_ENV
+ENV VARS_TYPE="${VARS_TYPE}"
+ENV PYTHON_VERSION=py2
+ENV SITE_URL="${SITE_URL}"
+ENV DEPLOY_ENV="${DEPLOY_ENV}"
+ENV VENV_DIR=/app/ckan/default
+ENV SRC_DIR=/app/ckan/default/src
+ENV APP_DIR=/app
+ENV CKAN_INI=/app/test.ini
+
+WORKDIR "${APP_DIR}"
+
+ENV DOCKERIZE_VERSION v0.6.1
+RUN apk add --no-cache curl build-base postgresql-client \
+    && curl -sLO https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz \
+    && rm dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz
+
+# Install CKAN.
+
+RUN . ${VENV_DIR}/bin/activate \
+    && pip install setuptools==36.1 \
+    && pip install -e "git+https://github.com/${CKAN_REPO}.git@${CKAN_VERSION}#egg=ckan" \
+    && ((test -f "${SRC_DIR}/ckan/requirements-py2.txt" && \
+        pip install -r "${SRC_DIR}/ckan/requirements-py2.txt") || \
+        pip install -r "${SRC_DIR}/ckan/requirements.txt") \
+    && pip install -r "${SRC_DIR}/ckan/dev-requirements.txt" \
+    && ln -s "${SRC_DIR}/ckan/who.ini" "$APP_DIR/who.ini" \
+    && deactivate \
+    && ln -s ${APP_DIR}/ckan /usr/lib/ckan \
+    && fix-permissions ${APP_DIR}/ckan
+
+COPY .docker/test-$VARS_TYPE.ini $CKAN_INI
+
+COPY . ${APP_DIR}/
+
+COPY .docker/scripts ${APP_DIR}/scripts
+
+COPY .docker/scripts/ckan_cli ${VENV_DIR}/bin/
+
+COPY vars/shared-$VARS_TYPE.var.yml $APP_DIR/scripts/extensions.yml
+
+RUN chmod +x ${APP_DIR}/scripts/*.sh ${VENV_DIR}/bin/ckan_cli
+
+# Init current extension.
+RUN ${APP_DIR}/scripts/init-ext.sh
+
+ENTRYPOINT ["/sbin/tini", "--", "/lagoon/entrypoints.sh"]
+CMD ["/app/scripts/serve.sh"]
