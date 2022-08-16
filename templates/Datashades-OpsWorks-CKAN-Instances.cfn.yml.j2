@@ -119,6 +119,10 @@ Parameters:
     Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'. Only needed for HA configurations.
     Type: String
     Default: none
+  OperatingSystem:
+    Description: The operating system to install on all instances.
+    Type: String
+    Default: "Amazon Linux 2018.03"
 
 Conditions:
   2PlusServiceInstances:
@@ -198,6 +202,7 @@ Resources:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
+      Os: !Ref OperatingSystem
       LayerIds:
         - Fn::ImportValue: !Ref SolrLayerID
       StackId:
@@ -234,6 +239,7 @@ Resources:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref ServicesEC2Size
+      Os: !Ref OperatingSystem
       SubnetId:
         Fn::ImportValue: !Sub "${AppSubnets}B" #todo, can only change if hostname also is changed
       LayerIds:
@@ -273,6 +279,7 @@ Resources:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
+      Os: !Ref OperatingSystem
       LayerIds:
         - Fn::ImportValue: !Ref WebLayerID
       StackId:
@@ -314,6 +321,7 @@ Resources:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
+      Os: !Ref OperatingSystem
       SubnetId:
         Fn::ImportValue: !Sub "${AppSubnets}{{ subnetLetters[ loopingTimes % 3 ] }}"
 
@@ -358,6 +366,7 @@ Resources:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
+      Os: !Ref OperatingSystem
       LayerIds:
         - Fn::ImportValue: !Ref WebLayerID
       StackId:
@@ -374,6 +383,7 @@ Resources:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
+      Os: !Ref OperatingSystem
       SubnetId:
         Fn::ImportValue: !Sub "${AppSubnets}C"
       LayerIds:
@@ -393,6 +403,7 @@ Resources:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref BatchEC2Size
+      Os: !Ref OperatingSystem
       LayerIds:
         - Fn::ImportValue: !Ref BatchLayerID
       StackId:
@@ -411,6 +422,7 @@ Resources:
       RootDeviceType: ebs
       InstallUpdatesOnBoot: true
       InstanceType: !Ref BatchEC2Size
+      Os: !Ref OperatingSystem
       LayerIds:
         - Fn::ImportValue: !Ref BatchLayerID
       StackId:
