@@ -11,7 +11,6 @@ jobs:
       matrix:
         application: [OpenData, Publications]
         python-version: [py2, py3]
-        target_environment: [DEV]
       fail-fast: false
 
     name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} infrastructure build
@@ -19,8 +18,7 @@ jobs:
     container: integratedexperts/ci-builder
     env:
       VARS_TYPE: ${{ matrix.application }}
-      DEPLOY_ENV: ${{ matrix.target_environment }}
-      CKAN_REPO: qld-gov-au/ckan
+      DEPLOY_ENV: DEV
       PYTHON_VERSION: ${{ matrix.python-version }}
 
     steps:

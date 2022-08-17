@@ -14,7 +14,6 @@ jobs:
       matrix:
         application: [OpenData, Publications]
         python-version: [py2, py3]
-        target_environment: [STAGING]
       fail-fast: true
 
     name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} infrastructure build
@@ -22,8 +21,7 @@ jobs:
     container: integratedexperts/ci-builder
     env:
       VARS_TYPE: ${{ matrix.application }}
-      DEPLOY_ENV: ${{ matrix.target_environment }}
-      CKAN_REPO: qld-gov-au/ckan
+      DEPLOY_ENV: STAGING
       PYTHON_VERSION: ${{ matrix.python-version }}
 
     steps:
@@ -41,7 +39,7 @@ jobs:
       - name: Retrieve screenshots
         if: failure()
         run: .circleci/process-artifacts.sh
-        timeout-minutes: 3
+        timeout-minutes: 1
 
       - name: Upload screenshots
         if: failure()
@@ -49,4 +47,4 @@ jobs:
         with:
           name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} screenshots
           path: /tmp/artifacts/behave/screenshots
-        timeout-minutes: 3
+        timeout-minutes: 1
