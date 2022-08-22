@@ -33,13 +33,13 @@ Feature: Data Request
         Given "CKANUser" as the persona
         When I log in
         And I go to "/user/datarequest/admin"
-        Then I should see an element with xpath "//*[contains(string(), 'Not authorized to see this page')]"
+        Then I should see an element with xpath "//*[contains(string(), 'Not authorised to see this page')]"
 
     @unauthenticated
     Scenario: User's data request page is not accessible anonymously
         Given "Unauthenticated" as the persona
         When I go to "/user/datarequest/admin"
-        Then I should see an element with xpath "//*[contains(string(), 'Not authorized to see this page')]"
+        Then I should see an element with xpath "//*[contains(string(), 'Not authorised to see this page')]"
 
     @unauthenticated
     Scenario: When visiting the datarequests page as a non-logged in user, the 'Add data request' button is not visible
