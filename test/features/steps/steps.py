@@ -315,7 +315,7 @@ def create_dataset_resource_availability(context, title, de_identified_data,
                     function () {
                         return $(this).html() == 'Test Organisation';
                     }
-                ).attr('value')""",
+                ).attr('value')""".replace('\n', ' '),
                resource_name=resource_name, resource_visible=resource_visible,
                governance_acknowledgement=governance_acknowledgement))
 
