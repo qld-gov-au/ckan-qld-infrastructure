@@ -14,11 +14,21 @@ sed -i -e "s/##//" docker-compose.yml
 # Pull the latest images.
 ahoy pull
 
-# Disable checks used on host machine.
-export DOCTOR_CHECK_PYGMY=0
-export DOCTOR_CHECK_PORT=0
-export DOCTOR_CHECK_SSH=0
-export DOCTOR_CHECK_WEBSERVER=0
-export DOCTOR_CHECK_BOOTSTRAP=0
+QGOV_CKAN_VERSION=`sh ./retrieve-ckan-version.sh`
+CKAN_VERSION=2.9
+PYTHON=python
+if [ "$PYTHON_VERSION" = "py2" ]; then
+    CKAN_VERSION="${CKAN_VERSION}-py2"
+else
+    PYTHON="${PYTHON}3"
+fi
+export CKAN_VERSION
+
+sed "s|{CKAN_VERSION}|$CKAN_VERSION|g" .docker/Dockerfile-template.ckan \
+    | sed "s|{PYTHON_VERSION}|$PYTHON_VERSION|g" \
+    | sed "s|{DEPLOY_ENV}|$DEPLOY_ENV|g" \
+    | sed "s|{VARS_TYPE}|$VARS_TYPE|g" \
+    | sed "s|{PYTHON}|$PYTHON|g" \
+    | sed "s|{QGOV_CKAN_VERSION}|$QGOV_CKAN_VERSION|g" > .docker/Dockerfile.ckan
 
 ahoy build || (ahoy logs; exit 1)

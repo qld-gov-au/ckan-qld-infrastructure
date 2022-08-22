@@ -163,12 +163,14 @@ def go_to_user_show(context, user_id):
 
 @step(u'I view the "{group_id}" group API "{including}" users')
 def go_to_group_including_users(context, group_id, including):
-    when_i_visit_url(context, r'/api/3/action/group_show?id={}&include_users={}'.format(group_id, including in ['with', 'including']))
+    when_i_visit_url(context, r'/api/3/action/group_show?id={}&include_users={}'.format(
+        group_id, including in ['with', 'including']))
 
 
 @step(u'I view the "{organisation_id}" organisation API "{including}" users')
 def go_to_organisation_including_users(context, organisation_id, including):
-    when_i_visit_url(context, r'/api/3/action/organization_show?id={}&include_users={}'.format(organisation_id, including in ['with', 'including']))
+    when_i_visit_url(context, r'/api/3/action/organization_show?id={}&include_users={}'.format(
+        organisation_id, including in ['with', 'including']))
 
 
 @step(u'I should be able to download via the element with xpath "{expression}"')
@@ -279,8 +281,13 @@ def log_out(context):
 # ckanext-data-qld
 
 
-@step(u'I create resource_availability test data with title:"{title}" de_identified_data:"{de_identified_data}" resource_name:"{resource_name}" resource_visible:"{resource_visible}" governance_acknowledgement:"{governance_acknowledgement}"')
-def create_dataset_resource_availability(context, title, de_identified_data, resource_name, resource_visible, governance_acknowledgement):
+@step(u'I create resource_availability test data with'
+      u' title:"{title}" de_identified_data:"{de_identified_data}"'
+      u' resource_name:"{resource_name}" resource_visible:"{resource_visible}"'
+      u' governance_acknowledgement:"{governance_acknowledgement}"')
+def create_dataset_resource_availability(context, title, de_identified_data,
+                                         resource_name, resource_visible,
+                                         governance_acknowledgement):
     assert context.persona
     context.execute_steps(u"""
         When I go to "/dataset/new"
@@ -298,13 +305,19 @@ def create_dataset_resource_availability(context, title, de_identified_data, res
         And I fill in "description" with "test description"
         And I select "{resource_visible}" from "resource_visible"
         And I select "{governance_acknowledgement}" from "governance_acknowledgement"
-        And I execute the script "size_field = document.getElementById('field-size'); if (size_field) size_field.value = '1024';"
+        And I fill in "size" with "1024" if present
         And I press the element with xpath "//button[@value='go-metadata']"
         Then I wait for 1 seconds
         and I should see "Data and Resources"
     """.format(title=title, de_identified_data=de_identified_data,
-               organisation_script="document.getElementById('field-organizations').value=jQuery('#field-organizations option').filter(function () { return $(this).html() == 'Test Organisation'; }).attr('value')",
-               resource_name=resource_name, resource_visible=resource_visible, governance_acknowledgement=governance_acknowledgement))
+               organisation_script="""
+                document.getElementById('field-organizations').value=jQuery('#field-organizations option').filter(
+                    function () {
+                        return $(this).html() == 'Test Organisation';
+                    }
+                ).attr('value')""".replace('\n', ' '),
+               resource_name=resource_name, resource_visible=resource_visible,
+               governance_acknowledgement=governance_acknowledgement))
 
 
 # ckanext-ytp-comments

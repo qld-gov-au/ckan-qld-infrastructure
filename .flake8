@@ -2,6 +2,8 @@
 # @see https://flake8.pycqa.org/en/latest/user/configuration.html?highlight=.flake8
 
 exclude =
+    ckan
+    scripts
     library
     lookup_plugins
 
@@ -17,6 +19,4 @@ max-line-length = 127
 
 # List ignore rules one per line.
 ignore =
-    C901
-    E501
     W503

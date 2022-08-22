@@ -20,7 +20,6 @@ jobs:
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
-      CKAN_REPO: qld-gov-au/ckan
       PYTHON_VERSION: ${{ matrix.python-version }}
 
     steps:
