@@ -5,9 +5,7 @@
 set -e
 set -x
 
-if [ "$VENV_DIR" != "" ]; then
-  . ${VENV_DIR}/bin/activate
-fi
+. ${APP_DIR}/scripts/activate
 
 # Create private test dataset with our standard fields
 curl -LsH "Authorization: ${API_KEY}" \
@@ -25,6 +23,4 @@ curl -LsH "Authorization: ${API_KEY}" \
 "notes": "test", "de_identified_data": "NO"}' \
     ${CKAN_ACTION_URL}/package_create
 
-if [ "$VENV_DIR" != "" ]; then
-  deactivate
-fi
+. ${APP_DIR}/scripts/deactivate

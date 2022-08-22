@@ -6,3 +6,6 @@ templates/Datashades-OpsWorks-CKAN-Extensions.cfn.yml
 templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml
 templates/*.sql
 .idea
+
+# generated from template
+Dockerfile.ckan
