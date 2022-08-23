@@ -25,17 +25,14 @@ install_requirements () {
     done
 }
 
-if [ "$VENV_DIR" != "" ]; then
-  . ${VENV_DIR}/bin/activate
-fi
+. ${APP_DIR}/scripts/activate
+
 install_requirements . dev-requirements requirements-dev
-EXTENSIONS_FILE=$APP_DIR/scripts/extensions.yml python $(dirname $0)/generate-ext-requirements.py
+EXTENSIONS_FILE=$APP_DIR/scripts/extensions.yml $PYTHON $(dirname $0)/generate-ext-requirements.py
 pip install --force-reinstall -r "/tmp/requirements-ext.txt"
 for extension in . `ls -d $SRC_DIR/ckanext-*`; do
     install_requirements $extension requirements pip-requirements
 done
 install_requirements . dev-requirements requirements-dev
 
-if [ "$VENV_DIR" != "" ]; then
-  deactivate
-fi
+. ${APP_DIR}/scripts/deactivate
