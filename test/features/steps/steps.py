@@ -217,18 +217,21 @@ def create_dataset(context, license, file_format, file):
     assert context.persona
     context.execute_steps(u"""
         When I visit "/dataset/new"
-        And I fill in title with random text
+        Then I fill in title with random text
         And I fill in "notes" with "Description"
         And I fill in "version" with "1.0"
         And I fill in "author_email" with "test@me.com"
         And I execute the script "document.getElementById('field-license_id').value={license}"
-        Then I fill in "de_identified_data" with "NO" if present
+        And I fill in "de_identified_data" with "NO" if present
         And I press "Add Data"
-        And I attach the file {file} to "upload"
+
+        Then I attach the file {file} to "upload"
         And I fill in "name" with "Test Resource"
         And I execute the script "document.getElementById('field-format').value={file_format}"
         And I fill in "description" with "Test Resource Description"
+        And I take a screenshot
         And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
+        And I take a screenshot
     """.format(license=license, file=file, file_format=file_format))
 
 

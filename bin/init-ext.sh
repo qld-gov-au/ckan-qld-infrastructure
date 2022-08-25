@@ -25,14 +25,14 @@ install_requirements () {
     done
 }
 
-. ${APP_DIR}/scripts/activate
+. ${APP_DIR}/bin/activate
 
 install_requirements . dev-requirements requirements-dev
-EXTENSIONS_FILE=$APP_DIR/scripts/extensions.yml $PYTHON $(dirname $0)/generate-ext-requirements.py
+EXTENSIONS_FILE=$APP_DIR/bin/extensions.yml $PYTHON $(dirname $0)/generate-ext-requirements.py
 pip install --force-reinstall -r "/tmp/requirements-ext.txt"
 for extension in . `ls -d $SRC_DIR/ckanext-*`; do
     install_requirements $extension requirements pip-requirements
 done
 install_requirements . dev-requirements requirements-dev
 
-. ${APP_DIR}/scripts/deactivate
+. ${APP_DIR}/bin/deactivate
