@@ -5,7 +5,7 @@
 set -e
 set -x
 
-. ${APP_DIR}/scripts/activate
+. ${APP_DIR}/bin/activate
 
 # Create publishing standards dataset
 curl -LsH "Authorization: ${API_KEY}" \
@@ -23,4 +23,4 @@ curl -LsH "Authorization: ${API_KEY}" \
     ${CKAN_ACTION_URL}/package_create
 
 
-. ${APP_DIR}/scripts/deactivate
+. ${APP_DIR}/bin/deactivate

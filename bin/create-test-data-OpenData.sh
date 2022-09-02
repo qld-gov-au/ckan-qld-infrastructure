@@ -5,7 +5,7 @@
 set -e
 set -x
 
-. ${APP_DIR}/scripts/activate
+. ${APP_DIR}/bin/activate
 
 # Create private test dataset with our standard fields
 curl -LsH "Authorization: ${API_KEY}" \
@@ -23,4 +23,4 @@ curl -LsH "Authorization: ${API_KEY}" \
 "notes": "test", "de_identified_data": "NO"}' \
     ${CKAN_ACTION_URL}/package_create
 
-. ${APP_DIR}/scripts/deactivate
+. ${APP_DIR}/bin/deactivate
