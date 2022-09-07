@@ -26,7 +26,7 @@ ckan_cli sysadmin add "${CKAN_USER_NAME}"
 API_KEY=$(ckan_cli user show "${CKAN_USER_NAME}" | tr -d '\n' | sed -r 's/^(.*)apikey=(\S*)(.*)/\2/')
 if [ "$API_KEY" = "None" ]; then
     echo "No API Key found on ${CKAN_USER_NAME}, generating API Token..."
-    API_KEY=$(ckan_cli user token add "${CKAN_USER_NAME}" test_setup |grep -v '^API Token created' | tr -d '[:space:]')
+    API_KEY=$(ckan_cli user token add "${CKAN_USER_NAME}" test_setup |tail -1 | tr -d '[:space:]')
 fi
 
 ##
