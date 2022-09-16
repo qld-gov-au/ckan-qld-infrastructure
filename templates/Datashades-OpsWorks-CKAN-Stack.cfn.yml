@@ -426,7 +426,7 @@ Resources:
         Fn::GetAtt:
           - InstanceRoleProfile
           - Arn
-      DefaultOs: "Amazon Linux 2018.03"
+      DefaultOs: "Amazon Linux 2"
       DefaultSshKeyName: !Ref DefaultEC2Key
       DefaultSubnetId:
         Fn::ImportValue:
