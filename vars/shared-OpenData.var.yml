@@ -108,7 +108,7 @@ extensions:
     CKANExtHarvestDataQldGeoScience: &CKANExtHarvestDataQldGeoScience
       name: "ckanext-harvest-{{ Environment }}"
       shortname: "ckanext-harvester-data-qld-geoscience"
-      description: "CKAN Extension for Data Qld Harvesting Enhancements"
+      description: "CKAN Extension for Data Qld Harvesting Enhancements for Geoscience"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-harvester-data-qld-geoscience"
       version: "v0.0.7"
@@ -152,7 +152,6 @@ extensions:
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
       version: "1.1.5"
-
 
   PROD:
     <<: *default_extensions
@@ -223,10 +222,6 @@ extensions:
 
     CKANExtCSRFFilter:
       <<: *CKANExtCSRFFilter
-      version: "develop"
-
-    CKANExtHarvestDataQldGeoScience:
-      <<: *CKANExtHarvestDataQldGeoScience
       version: "develop"
 
     # Move to default_extensions when ready to go to higher enviornments.
