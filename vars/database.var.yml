@@ -70,7 +70,7 @@ cloudformation_stacks:
     name: CKAN-DEV-RDS
     template_parameters:
       <<: *common_stack_template_parameters
-      DBEngineVersion: 12
+      DBEngineVersion: 13
       DBAllocatedStorage: "200"
       DBClass: db.t3.medium
       StorageEncrypted: "False"
