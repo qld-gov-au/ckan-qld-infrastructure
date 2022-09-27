@@ -184,16 +184,16 @@ extensions:
       <<: *CKANExtDataQld
       version: "master"
 
-    CKANExtHarvestDataQldGeoScience:
-      <<: *CKANExtHarvestDataQldGeoScience
-      version: "master"
-
     CKANExtODICertificates:
       <<: *CKANExtODICertificates
       version: "master"
 
     CKANExtDataRequests:
       <<: *CKANExtDataRequests
+      version: "master"
+
+    CKANExtHarvestDataQldGeoScience:
+      <<: *CKANExtHarvestDataQldGeoScience
       version: "master"
 
     CKANExtYTP:
@@ -224,17 +224,34 @@ extensions:
       <<: *CKANExtCSRFFilter
       version: "main"
 
+    # Move to default_extensions when ready to go to higher enviornments.
+    CKANExtValidationSchemaGenerator: &CKANExtValidationSchemaGenerator
+      name: "ckanext-validation-schema-generator-{{ Environment }}"
+      shortname: "ckanext-validation-schema-generator"
+      description: "CKAN Extension for Schema Generation"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-validation-schema-generator.git"
+      version: "master"
+
+    CKANExtResourceVisibility: &CKANExtResourceVisibility
+      name: "ckanext-resource-visibility-{{ Environment }}"
+      shortname: "ckanext-resource-visibility"
+      description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-resource-visibility.git"
+      version: "master"
+
 basic_facts:
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.test.data.qld.gov.au,test.data.qld.gov.au"
     SiteDomain: "test.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "staging.squizedge.net"
+    CmsOrigin: "oss.squizedge.net"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.test-dev.data.qld.gov.au,test-dev.data.qld.gov.au"
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "staging.squizedge.net"
+    CmsOrigin: "oss.squizedge.net"
