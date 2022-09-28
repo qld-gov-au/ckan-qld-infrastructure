@@ -95,7 +95,7 @@ extensions:
       description: "CKAN Extension for YTP Comments"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
-      version: "2.5.0-qgov.8"
+      version: "2.5.0-qgov.9"
 
     CKANExtHarvest: &CKANExtHarvest
       name: "ckanext-harvest-{{ Environment }}"
@@ -103,7 +103,7 @@ extensions:
       description: "CKAN Extension for Harvesting"
       type: "git"
       url: "https://github.com/ckan/ckanext-harvest.git"
-      version: "98edcd3ad7e3f6208797df90b7a4ebe76b1104d6"
+      version: "v1.4.1"
 
     CKANExtHarvestDataQldGeoScience: &CKANExtHarvestDataQldGeoScience
       name: "ckanext-harvest-{{ Environment }}"
@@ -111,7 +111,7 @@ extensions:
       description: "CKAN Extension for Data Qld Harvesting Enhancements for Geoscience"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-harvester-data-qld-geoscience"
-      version: "v0.0.6"
+      version: "v0.0.7"
 
     CKANExtReport: &CKANExtReport
       name: "ckanext-report-{{ Environment }}"
@@ -127,7 +127,7 @@ extensions:
       description: "CKAN Extension for Archiving needed for ckanext-qa"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-archiver.git"
-      version: "2.1.1-qgov.13"
+      version: "2.1.1-qgov.14"
 
     CKANExtQa: &CKANExtQa
       name: "ckanext-qa-{{ Environment }}"
@@ -184,16 +184,16 @@ extensions:
       <<: *CKANExtDataQld
       version: "master"
 
-    CKANExtHarvestDataQldGeoScience:
-      <<: *CKANExtHarvestDataQldGeoScience
-      version: "master"
-
     CKANExtODICertificates:
       <<: *CKANExtODICertificates
       version: "master"
 
     CKANExtDataRequests:
       <<: *CKANExtDataRequests
+      version: "master"
+
+    CKANExtHarvestDataQldGeoScience:
+      <<: *CKANExtHarvestDataQldGeoScience
       version: "master"
 
     CKANExtYTP:
@@ -224,17 +224,34 @@ extensions:
       <<: *CKANExtCSRFFilter
       version: "main"
 
+    # Move to default_extensions when ready to go to higher enviornments.
+    CKANExtValidationSchemaGenerator: &CKANExtValidationSchemaGenerator
+      name: "ckanext-validation-schema-generator-{{ Environment }}"
+      shortname: "ckanext-validation-schema-generator"
+      description: "CKAN Extension for Schema Generation"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-validation-schema-generator.git"
+      version: "master"
+
+    CKANExtResourceVisibility: &CKANExtResourceVisibility
+      name: "ckanext-resource-visibility-{{ Environment }}"
+      shortname: "ckanext-resource-visibility"
+      description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-resource-visibility.git"
+      version: "master"
+
 basic_facts:
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.test.data.qld.gov.au,test.data.qld.gov.au"
     SiteDomain: "test.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "staging.squizedge.net"
+    CmsOrigin: "oss.squizedge.net"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.test-dev.data.qld.gov.au,test-dev.data.qld.gov.au"
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "staging.squizedge.net"
+    CmsOrigin: "oss.squizedge.net"
