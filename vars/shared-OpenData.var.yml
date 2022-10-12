@@ -178,7 +178,7 @@ extensions:
 
     CKANExtValidation:
       <<: *CKANExtValidation
-      version: "9362d21c71830f4c64f6560afe2e049364c9dd7a" # "develop"
+      version: "develop"
 
     CKANExtDataQld:
       <<: *CKANExtDataQld
