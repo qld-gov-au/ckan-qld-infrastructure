@@ -19,7 +19,7 @@ jobs:
 
     name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} infrastructure build
     runs-on: ubuntu-latest
-    container: integratedexperts/ci-builder
+    container: drevops/ci-builder
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}

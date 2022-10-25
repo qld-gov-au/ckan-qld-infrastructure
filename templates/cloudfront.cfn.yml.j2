@@ -51,7 +51,91 @@ Parameters:
 
 Resources:
 
+  #The new way to do caching with cloudfront, much better now you can re reference it
+  CachePolicyCMS:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Comment: !Sub "${Service} Cache policy"
+        DefaultTTL: 1
+        MaxTTL: 1
+        MinTTL: 0
+        Name: !Sub "${AWS::StackName}_CachePolicyCMS"
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: "all" #none, whitelist, allExcept, all
+          EnableAcceptEncodingBrotli: true
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: "whitelist" #none, whitelist
+            Headers: #max 10
+              - "Accept"
+              - "Accept-Charset"
+              - "Accept-Language"
+              - "Authorization"
+              - "Host"
+              - "Origin"
+              - "Referer"
+              - "Access-Control-Request-Method"
+              - "Access-Control-Request-Headers"
+              - "Accept-Datetime"
+          QueryStringsConfig:
+            QueryStringBehavior: "all" #all, allExcept, none, whitelist
+
+  CachePolicyCkan:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Comment: !Sub "${Service} Cache policy"
+        DefaultTTL: 60
+        MaxTTL: 31536000
+        MinTTL: 0
+        Name: !Sub "${AWS::StackName}_CachePolicyCkan"
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: "all" #none, whitelist, allExcept, all
+          EnableAcceptEncodingBrotli: true
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: "whitelist" #none, whitelist
+            Headers: #max 10
+              - "Accept"
+              - "Accept-Charset"
+              - "Accept-Language"
+              - "Authorization"
+              - "Host"
+              - "Origin"
+              - "Referer"
+              - "Access-Control-Request-Method"
+              - "Access-Control-Request-Headers"
+              - "Accept-Datetime"
+          QueryStringsConfig:
+            QueryStringBehavior: "all" #all, allExcept, none, whitelist
+
+  CachePolicyS3:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Comment: !Sub "${Service} Cache policy"
+        DefaultTTL: 3600
+        MaxTTL: 3600
+        MinTTL: 0
+        Name: !Sub "${AWS::StackName}_CachePolicyS3"
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: "all" #none, whitelist, allExcept, all
+          EnableAcceptEncodingBrotli: true
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: "none" #none, whitelist
+          QueryStringsConfig:
+            QueryStringBehavior: "all" #all, allExcept, none, whitelist
+
   DistributionConfig:
+    DependsOn:
+      - CachePolicyCkan
+      - CachePolicyS3
+      - CachePolicyCMS
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
@@ -60,85 +144,23 @@ Resources:
 
 {% if CmsOrigin == "" %}
           - PathPattern: /assets/*
-            Compress: true
-            ForwardedValues:
-              QueryString: true
             TargetOriginId: 'WebOrigin'
-            MinTTL: 1800
+            CachePolicyId: !Ref CachePolicyCMS
+            Compress: true
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
           - PathPattern: /dataset/*/resource/*/download/*
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
             TargetOriginId: 'WebOrigin'
-            MinTTL: 120
-            ViewerProtocolPolicy: allow-all
+            CachePolicyId: !Ref CachePolicyCMS
+            Compress: true
+            ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
 
 {% else %}
-          #The next 3 rules are for testing ONLY. As the connection to Squiz is currently working they're not needed
-
-          #- PathPattern: /oss-squizedge-net* #oss.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
-          #  TargetOriginId: 'CmsOrigin'
-          #  AllowedMethods:
-          #    - GET
-          #    - HEAD
-          #    - OPTIONS
-          #    - PUT
-          #    - PATCH
-          #    - POST
-          #    - DELETE
-          #  Compress: true
-          #  ForwardedValues:
-          #    Cookies:
-          #      Forward: all
-          #    QueryString: true
-          #    Headers:
-          #      - "*"
-          #  ViewerProtocolPolicy: redirect-to-https
-          #- PathPattern: /staging-squizedge-net* #staging.squizedge.net, paths are configured on Squiz Matrix to handle this as if it was the root domain
-          #  TargetOriginId: 'CmsOrigin'
-          #  AllowedMethods:
-          #    - GET
-          #    - HEAD
-          #    - OPTIONS
-          #    - PUT
-          #    - PATCH
-          #    - POST
-          #    - DELETE
-          #  Compress: true
-          #  ForwardedValues:
-          #    Cookies:
-          #      Forward: all
-          #    QueryString: true
-          #    Headers:
-          #      - "*"
-          #  ViewerProtocolPolicy: redirect-to-https
-          #- PathPattern: /oss-uat-clients-squiz-net* #oss-uat.clients.squiz.net origin test, paths are configured on Squiz Matrix to handle this as if it was the root domain
-          #  TargetOriginId: 'CmsOrigin'
-          #  AllowedMethods:
-          #    - GET
-          #    - HEAD
-          #    - OPTIONS
-          #    - PUT
-          #    - PATCH
-          #    - POST
-          #    - DELETE
-          #  Compress: true
-          #  ForwardedValues:
-          #    Cookies:
-          #      Forward: all
-          #    QueryString: true
-          #    Headers:
-          #      - "*"
-          #  ViewerProtocolPolicy: redirect-to-https
           #Everything that isn't the below rules for CMS resources should go to CKAN
           - PathPattern: /index.* #If anyone reaches the homepage on an "index" url
             TargetOriginId: 'CmsOrigin'
@@ -150,30 +172,14 @@ Resources:
               - PATCH
               - POST
               - DELETE
+            # ForwardedValues, MinTTL, MaxTTL, DefaultTTL #This field is deprecated. Use a cache policy instead of this field.
+            CachePolicyId: !Ref CachePolicyCMS
             Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /_resources/* #Resources in Squiz such as PDF documents
+          - PathPattern: /_* # /_resources, /__data, /__lib, /__fudge, /_admin, /_edit, /_login, /_editplusapi, /_nocache, /_noproxycache, /_recache, /_performance, /_audit_info, /_designs, /_global, /__internal-api, /_media, /__streamline, /_web_services
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -183,100 +189,8 @@ Resources:
               - PATCH
               - POST
               - DELETE
+            CachePolicyId: !Ref CachePolicyCMS
             Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /__data/* #Squiz data that may be needed.
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /__lib/* #Provides content for the Squiz CMS functionally in _admin
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "*"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /__fudge/* #Provides content for the Squiz CMS functionally in _admin
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "*"
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
@@ -291,25 +205,8 @@ Resources:
               - PATCH
               - POST
               - DELETE
+            CachePolicyId: !Ref CachePolicyCMS
             Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
@@ -324,277 +221,8 @@ Resources:
               - PATCH
               - POST
               - DELETE
+            CachePolicyId: !Ref CachePolicyCMS
             Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /_admin* #The Squiz admin interface on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /_edit* #The Squiz edit interface of the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /_login* #The Squiz login page on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "*"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /_editplusapi* #The Squiz editplusapi on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /_nocache* #Squiz nocache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /_noproxycache* #Squiz noproxycache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /_recache* #Squiz recache on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /_performance* #Squiz performance page on the homepage. The * is required because Squiz redirects to /_blah/ when /_blah is typed in.
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
@@ -609,25 +237,8 @@ Resources:
               - PATCH
               - POST
               - DELETE
+            CachePolicyId: !Ref CachePolicyCMS
             Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
@@ -642,25 +253,8 @@ Resources:
               - PATCH
               - POST
               - DELETE
+            CachePolicyId: !Ref CachePolicyCMS
             Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
@@ -675,25 +269,8 @@ Resources:
               - PATCH
               - POST
               - DELETE
+            CachePolicyId: !Ref CachePolicyCMS
             Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
@@ -708,25 +285,8 @@ Resources:
               - PATCH
               - POST
               - DELETE
+            CachePolicyId: !Ref CachePolicyCMS
             Compress: true
-            DefaultTTL: 0
-            MaxTTL: 0
-            MinTTL: 0
-            ForwardedValues:
-              Cookies:
-                Forward: all
-              QueryString: true
-              Headers:
-                - "Accept"
-                - "Accept-Charset"
-                - "Accept-Datetime"
-                - "Accept-Encoding"
-                - "Accept-Language"
-                - "Authorization"
-                - "Origin"
-                - "Accept"
-                - "Host"
-                - "Referer"
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
@@ -739,12 +299,8 @@ Resources:
               - GET
               - HEAD
               - OPTIONS
-            Compress: false
-            DefaultTTL: 3600
-            MaxTTL: 3600
-            MinTTL: 0
-            ForwardedValues:
-              QueryString: true
+            CachePolicyId: !Ref CachePolicyS3
+            Compress: true
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
               - EventType: 'origin-request'
@@ -758,13 +314,8 @@ Resources:
             - OPTIONS
             - PUT
             - PATCH
+          CachePolicyId: !Ref CachePolicyCkan
           Compress: true
-          ForwardedValues:
-            Cookies:
-              Forward: all
-            QueryString: 'true'
-            Headers:
-            - "*"
           TargetOriginId: 'WebOrigin'
           ViewerProtocolPolicy: redirect-to-https
           LambdaFunctionAssociations:
@@ -782,6 +333,7 @@ Resources:
           Bucket: !Sub "${LogBucketName}.s3.amazonaws.com"
           IncludeCookies: true
           Prefix: !Sub "cloudfront-logs/${Platform}/${Environment}/"
+
         Origins:
         - DomainName:
             Fn::ImportValue: !Ref WebOrigin
@@ -808,8 +360,8 @@ Resources:
         PriceClass: PriceClass_All
         WebACLId:
           Fn::ImportValue: !Ref WebACLId
-        HttpVersion: 'http2'
-        #IsIPV6Enabled: 'true'
+        HttpVersion: 'http2and3'
+        IPV6Enabled: 'true'
         ViewerCertificate:
           AcmCertificateArn:
             Ref: ACMCertificateARN
