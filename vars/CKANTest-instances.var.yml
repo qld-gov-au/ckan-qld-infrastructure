@@ -46,8 +46,8 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: TRAINING
-      SolrEC2Size: t3.micro
-      BatchEC2Size: t3.micro
+#      SolrEC2Size: t3.micro #1gb ram not enough
+#      BatchEC2Size: t3.micro #1gb ram not enough
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -57,9 +57,9 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: DEV
-      SolrEC2Size: t3.micro
-      WebEC2Size: t3.micro
-      BatchEC2Size: t3.micro
+#      SolrEC2Size: t3.micro #1gb ram not enough
+#      WebEC2Size: t3.micro #1gb ram not enough
+#      BatchEC2Size: t3.micro #1gb ram not enough
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
