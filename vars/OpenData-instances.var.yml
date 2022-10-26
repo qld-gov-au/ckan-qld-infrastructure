@@ -50,8 +50,8 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: TRAINING
-      SolrEC2Size: t3.micro
-      WebEC2Size: t3.micro
+      SolrEC2Size: t3.medium
+      WebEC2Size: t3.medium
       BatchEC2Size: t3.medium
     tags:
       <<: *common_stack_tags
@@ -62,8 +62,8 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: DEV
-      SolrEC2Size: t3a.micro
-      WebEC2Size: t3a.micro
+      SolrEC2Size: t3a.medium
+      WebEC2Size: t3a.medium
       BatchEC2Size: t3.medium
     tags:
       <<: *common_stack_tags
