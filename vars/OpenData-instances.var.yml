@@ -26,8 +26,9 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: PROD
-      WebEC2Size: t3.medium
-      BatchEC2Size: t3.medium
+      SolrEC2Size: t3a.small
+      WebEC2Size: t3a.medium
+      BatchEC2Size: t3a.medium
       WebEC2Count: 2
     tags:
       <<: *common_stack_tags
@@ -39,8 +40,9 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: STAGING
       WebEC2Count: 2
-      WebEC2Size: t3.medium
-      BatchEC2Size: t3.medium
+      SolrEC2Size: t3a.small
+      WebEC2Size: t3a.medium
+      BatchEC2Size: t3a.medium
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -50,9 +52,9 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: TRAINING
-      SolrEC2Size: t3.medium
-      WebEC2Size: t3.medium
-      BatchEC2Size: t3.medium
+      SolrEC2Size: t3a.small
+      WebEC2Size: t3a.micro
+      BatchEC2Size: t3a.medium
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -62,9 +64,10 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: DEV
-      SolrEC2Size: t3a.medium
+      WebEC2Count: 2
+      SolrEC2Size: t3a.small
       WebEC2Size: t3a.medium
-      BatchEC2Size: t3.medium
+      BatchEC2Size: t3a.medium
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
