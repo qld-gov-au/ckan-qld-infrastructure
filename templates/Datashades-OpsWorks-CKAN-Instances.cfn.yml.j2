@@ -333,6 +333,7 @@ Resources:
     Condition: {{ loopingTimes }}PlusWebInstances
     DependsOn:
       - OpswxEC2Solr1AmazonLinux2b
+      - OpswxEC2Web1{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2b
     Type: AWS::OpsWorks::Instance
     Properties:
       Hostname: !Sub "${ApplicationId}-web{{ loopingTimes }}-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-{{ subnetLetters[ loopingTimes % 3 ] }}-al2b"
