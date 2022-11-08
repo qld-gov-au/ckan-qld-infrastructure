@@ -153,6 +153,22 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
       version: "1.1.6"
 
+    CKANExtValidationSchemaGenerator: &CKANExtValidationSchemaGenerator
+      name: "ckanext-validation-schema-generator-{{ Environment }}"
+      shortname: "ckanext-validation-schema-generator"
+      description: "CKAN Extension for Schema Generation"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-validation-schema-generator.git"
+      version: "1.0.1"
+
+    CKANExtResourceVisibility: &CKANExtResourceVisibility
+      name: "ckanext-resource-visibility-{{ Environment }}"
+      shortname: "ckanext-resource-visibility"
+      description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-resource-visibility.git"
+      version: "1.0.0"
+
   PROD:
     <<: *default_extensions
 
@@ -224,21 +240,12 @@ extensions:
       <<: *CKANExtCSRFFilter
       version: "develop"
 
-    # Move to default_extensions when ready to go to higher enviornments.
-    CKANExtValidationSchemaGenerator: &CKANExtValidationSchemaGenerator
-      name: "ckanext-validation-schema-generator-{{ Environment }}"
-      shortname: "ckanext-validation-schema-generator"
-      description: "CKAN Extension for Schema Generation"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-validation-schema-generator.git"
+    CKANExtValidationSchemaGenerator:
+      <<: *CKANExtValidationSchemaGenerator
       version: "develop"
 
-    CKANExtResourceVisibility: &CKANExtResourceVisibility
-      name: "ckanext-resource-visibility-{{ Environment }}"
-      shortname: "ckanext-resource-visibility"
-      description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-resource-visibility.git"
+    CKANExtResourceVisibility:
+      <<: *CKANExtResourceVisibility
       version: "develop"
 
 basic_facts:
