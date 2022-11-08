@@ -195,11 +195,17 @@ Conditions:
 
 Resources:
   #solr 1
-  OpswxEC2Solr1AmazonLinux2:
+  OpswxEC2Solr1AmazonLinux2b:
     Type: AWS::OpsWorks::Instance
     Properties:
-      Hostname: !Sub "${ApplicationId}-solr1{% if item.tags["PowerManaged"] == "Yes" %}-PM{% endif %}-al2"
+      Hostname: !Sub "${ApplicationId}-solr1{% if item.tags["PowerManaged"] == "Yes" %}-PM{% endif %}-al2b"
       RootDeviceType: ebs
+      BlockDeviceMappings:
+        - DeviceName: "ROOT_DEVICE"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 100
+            VolumeType: "gp2"
       InstallUpdatesOnBoot: true
       InstanceType: !Ref SolrEC2Size
       Os: !Ref OperatingSystem
@@ -231,12 +237,18 @@ Resources:
 {% endif %}
 
   #solr 2
-  OpswxEC2Solr2AmazonLinux2:
+  OpswxEC2Solr2AmazonLinux2b:
     Condition: 2PlusServiceInstances
     Type: AWS::OpsWorks::Instance
     Properties:
-      Hostname: !Sub "${ApplicationId}-solr2-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-B-al2"
+      Hostname: !Sub "${ApplicationId}-solr2-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-B-al2b"
       RootDeviceType: ebs
+      BlockDeviceMappings:
+        - DeviceName: "ROOT_DEVICE"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 100
+            VolumeType: "gp2"
       InstallUpdatesOnBoot: true
       InstanceType: !Ref SolrEC2Size
       Os: !Ref OperatingSystem
@@ -270,13 +282,19 @@ Resources:
 {% endif %}
 
   #web1 OpswxEC2Web1PM or OpswxEC2Web1AO
-  OpswxEC2Web1{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2:
+  OpswxEC2Web1{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2b:
     Type: AWS::OpsWorks::Instance
     DependsOn:
-      - OpswxEC2Solr1AmazonLinux2
+      - OpswxEC2Solr1AmazonLinux2b
     Properties:
-      Hostname: !Sub "${ApplicationId}-web1-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-A-al2"
+      Hostname: !Sub "${ApplicationId}-web1-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-A-al2b"
       RootDeviceType: ebs
+      BlockDeviceMappings:
+        - DeviceName: "ROOT_DEVICE"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 100
+            VolumeType: "gp2"
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
       Os: !Ref OperatingSystem
@@ -311,14 +329,21 @@ Resources:
 #OpswxEC2Web2AO ~ OpswxEC2Web6AO
 {% set subnetLetters = ["C","A","B"] %}
 {% for loopingTimes in range(2, 7) %}
-  OpswxEC2Web{{ loopingTimes }}{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2:
+  OpswxEC2Web{{ loopingTimes }}{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2b:
     Condition: {{ loopingTimes }}PlusWebInstances
     DependsOn:
-      - OpswxEC2Solr1AmazonLinux2
+      - OpswxEC2Solr1AmazonLinux2b
+      - OpswxEC2Web{{ loopingTimes - 1 }}{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2b
     Type: AWS::OpsWorks::Instance
     Properties:
-      Hostname: !Sub "${ApplicationId}-web{{ loopingTimes }}-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-{{ subnetLetters[ loopingTimes % 3 ] }}-al2"
+      Hostname: !Sub "${ApplicationId}-web{{ loopingTimes }}-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-{{ subnetLetters[ loopingTimes % 3 ] }}-al2b"
       RootDeviceType: ebs
+      BlockDeviceMappings:
+        - DeviceName: "ROOT_DEVICE"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 100
+            VolumeType: "gp2"
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
       Os: !Ref OperatingSystem
@@ -356,14 +381,20 @@ Resources:
 
 
 #legacy load servers
-  OpswxEC2Web1LoadAmazonLinux2:
+  OpswxEC2Web1LoadAmazonLinux2b:
     Type: AWS::OpsWorks::Instance
     DependsOn:
-      - OpswxEC2Solr1AmazonLinux2
+      - OpswxEC2Solr1AmazonLinux2b
     Properties:
       AutoScalingType: load
-      Hostname: !Sub "${ApplicationId}-web1-load-Sub-A-al2"
+      Hostname: !Sub "${ApplicationId}-web1-load-Sub-A-al2b"
       RootDeviceType: ebs
+      BlockDeviceMappings:
+        - DeviceName: "ROOT_DEVICE"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 100
+            VolumeType: "gp2"
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
       Os: !Ref OperatingSystem
@@ -372,15 +403,21 @@ Resources:
       StackId:
         Fn::ImportValue: !Ref OpsWorksStackID
 
-  OpswxEC2Web2LoadAmazonLinux2:
+  OpswxEC2Web2LoadAmazonLinux2b:
     Condition: 2PlusWebInstances
     Type: AWS::OpsWorks::Instance
     DependsOn:
-      - OpswxEC2Web1LoadAmazonLinux2
+      - OpswxEC2Web1LoadAmazonLinux2b
     Properties:
       AutoScalingType: load
-      Hostname: !Sub "${ApplicationId}-web2-load-Sub-C-al2"
+      Hostname: !Sub "${ApplicationId}-web2-load-Sub-C-al2b"
       RootDeviceType: ebs
+      BlockDeviceMappings:
+        - DeviceName: "ROOT_DEVICE"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 100
+            VolumeType: "gp2"
       InstallUpdatesOnBoot: true
       InstanceType: !Ref WebEC2Size
       Os: !Ref OperatingSystem
@@ -392,15 +429,21 @@ Resources:
         Fn::ImportValue: !Ref OpsWorksStackID
 
 
-  OpswxEC2Batch1LoadAmazonLinux2:
+  OpswxEC2Batch1LoadAmazonLinux2b:
     Condition: BatchLayerNeeded
     DependsOn:
-      - OpswxEC2Solr1AmazonLinux2
+      - OpswxEC2Solr1AmazonLinux2b
     Type: AWS::OpsWorks::Instance
     Properties:
       AutoScalingType: load
-      Hostname: !Sub "${ApplicationId}-batch1-load-Sub-A-al2"
+      Hostname: !Sub "${ApplicationId}-batch1-load-Sub-A-al2b"
       RootDeviceType: ebs
+      BlockDeviceMappings:
+        - DeviceName: "ROOT_DEVICE"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 100
+            VolumeType: "gp2"
       InstallUpdatesOnBoot: true
       InstanceType: !Ref BatchEC2Size
       Os: !Ref OperatingSystem
@@ -412,14 +455,20 @@ Resources:
 #OpswxEC2Batch1PM ~ OpswxEC2Batch6PM
 #OpswxEC2Batch1AO ~ OpswxEC2Batch6AO
 {% for loopingTimes in range(1, 7) %}
-  OpswxEC2Batch{{ loopingTimes }}{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2:
+  OpswxEC2Batch{{ loopingTimes }}{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2b:
     Condition: {{ loopingTimes }}PlusBatchInstances
     DependsOn:
-      - OpswxEC2Solr1AmazonLinux2
+      - OpswxEC2Solr1AmazonLinux2b
     Type: AWS::OpsWorks::Instance
     Properties:
-      Hostname: !Sub "${ApplicationId}-batch{{ loopingTimes }}-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-{{ subnetLetters[ loopingTimes % 3 ] }}-al2"
+      Hostname: !Sub "${ApplicationId}-batch{{ loopingTimes }}-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-{{ subnetLetters[ loopingTimes % 3 ] }}-al2b"
       RootDeviceType: ebs
+      BlockDeviceMappings:
+        - DeviceName: "ROOT_DEVICE"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 100
+            VolumeType: "gp2"
       InstallUpdatesOnBoot: true
       InstanceType: !Ref BatchEC2Size
       Os: !Ref OperatingSystem
