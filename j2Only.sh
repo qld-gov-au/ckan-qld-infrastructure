@@ -40,4 +40,4 @@ run-playbook () {
 
 
 
-run-playbook "j2Only" "vars/${INSTANCE_NAME}-instances.var.yml"
+run-playbook "j2Only" "vars/instances-${INSTANCE_NAME}.var.yml"
