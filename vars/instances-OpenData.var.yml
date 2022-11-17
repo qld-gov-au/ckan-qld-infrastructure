@@ -29,7 +29,7 @@ cloudformation_stacks:
       SolrEC2Size: t3a.small
       WebEC2Size: t3a.medium
       BatchEC2Size: t3a.medium
-      WebEC2Count: 2
+      WebEC2Count: 5 #We have been running on 2 auto and 3 manually created instances, time to make it IasC
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
