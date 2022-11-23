@@ -6,6 +6,10 @@ Parameters:
   Domain:
     Description: Domain pointing to EC2 load balancer
     Type: CommaDelimitedList
+  OriginReadTimeout:
+    Description: Wait response timeout, default 60
+    Default: 60
+    Type: Number
   WebOrigin:
     Description: Platform ELB
     Type: String
@@ -340,7 +344,7 @@ Resources:
           Id: 'WebOrigin'
           CustomOriginConfig:
             OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
-            OriginReadTimeout: 60
+            OriginReadTimeout: !Ref OriginReadTimeout
 
 {% if CmsOrigin != "" %}
         - DomainName:
@@ -348,6 +352,7 @@ Resources:
           Id: 'CmsOrigin'
           CustomOriginConfig:
             OriginProtocolPolicy: "match-viewer"      # required, accepts http-only, match-viewer, https-only
+            OriginReadTimeout: !Ref OriginReadTimeout
             OriginSSLProtocols:
               - "TLSv1.1"
               - "TLSv1.2"
