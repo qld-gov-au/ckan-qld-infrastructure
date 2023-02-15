@@ -1,7 +1,8 @@
 ---
 #based on https://raw.githubusercontent.com/ckan/ckanext-scheming/master/.github/workflows/test.yml
 # alternative https://github.com/ckan/ckan/blob/master/contrib/cookiecutter/ckan_extension/%7B%7Bcookiecutter.project%7D%7D/.github/workflows/test.yml
-name: Tests
+name: Tests Staging
+run-name: "This triggers on PR's to Master and Develop and builds the Staging environment configuration"
 on:
   pull_request:
     branches:
@@ -13,7 +14,7 @@ jobs:
     strategy:
       matrix:
         application: [OpenData, Publications]
-        python-version: [py2, py3]
+        python-version: [py3]
         target_environment: [STAGING]
       fail-fast: true
 
