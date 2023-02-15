@@ -1,5 +1,6 @@
 ---
 name: Tests Dev
+run-name: "${{ github.actor }} on ${{ github.ref_name }} verifying Dev environment configuration"
 on:
   push:
   schedule:
