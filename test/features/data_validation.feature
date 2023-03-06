@@ -2,11 +2,11 @@
 @OpenData
 Feature: Data Validation
 
-    Scenario Outline: As a sysadmin, admin and editor user of the dataset organisation I cannot see the '</> JSON' button
+    Scenario Outline: As a sysadmin, admin and editor user of the dataset organisation I can see the '</> JSON' button
        Given "<User>" as the persona
         When I log in
         And I visit "dataset/new_resource/annakarenina"
-        And I should not see an element with xpath "//a[contains(string(), '</> JSON')]"
+        And I should see an element with xpath "//*[@id='resource-schema-buttons']//a[contains(string(), 'JSON')]"
 
         Examples: Users
         | User              |
