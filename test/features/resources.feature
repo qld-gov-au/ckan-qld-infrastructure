@@ -16,6 +16,7 @@ Feature: Resource UI
         # | Domain ending with numbers | http://example.com.1.2.3.4 |
         | Domain ending with private | http://example.com.private |
 
+    @OpenData
     Scenario Outline: Add new resource metadata field on the create and edit resource GUI pages
         Given "<Persona>" as the persona
         When I log in
