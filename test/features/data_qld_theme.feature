@@ -1,3 +1,4 @@
+@OpenData
 Feature: Theme customisations
 
     @unauthenticated

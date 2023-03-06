@@ -1,3 +1,4 @@
+@OpenData
 Feature: Schema Generation
     Enable worker with `ckan jobs clear && ckan jobs worker`, since these tests rely on background tasks
 

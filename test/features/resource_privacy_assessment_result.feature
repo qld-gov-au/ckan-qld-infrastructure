@@ -1,3 +1,4 @@
+@OpenData
 Feature: Resource Privacy Assessment Result
 
     @fixture.dataset_with_schema::name=package-with-csv-res::owner_org=test-organisation

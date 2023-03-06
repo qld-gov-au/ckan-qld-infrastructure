@@ -1,3 +1,4 @@
+@OpenData
 Feature: Resource align_default_schema field
     @fixture.dataset_with_schema::name=package-without-default-schema::default_data_schema=::owner_org=test-organisation
     @fixture.create_resource_for_dataset_with_params::package_id=package-without-default-schema::name=resource-one::schema=
