@@ -31,12 +31,25 @@ jobs:
         run: bin/build.sh
         timeout-minutes: 20
 
+      - name: Test lint
+        run: bin/test-lint.sh
+        timeout-minutes: 30
+
       - name: Test
         run: bin/test.sh
         timeout-minutes: 40
 
+      - name: Test BDD
+        run: bin/test-bdd.sh
+        timeout-minutes: 45
+
+      - name: Retrieve logs
+        if: always()
+        run: bin/get-logs.sh
+        timeout-minutes: 5
+
       - name: Retrieve screenshots
-        if: failure()
+        if: always()
         run: bin/process-artifacts.sh
         timeout-minutes: 1
 
