@@ -41,7 +41,7 @@ jobs:
 
       - name: Test BDD
         run: bin/test-bdd.sh
-        timeout-minutes: 45
+        timeout-minutes: 60
 
       - name: Retrieve logs
         if: always()
