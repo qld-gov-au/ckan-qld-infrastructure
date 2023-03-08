@@ -1,5 +1,4 @@
-@OpenData
-Feature: Theme customisations
+Feature: Theme customisations (Publications and OpenData)
 
     @unauthenticated
     Scenario: Lato font is implemented on homepage
@@ -89,7 +88,7 @@ Feature: Theme customisations
         Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=xml') and contains(string(), 'XML')]"
 
     @Publications
-    Scenario: Menu items are present and correct
+    Scenario: Publications - Menu items are present and correct
         When I go to "/dataset"
         Then I should see an element with xpath "//li[contains(@class, 'active')]/a[contains(string(), 'Publication') and (@href='/dataset' or @href='/dataset/')]"
         And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'Standards') and @href='/dataset/publishing-standards-publications-qld-gov-au']"
