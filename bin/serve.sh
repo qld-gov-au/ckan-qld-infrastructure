@@ -15,7 +15,7 @@ done
 
 . ${APP_DIR}/bin/activate
 if (which ckan > /dev/null); then
-    ckan -c ${CKAN_INI} run -r
+    ckan -c ${CKAN_INI} run -r -t
 else
     paster serve ${CKAN_INI}
 fi
