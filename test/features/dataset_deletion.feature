@@ -14,26 +14,23 @@ Feature: Dataset deletion
         Then I fill in "author_email" with "test@test.com"
         Then I fill in "de_identified_data" with "NO" if present
         And I press the element with xpath "//form[contains(@class, 'dataset-form')]//button[contains(@class, 'btn-primary')]"
-        And I wait for 10 seconds
-        Then I execute the script "document.getElementById('field-image-url').value='https://example.com'"
+
+        Then I attach the file "csv_resource.csv" to "upload"
         Then I fill in "name" with "res1"
         Then I fill in "description" with "description"
         Then I fill in "size" with "1024" if present
         Then I fill in "resource_visibility" with "FALSE" if present
         Then I press the element with xpath "//button[@value='go-metadata']"
-        And I wait for 10 seconds
         Then I should see "Data and Resources"
 
         When I go to "/dataset/edit/dataset-deletion"
         Then I press the element with xpath "//a[@data-module='confirm-action']"
-        And I wait for 5 seconds
         Then I should see "Briefly describe the reason for deleting this dataset"
         And I should see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"
-        When I type "it should be longer than 10 characters" to "deletion_reason"
+        When I fill in "deletion_reason" with "it should be longer than 10 characters"
         Then I should not see an element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary' and @disabled='disabled']"
         Then I press the element with xpath "//div[@class='modal-footer']//button[@class='btn btn-primary']"
-        And I wait for 5 seconds
-        Then I should see "Dataset has been deleted"
+        And I reload page every 2 seconds until I see an element with xpath "//div[contains(@class, "alert") and contains(text(), "Dataset has been deleted")]" but not more than 5 times
         And I should not see "Dataset deletion"
         When I go to "/ckan-admin/trash"
         Then I should see "Dataset deletion"

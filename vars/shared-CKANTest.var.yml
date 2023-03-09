@@ -14,8 +14,8 @@ extensions:
       shortname: "ckanext-xloader"
       description: "CKAN Express Loader Extension"
       type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-xloader.git"
-      version: "0.11.0-qgov.2"
+      url: "https://github.com/ckan/ckanext-xloader.git"
+      version: "0.12.2"
 
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
@@ -164,10 +164,6 @@ extensions:
 
   DEV:
     <<: *default_extensions
-    CKANExtXLoader:
-      <<: *CKANExtXLoader
-      version: "master"
-
     CKANExtQGOV:
       <<: *CKANExtQGOV
       version: "master"

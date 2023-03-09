@@ -58,15 +58,11 @@ Feature: Data Request
         And I should see an element with the css selector "span.error-block" within 1 seconds
         And I should see "Description cannot be empty" within 1 seconds
 
-    Scenario Outline: Data request creator and Sysadmin can see a 'Close' button on the data request detail page for opened data requests
-        Given "<User>" as the persona
+    Scenario: Data request creator and Sysadmin can see a 'Close' button on the data request detail page for opened data requests
+        Given "SysAdmin" as the persona
         When I log in and go to the data requests page
         And I press "Test Request"
         Then I should see an element with xpath "//a[contains(string(), 'Close')]"
-
-        Examples: Users
-        | User                  |
-        | SysAdmin              |
 
     Scenario Outline: Non admin users cannot see a 'Close' button on the data request detail page for opened data requests
         Given "<User>" as the persona

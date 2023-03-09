@@ -22,7 +22,7 @@ extensions:
       description: "CKAN Extension to keep uploaded files in S3"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
-      version: "0.7.7-qgov.5"
+      version: "0.7.7-qgov.6"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       name: "ckanext-ssm-config-{{ Environment }}"
@@ -38,7 +38,7 @@ extensions:
       type: "git"
       description: "CKAN Extension for Queensland Government Publications theme"
       url: "https://github.com/qld-gov-au/ckanext-publications-qld-theme.git"
-      version: "1.2.1"
+      version: "1.2.2"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"
