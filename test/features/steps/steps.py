@@ -1,13 +1,19 @@
+import uuid
+import email
+import quopri
+import re
+
+import requests
+import six
+from six.moves.urllib.parse import urlparse
 from behave import step
 from behaving.personas.steps import *  # noqa: F401, F403
 from behaving.mail.steps import *  # noqa: F401, F403
 from behaving.web.steps import *  # noqa: F401, F403
 from behaving.web.steps.url import when_i_visit_url
-import email
-import quopri
-import requests
-import uuid
-import six
+
+URL_RE = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|\
+                    (?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I | re.S | re.U)
 
 
 @step(u'I get the current URL')
@@ -78,7 +84,6 @@ def request_reset(context):
         When I visit "/user/reset"
         And I fill in "user" with "$name"
         And I press the element with xpath "//button[contains(string(), 'Request Reset')]"
-        And I go to dataset page
     """)
 
 
@@ -99,7 +104,7 @@ def add_resource(context, name, url):
         And I fill in "description" with "description"
         And I fill in "size" with "1024" if present
         And I execute the script "document.getElementById('field-format').value='HTML'"
-        And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
+        And I press the element with xpath "//button[@class="btn btn-primary" and text()="Add"]"
     """.format(name=name, url=url))
 
 
@@ -217,15 +222,14 @@ def create_dataset(context, license, file_format, file):
     assert context.persona
     context.execute_steps(u"""
         When I visit "/dataset/new"
-        Then I fill in title with random text
+        And I fill in title with random text
         And I fill in "notes" with "Description"
         And I fill in "version" with "1.0"
         And I fill in "author_email" with "test@me.com"
         And I execute the script "document.getElementById('field-license_id').value={license}"
-        And I fill in "de_identified_data" with "NO" if present
+        Then I fill in "de_identified_data" with "NO" if present
         And I press "Add Data"
-
-        Then I attach the file {file} to "upload"
+        And I attach the file {file} to "upload"
         And I fill in "name" with "Test Resource"
         And I execute the script "document.getElementById('field-format').value={file_format}"
         And I fill in "description" with "Test Resource Description"
@@ -282,6 +286,50 @@ def log_out(context):
 
 
 # ckanext-data-qld
+
+@step(u'I visit resource schema generation page')
+def resource_schema_generation(context):
+    path = urlparse(context.browser.url).path
+    when_i_visit_url(context, path + '/generate_schema')
+
+
+@step(u'I reload page every {seconds:d} seconds until I see an element with xpath "{xpath}" but not more than {reload_times:d} times')
+def reload_page_every_n_until_find(context, xpath, seconds=5, reload_times=5):
+    for _ in range(reload_times):
+        element = context.browser.is_element_present_by_xpath(
+            xpath, wait_time=seconds
+        )
+        if not element:
+            context.browser.reload()
+        else:
+            assert element, 'Element with xpath "{}" was found'.format(xpath)
+            return
+
+    assert False, 'Element with xpath "{}" was not found'.format(xpath)
+
+
+@step(u'I trigger notification about updated privacy assessment results')
+def i_trigger_notification_assessment_results(context):
+    context.execute_steps(u"""
+        Given I visit "api/action/qld_test_trigger_notify_privacy_assessment_result"
+    """)
+
+
+@step(u'I click the resource link in the email I received at "{address}"')
+def click_link_in_email(context, address):
+    mails = context.mail.user_messages(address)
+    assert mails, u"message not found"
+
+    mail = email.message_from_string(mails[-1])
+    links = []
+
+    payload = mail.get_payload(decode=True).decode("utf-8")
+    links = URL_RE.findall(payload.replace("=\n", ""))
+
+    assert links, u"link not found"
+    url = links[0].rstrip(':')
+
+    context.browser.visit(url)
 
 
 @step(u'I create resource_availability test data with'

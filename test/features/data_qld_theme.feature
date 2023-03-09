@@ -1,4 +1,4 @@
-Feature: Theme customisations
+Feature: Theme customisations (Publications and OpenData)
 
     @unauthenticated
     Scenario: Lato font is implemented on homepage
@@ -72,13 +72,15 @@ Feature: Theme customisations
         Then I should see "Password: Must contain at least one number, lowercase letter, capital letter, and symbol"
 
     @OpenData
+    @fixture.dataset_with_schema::name=package-with-csv-res::owner_org=test-organisation::author_email=test@gmail.com
+    @fixture.create_resource_for_dataset_with_params::package_id=package-with-csv-res::name=res-with-api-entry::xloader=True
     Scenario: As a publisher, when I create a resource with an API entry, I can download it in various formats
         Given "TestOrgEditor" as the persona
         When I log in
-        And I create a dataset with license "other-open" and "CSV" resource file "csv_resource.csv"
-        And I wait for 10 seconds
-        And I click the link with text that contains "Test Resource"
-        Then I should see an element with xpath "//a[contains(@class, 'resource-btn') and contains(@href, '/download/csv_resource.csv') and contains(string(), '(CSV)')]"
+        And I go to dataset "package-with-csv-res"
+        And I click the link with text that contains "res-with-api-entry"
+        And I reload page every 3 seconds until I see an element with xpath "//button[@data-toggle='dropdown']" but not more than 5 times
+        Then I should see an element with xpath "//a[contains(@class, 'resource-btn') and contains(@href, '/download/test.csv') and contains(string(), '(csv)')]"
         When I press the element with xpath "//button[@data-toggle='dropdown']"
         Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(string(), 'CSV')]"
         Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=tsv') and contains(string(), 'TSV')]"
@@ -86,7 +88,7 @@ Feature: Theme customisations
         Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=xml') and contains(string(), 'XML')]"
 
     @Publications
-    Scenario: Menu items are present and correct
+    Scenario: Publications - Menu items are present and correct
         When I go to "/dataset"
         Then I should see an element with xpath "//li[contains(@class, 'active')]/a[contains(string(), 'Publication') and (@href='/dataset' or @href='/dataset/')]"
         And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'Standards') and @href='/dataset/publishing-standards-publications-qld-gov-au']"
