@@ -159,7 +159,7 @@ extensions:
       description: "CKAN Extension for Schema Generation"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation-schema-generator.git"
-      version: "1.0.1"
+      version: "1.0.2"
 
     CKANExtResourceVisibility: &CKANExtResourceVisibility
       name: "ckanext-resource-visibility-{{ Environment }}"
