@@ -6,7 +6,7 @@ ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', regi
 
 solr7: "http://archive.apache.org/dist/lucene/solr/7.7.2/solr-7.7.2.zip"
 ckan_tag: "ckan-2.9.5-qgov.9"
-ckan_qgov_branch: "qgov-master-2.9.5"
+ckan_qgov_branch: "qgov-master-2.9.8"
 
 common_stack: &common_stack
   state: "{{ state | default('present')}}"
