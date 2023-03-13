@@ -15,7 +15,7 @@ sed -i -e "s/##//" docker-compose.yml
 ahoy pull
 
 QGOV_CKAN_VERSION=`sh ./retrieve-ckan-version.sh`
-CKAN_VERSION=2.9
+CKAN_VERSION=2.10
 PYTHON=python
 if [ "$PYTHON_VERSION" = "py2" ]; then
     CKAN_VERSION="${CKAN_VERSION}-py2"
