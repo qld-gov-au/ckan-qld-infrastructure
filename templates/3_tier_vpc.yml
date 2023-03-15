@@ -210,7 +210,7 @@ Resources:
     Condition: 2PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableB
       SubnetId:
         Ref: AppSubnetB
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -249,7 +249,7 @@ Resources:
     Condition: 3PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableC
       SubnetId:
         Ref: AppSubnetC
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -288,7 +288,7 @@ Resources:
     Condition: 4PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableD
       SubnetId:
         Ref: AppSubnetD
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -327,7 +327,7 @@ Resources:
     Condition: 5PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableE
       SubnetId:
         Ref: AppSubnetE
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -421,7 +421,7 @@ Resources:
     Condition: 2PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableB
       SubnetId:
         Ref: DataSubnetB
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -460,7 +460,7 @@ Resources:
     Condition: 3PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableC
       SubnetId:
         Ref: DataSubnetC
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -499,7 +499,7 @@ Resources:
     Condition: 4PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableD
       SubnetId:
         Ref: DataSubnetD
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -538,7 +538,7 @@ Resources:
     Condition: 5PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableE
       SubnetId:
         Ref: DataSubnetE
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -659,6 +659,160 @@ Resources:
       VpcId:
         Ref: VPC
     Type: AWS::EC2::RouteTable
+## private RouteTableB to E
+  PrivateNATGatewayRouteB:
+    Condition: 2PlusAZsNatGateways
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NATGatewayB
+      RouteTableId:
+        Ref: PrivateRouteTableB
+    Type: AWS::EC2::Route
+  PrivateOpsRouteB:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      DestinationCidrBlock: !Ref VPCPeeringCidr
+      VpcPeeringConnectionId: !Ref VPCPeeringID
+      RouteTableId: !Ref PrivateRouteTableB
+    Type: AWS::EC2::Route
+  BambooAgentRouteB:
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableB
+    Type: AWS::EC2::Route
+  BambooAgentRouteB2:
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp2
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableB
+    Type: AWS::EC2::Route
+  PrivateRouteTableB:
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${VPCNamePrefix}Vpc-${Environment}-PrivateRoutesB"
+      VpcId:
+        Ref: VPC
+    Type: AWS::EC2::RouteTable
+PrivateNATGatewayRouteC:
+  Condition: 3PlusAZsNatGateways
+  Properties:
+    DestinationCidrBlock: 0.0.0.0/0
+    NatGatewayId:
+      Ref: NATGatewayC
+    RouteTableId:
+      Ref: PrivateRouteTableC
+  Type: AWS::EC2::Route
+PrivateOpsRouteC:
+  Condition: IsVPCPeeringEnabled
+  Properties:
+    DestinationCidrBlock: !Ref VPCPeeringCidr
+    VpcPeeringConnectionId: !Ref VPCPeeringID
+    RouteTableId: !Ref PrivateRouteTableC
+  Type: AWS::EC2::Route
+BambooAgentRouteC:
+  DependsOn: AttachGateway
+  Properties:
+    DestinationCidrBlock: !Ref BambooAgentIp
+    GatewayId: !Ref InternetGateway
+    RouteTableId: !Ref PrivateRouteTableC
+  Type: AWS::EC2::Route
+BambooAgentRouteC2:
+  DependsOn: AttachGateway
+  Properties:
+    DestinationCidrBlock: !Ref BambooAgentIp2
+    GatewayId: !Ref InternetGateway
+    RouteTableId: !Ref PrivateRouteTableC
+  Type: AWS::EC2::Route
+PrivateRouteTableC:
+  Properties:
+    Tags:
+      - Key: Name
+        Value: !Sub "${VPCNamePrefix}Vpc-${Environment}-PrivateRoutesC"
+    VpcId:
+      Ref: VPC
+  Type: AWS::EC2::RouteTable
+PrivateNATGatewayRouteD:
+  Condition: 4PlusAZsNatGateways
+  Properties:
+    DestinationCidrBlock: 0.0.0.0/0
+    NatGatewayId:
+      Ref: NATGatewayD
+    RouteTableId:
+      Ref: PrivateRouteTableD
+  Type: AWS::EC2::Route
+PrivateOpsRouteD:
+  Condition: IsVPCPeeringEnabled
+  Properties:
+    DestinationCidrBlock: !Ref VPCPeeringCidr
+    VpcPeeringConnectionId: !Ref VPCPeeringID
+    RouteTableId: !Ref PrivateRouteTableD
+  Type: AWS::EC2::Route
+BambooAgentRouteD:
+  DependsOn: AttachGateway
+  Properties:
+    DestinationCidrBlock: !Ref BambooAgentIp
+    GatewayId: !Ref InternetGateway
+    RouteTableId: !Ref PrivateRouteTableD
+  Type: AWS::EC2::Route
+BambooAgentRouteD2:
+  DependsOn: AttachGateway
+  Properties:
+    DestinationCidrBlock: !Ref BambooAgentIp2
+    GatewayId: !Ref InternetGateway
+    RouteTableId: !Ref PrivateRouteTableD
+  Type: AWS::EC2::Route
+PrivateRouteTableD:
+  Properties:
+    Tags:
+      - Key: Name
+        Value: !Sub "${VPCNamePrefix}Vpc-${Environment}-PrivateRoutesD"
+    VpcId:
+      Ref: VPC
+  Type: AWS::EC2::RouteTable
+  PrivateNATGatewayRouteE:
+    Condition: 5PlusAZsNatGateways
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NATGatewayE
+      RouteTableId:
+        Ref: PrivateRouteTableE
+    Type: AWS::EC2::Route
+  PrivateOpsRouteE:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      DestinationCidrBlock: !Ref VPCPeeringCidr
+      VpcPeeringConnectionId: !Ref VPCPeeringID
+      RouteTableId: !Ref PrivateRouteTableE
+    Type: AWS::EC2::Route
+  BambooAgentRouteE:
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableE
+    Type: AWS::EC2::Route
+  BambooAgentRouteE2:
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp2
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableE
+    Type: AWS::EC2::Route
+  PrivateRouteTableE:
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${VPCNamePrefix}Vpc-${Environment}-PrivateRoutesE"
+      VpcId:
+        Ref: VPC
+    Type: AWS::EC2::RouteTable
+### end private routetable
   PublicDefaultRoute:
     DependsOn: AttachGateway
     Properties:
