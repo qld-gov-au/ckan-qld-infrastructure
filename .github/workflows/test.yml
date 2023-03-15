@@ -1,5 +1,6 @@
 ---
-name: Tests
+name: Tests Dev
+run-name: "${{ github.actor }} on ${{ github.ref_name }} verifying Dev environment configuration"
 on:
   push:
   schedule:
@@ -10,7 +11,7 @@ jobs:
     strategy:
       matrix:
         application: [OpenData, Publications]
-        python-version: [py2, py3]
+        python-version: [py3]
         target_environment: [DEV]
       fail-fast: false
 
@@ -30,12 +31,25 @@ jobs:
         run: bin/build.sh
         timeout-minutes: 20
 
+      - name: Test lint
+        run: bin/test-lint.sh
+        timeout-minutes: 30
+
       - name: Test
         run: bin/test.sh
         timeout-minutes: 40
 
+      - name: Test BDD
+        run: bin/test-bdd.sh
+        timeout-minutes: 60
+
+      - name: Retrieve logs
+        if: always()
+        run: bin/get-logs.sh
+        timeout-minutes: 5
+
       - name: Retrieve screenshots
-        if: failure()
+        if: always()
         run: bin/process-artifacts.sh
         timeout-minutes: 1
 

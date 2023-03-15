@@ -1,7 +1,10 @@
 import os
-from behaving import environment as benv
+import json
 
+from behave import fixture, use_fixture
+from behaving import environment as benv
 from behaving.web.steps.browser import named_browser
+
 
 # Path to the root of the project.
 ROOT_PATH = os.path.realpath(os.path.join(
@@ -139,6 +142,50 @@ def before_scenario(context, scenario):
     # Set personas.
     context.personas = PERSONAS
 
+    for tag in scenario.tags:
+        FIXTURE_NAME = 0
+        PARAMS = slice(1, None)
+
+        parts = tag.split("::")
+
+        if parts[FIXTURE_NAME].startswith("fixture.dataset_with_schema"):
+            use_fixture(dataset_with_schema, context, parts[PARAMS])
+        elif parts[FIXTURE_NAME].startswith("fixture.create_resource_for_dataset_with_params"):
+            use_fixture(create_resource_for_dataset_with_params,
+                        context, parts[PARAMS])
+
 
 def after_scenario(context, scenario):
     benv.after_scenario(context, scenario)
+
+
+@fixture
+def dataset_with_schema(context, path="", **kwargs):
+    params = "&".join(path)
+    context.execute_steps(u"""
+        Given browser "remote"
+        Then I visit "api/action/qld_test_create_dataset?{}"
+    """.format(params))
+
+    json_content = context.browser.find_by_tag("pre")[0].text
+    pkg_data = json.loads(json_content)['result']
+    pkg_id = pkg_data['id']
+    context.dataset = pkg_data
+
+    yield
+
+    context.execute_steps(u"""
+        Given browser "remote"
+        Then I visit "api/action/qld_test_purge_dataset?id={}"
+    """.format(pkg_id))
+
+    context.browser.quit()
+
+
+@fixture
+def create_resource_for_dataset_with_params(context, params="",):
+    params = "&".join(params)
+    context.execute_steps(u"""
+        Given browser "remote"
+        Then I visit "api/action/qld_test_create_resource_for_dataset?{}"
+    """.format(params))
