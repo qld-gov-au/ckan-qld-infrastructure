@@ -589,6 +589,9 @@ Resources:
         - AllocationId
       SubnetId:
         Ref: WebSubnetA
+      Tags:
+        - Key: Name
+          Value: !Sub "NATGateway-${AWS::StackName}-WebSubnetA"
     Type: AWS::EC2::NatGateway
   NATGatewayEIP:
     Condition: NatGateways
@@ -605,6 +608,9 @@ Resources:
           - AllocationId
       SubnetId:
         Ref: WebSubnetB
+      Tags:
+        - Key: Name
+          Value: !Sub "NATGateway-${AWS::StackName}-WebSubnetB"
     Type: AWS::EC2::NatGateway
   NATGatewayEipB:
     Condition: 2PlusAZsNatGateways
@@ -621,6 +627,9 @@ Resources:
           - AllocationId
       SubnetId:
         Ref: WebSubnetC
+      Tags:
+        - Key: Name
+          Value: !Sub "NATGateway-${AWS::StackName}-WebSubnetC"
     Type: AWS::EC2::NatGateway
   NATGatewayEipC:
     Condition: 3PlusAZsNatGateways
@@ -637,6 +646,9 @@ Resources:
           - AllocationId
       SubnetId:
         Ref: WebSubnetD
+      Tags:
+        - Key: Name
+          Value: !Sub "NATGateway-${AWS::StackName}-WebSubnetD"
     Type: AWS::EC2::NatGateway
   NATGatewayEipD:
     Condition: 4PlusAZsNatGateways
@@ -653,6 +665,9 @@ Resources:
           - AllocationId
       SubnetId:
         Ref: WebSubnetE
+      Tags:
+        - Key: Name
+          Value: !Sub "NATGateway-${AWS::StackName}-WebSubnetE"
     Type: AWS::EC2::NatGateway
   NATGatewayEipE:
     Condition: 5PlusAZsNatGateways
