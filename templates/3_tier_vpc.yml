@@ -705,32 +705,434 @@ Resources:
       RuleAction: allow
       RuleNumber: '100'
     Type: AWS::EC2::NetworkAclEntry
-  PermitAnyToData:
+  PermitAnyToDataTcp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '99'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToDataTcpSsh:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '101'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToDataTcpSsh:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '102'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataTcp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '103'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToDataTcpRdp:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '104'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToDataTcpRdp:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '105'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataTcp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '106'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataUdp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '107'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataUdp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '108'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataUdp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '109'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataICMP:
     Properties:
       CidrBlock: 0.0.0.0/0
       NetworkAclId:
         Ref: AppNACL
-      Protocol: '-1'
+      Protocol: '1'
       RuleAction: allow
-      RuleNumber: '100'
+      RuleNumber: '110'
+      Icmp:
+        Code: -1
+        Type: -1
     Type: AWS::EC2::NetworkAclEntry
-  PermitAnyToMgmt:
+  PermitAnyToDataICMPv6:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '58'
+      RuleAction: allow
+      RuleNumber: '111'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtTcp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '99'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToMgmtTcpSsh:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '101'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToMgmtTcpSsh:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '102'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtTcp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '103'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToMgmtTcpRdp:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '104'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToMgmtTcpRdp:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '105'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtTcp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '106'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtUdp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '107'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtUdp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '108'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtUdp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '109'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtICMP:
     Properties:
       CidrBlock: 0.0.0.0/0
       NetworkAclId:
         Ref: DataNACL
-      Protocol: '-1'
+      Protocol: '1'
       RuleAction: allow
-      RuleNumber: '100'
+      RuleNumber: '110'
+      Icmp:
+        Code: -1
+        Type: -1
     Type: AWS::EC2::NetworkAclEntry
-  PermitAnyToWeb:
+  PermitAnyToMgmtICMPv6:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '58'
+      RuleAction: allow
+      RuleNumber: '111'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebTcp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '99'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToWebTcpSsh:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '101'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToWebTcpSsh:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '102'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebTcp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '103'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToWebTcpRdp:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '104'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToWebTcpRdp:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '105'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebTcp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '106'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebUdp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '107'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebUdp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '108'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebUdp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '109'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebICMP:
     Properties:
       CidrBlock: 0.0.0.0/0
       NetworkAclId:
         Ref: WebNACL
-      Protocol: '-1'
+      Protocol: '1'
       RuleAction: allow
-      RuleNumber: '100'
+      RuleNumber: '110'
+      Icmp:
+        Code: -1
+        Type: -1
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebICMPv6:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '58'
+      RuleAction: allow
+      RuleNumber: '111'
     Type: AWS::EC2::NetworkAclEntry
   PrivateNATGatewayRoute:
     Condition: NatGateways
