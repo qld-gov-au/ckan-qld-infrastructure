@@ -67,6 +67,14 @@ Conditions:
     - Fn::Equals:
       - Ref: AZCount
       - '5'
+  2PlusAZsNatGateways:
+    Fn::And:
+    - Condition: 2PlusAZs
+    - Condition: NatGateways
+  2PlusAZsIsVPCPeeringEnabled:
+    Fn::And:
+    - Condition: 2PlusAZs
+    - Condition: IsVPCPeeringEnabled
   3PlusAZs:
     Fn::Or:
     - Fn::Equals:
@@ -78,6 +86,14 @@ Conditions:
     - Fn::Equals:
       - Ref: AZCount
       - '5'
+  3PlusAZsNatGateways:
+    Fn::And:
+      - Condition: 3PlusAZs
+      - Condition: NatGateways
+  3PlusAZsIsVPCPeeringEnabled:
+    Fn::And:
+      - Condition: 3PlusAZs
+      - Condition: IsVPCPeeringEnabled
   4PlusAZs:
     Fn::Or:
     - Fn::Equals:
@@ -86,10 +102,26 @@ Conditions:
     - Fn::Equals:
       - Ref: AZCount
       - '5'
+  4PlusAZsNatGateways:
+    Fn::And:
+      - Condition: 4PlusAZs
+      - Condition: NatGateways
+  4PlusAZsIsVPCPeeringEnabled:
+    Fn::And:
+      - Condition: 4PlusAZs
+      - Condition: IsVPCPeeringEnabled
   5PlusAZs:
     Fn::Equals:
     - Ref: AZCount
     - '5'
+  5PlusAZsNatGateways:
+    Fn::And:
+      - Condition: 5PlusAZs
+      - Condition: NatGateways
+  5PlusAZsIsVPCPeeringEnabled:
+    Fn::And:
+      - Condition: 5PlusAZs
+      - Condition: IsVPCPeeringEnabled
 Description: VPC Network
 Parameters:
   ApplicationName:
@@ -210,7 +242,7 @@ Resources:
     Condition: 2PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableB
       SubnetId:
         Ref: AppSubnetB
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -249,7 +281,7 @@ Resources:
     Condition: 3PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableC
       SubnetId:
         Ref: AppSubnetC
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -288,7 +320,7 @@ Resources:
     Condition: 4PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableD
       SubnetId:
         Ref: AppSubnetD
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -327,7 +359,7 @@ Resources:
     Condition: 5PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableE
       SubnetId:
         Ref: AppSubnetE
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -421,7 +453,7 @@ Resources:
     Condition: 2PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableB
       SubnetId:
         Ref: DataSubnetB
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -460,7 +492,7 @@ Resources:
     Condition: 3PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableC
       SubnetId:
         Ref: DataSubnetC
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -499,7 +531,7 @@ Resources:
     Condition: 4PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableD
       SubnetId:
         Ref: DataSubnetD
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -538,7 +570,7 @@ Resources:
     Condition: 5PlusAZs
     Properties:
       RouteTableId:
-        Ref: PrivateRouteTable
+        Ref: PrivateRouteTableE
       SubnetId:
         Ref: DataSubnetE
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -557,9 +589,88 @@ Resources:
         - AllocationId
       SubnetId:
         Ref: WebSubnetA
+      Tags:
+        - Key: Name
+          Value: !Sub "NATGateway-${AWS::StackName}-WebSubnetA"
     Type: AWS::EC2::NatGateway
   NATGatewayEIP:
     Condition: NatGateways
+    DependsOn: VPC
+    Properties:
+      Domain: VPC
+    Type: AWS::EC2::EIP
+  NATGatewayB:
+    Condition: 2PlusAZsNatGateways
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - NATGatewayEipB
+          - AllocationId
+      SubnetId:
+        Ref: WebSubnetB
+      Tags:
+        - Key: Name
+          Value: !Sub "NATGateway-${AWS::StackName}-WebSubnetB"
+    Type: AWS::EC2::NatGateway
+  NATGatewayEipB:
+    Condition: 2PlusAZsNatGateways
+    DependsOn: VPC
+    Properties:
+      Domain: VPC
+    Type: AWS::EC2::EIP
+  NATGatewayC:
+    Condition: 3PlusAZsNatGateways
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - NATGatewayEipC
+          - AllocationId
+      SubnetId:
+        Ref: WebSubnetC
+      Tags:
+        - Key: Name
+          Value: !Sub "NATGateway-${AWS::StackName}-WebSubnetC"
+    Type: AWS::EC2::NatGateway
+  NATGatewayEipC:
+    Condition: 3PlusAZsNatGateways
+    DependsOn: VPC
+    Properties:
+      Domain: VPC
+    Type: AWS::EC2::EIP
+  NATGatewayD:
+    Condition: 4PlusAZsNatGateways
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - NATGatewayEipD
+          - AllocationId
+      SubnetId:
+        Ref: WebSubnetD
+      Tags:
+        - Key: Name
+          Value: !Sub "NATGateway-${AWS::StackName}-WebSubnetD"
+    Type: AWS::EC2::NatGateway
+  NATGatewayEipD:
+    Condition: 4PlusAZsNatGateways
+    DependsOn: VPC
+    Properties:
+      Domain: VPC
+    Type: AWS::EC2::EIP
+  NATGatewayE:
+    Condition: 5PlusAZsNatGateways
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - NATGatewayEipE
+          - AllocationId
+      SubnetId:
+        Ref: WebSubnetE
+      Tags:
+        - Key: Name
+          Value: !Sub "NATGateway-${AWS::StackName}-WebSubnetE"
+    Type: AWS::EC2::NatGateway
+  NATGatewayEipE:
+    Condition: 5PlusAZsNatGateways
     DependsOn: VPC
     Properties:
       Domain: VPC
@@ -594,35 +705,438 @@ Resources:
       RuleAction: allow
       RuleNumber: '100'
     Type: AWS::EC2::NetworkAclEntry
-  PermitAnyToData:
+  PermitAnyToDataTcp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '99'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToDataTcpSsh:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '101'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToDataTcpSsh:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '102'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataTcp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '103'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToDataTcpRdp:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '104'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToDataTcpRdp:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '105'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataTcp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '106'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataUdp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '107'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataUdp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '108'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataUdp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '109'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToDataICMP:
     Properties:
       CidrBlock: 0.0.0.0/0
       NetworkAclId:
         Ref: AppNACL
-      Protocol: '-1'
+      Protocol: '1'
       RuleAction: allow
-      RuleNumber: '100'
+      RuleNumber: '110'
+      Icmp:
+        Code: -1
+        Type: -1
     Type: AWS::EC2::NetworkAclEntry
-  PermitAnyToMgmt:
+  PermitAnyToDataICMPv6:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId:
+        Ref: AppNACL
+      Protocol: '58'
+      RuleAction: allow
+      RuleNumber: '111'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtTcp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '99'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToMgmtTcpSsh:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '101'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToMgmtTcpSsh:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '102'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtTcp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '103'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToMgmtTcpRdp:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '104'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToMgmtTcpRdp:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '105'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtTcp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '106'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtUdp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '107'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtUdp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '108'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtUdp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '109'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToMgmtICMP:
     Properties:
       CidrBlock: 0.0.0.0/0
       NetworkAclId:
         Ref: DataNACL
-      Protocol: '-1'
+      Protocol: '1'
       RuleAction: allow
-      RuleNumber: '100'
+      RuleNumber: '110'
+      Icmp:
+        Code: -1
+        Type: -1
     Type: AWS::EC2::NetworkAclEntry
-  PermitAnyToWeb:
+  PermitAnyToMgmtICMPv6:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId:
+        Ref: DataNACL
+      Protocol: '58'
+      RuleAction: allow
+      RuleNumber: '111'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebTcp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '99'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToWebTcpSsh:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '101'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToWebTcpSsh:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 22
+        To: 22
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '102'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebTcp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '103'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitLocalToWebTcpRdp:
+    Properties:
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '104'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitPeeringToWebTcpRdp:
+    Condition: IsVPCPeeringEnabled
+    Properties:
+      CidrBlock: !Ref VPCPeeringCidr
+      PortRange:
+        From: 3389
+        To: 3389
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '105'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebTcp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '6'
+      RuleAction: allow
+      RuleNumber: '106'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebUdp1:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 0
+        To: 21
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '107'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebUdp2:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 23
+        To: 3388
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '108'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebUdp3:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      PortRange:
+        From: 3390
+        To: 65535
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '17'
+      RuleAction: allow
+      RuleNumber: '109'
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebICMP:
     Properties:
       CidrBlock: 0.0.0.0/0
       NetworkAclId:
         Ref: WebNACL
-      Protocol: '-1'
+      Protocol: '1'
       RuleAction: allow
-      RuleNumber: '100'
+      RuleNumber: '110'
+      Icmp:
+        Code: -1
+        Type: -1
+    Type: AWS::EC2::NetworkAclEntry
+  PermitAnyToWebICMPv6:
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      NetworkAclId:
+        Ref: WebNACL
+      Protocol: '58'
+      RuleAction: allow
+      RuleNumber: '111'
     Type: AWS::EC2::NetworkAclEntry
   PrivateNATGatewayRoute:
     Condition: NatGateways
+    DependsOn: NATGateway
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId:
@@ -659,6 +1173,176 @@ Resources:
       VpcId:
         Ref: VPC
     Type: AWS::EC2::RouteTable
+## private RouteTableB to E
+  PrivateNATGatewayRouteB:
+    Condition: 2PlusAZsNatGateways
+    DependsOn: NATGatewayB
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NATGatewayB
+      RouteTableId:
+        Ref: PrivateRouteTableB
+    Type: AWS::EC2::Route
+  PrivateOpsRouteB:
+    Condition: 2PlusAZsIsVPCPeeringEnabled
+    Properties:
+      DestinationCidrBlock: !Ref VPCPeeringCidr
+      VpcPeeringConnectionId: !Ref VPCPeeringID
+      RouteTableId: !Ref PrivateRouteTableB
+    Type: AWS::EC2::Route
+  BambooAgentRouteB:
+    Condition: 2PlusAZs
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableB
+    Type: AWS::EC2::Route
+  BambooAgentRouteB2:
+    Condition: 2PlusAZs
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp2
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableB
+    Type: AWS::EC2::Route
+  PrivateRouteTableB:
+    Condition: 2PlusAZs
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${VPCNamePrefix}Vpc-${Environment}-PrivateRoutesB"
+      VpcId:
+        Ref: VPC
+    Type: AWS::EC2::RouteTable
+  PrivateNATGatewayRouteC:
+    Condition: 3PlusAZsNatGateways
+    DependsOn: PrivateRouteTableC
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NATGatewayC
+      RouteTableId:
+        Ref: PrivateRouteTableC
+    Type: AWS::EC2::Route
+  PrivateOpsRouteC:
+    Condition: 3PlusAZsIsVPCPeeringEnabled
+    Properties:
+      DestinationCidrBlock: !Ref VPCPeeringCidr
+      VpcPeeringConnectionId: !Ref VPCPeeringID
+      RouteTableId: !Ref PrivateRouteTableC
+    Type: AWS::EC2::Route
+  BambooAgentRouteC:
+    Condition: 3PlusAZs
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableC
+    Type: AWS::EC2::Route
+  BambooAgentRouteC2:
+    Condition: 3PlusAZs
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp2
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableC
+    Type: AWS::EC2::Route
+  PrivateRouteTableC:
+    Condition: 3PlusAZs
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${VPCNamePrefix}Vpc-${Environment}-PrivateRoutesC"
+      VpcId:
+        Ref: VPC
+    Type: AWS::EC2::RouteTable
+  PrivateNATGatewayRouteD:
+    Condition: 4PlusAZsNatGateways
+    DependsOn: NATGatewayD
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NATGatewayD
+      RouteTableId:
+        Ref: PrivateRouteTableD
+    Type: AWS::EC2::Route
+  PrivateOpsRouteD:
+    Condition: 4PlusAZsIsVPCPeeringEnabled
+    Properties:
+      DestinationCidrBlock: !Ref VPCPeeringCidr
+      VpcPeeringConnectionId: !Ref VPCPeeringID
+      RouteTableId: !Ref PrivateRouteTableD
+    Type: AWS::EC2::Route
+  BambooAgentRouteD:
+    Condition: 4PlusAZs
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableD
+    Type: AWS::EC2::Route
+  BambooAgentRouteD2:
+    Condition: 4PlusAZs
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp2
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableD
+    Type: AWS::EC2::Route
+  PrivateRouteTableD:
+    Condition: 4PlusAZs
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${VPCNamePrefix}Vpc-${Environment}-PrivateRoutesD"
+      VpcId:
+        Ref: VPC
+    Type: AWS::EC2::RouteTable
+  PrivateNATGatewayRouteE:
+    Condition: 5PlusAZsNatGateways
+    DependsOn: NATGatewayE
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NATGatewayE
+      RouteTableId:
+        Ref: PrivateRouteTableE
+    Type: AWS::EC2::Route
+  PrivateOpsRouteE:
+    Condition: 5PlusAZsIsVPCPeeringEnabled
+    Properties:
+      DestinationCidrBlock: !Ref VPCPeeringCidr
+      VpcPeeringConnectionId: !Ref VPCPeeringID
+      RouteTableId: !Ref PrivateRouteTableE
+    Type: AWS::EC2::Route
+  BambooAgentRouteE:
+    Condition: 5PlusAZs
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableE
+    Type: AWS::EC2::Route
+  BambooAgentRouteE2:
+    Condition: 5PlusAZs
+    DependsOn: AttachGateway
+    Properties:
+      DestinationCidrBlock: !Ref BambooAgentIp2
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref PrivateRouteTableE
+    Type: AWS::EC2::Route
+  PrivateRouteTableE:
+    Condition: 5PlusAZs
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${VPCNamePrefix}Vpc-${Environment}-PrivateRoutesE"
+      VpcId:
+        Ref: VPC
+    Type: AWS::EC2::RouteTable
+### end private routetable
   PublicDefaultRoute:
     DependsOn: AttachGateway
     Properties:
