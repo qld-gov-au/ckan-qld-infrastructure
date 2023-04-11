@@ -188,10 +188,6 @@ extensions:
       <<: *CKANExtDataQld
       version: "develop"
 
-    CKANExtODICertificates:
-      <<: *CKANExtODICertificates
-      version: "develop"
-
     CKANExtDataRequests:
       <<: *CKANExtDataRequests
       version: "develop"
