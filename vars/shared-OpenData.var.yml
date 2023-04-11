@@ -73,14 +73,6 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
       version: "7.0.0"
 
-    CKANExtODICertificates: &CKANExtODICertificates
-      name: "ckanext-odi-certificates-{{ Environment }}"
-      shortname: "ckanext-odi-certificates"
-      description: "CKAN Extension for ODI Certificates"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-odi-certificates.git"
-      version: "1.0.3"
-
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
       shortname: "ckanext-datarequests"
