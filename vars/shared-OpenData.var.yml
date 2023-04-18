@@ -172,6 +172,10 @@ extensions:
 
   DEV:
     <<: *default_extensions
+    CKANExtXLoader:
+      <<: *CKANExtXLoader
+      version: "develop"
+
     CKANExtQGOV:
       <<: *CKANExtQGOV
       version: "develop"
