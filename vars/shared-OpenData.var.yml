@@ -55,7 +55,7 @@ extensions:
       description: "CKAN Extension for Scheming"
       type: "git"
       url: "https://github.com/ckan/ckanext-scheming.git"
-      version: "release-2.1.0"
+      version: "release-3.0.0"
 
     CKANExtValidation: &CKANExtValidation
       name: "ckanext-validation-{{ Environment }}"
@@ -73,21 +73,13 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
       version: "7.0.1"
 
-    CKANExtODICertificates: &CKANExtODICertificates
-      name: "ckanext-odi-certificates-{{ Environment }}"
-      shortname: "ckanext-odi-certificates"
-      description: "CKAN Extension for ODI Certificates"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-odi-certificates.git"
-      version: "1.0.3"
-
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
       shortname: "ckanext-datarequests"
       description: "CKAN Extension for Data Requests"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-datarequests.git"
-      version: "2.2.1-qgov.5"
+      version: "2.2.1-qgov.7"
 
     CKANExtYTP: &CKANExtYTP
       name: "ckanext-ytp-comments-{{ Environment }}"
@@ -95,7 +87,7 @@ extensions:
       description: "CKAN Extension for YTP Comments"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
-      version: "2.5.0-qgov.9"
+      version: "2.5.0-qgov.10"
 
     CKANExtHarvest: &CKANExtHarvest
       name: "ckanext-harvest-{{ Environment }}"
@@ -194,10 +186,6 @@ extensions:
 
     CKANExtDataQld:
       <<: *CKANExtDataQld
-      version: "develop"
-
-    CKANExtODICertificates:
-      <<: *CKANExtODICertificates
       version: "develop"
 
     CKANExtDataRequests:
