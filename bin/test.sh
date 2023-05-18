@@ -5,4 +5,4 @@
 set -e
 
 echo "==> Run Unit tests"
-ahoy test-unit
+ahoy test-unit || (ahoy logs; exit 1)
