@@ -1,21 +1,27 @@
 ckan_cli datastore set-permissions | psql "postgresql://datastore_write:pass@postgres-datastore/datastore_test" --set ON_ERROR_STOP=1
 
 # Initialise validation tables
-PASTER_PLUGIN=ckanext-validation ckan_cli validation init-db
+ckan_cli validation init-db
 
 # Initialise the Comments database tables
-PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments initdb
-PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments updatedb
-PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments init_notifications_db
+ckan_cli comments initdb
+ckan_cli comments updatedb
+ckan_cli comments init_notifications_db
 
 # Initialise the archiver database tables
-PASTER_PLUGIN=ckanext-archiver ckan_cli archiver init
+ckan_cli archiver init
 
 # Initialise the reporting database tables
-PASTER_PLUGIN=ckanext-report ckan_cli report initdb
+ckan_cli report initdb
 
 # Initialise the QA database tables
-PASTER_PLUGIN=ckanext-qa ckan_cli qa init
+ckan_cli qa init
+
+# Initialise the data request tables if applicable
+if (ckan_cli datarequests --help); then
+    ckan_cli datarequests init_db
+    ckan_cli datarequests update_db
+fi
 
 #Initiialise the Harvester database tables
-PASTER_PLUGIN=ckanext-harvest ckan_cli harvester initdb
+ckan_cli harvester initdb
