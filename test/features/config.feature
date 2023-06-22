@@ -3,7 +3,8 @@ Feature: Config
 
     Scenario: Assert that configuration values are customised
         Given "SysAdmin" as the persona
-        When I log in and go to admin config page
+        When I log in
+        And I go to admin config page
         Then I should see "Intro Text"
         And I should see "Excluded display name words:"
         And I should see an element with xpath "//textarea[@id='field-ckanext.data_qld.excluded_display_name_words' and contains(string(), 'gov')]"
@@ -13,7 +14,8 @@ Feature: Config
     @OpenData
     Scenario: Assert that Data Request configuration values are available
         Given "SysAdmin" as the persona
-        When I log in and go to admin config page
+        When I log in
+        And I go to admin config page
         Then I should see "Data Request Suggested Description"
         And I should see an element with id "field-ckanext.data_qld.datarequest_suggested_description"
         And I should see "Data Request Closing Circumstances"

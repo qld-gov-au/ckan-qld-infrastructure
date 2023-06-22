@@ -1,3 +1,4 @@
+@dataset_schema
 @OpenData
 Feature: Dataset Schema
 
@@ -6,12 +7,12 @@ Feature: Dataset Schema
         When I log in
         And I visit "/dataset/new"
 
-        And I should see an element with xpath "//label[text()="Default data schema"]"
+        Then I should see an element with xpath "//label[string()="Default data schema"]"
         And I should see an element with xpath "//label[@for="field-de_identified_data"]/following::div[@id="resource-schema-buttons"]"
 
-        Then I should see "Upload"
-        And I should see "Link"
-        And I should see "JSON"
+        And I should see an element with xpath "//input[@name='schema_upload']"
+        And I should see an element with xpath "//input[@name='schema_url']"
+        And I should see an element with xpath "//textarea[@name='schema_json']"
 
         And field "default_data_schema" should not be required
         And field "schema_upload" should not be required
@@ -26,17 +27,11 @@ Feature: Dataset Schema
         | DataRequestOrgAdmin  |
         | DataRequestOrgEditor |
 
-    @fixture.dataset_with_schema::name=package-with-schema
-    Scenario: New field visibility on dataset Additional info
+    Scenario: New field visibility on dataset Additional info and API
         Given "SysAdmin" as the persona
         When I log in
-        And I go to dataset "package-with-schema"
-        Then I should see an element with xpath "//th[@class="dataset-label" and text()="Default data schema"]/following::a[text()="View Schema File"]"
-        Then I should see an element with xpath "//th[@class="dataset-label" and text()="Data schema validation options"]/following::td[@class="dataset-details" and text()="Field name 'validation_options' not in data"]"
-
-    @fixture.dataset_with_schema::name=package-with-schema
-    Scenario: New field visibility on dataset via API
-        Given "SysAdmin" as the persona
-        When I log in
-        Then I visit "api/action/package_show?id=package-with-schema"
-        And I should see an element with xpath "//body/*[contains(text(), '"default_data_schema":')]"
+        And I create a dataset and resource with key-value parameters "schema_json=default" and "url=default"
+        Then I should see an element with xpath "//th[@class="dataset-label" and string()="Default data schema"]/following::a[string()="View Schema File"]"
+        Then I should see an element with xpath "//th[@class="dataset-label" and string()="Data schema validation options"]/following::td[@class="dataset-details" and string()="Field name 'validation_options' not in data"]"
+        When I visit "api/action/package_show?id=$last_generated_name"
+        Then I should see an element with xpath "//body/*[contains(string(), '"default_data_schema":')]"

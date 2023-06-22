@@ -41,6 +41,9 @@ pip install --force-reinstall -r "/tmp/requirements-ext.txt"
 for extension in . `ls -d $SRC_DIR/ckanext-*`; do
     install_requirements $extension requirements pip-requirements
 done
+# force version that declares itself to be incompatible but actually works
+pip install click==7.1.2
 install_requirements . dev-requirements requirements-dev
 
+. $APP_DIR/bin/process-config.sh
 . ${APP_DIR}/bin/deactivate

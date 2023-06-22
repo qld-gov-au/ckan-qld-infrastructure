@@ -31,11 +31,11 @@ Feature: Resource freshness
         Given "<User>" as the persona
         When I log in
         Then I should be able to patch dataset "test-dataset" via the API
-        And I go to "/dataset/edit/test-dataset"
+        When I edit the "test-dataset" dataset
         And I select "monthly" from "update_frequency"
         Then I should see "Next update due"
         When I fill in "next_update_due" with "01/01/1970"
-        And I press the element with xpath "//form[contains(@class, 'dataset-form')]//button[contains(@class, 'btn-primary')]"
+        And I press the element with xpath "//form[@id='dataset-edit']//button[contains(@class, 'btn-primary')]"
         And I wait for 3 seconds
         Then I should be able to patch dataset "test-dataset" via the API
 

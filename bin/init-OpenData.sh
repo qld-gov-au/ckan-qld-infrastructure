@@ -19,9 +19,16 @@ ckan_cli qa init
 
 # Initialise the data request tables if applicable
 if (ckan_cli datarequests --help); then
-    ckan_cli datarequests init_db
-    ckan_cli datarequests update_db
+    # Click 7+ expects hyphenated action names,
+    # older Click expects underscore.
+    if (ckan_cli datarequests init-db --help); then
+        ckan_cli datarequests init-db
+        ckan_cli datarequests update-db
+    else
+        ckan_cli datarequests init_db
+        ckan_cli datarequests update_db
+    fi
 fi
 
-#Initiialise the Harvester database tables
+#Initialise the Harvester database tables
 ckan_cli harvester initdb

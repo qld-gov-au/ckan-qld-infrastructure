@@ -4,10 +4,10 @@
 #
 set -e
 
-./test-lint.sh
+SCRIPT_DIR=`dirname $0`
 
-./test.sh ||  (ahoy logs; exit 1)
+$SCRIPT_DIR/test-lint.sh
 
-./test-bdd.sh ||  (ahoy logs; exit 1)
+$SCRIPT_DIR/test.sh
 
-
+$SCRIPT_DIR/test-bdd.sh
