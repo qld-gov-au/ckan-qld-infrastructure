@@ -43,4 +43,5 @@ for extension in . `ls -d $SRC_DIR/ckanext-*`; do
 done
 install_requirements . dev-requirements requirements-dev
 
+. $APP_DIR/bin/process-config.sh
 . ${APP_DIR}/bin/deactivate

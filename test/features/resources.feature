@@ -3,7 +3,9 @@ Feature: Resource UI
 
     Scenario Outline: Link resource should create a link to its URL
         Given "SysAdmin" as the persona
-        When I create a resource with name "<name>" and URL "<url>"
+        When I log in
+        And I open the new resource form for dataset "test-dataset"
+        And I create a resource with key-value parameters "name=<name>::url=<url>"
         And I press the element with xpath "//a[contains(@title, '<name>') and contains(string(), '<name>')]"
         Then I should see "<url>"
 
@@ -20,7 +22,7 @@ Feature: Resource UI
     Scenario Outline: Add new resource metadata field on the create and edit resource GUI pages
         Given "<Persona>" as the persona
         When I log in
-        And I visit "/dataset/data_request_dataset/resource/new"
+        And I open the new resource form for dataset "data_request_dataset"
         Then I should see an element with xpath "//label[@for="field-request_privacy_assessment"]"
         And field "request_privacy_assessment" should not be required
         And I should not see an element with xpath "//label[@for="field-request_privacy_assessment"]//*[@class="control-required"]"
@@ -34,6 +36,7 @@ Feature: Resource UI
     @Publications
     Scenario: Link resource with missing or invalid protocol should use HTTP
         Given "SysAdmin" as the persona
-        When I create a resource with name "Non-HTTP link" and URL "git+https://github.com/ckan/ckan.git"
-        And I press the element with xpath "//a[contains(@title, 'Non-HTTP link') and contains(string(), 'Non-HTTP link')]"
-        And I should see "http://git+https://github.com/ckan/ckan.git"
+        When I log in
+        And I create a dataset and resource with key-value parameters "title=Non-HTTP resource" and "name=Non-HTTP link::url=git+https://github.com/ckan/ckan.git"
+        And I press "Non-HTTP link"
+        Then I should see "http://git+https://github.com/ckan/ckan.git"

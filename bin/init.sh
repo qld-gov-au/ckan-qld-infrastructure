@@ -10,6 +10,3 @@ ckan_cli db init
 ckan_cli db upgrade
 . $APP_DIR/bin/init-${VARS_TYPE}.sh
 
-# Create some base test data
-. $APP_DIR/bin/create-test-data.sh
-. $APP_DIR/bin/create-test-data-$VARS_TYPE.sh

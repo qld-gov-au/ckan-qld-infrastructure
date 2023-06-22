@@ -14,12 +14,17 @@ curl -LsH "Authorization: ${API_KEY}" \
 
 # Create private test dataset with our standard fields
 curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"name": "test-dataset", "owner_org": "'"${TEST_ORG_ID}"'", "private": true}' \
+    --data '{"name": "test-dataset", "owner_org": "'"${TEST_ORG_ID}"'", "private": true,
+"notes": "private test"}' \
     ${CKAN_ACTION_URL}/package_create
 
 # Create public test dataset with our standard fields
 curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"name": "public-test-dataset", "owner_org": "'"${TEST_ORG_ID}"'"}' \
+    --data '{"name": "public-test-dataset", "owner_org": "'"${TEST_ORG_ID}"'",
+"notes": "public test", "resources": [
+    {"name": "test-resource", "description": "Test resource description",
+     "url": "https://example.com", "format": "HTML", "size": 1024}
+]}' \
     ${CKAN_ACTION_URL}/package_create
 
 
