@@ -411,6 +411,10 @@ def create_dataset_and_resource_from_params(context, params, resource_params):
     """.format(resource_params))
 
 
+def _is_truthy(text):
+    return text and text.lower() in ["true", "t", "yes", "y"]
+
+
 # Creates a resource using default values apart from the ones specified.
 # The browser should already be on the create/edit resource page.
 @when(u'I create a resource with key-value parameters "{resource_params}"')
@@ -438,11 +442,21 @@ def create_resource_from_params(context, resource_params):
             context.execute_steps(u"""
                 When I execute the script "document.getElementById('field-format').value='{0}'"
             """.format(value))
-        elif key in ["align_default_schema", "resource_visible"]:
-            action = "check" if value and value.lower() in ["true", "t", "yes", "y"] else "uncheck"
+        elif key in ["align_default_schema"]:
+            action = "check" if _is_truthy(value) else "uncheck"
             context.execute_steps(u"""
                 When I {0} "{1}"
             """.format(action, key))
+        elif key == "resource_visible":
+            option = "TRUE" if _is_truthy(value) else "FALSE"
+            context.execute_steps(u"""
+                When I select "{1}" from "{0}"
+            """.format(key, option))
+        elif key in ["governance_acknowledgement", "request_privacy_assessment"]:
+            option = "YES" if _is_truthy(value) else "NO"
+            context.execute_steps(u"""
+                When I select "{1}" from "{0}"
+            """.format(key, option))
         elif key == "schema":
             if value == "default":
                 value = """{
