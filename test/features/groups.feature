@@ -19,9 +19,9 @@ Feature: Group APIs
         Then I should see an element with xpath "//*[contains(string(), '"success": false') and contains(string(), 'Authorization Error')]"
 
         Examples: Non-admin users
-            | Persona             |
-            | Organisation Admin  |
-            | Walker              |
+            | Persona       |
+            | TestOrgAdmin  |
+            | Walker        |
 
     @unauthenticated
     Scenario: Group membership is not accessible anonymously

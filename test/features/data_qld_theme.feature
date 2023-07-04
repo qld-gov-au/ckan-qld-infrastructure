@@ -1,4 +1,17 @@
+@theme
 Feature: Theme customisations (Publications and OpenData)
+
+    @unauthenticated
+    Scenario: As a member of the public, when I go to the consistent asset URLs, I can see the asset
+        Given "Unauthenticated" as the persona
+        When I visit "/assets/css/main"
+        Then I should see "Bootstrap"
+        When I visit "/assets/css/font-awesome"
+        Then I should see "Font Awesome"
+        When I visit "/assets/css/select2"
+        Then I should see "select2-container"
+        When I visit "/assets/js/jquery"
+        Then I should see "jQuery"
 
     @unauthenticated
     Scenario: Lato font is implemented on homepage
@@ -17,9 +30,10 @@ Feature: Theme customisations (Publications and OpenData)
         Given "SysAdmin" as the persona
         When I log in
         And I go to organisation page
-        And I click the link with text that contains "Add Organisation"
+        And I press "Add Organisation"
         Then I should see "Create an Organisation"
-        When I fill in "title" with "Org without description"
+        When I execute the script "$('#field-name').val('Org without description')"
+        And I execute the script "$('#field-url').val('org-without-description')"
         And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
         Then I should see "Org without description"
         And I should see "No datasets found"
@@ -29,9 +43,10 @@ Feature: Theme customisations (Publications and OpenData)
         Given "SysAdmin" as the persona
         When I log in
         And I go to organisation page
-        And I click the link with text that contains "Add Organisation"
+        And I press "Add Organisation"
         Then I should see "Create an Organisation"
-        When I fill in "title" with "Org with description"
+        When I execute the script "$('#field-name').val('Org with description')"
+        And I execute the script "$('#field-url').val('org-with-description')"
         And I fill in "description" with "Some description or other"
         And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
         Then I should see "Org with description"
@@ -42,16 +57,17 @@ Feature: Theme customisations (Publications and OpenData)
     @unauthenticated
     Scenario: Explore button does not exist on dataset detail page
         Given "Unauthenticated" as the persona
-        When I go to dataset page
-        And I click the link with text that contains "A Wonderful Story"
+        When I go to dataset "public-test-dataset"
         Then I should not see "Explore"
 
     @unauthenticated
-    Scenario: Explore button does not exist on dataset detail page
+    Scenario: As a member of the public, I should be able to see the help text on the organisation page
+        Given "Unauthenticated" as the persona
         When I go to organisation page
         Then I should see "Organisations are Queensland Government departments, other agencies or legislative entities responsible for publishing open data on this portal."
 
     Scenario: Register user password must be 10 characters or longer
+        Given "Unauthenticated" as the persona
         When I go to register page
         And I fill in "name" with "name"
         And I fill in "fullname" with "fullname"
@@ -62,6 +78,7 @@ Feature: Theme customisations (Publications and OpenData)
         Then I should see "Password: Your password must be 10 characters or longer"
 
     Scenario: Register user password must contain at least one number, lowercase letter, capital letter, and symbol
+        Given "Unauthenticated" as the persona
         When I go to register page
         And I fill in "name" with "name"
         And I fill in "fullname" with "fullname"
@@ -72,23 +89,24 @@ Feature: Theme customisations (Publications and OpenData)
         Then I should see "Password: Must contain at least one number, lowercase letter, capital letter, and symbol"
 
     @OpenData
-    @fixture.dataset_with_schema::name=package-with-csv-res::owner_org=test-organisation::author_email=test@gmail.com
-    @fixture.create_resource_for_dataset_with_params::package_id=package-with-csv-res::name=res-with-api-entry::xloader=True
     Scenario: As a publisher, when I create a resource with an API entry, I can download it in various formats
         Given "TestOrgEditor" as the persona
         When I log in
-        And I go to dataset "package-with-csv-res"
-        And I click the link with text that contains "res-with-api-entry"
-        And I reload page every 3 seconds until I see an element with xpath "//button[@data-toggle='dropdown']" but not more than 5 times
-        Then I should see an element with xpath "//a[contains(@class, 'resource-btn') and contains(@href, '/download/test.csv') and contains(string(), '(csv)')]"
-        When I press the element with xpath "//button[@data-toggle='dropdown']"
+        And I create a dataset and resource with key-value parameters "license=other-open::private=False" and "format=CSV::upload=csv_resource.csv"
+        And I wait for 10 seconds
+        And I press "Test Resource"
+        Then I should see an element with xpath "//a[contains(string(), 'Data API')]"
+        And I should see an element with xpath "//button[contains(@class, 'dropdown-toggle')]"
+        And I should see an element with xpath "//a[contains(@class, 'resource-btn') and contains(@href, '/download/csv_resource.csv') and contains(string(), '(CSV)')]"
+        When I press the element with xpath "//button[contains(@class, 'dropdown-toggle')]"
         Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(string(), 'CSV')]"
-        Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=tsv') and contains(string(), 'TSV')]"
-        Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=json') and contains(string(), 'JSON')]"
-        Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=xml') and contains(string(), 'XML')]"
+        And I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=tsv') and contains(string(), 'TSV')]"
+        And I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=json') and contains(string(), 'JSON')]"
+        And I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=xml') and contains(string(), 'XML')]"
 
     @Publications
     Scenario: Publications - Menu items are present and correct
+        Given "Unauthenticated" as the persona
         When I go to "/dataset"
         Then I should see an element with xpath "//li[contains(@class, 'active')]/a[contains(string(), 'Publication') and (@href='/dataset' or @href='/dataset/')]"
         And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'Standards') and @href='/dataset/publishing-standards-publications-qld-gov-au']"
@@ -134,6 +152,13 @@ Feature: Theme customisations (Publications and OpenData)
         Then I should see an element with xpath "//a[@href='/user/login' and contains(string(), 'Log in')]"
         And I should see an element with xpath "//a[@href='/user/register' and contains(string(), 'Register')]"
         And I should not see "not found"
+
+    @unauthenticated
+    @OpenData
+    Scenario: When I go to the header URL, I can see the data request link
+        Given "Unauthenticated" as the persona
+        When I go to "/header.html"
+        Then I should see an element with xpath "//a[@href='/datarequest' and contains(string(), 'Request data')]"
 
     @unauthenticated
     Scenario: When I go to the robots file, I can see a custom disallow block

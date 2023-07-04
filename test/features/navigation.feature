@@ -12,7 +12,7 @@ Feature: Navigation
     Scenario: Check for the presence of the 'Request data' link in header when visiting as a logged in user
         Given "SysAdmin" as the persona
         When I log in
-        Then I go to homepage
+        And I go to homepage
         # Make the comparison case-insensitive
         Then I should see an element with xpath "//a[contains(translate(., 'RD', 'rd'), "request data")]"
 

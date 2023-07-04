@@ -2,11 +2,11 @@
 @OpenData
 Feature: Data Validation
 
-    Scenario Outline: As a sysadmin, admin and editor user of the dataset organisation I can see the '</> JSON' button
+    Scenario Outline: As a sysadmin, admin and editor user of the dataset organisation I can see the 'JSON' button
        Given "<User>" as the persona
         When I log in
-        And I visit "dataset/new_resource/annakarenina"
-        And I should see an element with xpath "//*[@id='resource-schema-buttons']//a[contains(string(), 'JSON')]"
+        And I open the new resource form for dataset "public-test-dataset"
+        Then I should see an element with xpath "//textarea[@name='schema_json']"
 
         Examples: Users
         | User              |
@@ -18,21 +18,14 @@ Feature: Data Validation
        Given "SysAdmin" as the persona
         When I log in
         And I visit "dataset/new"
-        When I fill in title with random text
-        When I fill in "notes" with "Description"
-        When I fill in "version" with "1.0"
-        When I fill in "author_email" with "test@me.com"
-        Then I select "NO" from "de_identified_data"
-        When I press "Add Data"
-        And I execute the script "document.getElementById('field-image-url').value='https://example.com'"
-        And I fill in "name" with "Test Resource"
-        And I execute the script "document.getElementById('field-format').value='HTML'"
-        And I fill in "description" with "Test Resource Description"
-        And I fill in "size" with "1mb"
+        And I fill in default dataset fields
+        And I press "Add Data"
+        And I fill in default resource fields
+        And I fill in link resource fields
         And I execute the script "document.getElementById('field-schema-upload').parentNode.parentNode.setAttribute('style', '')"
         And I attach the file "test-resource_schemea.json" to "schema_upload"
         And I press "Finish"
-        When I wait for 1 seconds
-        And I click the link with text that contains "Test Resource"
-        And I click the link with text that contains "View Schema File"
+        And I wait for 1 seconds
+        And I press "Test Resource"
+        And I press "View Schema File"
         Then I should see "Measure of the oblique fractal impedance at noon"
