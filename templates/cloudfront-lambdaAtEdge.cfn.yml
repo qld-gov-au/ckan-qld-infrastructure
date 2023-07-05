@@ -137,10 +137,10 @@ Resources:
 
 #  #versions are hard coded, if you need two versions, leave the old one in, but be aware that cloudformation does not like having two versions which are the same so it might get cranky.
 #  #current version as of 6/9/2023
-#  VersionedLambdaFunction48e660f32023: #change name if changing lambda code and update cloudfront link
-#    Type: 'AWS::Lambda::Version'
-#    Properties:
-#      FunctionName: !Ref LambdaEdgeFunction48e660f2023
+  VersionedLambdaFunction48e660f32023: #change name if changing lambda code and update cloudfront link
+    Type: 'AWS::Lambda::Version'
+    Properties:
+      FunctionName: !Ref LambdaEdgeFunction48e660f2023
 
   LambdaOriginFunctionVersion9cd5bfa:
     Type: 'AWS::Lambda::Version'
