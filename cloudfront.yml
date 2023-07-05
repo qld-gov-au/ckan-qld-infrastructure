@@ -39,7 +39,7 @@
       register: acmUsEast1
 
     - set_fact:
-        LambdaAtEdgeViewerRequestVersion: "{{ lambdaAtEdgeStack.ansible_facts.cloudformation[lambdaAtEdgestack_name].stack_outputs.VersionedLambdaFunction48e660f32023 }}"
+        LambdaAtEdgeViewerRequestVersion: "{{ lambdaAtEdgeStack.ansible_facts.cloudformation[lambdaAtEdgestack_name].stack_outputs.VersionedLambdaFunction48e660f32023b }}"
         LambdaAtEdgeOriginRequestVersion: "{{ lambdaAtEdgeStack.ansible_facts.cloudformation[lambdaAtEdgestack_name].stack_outputs.LambdaEdgeOriginFunctionVersion9cd5bfa }}"
         ACMCertificateARNForUsEast1: "{{ acmUsEast1.ansible_facts.cloudformation[acm_stack_name].stack_outputs.AcmCert }}"
 
