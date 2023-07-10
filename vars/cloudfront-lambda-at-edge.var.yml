@@ -9,6 +9,7 @@ cloudformation_stacks:
     template: "{{ template }}"
     template_parameters:
       Environment: "{{ Environment }}"
+      SiteDomain: "{{ SiteDomain }}"
     tags:
       Environment: "{{ Environment }}"
       Service: "CKAN"

@@ -1,5 +1,6 @@
 @resource_visibility
 @OpenData
+@resource_visibility
 Feature: Resource Privacy Assessment Result
 
     Scenario: As a publisher, when I edit a resource, I should see the read-only 'Privacy assessment result' field

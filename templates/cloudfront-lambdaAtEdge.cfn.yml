@@ -1,5 +1,8 @@
 Description: Cloudfront Lambda At Edge for fronting an application.
 Parameters:
+  SiteDomain:
+    Description: Side domain to ensure alt domains are not allowed through
+    Type: String
   Environment:
     Description: Stack environment eg DEV, TRAINING
     Type: String
@@ -11,6 +14,7 @@ Parameters:
       - PROD
 Resources:
   #This lambda function reorders querystring alphabetically for improved caching and remove www from host name if set
+  ## Remove after August 2023 onwards once not in use
   LambdaEdgeFunction48e660f:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -61,6 +65,45 @@ Resources:
       Handler: index.handler
       Timeout: 5
 
+  LambdaEdgeFunction48e660f2023b:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code: #see files/cloudfrontLambda.js for human readable code (remove comments when updating inline js
+        ZipFile:
+         !Sub |
+          'use strict';
+          const querystring = require('querystring');
+          exports.handler = (event, context, callback) => {
+              const request = event.Records[0].cf.request;
+              const params = querystring.parse(request.querystring);
+              const sortedParams = {};
+              Object.keys(params).sort().forEach(key => {
+                  sortedParams[key] = params[key];
+              });
+              request.querystring = querystring.stringify(sortedParams);
+              let queryStringOutput = request.querystring ? '?' + request.querystring : ''
+              let siteDomain = '${SiteDomain}'
+              if (request.headers.host[0].value !== siteDomain) {
+                  let redirect = {
+                      status: '301',
+                      statusDescription: `Redirecting to site domain`,
+                      headers: {
+                          location: [{ key: 'Location', value: 'https://' + siteDomain + request.uri + queryStringOutput }],
+                          "access-control-allow-origin": [{ key: "Access-Control-Allow-Origin", value: "*" }],
+                          "access-control-allow-methods": [{ key: "Access-Control-Allow-Methods", value: "POST, PUT, GET, DELETE, OPTIONS" }],
+                          "access-control-allow-headers": [{ key: "Access-Control-Allow-Headers", value: "X-CKAN-API-KEY, Authorization, Content-Type" }]
+                      }
+                  };
+                  callback(null, redirect);
+              } else {
+                  callback(null, request);
+              }
+          };
+      Role: !GetAtt LambdaEdgeFunctionRole.Arn
+      Runtime: nodejs16.x
+      Handler: index.handler
+      Timeout: 5
+
   # This function strips the name of an S3 bucket out of the URL,
   # before passing the request upstream. This is needed because
   # CloudFront can only add a prefix to the request, not remove one.
@@ -86,11 +129,18 @@ Resources:
       Timeout: 5
 
   #versions are hard coded, if you need two versions, leave the old one in, but be aware that cloudformation does not like having two versions which are the same so it might get cranky.
-  #current version as of 6/9/2019
+  #previous version as of 6/9/2019 (decom in august 2023 or when not in use)
   VersionedLambdaFunction48e660f3: #change name if changing lambda code and update cloudfront link
     Type: 'AWS::Lambda::Version'
     Properties:
       FunctionName: !Ref LambdaEdgeFunction48e660f
+
+#  #versions are hard coded, if you need two versions, leave the old one in, but be aware that cloudformation does not like having two versions which are the same so it might get cranky.
+#  #current version as of 6/9/2023
+  VersionedLambdaFunction48e660f32023b: #change name if changing lambda code and update cloudfront link
+    Type: 'AWS::Lambda::Version'
+    Properties:
+      FunctionName: !Ref LambdaEdgeFunction48e660f2023b
 
   LambdaOriginFunctionVersion9cd5bfa:
     Type: 'AWS::Lambda::Version'
@@ -117,9 +167,14 @@ Resources:
                 - "edgelambda.amazonaws.com"
 
 Outputs:
-  #current version as of 6/9/2019
+  #previous version as of 6/9/2019 (#decomission after August 2023 or when not in use)
   VersionedLambdaFunction48e660f3:
     Value: !Ref VersionedLambdaFunction48e660f3
+  #don't forget add the new version to output the value for cross region referencing. Note cfn import's don't work cross region so we can't lock it sadly
+
+  #current version as of 6/9/2023
+  VersionedLambdaFunction48e660f32023b:
+    Value: !Ref VersionedLambdaFunction48e660f32023b
   #don't forget add the new version to output the value for cross region referencing. Note cfn import's don't work cross region so we can't lock it sadly
 
   LambdaEdgeOriginFunctionVersion9cd5bfa:

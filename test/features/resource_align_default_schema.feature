@@ -1,5 +1,6 @@
 @dataset_schema
 @OpenData
+@dataset_schema
 Feature: Resource align_default_schema field
 
     Scenario: Create or edit resource in the GUI where default_data_schema is NULL, initial display and behaviour
