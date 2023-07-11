@@ -25,7 +25,7 @@ Feature: Re-identification risk governance acknowledgement or Resource visibilit
         When I log out
         And I log in
         And I go to dataset "package-with-assessed-resource"
-        Then I not should see "resource-for-assessment"
+        Then I should not see "resource-for-assessment"
 
     Scenario: As an unprivileged user, I can see de-identified resources marked as visible without a privacy assessment
         Given "TestOrgEditor" as the persona
