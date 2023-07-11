@@ -389,6 +389,7 @@ def _create_dataset_from_params(context, params):
                 When I fill in "{0}" with "{1}" if present
             """.format(key, value))
     context.execute_steps(u"""
+        When I take a screenshot
         When I press "Add Data"
         Then I should see "Add New Resource"
     """)
@@ -477,6 +478,7 @@ def create_resource_from_params(context, resource_params):
                 When I fill in "{0}" with "{1}" if present
             """.format(key, value))
     context.execute_steps(u"""
+        When I take a screenshot
         When I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
     """)
 
