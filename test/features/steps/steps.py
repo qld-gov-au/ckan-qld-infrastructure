@@ -25,6 +25,7 @@ if not hasattr(forms, 'fill_in_elem_by_name'):
 URL_RE = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|\
                     (?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I | re.S | re.U)
 
+
 @when(u'I take a debugging screenshot')
 def debug_screenshot(context):
     """ Take a screenshot only if debugging is enabled in the persona.
@@ -33,6 +34,7 @@ def debug_screenshot(context):
         context.execute_steps(u"""
             Then I take a screenshot
         """)
+
 
 @when(u'I go to homepage')
 def go_to_home(context):
@@ -398,7 +400,7 @@ def _create_dataset_from_params(context, params):
             """.format(key, value))
     context.execute_steps(u"""
         When I take a debugging screenshot
-        When I press "Add Data"
+        And I press "Add Data"
         Then I should see "Add New Resource"
     """)
 
