@@ -7,7 +7,7 @@ import six
 from six.moves.urllib.parse import urlparse
 import uuid
 
-from behave import step
+from behave import when, then
 from behaving.personas.steps import *  # noqa: F401, F403
 from behaving.mail.steps import *  # noqa: F401, F403
 from behaving.web.steps import *  # noqa: F401, F403
@@ -24,6 +24,16 @@ if not hasattr(forms, 'fill_in_elem_by_name'):
 
 URL_RE = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|\
                     (?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I | re.S | re.U)
+
+
+@when(u'I take a debugging screenshot')
+def debug_screenshot(context):
+    """ Take a screenshot only if debugging is enabled in the persona.
+    """
+    if context.persona and context.persona.get('debug') == 'True':
+        context.execute_steps(u"""
+            Then I take a screenshot
+        """)
 
 
 @when(u'I go to homepage')
@@ -389,7 +399,8 @@ def _create_dataset_from_params(context, params):
                 When I fill in "{0}" with "{1}" if present
             """.format(key, value))
     context.execute_steps(u"""
-        When I press "Add Data"
+        When I take a debugging screenshot
+        And I press "Add Data"
         Then I should see "Add New Resource"
     """)
 
@@ -409,6 +420,10 @@ def create_dataset_and_resource_from_params(context, params, resource_params):
         When I create a resource with key-value parameters "{0}"
         Then I should see "Data and Resources"
     """.format(resource_params))
+
+
+def _is_truthy(text):
+    return text and text.lower() in ["true", "t", "yes", "y"]
 
 
 # Creates a resource using default values apart from the ones specified.
@@ -438,11 +453,21 @@ def create_resource_from_params(context, resource_params):
             context.execute_steps(u"""
                 When I execute the script "document.getElementById('field-format').value='{0}'"
             """.format(value))
-        elif key in ["align_default_schema", "resource_visible"]:
-            action = "check" if value and value.lower() in ["true", "t", "yes", "y"] else "uncheck"
+        elif key in ["align_default_schema"]:
+            action = "check" if _is_truthy(value) else "uncheck"
             context.execute_steps(u"""
                 When I {0} "{1}"
             """.format(action, key))
+        elif key == "resource_visible":
+            option = "TRUE" if _is_truthy(value) else "FALSE"
+            context.execute_steps(u"""
+                When I select "{1}" from "{0}"
+            """.format(key, option))
+        elif key in ["governance_acknowledgement", "request_privacy_assessment"]:
+            option = "YES" if _is_truthy(value) else "NO"
+            context.execute_steps(u"""
+                When I select "{1}" from "{0}"
+            """.format(key, option))
         elif key == "schema":
             if value == "default":
                 value = """{
@@ -463,7 +488,9 @@ def create_resource_from_params(context, resource_params):
                 When I fill in "{0}" with "{1}" if present
             """.format(key, value))
     context.execute_steps(u"""
-        When I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
+        When I take a debugging screenshot
+        And I press the element with xpath "//form[contains(@class, 'resource-form')]//button[contains(@class, 'btn-primary')]"
+        And I take a debugging screenshot
     """)
 
 

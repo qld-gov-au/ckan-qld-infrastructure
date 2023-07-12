@@ -1,5 +1,5 @@
-@OpenData
 @reporting
+@OpenData
 Feature: Reporting
 
     @unauthenticated

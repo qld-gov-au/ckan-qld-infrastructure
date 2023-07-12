@@ -5,7 +5,7 @@ Feature: Re-identification risk governance acknowledgement or Resource visibilit
     Scenario: As a publisher, I can view hidden resources
         Given "TestOrgEditor" as the persona
         When I log in
-        And I create a dataset and resource with key-value parameters "name=package-with-invisible-resource::notes=Package with invisible resource::de_identified_data=NO" and "name=invisible-resource::resource_visible=FALSE"
+        And I create a dataset and resource with key-value parameters "name=package-with-invisible-resource::notes=Package with invisible resource::de_identified_data=NO::private=False" and "name=invisible-resource::resource_visible=FALSE"
         Then I should see "invisible-resource"
 
         Given "CKANUser" as the persona
@@ -15,17 +15,17 @@ Feature: Re-identification risk governance acknowledgement or Resource visibilit
         Then I should see "Package with invisible resource"
         And I should not see "invisible-resource"
 
-    Scenario: As any user, I can see resources marked as visible and assessed
+    Scenario: As an unprivileged user, I cannot see resources with privacy assessment requested and risk governance completed 
         Given "TestOrgEditor" as the persona
         When I log in
-        And I create a dataset and resource with key-value parameters "name=package-with-assessed-resource::notes=Package with assessed resource::de_identified_data=NO::private=False" and "name=visible-resource::request_privacy_assessment=YES::governance_acknowledgement=YES::resource_visible=TRUE"
-        Then I should see "visible-resource"
+        And I create a dataset and resource with key-value parameters "name=package-with-assessed-resource::notes=Package with assessed resource::de_identified_data=NO::private=False" and "name=resource-for-assessment::request_privacy_assessment=YES::governance_acknowledgement=YES::resource_visible=TRUE"
+        Then I should see "resource-for-assessment"
 
         Given "CKANUser" as the persona
         When I log out
         And I log in
         And I go to dataset "package-with-assessed-resource"
-        Then I should see "visible-resource"
+        Then I should not see "resource-for-assessment"
 
     Scenario: As an unprivileged user, I can see de-identified resources marked as visible without a privacy assessment
         Given "TestOrgEditor" as the persona

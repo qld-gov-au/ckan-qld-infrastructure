@@ -1,5 +1,5 @@
-@OpenData
 @datarequest
+@OpenData
 Feature: Data Request
 
     @unauthenticated

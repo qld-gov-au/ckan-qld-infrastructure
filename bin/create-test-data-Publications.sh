@@ -5,8 +5,6 @@
 set -e
 set -x
 
-. ${APP_DIR}/bin/activate
-
 # Create publishing standards dataset
 curl -LsH "Authorization: ${API_KEY}" \
     --data '{"name": "publishing-standards-publications-qld-gov-au", "owner_org": "'"${TEST_ORG_ID}"'"}' \
@@ -27,5 +25,3 @@ curl -LsH "Authorization: ${API_KEY}" \
 ]}' \
     ${CKAN_ACTION_URL}/package_create
 
-
-. ${APP_DIR}/bin/deactivate

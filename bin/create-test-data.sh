@@ -30,6 +30,19 @@ if [ "$API_KEY" = "None" ]; then
 fi
 
 ##
+# BEGIN: Add sysadmin config values.
+#
+echo "Adding sysadmin config:"
+
+curl -LsH "Authorization: ${API_KEY}" \
+    --data '{"ckanext.data_qld.excluded_display_name_words": "gov"}' \
+    ${CKAN_ACTION_URL}/config_option_update
+
+##
+# END.
+#
+
+##
 # BEGIN: Create a test organisation with test users for admin, editor and member
 #
 TEST_ORG_NAME=test-organisation
@@ -128,13 +141,8 @@ walker_update=$( \
 echo ${walker_update}
 
 ##
-# BEGIN: Add sysadmin config values.
+# END.
 #
-echo "Adding sysadmin config:"
-
-curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"ckanext.data_qld.excluded_display_name_words": "gov"}' \
-    ${CKAN_ACTION_URL}/config_option_update
 
 . ${APP_DIR}/bin/create-test-data-$VARS_TYPE.sh
 . ${APP_DIR}/bin/deactivate

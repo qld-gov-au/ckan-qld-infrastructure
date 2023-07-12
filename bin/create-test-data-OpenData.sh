@@ -5,8 +5,6 @@
 set -e
 set -x
 
-. ${APP_DIR}/bin/activate
-
 ##
 # BEGIN: Add sysadmin config values.
 #
@@ -86,15 +84,15 @@ curl -LsH "Authorization: ${API_KEY}" \
 "data_driven_application": "NO", "security_classification": "PUBLIC", "notes": "test", "de_identified_data": "NO"}'\
     ${CKAN_ACTION_URL}/package_create
 
-##
-# END.
-#
-
 echo "Creating test Data Request:"
 
 curl -LsH "Authorization: ${API_KEY}" \
     --data '{"title": "Test Request", "description": "This is an example", "organization_id": "'"${TEST_ORG_ID}"'"}' \
     ${CKAN_ACTION_URL}/create_datarequest
+
+##
+# END.
+#
 
 ##
 # BEGIN: Create a Reporting organisation with test users
@@ -146,4 +144,3 @@ curl -LsH "Authorization: ${API_KEY}" \
 # END.
 #
 
-. ${APP_DIR}/bin/deactivate
