@@ -7,7 +7,7 @@ Feature: Resource align_default_schema field
         When I log in
         And I create a dataset and resource with key-value parameters "schema_json=" and "upload=default::format=CSV"
         And I go to dataset "$last_generated_name"
-        Then I should see an element with xpath "//th[@class="dataset-label" and string()="Default data schema"]/following-sibling::td[contains(string(), "Field name 'default_data_schema' not in data")]"
+        Then I should see an element with xpath "//th[@class="dataset-label" and string()="Default data schema"]/following-sibling::td[contains(string(), "[blank]")]"
 
         When I go to the first resource in the dataset
         And I press the element with xpath "//a[contains(string(),'Manage')]"

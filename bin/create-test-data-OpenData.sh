@@ -50,7 +50,6 @@ echo "Creating test users for ${DR_ORG_TITLE} Organisation:"
 
 add_user_if_needed dr_admin "Data Request Admin" dr_admin@localhost
 add_user_if_needed dr_editor "Data Request Editor" dr_editor@localhost
-add_user_if_needed dr_member "Data Request Member" dr_member@localhost
 
 echo "Creating ${DR_ORG_TITLE} Organisation:"
 
@@ -72,10 +71,6 @@ curl -LsH "Authorization: ${API_KEY}" \
     --data '{"id": "'"${DR_ORG_ID}"'", "object": "dr_editor", "object_type": "user", "capacity": "editor"}' \
     ${CKAN_ACTION_URL}/member_create
 
-curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"id": "'"${DR_ORG_ID}"'", "object": "dr_member", "object_type": "user", "capacity": "member"}' \
-    ${CKAN_ACTION_URL}/member_create
-
 echo "Creating test dataset for data request organisation:"
 
 curl -LsH "Authorization: ${API_KEY}" \
@@ -95,16 +90,15 @@ curl -LsH "Authorization: ${API_KEY}" \
 #
 
 ##
-# BEGIN: Create a Reporting organisation with test users
+# BEGIN: Create a Reporting organisation
 #
 
 REPORT_ORG_NAME=reporting-org
 REPORT_ORG_TITLE="Reporting Organisation"
 
-echo "Creating test users for ${REPORT_ORG_TITLE} Organisation:"
+echo "Creating admin user for ${REPORT_ORG_TITLE} Organisation:"
 
 add_user_if_needed report_admin "Reporting Admin" report_admin@localhost
-add_user_if_needed report_editor "Reporting Editor" report_editor@localhost
 
 echo "Creating ${REPORT_ORG_TITLE} Organisation:"
 
@@ -116,23 +110,11 @@ REPORT_ORG=$( \
 
 REPORT_ORG_ID=$(echo $REPORT_ORG | $PYTHON $APP_DIR/bin/extract-id.py)
 
-echo "Assigning test users to ${REPORT_ORG_TITLE} Organisation:"
+echo "Assigning admin user to ${REPORT_ORG_TITLE} Organisation:"
 
 curl -LsH "Authorization: ${API_KEY}" \
     --data '{"id": "'"${REPORT_ORG_ID}"'", "object": "report_admin", "object_type": "user", "capacity": "admin"}' \
     ${CKAN_ACTION_URL}/member_create
-
-curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"id": "'"${REPORT_ORG_ID}"'", "object": "report_editor", "object_type": "user", "capacity": "editor"}' \
-    ${CKAN_ACTION_URL}/member_create
-
-echo "Creating test dataset for reporting:"
-
-curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"name": "reporting-dataset", "title": "Dataset for reporting", "owner_org": "'"${REPORT_ORG_ID}"'",
-"update_frequency": "near-realtime", "author_email": "report_admin@localhost", "version": "1.0", "license_id": "cc-by-4",
-"data_driven_application": "NO", "security_classification": "PUBLIC", "notes": "test", "de_identified_data": "NO"}'\
-    ${CKAN_ACTION_URL}/package_create
 
 echo "Creating test Data Request for reporting:"
 

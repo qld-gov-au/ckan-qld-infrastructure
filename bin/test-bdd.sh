@@ -5,5 +5,4 @@
 set -ex
 
 ahoy install-site
-echo "==> Run BDD tests"
 ahoy test-bdd

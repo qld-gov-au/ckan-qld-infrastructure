@@ -2,7 +2,6 @@
 ##
 # Run tests in CI.
 #
-set -e
+set -ex
 
-echo "==> Run Unit tests"
 ahoy test-unit

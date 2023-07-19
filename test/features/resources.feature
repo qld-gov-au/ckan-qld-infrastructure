@@ -22,16 +22,16 @@ Feature: Resource UI
     Scenario Outline: Add new resource metadata field on the create and edit resource GUI pages
         Given "<Persona>" as the persona
         When I log in
-        And I open the new resource form for dataset "data_request_dataset"
+        And I open the new resource form for dataset "public-test-dataset"
         Then I should see an element with xpath "//label[@for="field-request_privacy_assessment"]"
         And field "request_privacy_assessment" should not be required
         And I should not see an element with xpath "//label[@for="field-request_privacy_assessment"]//*[@class="control-required"]"
         And I should see an element with xpath "//select[@id="field-request_privacy_assessment"]//option[@value="" or @value="YES" or @value="NO"]"
-        And I should see "Where the dataset contains de-identified data, selecting ‘YES’ will hide this resource, pending a privacy assessment. Assessments will not be completed where the dataset does not contain de-identified data. Select ‘NO’ where the dataset does not contain de-identified data or where a privacy assessment is not required."
+        And I should see "Privacy risk assessment prior to public release might assist the publishing decision-making process."
         Examples: roles
         | Persona              |
-        | DataRequestOrgAdmin  |
-        | DataRequestOrgEditor |
+        | TestOrgAdmin  |
+        | TestOrgEditor |
 
     @Publications
     Scenario: Link resource with missing or invalid protocol should use HTTP

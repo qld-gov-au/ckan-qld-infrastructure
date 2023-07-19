@@ -19,6 +19,7 @@ commands:
   build-network:
     usage: Ensure that the amazeeio network exists.
     cmd: |
+      ahoy title "Creating amazeeio Docker network"
       docker network prune -f > /dev/null
       docker network inspect amazeeio-network > /dev/null || docker network create amazeeio-network
 
@@ -34,15 +35,15 @@ commands:
   up:
     usage: Build and start Docker containers.
     cmd: |
-      echo "Preparing containers for $VARS_TYPE"
+      ahoy title "Building and starting Docker containers for $VARS_TYPE"
       docker-compose up -d "$@"
-      sleep 10
-      docker-compose logs
-      ahoy cli "dockerize -wait tcp://ckan:5000 -timeout 1m"
-      if docker-compose logs | grep -q "\[Error\]"; then docker-compose logs; exit 1; fi
-      if docker-compose logs | grep -q "Exception"; then docker-compose logs; exit 1; fi
-      docker ps -a --filter name=^/${COMPOSE_PROJECT_NAME}_
+      echo "Initialising database schema"
       ahoy cli '$APP_DIR/bin/init.sh'
+      echo "Waiting for containers to start listening..."
+      ahoy cli "dockerize -wait tcp://ckan:5000 -timeout 1m"
+      if docker-compose logs | grep -q "\[Error\]"; then exit 1; fi
+      if docker-compose logs | grep -q "Exception"; then exit 1; fi
+      docker ps -a --filter name=^/${COMPOSE_PROJECT_NAME}_
       export DOCTOR_CHECK_CLI=0
 
   down:
@@ -86,6 +87,7 @@ commands:
   clean:
     usage: Remove containers and all build files.
     cmd: |
+      ahoy title "Cleaning up old builds"
       ahoy down
       # Remove other directories.
       # @todo: Add destinations below.
@@ -107,6 +109,7 @@ commands:
   lint:
     usage: Lint code.
     cmd: |
+      ahoy title 'Check for lint'
       ahoy cli "flake8 ${@:-roles}" || \
       [ "${ALLOW_LINT_FAIL:-0}" -eq 1 ]
 
@@ -120,12 +123,14 @@ commands:
   test-unit:
     usage: Run unit tests.
     cmd: |
+      ahoy title 'Run unit tests'
       ahoy cli 'pytest --ckan-ini=${CKAN_INI} $APP_DIR/test' || \
       [ "${ALLOW_UNIT_FAIL:-0}" -eq 1 ]
 
   test-bdd:
     usage: Run BDD tests.
     cmd: |
+      ahoy title 'Run scenario tests'
       ahoy cli "rm -f test/screenshots/*"
       ahoy start-ckan-job-workers
       ahoy start-mailmock &

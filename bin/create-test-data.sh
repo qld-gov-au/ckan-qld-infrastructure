@@ -92,7 +92,6 @@ organisation_create=$( \
 )
 echo ${organisation_create}
 
-add_user_if_needed foodie "Foodie" foodie@localhost
 add_user_if_needed group_admin "Group Admin" group_admin@localhost
 add_user_if_needed walker "Walker" walker@localhost
 
@@ -100,26 +99,10 @@ add_user_if_needed walker "Walker" walker@localhost
 
 echo "Assigning test Datasets to Organisation..."
 
-echo "Updating foodie to have admin privileges in the food-standards-agency Organisation:"
-foodie_update=$( \
-    curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"id": "food-standards-agency", "username": "foodie", "role": "admin"}' \
-    ${CKAN_ACTION_URL}/organization_member_create
-)
-echo ${foodie_update}
-
 echo "Creating non-organisation group:"
 group_create=$( \
     curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"name": "silly-walks"}' \
-    ${CKAN_ACTION_URL}/group_create
-)
-echo ${group_create}
-
-echo "Creating Dave's Books group:"
-group_create=$( \
-    curl -LsH "Authorization: ${API_KEY}" \
-    --data '{"name": "dave", "title": "Dave'"'"'s books", "description": "These are books that David likes."}' \
+    --data '{"name": "silly-walks", "title": "Silly walks", "description": "The Ministry of Silly Walks"}' \
     ${CKAN_ACTION_URL}/group_create
 )
 echo ${group_create}

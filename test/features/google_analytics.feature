@@ -20,15 +20,13 @@ Feature: GoogleAnalytics
         And I should see an element with xpath "//meta[@name='DCTERMS.type' and @content='Text' and @scheme='DCTERMS.DCMIType']"
         And I should see an element with xpath "//meta[@name='AGLSTERMS.documentType' and @content='index']"
 
-        # Can't use 'I press' because the text contains an apostrophe
-        # See https://github.com/ggozad/behaving/issues/137
-        When I click the link with text that contains "Dave's books"
+        When I press "Silly walks"
         And I press "About"
-        Then I should see an element with xpath "//meta[@name='DCTERMS.title' and contains(@content, 'Dave')]"
+        Then I should see an element with xpath "//meta[@name='DCTERMS.title' and contains(@content, 'Silly walks')]"
         And I should see an element with xpath "//meta[@name='DCTERMS.publisher' and @content='corporateName=The State of Queensland; jurisdiction=Queensland' and @scheme='AGLSTERMS.AglsAgent']"
-        And I should see an element with xpath "//meta[@name='DCTERMS.creator' and contains(@content, 'c=AU; o=The State of Queensland; ou=Dave') and @scheme='AGLSTERMS.GOLD']"
+        And I should see an element with xpath "//meta[@name='DCTERMS.creator' and contains(@content, 'c=AU; o=The State of Queensland; ou=Silly walks') and @scheme='AGLSTERMS.GOLD']"
         And I should see an element with xpath "//meta[@name='DCTERMS.created' and @content!='' and @content!='None']"
-        And I should see an element with xpath "//meta[@name='DCTERMS.description' and @content='These are books that David likes.']"
+        And I should see an element with xpath "//meta[@name='DCTERMS.description' and @content='The Ministry of Silly Walks']"
         And I should see an element with xpath "//meta[@name='DCTERMS.identifier' and @content!='' and @content!='None']"
         And I should see an element with xpath "//meta[@name='DCTERMS.jurisdiction' and @content='Queensland' and @scheme='AGLSTERMS.AglsJuri']"
         And I should see an element with xpath "//meta[@name='DCTERMS.type' and @content='Text' and @scheme='DCTERMS.DCMIType']"
