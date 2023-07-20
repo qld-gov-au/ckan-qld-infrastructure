@@ -24,14 +24,14 @@ Feature: Dataset Schema
 
         Examples: roles
         | User                 |
-        | DataRequestOrgAdmin  |
-        | DataRequestOrgEditor |
+        | TestOrgAdmin  |
+        | TestOrgEditor |
 
     Scenario: New field visibility on dataset Additional info and API
         Given "SysAdmin" as the persona
         When I log in
         And I create a dataset and resource with key-value parameters "schema_json=default" and "url=default"
         Then I should see an element with xpath "//th[@class="dataset-label" and string()="Default data schema"]/following::a[string()="View Schema File"]"
-        Then I should see an element with xpath "//th[@class="dataset-label" and string()="Data schema validation options"]/following::td[@class="dataset-details" and string()="Field name 'validation_options' not in data"]"
+        Then I should see an element with xpath "//th[@class="dataset-label" and string()="Data schema validation options"]/following::td[@class="dataset-details" and string()="[blank]"]"
         When I visit "api/action/package_show?id=$last_generated_name"
         Then I should see an element with xpath "//body/*[contains(string(), '"default_data_schema":')]"

@@ -40,36 +40,33 @@ Feature: AdminReporting
         Then I should see an element with xpath "//tr[@id='overdue-datasets']/td[contains(@class, 'metric-title') and contains(string(), 'Overdue Datasets') and position()=1]"
         And I should see an element with xpath "//tr[@id='overdue-datasets']/td[contains(@class, 'metric-data') and position()=2]"
 
-    Scenario: As an admin user of my organisation, when I view my admin report, I can verify that datasets without groups are identified
+    Scenario: As an admin user of my organisation, when I view my admin report, I can verify that datasets without groups or tags are identified
         Given "ReportingOrgAdmin" as the persona
         When I log in
+        And I create a dataset and resource with key-value parameters "title=Dataset for admin reporting" and "url=default"
         And I go to my reports page
         And I press "Admin Report"
         And I press the element with xpath "//button[contains(string(), 'Show')]"
         Then I should see an element with xpath "//tr[@id='datasets_no_groups']/td[contains(@class, 'metric-title') and position()=1]/a[contains(@href, 'datasets_no_groups?report_type=admin') and contains(string(), 'Datasets not added to group')]"
         And I should see an element with xpath "//tr[@id='datasets_no_groups']/td[contains(@class, 'metric-data') and position()=2]/a[contains(@href, 'datasets_no_groups?report_type=admin')]"
+        And I should see an element with xpath "//tr[@id='datasets_no_tags']/td[contains(@class, 'metric-title') and position()=1]/a[contains(@href, 'datasets_no_tags?report_type=admin') and contains(string(), 'Datasets with no tags')]"
+        And I should see an element with xpath "//tr[@id='datasets_no_tags']/td[contains(@class, 'metric-data') and position()=2]/a[contains(@href, 'datasets_no_tags?report_type=admin')]"
 
         When I press "Datasets not added to group/s"
         Then I should see "Admin Report: Datasets not added to group/s: Reporting Organisation"
-        And I should see "Dataset for reporting"
-        When I press "Dataset for reporting"
-        Then I should see "Dataset for reporting"
+        And I should see "Dataset for admin reporting"
+        When I press "Dataset for admin reporting"
+        Then I should see "Dataset for admin reporting"
         And I should see "Data and Resources"
 
-    Scenario: As an admin user of my organisation, when I view my admin report, I can verify that datasets without tags are identified
-        Given "ReportingOrgAdmin" as the persona
-        When I log in
-        And I go to my reports page
+        When I go to my reports page
         And I press "Admin Report"
         And I press the element with xpath "//button[contains(string(), 'Show')]"
-        Then I should see an element with xpath "//tr[@id='datasets_no_tags']/td[contains(@class, 'metric-title') and position()=1]/a[contains(@href, 'datasets_no_tags?report_type=admin') and contains(string(), 'Datasets with no tags')]"
-        And I should see an element with xpath "//tr[@id='datasets_no_tags']/td[contains(@class, 'metric-data') and position()=2]/a[contains(@href, 'datasets_no_tags?report_type=admin')]"
-
-        When I press "Datasets with no tags"
+        And I press "Datasets with no tags"
         Then I should see "Admin Report: Datasets with no tags: Reporting Organisation"
-        And I should see "Dataset for reporting"
-        When I press "Dataset for reporting"
-        Then I should see "Dataset for reporting"
+        And I should see "Dataset for admin reporting"
+        When I press "Dataset for admin reporting"
+        Then I should see "Dataset for admin reporting"
         And I should see "Data and Resources"
 
     Scenario: As an admin user of my organisation, when I view my admin report, I can verify de-identified datasets without default data schema

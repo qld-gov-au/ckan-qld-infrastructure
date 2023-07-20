@@ -2,8 +2,7 @@
 ##
 # Install current extension.
 #
-set -e
-set -x
+set -ex
 
 install_requirements () {
     PROJECT_DIR=$1

@@ -120,7 +120,7 @@ Feature: User APIs
 
     @email
     Scenario: As a registered user, when I have locked my account with too many failed logins, I can reset my password to unlock it
-        Given "Foodie" as the persona
+        Given "CKANUser" as the persona
         When I lock my account
         And I go to "/user/login"
         And I attempt to log in with password "$password"

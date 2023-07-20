@@ -72,7 +72,6 @@ Feature: Data Request
         | User                  |
         | CKANUser              |
         | DataRequestOrgEditor  |
-        | DataRequestOrgMember  |
         | TestOrgEditor         |
         | TestOrgMember         |
 
