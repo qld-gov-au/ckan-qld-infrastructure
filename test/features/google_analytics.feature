@@ -1,4 +1,4 @@
-@google-analytics
+@google_analytics
 Feature: GoogleAnalytics
 
     @unauthenticated
@@ -11,7 +11,7 @@ Feature: GoogleAnalytics
     Scenario: When viewing the HTML source code of a group, the appropriate metadata is visible
         Given "Unauthenticated" as the persona
         When I go to group page
-        And I resize the browser to 1024x2048
+        And I expand the browser height
         Then I should see an element with xpath "//meta[@name='DCTERMS.title' and @content='Groups']"
         And I should see an element with xpath "//meta[@name='DCTERMS.publisher' and @content='corporateName=The State of Queensland; jurisdiction=Queensland' and @scheme='AGLSTERMS.AglsAgent']"
         And I should see an element with xpath "//meta[@name='DCTERMS.creator' and @content='c=AU; o=The State of Queensland;' and @scheme='AGLSTERMS.GOLD']"
@@ -20,13 +20,13 @@ Feature: GoogleAnalytics
         And I should see an element with xpath "//meta[@name='DCTERMS.type' and @content='Text' and @scheme='DCTERMS.DCMIType']"
         And I should see an element with xpath "//meta[@name='AGLSTERMS.documentType' and @content='index']"
 
-        When I click the link with text that contains "Dave's books"
-        And I click the link with text that contains "About"
-        Then I should see an element with xpath "//meta[@name='DCTERMS.title' and contains(@content, 'Dave')]"
+        When I press "Silly walks"
+        And I press "About"
+        Then I should see an element with xpath "//meta[@name='DCTERMS.title' and contains(@content, 'Silly walks')]"
         And I should see an element with xpath "//meta[@name='DCTERMS.publisher' and @content='corporateName=The State of Queensland; jurisdiction=Queensland' and @scheme='AGLSTERMS.AglsAgent']"
-        And I should see an element with xpath "//meta[@name='DCTERMS.creator' and contains(@content, 'c=AU; o=The State of Queensland; ou=Dave') and @scheme='AGLSTERMS.GOLD']"
+        And I should see an element with xpath "//meta[@name='DCTERMS.creator' and contains(@content, 'c=AU; o=The State of Queensland; ou=Silly walks') and @scheme='AGLSTERMS.GOLD']"
         And I should see an element with xpath "//meta[@name='DCTERMS.created' and @content!='' and @content!='None']"
-        And I should see an element with xpath "//meta[@name='DCTERMS.description' and @content='These are books that David likes.']"
+        And I should see an element with xpath "//meta[@name='DCTERMS.description' and @content='The Ministry of Silly Walks']"
         And I should see an element with xpath "//meta[@name='DCTERMS.identifier' and @content!='' and @content!='None']"
         And I should see an element with xpath "//meta[@name='DCTERMS.jurisdiction' and @content='Queensland' and @scheme='AGLSTERMS.AglsJuri']"
         And I should see an element with xpath "//meta[@name='DCTERMS.type' and @content='Text' and @scheme='DCTERMS.DCMIType']"
@@ -36,7 +36,7 @@ Feature: GoogleAnalytics
     Scenario: When viewing the HTML source code of an organisation, the appropriate metadata is visible
         Given "Unauthenticated" as the persona
         When I go to organisation page
-        And I resize the browser to 1024x2048
+        And I expand the browser height
         Then I should see an element with xpath "//meta[@name='DCTERMS.title' and @content='Organisations']"
         And I should see an element with xpath "//meta[@name='DCTERMS.publisher' and @content='corporateName=The State of Queensland; jurisdiction=Queensland' and @scheme='AGLSTERMS.AglsAgent']"
         And I should see an element with xpath "//meta[@name='DCTERMS.creator' and @content='c=AU; o=The State of Queensland;' and @scheme='AGLSTERMS.GOLD']"
@@ -45,13 +45,13 @@ Feature: GoogleAnalytics
         And I should see an element with xpath "//meta[@name='DCTERMS.type' and @content='Text' and @scheme='DCTERMS.DCMIType']"
         And I should see an element with xpath "//meta[@name='AGLSTERMS.documentType' and @content='index']"
 
-        When I click the link with text that contains "Department of Health"
-        And I click the link with text that contains "About"
-        Then I should see an element with xpath "//meta[@name='DCTERMS.title' and @content='Department of Health']"
+        When I press "Test Organisation"
+        And I press "About"
+        Then I should see an element with xpath "//meta[@name='DCTERMS.title' and @content='Test Organisation']"
         And I should see an element with xpath "//meta[@name='DCTERMS.publisher' and @content='corporateName=The State of Queensland; jurisdiction=Queensland' and @scheme='AGLSTERMS.AglsAgent']"
-        And I should see an element with xpath "//meta[@name='DCTERMS.creator' and @content='c=AU; o=The State of Queensland; ou=Department of Health' and @scheme='AGLSTERMS.GOLD']"
+        And I should see an element with xpath "//meta[@name='DCTERMS.creator' and @content='c=AU; o=The State of Queensland; ou=Test Organisation' and @scheme='AGLSTERMS.GOLD']"
         And I should see an element with xpath "//meta[@name='DCTERMS.created' and @content!='' and @content!='None']"
-        And I should see an element with xpath "//meta[@name='DCTERMS.description' and @content='Department of Health']"
+        And I should see an element with xpath "//meta[@name='DCTERMS.description' and @content='Organisation for testing issues']"
         And I should see an element with xpath "//meta[@name='DCTERMS.identifier' and @content!='' and @content!='None']"
         And I should see an element with xpath "//meta[@name='DCTERMS.jurisdiction' and @content='Queensland' and @scheme='AGLSTERMS.AglsJuri']"
         And I should see an element with xpath "//meta[@name='DCTERMS.type' and @content='Text' and @scheme='DCTERMS.DCMIType']"
@@ -60,7 +60,7 @@ Feature: GoogleAnalytics
     Scenario: When viewing the HTML source code of a resource, the appropriate metadata is visible
         Given "TestOrgEditor" as the persona
         When I go to Dataset page
-        And I resize the browser to 1024x2048
+        And I expand the browser height
         Then I should see an element with xpath "//meta[@name='DCTERMS.title' and @content='Datasets']"
         And I should see an element with xpath "//meta[@name='DCTERMS.publisher' and @content='corporateName=The State of Queensland; jurisdiction=Queensland' and @scheme='AGLSTERMS.AglsAgent']"
         And I should see an element with xpath "//meta[@name='DCTERMS.creator' and @content='c=AU; o=The State of Queensland;' and @scheme='AGLSTERMS.GOLD']"
@@ -70,8 +70,8 @@ Feature: GoogleAnalytics
         And I should see an element with xpath "//meta[@name='AGLSTERMS.documentType' and @content='index']"
 
         When I log in
-        And I create a dataset with title "DCTERMS-testing"
-        Then I should see an element with xpath "//meta[@name='DCTERMS.title' and @content='DCTERMS-testing']"
+        And I create a dataset and resource with key-value parameters "name=dcterms-testing::title=DCTERMS testing" and "url=default"
+        Then I should see an element with xpath "//meta[@name='DCTERMS.title' and @content='DCTERMS testing']"
         And I should see an element with xpath "//meta[@name='DCTERMS.publisher' and @content='corporateName=The State of Queensland; jurisdiction=Queensland' and @scheme='AGLSTERMS.AglsAgent']"
         And I should see an element with xpath "//meta[@name='DCTERMS.creator' and @content='c=AU; o=The State of Queensland; ou=Test Organisation' and @scheme='AGLSTERMS.GOLD']"
         And I should see an element with xpath "//meta[@name='DCTERMS.created' and @content!='' and @content!='None']"
@@ -82,7 +82,7 @@ Feature: GoogleAnalytics
         And I should see an element with xpath "//meta[@name='DCTERMS.type' and @content='Text' and @scheme='DCTERMS.DCMIType']"
         And I should see an element with xpath "//meta[@name='AGLSTERMS.documentType' and @content='index']"
 
-        When I click the link with text that contains "Test Resource"
+        When I press "Test Resource"
         Then I should see an element with xpath "//meta[@name='DCTERMS.title' and @content='Test Resource']"
         And I should see an element with xpath "//meta[@name='DCTERMS.publisher' and @content='corporateName=The State of Queensland; jurisdiction=Queensland' and @scheme='AGLSTERMS.AglsAgent']"
         And I should see an element with xpath "//meta[@name='DCTERMS.creator' and @content='c=AU; o=The State of Queensland; ou=Test Organisation' and @scheme='AGLSTERMS.GOLD']"

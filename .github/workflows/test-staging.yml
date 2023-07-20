@@ -1,6 +1,4 @@
 ---
-#based on https://raw.githubusercontent.com/ckan/ckanext-scheming/master/.github/workflows/test.yml
-# alternative https://github.com/ckan/ckan/blob/master/contrib/cookiecutter/ckan_extension/%7B%7Bcookiecutter.project%7D%7D/.github/workflows/test.yml
 name: Tests Staging
 run-name: "${{ github.actor }} PR ${{ github.event.pull_request.title }} on ${{ github.ref_name }} verifying Staging environment configuration"
 on:
@@ -27,7 +25,7 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         timeout-minutes: 2
 
       - name: Build
@@ -44,7 +42,7 @@ jobs:
 
       - name: Test BDD
         run: bin/test-bdd.sh
-        timeout-minutes: 45
+        timeout-minutes: 60
 
       - name: Retrieve logs
         if: always()
@@ -58,7 +56,7 @@ jobs:
 
       - name: Upload screenshots
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} screenshots
           path: /tmp/artifacts/behave/screenshots

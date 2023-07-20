@@ -17,8 +17,8 @@ Feature: SchemaMetadata
     Scenario: When I create a resource without a name or description, I should see errors
         Given "SysAdmin" as the persona
         When I log in
-        And I go to "/dataset/new_resource/warandpeace"
-        And I execute the script "document.getElementById('field-image-url').value='https://example.com'"
+        And I open the new resource form for dataset "public-test-dataset"
+        And I enter the resource URL "https://example.com"
         And I press the element with xpath "//button[contains(string(), 'Add')]"
         Then I should see "Name: Missing value"
         And I should see "Description: Missing value"
@@ -26,7 +26,7 @@ Feature: SchemaMetadata
     @unauthenticated
     Scenario: When viewing the HTML source code of a dataset page, the structured data script is visible
         Given "Unauthenticated" as the persona
-        When I go to "/dataset/warandpeace"
+        When I go to dataset "public-test-dataset"
         Then I should see an element with xpath "//link[@type='application/ld+json']"
 
     Scenario Outline: Check value of de_identified_data dropdown field
@@ -47,7 +47,7 @@ Feature: SchemaMetadata
     Scenario Outline: Edit existing dataset, field de_identified_data value should be NO
         Given "<User>" as the persona
         When I log in
-        And I go to "/dataset/edit/warandpeace"
+        And I edit the "public-test-dataset" dataset
         Then I should see an element with id "field-de_identified_data"
         Then I should see an element with xpath "//select[@id='field-de_identified_data']/option[@value='YES']"
         Then I should see an element with xpath "//select[@id='field-de_identified_data']/option[@selected='' and @value='NO']"
@@ -61,12 +61,12 @@ Feature: SchemaMetadata
         Given "<User>" as the persona
         When I log in
 
-        And I go to "/dataset/warandpeace"
+        And I go to dataset "public-test-dataset"
         Then I should see "Contains de-identified data"
-        Then I should see an element with xpath "//th[contains(text(), 'Contains de-identified data')]/following-sibling::td[contains(text(), 'NO')]"
+        Then I should see an element with xpath "//th[contains(string(), 'Contains de-identified data')]/following-sibling::td[contains(string(), 'NO')]"
 
-        When I go to "/api/3/action/package_show?id=warandpeace"
-        Then I should see an element with xpath "//body/*[contains(text(), '"de_identified_data":')]"
+        When I go to "/api/3/action/package_show?id=public-test-dataset"
+        Then I should see an element with xpath "//body/*[contains(string(), '"de_identified_data":')]"
 
         Examples: Users
             | User          |
@@ -76,19 +76,19 @@ Feature: SchemaMetadata
     @unauthenticated
     Scenario: Non logged-in user should not see de_identified_data value.
         Given "Unauthenticated" as the persona
-        When I go to "/dataset/warandpeace"
+        When I go to dataset "public-test-dataset"
         Then I should not see "Contains de-identified data"
-        Then I should not see an element with xpath "//th[contains(text(), 'Contains de-identified data')]/following-sibling::td[contains(text(), 'NO')]"
+        And I should not see an element with xpath "//th[contains(string(), 'Contains de-identified data')]/following-sibling::td[contains(string(), 'NO')]"
 
-        And I go to "/api/3/action/package_show?id=warandpeace"
-        Then I should not see an element with xpath "//body/*[contains(text(), '"de_identified_data":')]"
+        When I go to "/api/3/action/package_show?id=public-test-dataset"
+        Then I should not see an element with xpath "//body/*[contains(string(), '"de_identified_data":')]"
 
     Scenario Outline: Check label of the Data schema validation options field
         Given "<User>" as the persona
         When I log in
-        And I go to "/dataset/new_resource/warandpeace"
-        Then I should see an element with xpath "//label[text()='Data schema validation options']"
-        Then I should not see an element with xpath "//label[text()='Validation options']"
+        And I open the new resource form for dataset "public-test-dataset"
+        Then I should see an element with xpath "//label[string()='Data schema validation options']"
+        Then I should not see an element with xpath "//label[string()='Validation options']"
 
         Examples: Users
           | User          |

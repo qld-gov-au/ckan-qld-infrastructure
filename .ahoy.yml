@@ -12,7 +12,6 @@ commands:
       ahoy clean
       ahoy build-network
       ahoy up -- --build --force-recreate
-      ahoy install-site
       ahoy title "Build complete"
       ahoy doctor
       ahoy info 1
@@ -20,6 +19,7 @@ commands:
   build-network:
     usage: Ensure that the amazeeio network exists.
     cmd: |
+      ahoy title "Creating amazeeio Docker network"
       docker network prune -f > /dev/null
       docker network inspect amazeeio-network > /dev/null || docker network create amazeeio-network
 
@@ -35,13 +35,14 @@ commands:
   up:
     usage: Build and start Docker containers.
     cmd: |
-      echo "Preparing containers for $VARS_TYPE"
+      ahoy title "Building and starting Docker containers for $VARS_TYPE"
       docker-compose up -d "$@"
-      sleep 10
-      docker-compose logs
+      echo "Initialising database schema"
+      ahoy cli '$APP_DIR/bin/init.sh'
+      echo "Waiting for containers to start listening..."
       ahoy cli "dockerize -wait tcp://ckan:5000 -timeout 1m"
-      if docker-compose logs | grep -q "\[Error\]"; then docker-compose logs; exit 1; fi
-      if docker-compose logs | grep -q "Exception"; then docker-compose logs; exit 1; fi
+      if docker-compose logs | grep -q "\[Error\]"; then exit 1; fi
+      if docker-compose logs | grep -q "Exception"; then exit 1; fi
       docker ps -a --filter name=^/${COMPOSE_PROJECT_NAME}_
       export DOCTOR_CHECK_CLI=0
 
@@ -67,7 +68,7 @@ commands:
 
   pull:
     usage: Pull latest docker images.
-    cmd: if [ ! -z "$(docker image ls -q)" ]; then docker image ls --format \"{{.Repository}}:{{.Tag}}\" | grep amazeeio/ | grep -v none | xargs -n1 docker pull | cat; fi
+    cmd: if [ ! -z "$(docker image ls -q)" ]; then docker image ls --format \"{{.Repository}}:{{.Tag}}\" | grep ckan/ckan- | grep -v none | xargs -n1 docker pull | cat; fi
 
   cli:
     usage: Start a shell inside CLI container or run a command.
@@ -78,14 +79,15 @@ commands:
     cmd: bin/doctor.sh "$@"
 
   install-site:
-    usage: Install a site.
+    usage: Install test site data.
     cmd: |
       ahoy title "Installing a fresh site"
-      ahoy cli '$APP_DIR/bin/init.sh'
+      ahoy cli '$APP_DIR/bin/init.sh && $APP_DIR/bin/create-test-data.sh'
 
   clean:
     usage: Remove containers and all build files.
     cmd: |
+      ahoy title "Cleaning up old builds"
       ahoy down
       # Remove other directories.
       # @todo: Add destinations below.
@@ -107,6 +109,7 @@ commands:
   lint:
     usage: Lint code.
     cmd: |
+      ahoy title 'Check for lint'
       ahoy cli "flake8 ${@:-roles}" || \
       [ "${ALLOW_LINT_FAIL:-0}" -eq 1 ]
 
@@ -115,31 +118,34 @@ commands:
     cmd: |
       docker cp . $(docker-compose ps -q ckan):/srv/app/
       docker cp bin/ckan_cli $(docker-compose ps -q ckan):/usr/bin/
-      ahoy cli 'chmod -v u+x /usr/bin/ckan_cli; cp -v .docker/test-$VARS_TYPE.ini $CKAN_INI'
+      ahoy cli 'chmod -v u+x /usr/bin/ckan_cli $APP_DIR/bin/*; cp -v .docker/test-$VARS_TYPE.ini $CKAN_INI; $APP_DIR/bin/process-config.sh'
 
   test-unit:
     usage: Run unit tests.
     cmd: |
+      ahoy title 'Run unit tests'
       ahoy cli 'pytest --ckan-ini=${CKAN_INI} $APP_DIR/test' || \
       [ "${ALLOW_UNIT_FAIL:-0}" -eq 1 ]
 
   test-bdd:
     usage: Run BDD tests.
     cmd: |
+      ahoy title 'Run scenario tests'
+      ahoy cli "rm -f test/screenshots/*"
       ahoy start-ckan-job-workers
       ahoy start-mailmock &
       sleep 5 &&
-      # Run generic tests
-      BEHAVE_COMMAND="behave -k --tags=-OpenData --tags=-Publications ${*:-test/features}"
-      echo "Args: ${*:-test/features}, command: $BEHAVE_COMMAND"
-      ahoy cli "$BEHAVE_COMMAND" || \
-      [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
-      # Run app-specific tests
-      ahoy cli "behave -k --tags $VARS_TYPE --tags=-reporting ${*:-test/features}" || \
-      [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
-      # Ensure reporting tests run last so there's no race condition on the numbers
-      ahoy cli "behave -k --tags $VARS_TYPE --tags=reporting ${*:-test/features}" || \
-      [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
+      if [ "$BEHAVE_TAG" = "" ]; then
+        # Run reporting tests last so numbers are consistent
+        (ahoy cli "behave -k --tags=-OpenData --tags=-Publications ${*:-test/features}" \
+         && ahoy cli "behave -k --tags $VARS_TYPE --tags=-reporting ${*:-test/features}" \
+         && ahoy cli "behave -k --tags $VARS_TYPE --tags=reporting ${*:-test/features}" \
+        ) || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
+      else
+        # run tests with the specified tag
+        ahoy cli "behave -k ${*:-test/features} --tags=$BEHAVE_TAG --tags=-reporting" \
+          || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
+      fi
       ahoy stop-mailmock
       ahoy stop-ckan-job-workers
 

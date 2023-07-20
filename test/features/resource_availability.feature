@@ -2,84 +2,103 @@
 @OpenData
 Feature: Re-identification risk governance acknowledgement or Resource visibility
 
-    @fixture.dataset_with_schema::name=random_package::owner_org=test-organisation::de_identified_data=NO
-    @fixture.create_resource_for_dataset_with_params::package_id=random_package::name=invisible-resource::resource_visible=FALSE
-    Scenario: resource with resource_visible=False must be visible for org editor, org admin
+    Scenario: As a publisher, I can view hidden resources
         Given "TestOrgEditor" as the persona
         When I log in
-        Then I go to dataset "random_package"
-        And I should see "invisible-resource"
+        And I create a dataset and resource with key-value parameters "name=package-with-invisible-resource::notes=Package with invisible resource::de_identified_data=NO::private=False" and "name=invisible-resource::resource_visible=FALSE"
+        Then I should see "invisible-resource"
+        And I should see "HIDDEN"
+        When I press "invisible-resource"
+        # Check that we made it to the resource page
+        Then I should see "Resource visible"
+        And I should see "HIDDEN"
 
-    @fixture.dataset_with_schema::name=random_package::owner_org=test-organisation::de_identified_data=NO
-    @fixture.create_resource_for_dataset_with_params::package_id=random_package::name=invisible-resource::resource_visible=FALSE
-    Scenario: resource with resource_visible=False mustnt be visible for regular user, org editor/admin from different org
         Given "CKANUser" as the persona
-        When I log in
-        Then I go to dataset "random_package"
+        When I log out
+        And I log in
+        And I go to dataset "package-with-invisible-resource"
+        Then I should see "Package with invisible resource"
         And I should not see "invisible-resource"
 
-    @fixture.dataset_with_schema::name=random_package::owner_org=test-organisation::de_identified_data=NO
-    @fixture.create_resource_for_dataset_with_params::package_id=random_package::name=visible-resource::request_privacy_assessment=YES::governance_acknowledgement=YES::resource_visible=TRUE
-    Scenario: Resource visible, governance_acknowledgement & request_privacy_assessment & not de_identified_data
-        Given "CKANUser" as the persona
-        When I log in
-        Then I go to dataset "random_package"
-        And I should see "visible-resource"
-
-    @fixture.dataset_with_schema::name=random_package::owner_org=test-organisation::de_identified_data=YES
-    @fixture.create_resource_for_dataset_with_params::package_id=random_package::name=visible-resource::request_privacy_assessment=NO::governance_acknowledgement=YES::resource_visible=TRUE
-    Scenario: Resource visible, governance_acknowledgement & not request_privacy_assessment & de_identified_data
-        Given "CKANUser" as the persona
-        When I log in
-        Then I go to dataset "random_package"
-        And I should see "visible-resource"
-
-    @fixture.dataset_with_schema::name=random_package::owner_org=test-organisation::de_identified_data=YES
-    @fixture.create_resource_for_dataset_with_params::package_id=random_package::name=visible-resource::request_privacy_assessment=NO::governance_acknowledgement=YES::resource_visible=TRUE
-    Scenario: Resource visible for Unauthenticated, governance_acknowledgement & not request_privacy_assessment & de_identified_data
-        Given "Unauthenticated" as the persona
-        Then I go to dataset "random_package"
-        And I should see "visible-resource"
-
-    @fixture.dataset_with_schema::name=random_package::owner_org=test-organisation::de_identified_data=YES
-    @fixture.create_resource_for_dataset_with_params::package_id=random_package::name=invisible-resource::request_privacy_assessment=YES::governance_acknowledgement=NO::resource_visible=TRUE
-    Scenario: Resource visible, not governance_acknowledgement & not request_privacy_assessment & de_identified_data
-        Given "CKANUser" as the persona
-        When I log in
-        Then I go to dataset "random_package"
-        And I should not see "invisible-resource"
-
-    @fixture.dataset_with_schema::name=random_package::owner_org=test-organisation::de_identified_data=YES
-    @fixture.create_resource_for_dataset_with_params::package_id=random_package::name=invisible-resource::request_privacy_assessment=YES::governance_acknowledgement=NO::resource_visible=TRUE
-    Scenario: Resource not visible for Unauthenticated, not governance_acknowledgement & not request_privacy_assessment & de_identified_data
-        Given "Unauthenticated" as the persona
-        Then I go to dataset "random_package"
-        And I should not see "invisible-resource"
-
-    @fixture.dataset_with_schema::name=random_package::owner_org=test-organisation::de_identified_data=YES
-    @fixture.create_resource_for_dataset_with_params::package_id=random_package::name=invisible-resource::request_privacy_assessment=YES::governance_acknowledgement=YES::resource_visible=TRUE
-    Scenario: Resource visible, governance_acknowledgement & request_privacy_assessment & de_identified_data
-        Given "CKANUser" as the persona
-        When I log in
-        Then I go to dataset "random_package"
-        And I should not see "invisible-resource"
-
-    @fixture.dataset_with_schema::name=random_package::owner_org=test-organisation::de_identified_data=NO
-    @fixture.create_resource_for_dataset_with_params::package_id=random_package::name=invisible-resource::resource_visible=FALSE
-    Scenario: update the invisible resource
+    Scenario: As an unprivileged user, I cannot see resources with privacy assessment requested and risk governance completed 
         Given "TestOrgEditor" as the persona
         When I log in
-        Then I go to dataset "random_package"
-        And I click the link with text that contains "invisible-resource"
-        And I click the link with text that contains "Manage"
-        And I should not see an element with xpath "//label[@for="field-request_privacy_assessment"]//*[@class="control-required"]"
+        And I create a dataset and resource with key-value parameters "name=package-with-assessed-resource::notes=Package with assessed resource::de_identified_data=NO::private=False" and "name=resource-for-assessment::request_privacy_assessment=YES::governance_acknowledgement=YES::resource_visible=TRUE"
+        Then I should see "resource-for-assessment"
+
+        Given "CKANUser" as the persona
+        When I log out
+        And I log in
+        And I go to dataset "package-with-assessed-resource"
+        Then I should not see "resource-for-assessment"
+
+    Scenario: As an unprivileged user, I can see de-identified resources marked as visible without a privacy assessment
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I create a dataset and resource with key-value parameters "name=de-identified-package-with-unassessed-resource::de_identified_data=YES::private=False" and "name=visible-resource::request_privacy_assessment=NO::governance_acknowledgement=YES::resource_visible=TRUE"
+
+        Given "CKANUser" as the persona
+        When I log out
+        And I log in
+        And I go to dataset "de-identified-package-with-unassessed-resource"
+        Then I should see "visible-resource"
+
+        When I log out
+        And I go to dataset "de-identified-package-with-unassessed-resource"
+        Then I should see "visible-resource"
+
+    Scenario: As an unprivileged user, I cannot see de-identified resources with an incomplete privacy assessment
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I create a dataset and resource with key-value parameters "name=de-identified-package-with-partially-assessed-resource::de_identified_data=YES" and "name=invisible-resource::request_privacy_assessment=YES::governance_acknowledgement=NO::resource_visible=TRUE"
+        Then I should see "invisible-resource"
+
+        Given "CKANUser" as the persona
+        When I log out
+        And I log in
+        And I go to dataset "de-identified-package-with-partially-assessed-resource"
+        Then I should not see "invisible-resource"
+
+        When I log out
+        And I go to dataset "de-identified-package-with-partially-assessed-resource"
+        Then I should not see "invisible-resource"
+
+    Scenario: As an unprivileged user, I cannot see de-identified resources
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I create a dataset and resource with key-value parameters "name=de-identified-package-with-assessed-resource::de_identified_data=YES" and "name=invisible-resource::request_privacy_assessment=YES::governance_acknowledgement=YES::resource_visible=TRUE"
+        Then I should see "invisible-resource"
+
+        Given "CKANUser" as the persona
+        When I log out
+        And I log in
+        And I go to dataset "random_package"
+        Then I should not see "invisible-resource"
+
+    Scenario: As a publisher, when I edit a resource, I can set its visibility
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I create a dataset and resource with key-value parameters "de_identified_data=NO" and "name=invisible-resource::resource_visible=FALSE"
+        And I should see "HIDDEN"
+        And I press "invisible-resource"
+        And I should see "HIDDEN"
+        And I press "Manage"
+        Then I should not see an element with xpath "//label[@for="field-request_privacy_assessment"]//*[@class="control-required"]"
         And I should see an element with xpath "//select[@id="field-request_privacy_assessment"]//option[@value="" or @value="YES" or @value="NO"]"
-        And I press the element with xpath "//button[text()='Update Resource']"
-        And I should see an element with xpath "//th[text()='Request privacy assessment']/following-sibling::td[not(text())]"
+        And I should see "Privacy risk assessment prior to public release might assist the publishing decision-making process"
+        And I should see an element with xpath "//a[contains(@href, 'download') and contains(string(), 'Privacy assessment guidance')]"
 
-    @fixture.dataset_with_schema::name=random_package::owner_org=test-organisation::de_identified_data=NO
-    @fixture.create_resource_for_dataset_with_params::package_id=random_package::name=visible-resource::resource_visible=TRUE::governance_acknowledgement=NO
-    Scenario: Unauthenticated user should see a visible resource when de-identified data is NO and Resource visibility is TRUE and Acknowledgement is NO
-        Given "Unauthenticated" as the persona
-        When I go to dataset "random_package"
+        When I press the element with xpath "//button[string()='Update Resource']"
+        Then I should see an element with xpath "//th[string()='Request privacy assessment']/following-sibling::td[not(string())]"
+
+    Scenario: As an anonymous user, I can see resources without de-identified data
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I create a dataset and resource with key-value parameters "name=package-without-de-identified-data::de_identified_data=NO::private=False" and "name=visible-resource::governance_acknowledgement=NO::resource_visible=TRUE"
+
+        When I log out
+        And I go to dataset "package-without-de-identified-data"
+        Then I should not see "HIDDEN"
         And I should see "visible-resource"
+        And I click the link with text that contains "visible-resource"
+        And I should not see "HIDDEN"
