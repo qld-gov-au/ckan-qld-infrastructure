@@ -12,7 +12,7 @@ Feature: User creation
     Scenario: SysAdmin create a new user to the site.
         Given "SysAdmin" as the persona
         When I log in
-        When I go to "/user/register"
+        And I go to "/user/register"
         Then I should see an element with xpath "//input[@name='fullname']"
         And I should see "Displayed name"
         When I fill in "name" with "publisher_user"
