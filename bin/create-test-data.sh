@@ -2,8 +2,7 @@
 ##
 # Create some example content for extension BDD tests.
 #
-set -e
-set -x
+set -ex
 
 CKAN_ACTION_URL=${CKAN_SITE_URL}api/action
 CKAN_USER_NAME="${CKAN_USER_NAME:-admin}"

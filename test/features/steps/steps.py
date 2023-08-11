@@ -251,7 +251,7 @@ def fill_in_default_link_resource_fields(context):
 @when(u'I upload "{file_name}" of type "{file_format}" to resource')
 def upload_file_to_resource(context, file_name, file_format):
     context.execute_steps(u"""
-        When I execute the script "button = document.getElementById('resource-upload-button'); if (button) button.click();"
+        When I execute the script "$('#resource-upload-button').trigger(click);"
         And I attach the file "{file_name}" to "upload"
         # Don't quote the injected string since it can have trailing spaces
         And I execute the script "document.getElementById('field-format').value='{file_format}'"

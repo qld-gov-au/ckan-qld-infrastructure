@@ -35,7 +35,7 @@ commands:
   up:
     usage: Build and start Docker containers.
     cmd: |
-      ahoy title "Building and starting Docker containers for $VARS_TYPE"
+      ahoy title "Building and starting Docker containers"
       docker-compose up -d "$@"
       echo "Initialising database schema"
       ahoy cli '$APP_DIR/bin/init.sh'
