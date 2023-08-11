@@ -213,9 +213,11 @@ def select_licence(context, licence_id):
 
 @when(u'I enter the resource URL "{url}"')
 def enter_resource_url(context, url):
-    context.execute_steps(u"""
-        When I execute the script "$('#resource-edit [name=url]').val('{0}')"
-    """.format(url))
+    if url != "default":
+        context.execute_steps(u"""
+            When I clear the URL field
+            When I execute the script "$('#resource-edit [name=url]').val('{0}')"
+        """.format(url))
 
 
 @when(u'I fill in default dataset fields')
@@ -370,7 +372,7 @@ def _create_dataset_from_params(context, params):
             context.execute_steps(u"""
                 When I set "last_generated_name" to "{0}"
             """.format(value))
-        if key == "owner_org":
+        elif key == "owner_org":
             # Owner org uses UUIDs as its values, so we need to rely on displayed text
             context.execute_steps(u"""
                 When I select by text "{1}" from "{0}"
@@ -426,6 +428,10 @@ def _is_truthy(text):
     return text and text.lower() in ["true", "t", "yes", "y"]
 
 
+def _get_yn_value(value, y_value="TRUE", n_value="FALSE"):
+    return y_value if _is_truthy(value) else n_value
+
+
 # Creates a resource using default values apart from the ones specified.
 # The browser should already be on the create/edit resource page.
 @when(u'I create a resource with key-value parameters "{resource_params}"')
@@ -436,11 +442,9 @@ def create_resource_from_params(context, resource_params):
     """)
     for key, value in _parse_params(resource_params):
         if key == "url":
-            if value != "default":
-                context.execute_steps(u"""
-                    When I clear the URL field
-                    And I execute the script "$('#resource-edit [name=url]').val('{0}')"
-                """.format(value))
+            context.execute_steps(u"""
+                When I enter the resource URL "{0}"
+            """.format(value))
         elif key == "upload":
             if value == "default":
                 value = "test_game_data.csv"
@@ -454,17 +458,17 @@ def create_resource_from_params(context, resource_params):
                 When I execute the script "document.getElementById('field-format').value='{0}'"
             """.format(value))
         elif key in ["align_default_schema"]:
-            action = "check" if _is_truthy(value) else "uncheck"
+            action = _get_yn_value(value, "check", "uncheck")
             context.execute_steps(u"""
                 When I {0} "{1}"
             """.format(action, key))
         elif key == "resource_visible":
-            option = "TRUE" if _is_truthy(value) else "FALSE"
+            option = _get_yn_value(value)
             context.execute_steps(u"""
                 When I select "{1}" from "{0}"
             """.format(key, option))
         elif key in ["governance_acknowledgement", "request_privacy_assessment"]:
-            option = "YES" if _is_truthy(value) else "NO"
+            option = _get_yn_value(value, "YES", "NO")
             context.execute_steps(u"""
                 When I select "{1}" from "{0}"
             """.format(key, option))
@@ -536,17 +540,6 @@ def log_out(context):
     """)
 
 
-# ckanext-data-qld
-
-
-@when(u'I visit resource schema generation page')
-def resource_schema_generation(context):
-    path = urlparse(context.browser.url).path
-    context.execute_steps(u"""
-        When I visit "{0}/generate_schema"
-    """.format(path))
-
-
 @when(u'I reload page every {seconds:d} seconds until I see an element with xpath "{xpath}" but not more than {reload_times:d} times')
 def reload_page_every_n_until_find(context, xpath, seconds=5, reload_times=5):
     for _ in range(reload_times):
@@ -561,6 +554,17 @@ def reload_page_every_n_until_find(context, xpath, seconds=5, reload_times=5):
             context.browser.reload()
 
     assert False, 'Element with xpath "{}" was not found'.format(xpath)
+
+
+# ckanext-data-qld
+
+
+@when(u'I visit resource schema generation page')
+def resource_schema_generation(context):
+    path = urlparse(context.browser.url).path
+    context.execute_steps(u"""
+        When I visit "{0}/generate_schema"
+    """.format(path))
 
 
 @when(u'I trigger notification about updated privacy assessment results')
