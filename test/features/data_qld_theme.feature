@@ -104,6 +104,7 @@ Feature: Theme customisations (Publications and OpenData)
         And I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=json') and contains(string(), 'JSON')]"
         And I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=xml') and contains(string(), 'XML')]"
 
+    @unauthenticated
     @Publications
     Scenario: Publications - Menu items are present and correct
         Given "Unauthenticated" as the persona

@@ -35,7 +35,7 @@ commands:
   up:
     usage: Build and start Docker containers.
     cmd: |
-      ahoy title "Building and starting Docker containers for $VARS_TYPE"
+      ahoy title "Building and starting Docker containers"
       docker-compose up -d "$@"
       echo "Initialising database schema"
       ahoy cli '$APP_DIR/bin/init.sh'
@@ -134,7 +134,7 @@ commands:
       ahoy cli "rm -f test/screenshots/*"
       ahoy start-ckan-job-workers
       ahoy start-mailmock &
-      sleep 5 &&
+      sleep 5
       if [ "$BEHAVE_TAG" = "" ]; then
         # Run reporting tests last so numbers are consistent
         (ahoy cli "behave -k --tags=-OpenData --tags=-Publications ${*:-test/features}" \
