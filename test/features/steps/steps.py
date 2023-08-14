@@ -536,17 +536,6 @@ def log_out(context):
     """)
 
 
-# ckanext-data-qld
-
-
-@when(u'I visit resource schema generation page')
-def resource_schema_generation(context):
-    path = urlparse(context.browser.url).path
-    context.execute_steps(u"""
-        When I visit "{0}/generate_schema"
-    """.format(path))
-
-
 @when(u'I reload page every {seconds:d} seconds until I see an element with xpath "{xpath}" but not more than {reload_times:d} times')
 def reload_page_every_n_until_find(context, xpath, seconds=5, reload_times=5):
     for _ in range(reload_times):
@@ -561,6 +550,17 @@ def reload_page_every_n_until_find(context, xpath, seconds=5, reload_times=5):
             context.browser.reload()
 
     assert False, 'Element with xpath "{}" was not found'.format(xpath)
+
+
+# ckanext-data-qld
+
+
+@when(u'I visit resource schema generation page')
+def resource_schema_generation(context):
+    path = urlparse(context.browser.url).path
+    context.execute_steps(u"""
+        When I visit "{0}/generate_schema"
+    """.format(path))
 
 
 @when(u'I trigger notification about updated privacy assessment results')
@@ -662,6 +662,7 @@ def lock_account(context):
     for x in range(11):
         context.execute_steps(u"""
             When I attempt to log in with password "incorrect password"
+            Then I should see "Bad username or password or reCAPTCHA."
         """)
 
 

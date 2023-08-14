@@ -136,7 +136,7 @@ Feature: User APIs
         When I fill in "password1" with "$password"
         And I fill in "password2" with "$password"
         And I press the element with xpath "//button[@class='btn btn-primary']"
-        When I log in
+        And I log in
         Then I should see "Dashboard"
 
     Scenario: Register user password must be 10 characters or longer and contain number, lowercase, capital, and symbol
