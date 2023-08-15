@@ -369,10 +369,13 @@ def _create_dataset_from_params(context, params):
     """)
     for key, value in _parse_params(params):
         if key == "name":
+            # 'name' doesn't need special input, but we want to remember it
             context.execute_steps(u"""
                 When I set "last_generated_name" to "{0}"
             """.format(value))
-        elif key == "owner_org":
+
+        # Don't use elif here, we still want to type 'name' as usual
+        if key == "owner_org":
             # Owner org uses UUIDs as its values, so we need to rely on displayed text
             context.execute_steps(u"""
                 When I select by text "{1}" from "{0}"
