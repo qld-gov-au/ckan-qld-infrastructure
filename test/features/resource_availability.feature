@@ -20,7 +20,7 @@ Feature: Re-identification risk governance acknowledgement or Resource visibilit
         Then I should see "Package with invisible resource"
         And I should not see "invisible-resource"
 
-    Scenario: As an unprivileged user, I cannot see resources with privacy assessment requested and risk governance completed 
+    Scenario: As an unprivileged user, I cannot see resources with privacy assessment requested and risk governance completed
         Given "TestOrgEditor" as the persona
         When I log in
         And I create a dataset and resource with key-value parameters "name=package-with-assessed-resource::notes=Package with assessed resource::de_identified_data=NO::private=False" and "name=resource-for-assessment::request_privacy_assessment=YES::governance_acknowledgement=YES::resource_visible=TRUE"
