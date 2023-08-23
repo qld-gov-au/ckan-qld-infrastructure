@@ -6,6 +6,7 @@ templates/Datashades-OpsWorks-CKAN-Extensions.cfn.yml
 templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml
 templates/*.sql
 .idea
+*.log
 
 # generated from template
 Dockerfile.ckan

@@ -2,8 +2,7 @@
 ##
 # Create some example content for extension BDD tests.
 #
-set -e
-set -x
+set -ex
 
 CKAN_ACTION_URL=${CKAN_SITE_URL}api/action
 CKAN_USER_NAME="${CKAN_USER_NAME:-admin}"
@@ -94,10 +93,6 @@ echo ${organisation_create}
 
 add_user_if_needed group_admin "Group Admin" group_admin@localhost
 add_user_if_needed walker "Walker" walker@localhost
-
-# Datasets need to be assigned to an organisation
-
-echo "Assigning test Datasets to Organisation..."
 
 echo "Creating non-organisation group:"
 group_create=$( \
