@@ -255,4 +255,5 @@ basic_facts:
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "oss.squizedge.net"
     CKANRevision: "ckan-2.10.1-qgov.3"
+    SolrSource: "http://archive.apache.org/dist/lucene/solr/8.11.2/solr-8.11.2.zip"
 
