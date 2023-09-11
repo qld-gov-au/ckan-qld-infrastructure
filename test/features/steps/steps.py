@@ -151,7 +151,7 @@ def confirm_dialog_if_present(context, text):
     else:
         return
     button_xpath = parent_xpath + "//button[contains(@class, 'btn-primary')]"
-        context.execute_steps(u"""
+    context.execute_steps(u"""
         When I press the element with xpath "{0}"
     """.format(button_xpath))
 
