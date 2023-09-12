@@ -47,7 +47,7 @@ jobs:
       - name: Retrieve logs
         if: always()
         run: bin/get-logs.sh
-        timeout-minutes: 5
+        timeout-minutes: 1
 
       - name: Retrieve screenshots
         if: always()
