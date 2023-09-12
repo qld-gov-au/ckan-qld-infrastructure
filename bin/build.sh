@@ -16,7 +16,7 @@ ahoy pull
 
 PYTHON=python
 CKAN_GIT_VERSION=`sh ./retrieve-ckan-version.sh`
-CKAN_VERSION=2.9
+CKAN_VERSION=2.10
 if [ "$PYTHON_VERSION" = "py2" ]; then
     CKAN_VERSION="${CKAN_VERSION}-py2"
 else
