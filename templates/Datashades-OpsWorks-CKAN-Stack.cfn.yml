@@ -574,7 +574,7 @@ Resources:
         Type: git
         Url: !Ref CKANSource
         Revision: !Ref CKANRevision
-      Description: "CKAN 2.8"
+      Description: "CKAN Data Management System"
       EnableSsl: false
       Name: !Sub "${ApplicationName}-${Environment}"
       Shortname: !Sub "${ApplicationId}-${Environment}"
@@ -587,10 +587,10 @@ Resources:
       AppSource:
         Type: archive
         Url: !Ref SolrSource
-      Description: "Apache Solr 5.5.5"
+      Description: "Apache Solr"
       EnableSsl: false
-      Name: !Sub "${ApplicationName}-${Environment}-solr-5.5"
-      Shortname: !Sub "${ApplicationId}-${Environment}-solr-5.5"
+      Name: !Sub "${ApplicationName}-${Environment}-solr"
+      Shortname: !Sub "${ApplicationId}-${Environment}-solr"
       StackId: !Ref OpsWorksStack
       Type: other
 
