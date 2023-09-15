@@ -36,7 +36,7 @@ install_requirements () {
 
 install_requirements . dev-requirements requirements-dev
 EXTENSIONS_FILE=$APP_DIR/bin/extensions.yml $PYTHON $(dirname $0)/generate-ext-requirements.py
-pip install --force-reinstall -r "/tmp/requirements-ext.txt"
+pip install -r "/tmp/requirements-ext.txt"
 for extension in . `ls -d $SRC_DIR/ckanext-*`; do
     install_requirements $extension requirements pip-requirements
 done
