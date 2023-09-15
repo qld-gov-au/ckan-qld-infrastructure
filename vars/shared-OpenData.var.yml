@@ -49,13 +49,13 @@ extensions:
       url: "https://github.com/ckan/ckanext-dcat.git"
       version: "v1.2.0"
 
-    #~ CKANExtScheming: &CKANExtScheming
-      #~ name: "ckanext-scheming-{{ Environment }}"
-      #~ shortname: "ckanext-scheming"
-      #~ description: "CKAN Extension for Scheming"
-      #~ type: "git"
-      #~ url: "https://github.com/ckan/ckanext-scheming.git"
-      #~ version: "release-3.0.0"
+    CKANExtScheming: &CKANExtScheming
+      name: "ckanext-scheming-{{ Environment }}"
+      shortname: "ckanext-scheming"
+      description: "CKAN Extension for Scheming"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-scheming.git"
+      version: "release-3.0.0"
 
     CKANExtValidation: &CKANExtValidation
       name: "ckanext-validation-{{ Environment }}"
