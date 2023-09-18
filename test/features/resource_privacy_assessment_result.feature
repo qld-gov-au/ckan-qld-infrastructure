@@ -34,7 +34,7 @@ Feature: Resource Privacy Assessment Result
     Scenario: Email to dataset contact when result of requested privacy assessment is posted
         Given "SysAdmin" as the persona
         When I log in
-        And I create a dataset and resource with key-value parameters "name=package-with-new-privacy-assessment::author_email=test@gmail.com" and "name=pending-assessment-resource::request_privacy_assessment=YES"
+        And I create a dataset and resource with key-value parameters "notes=Package with new privacy assessment::author_email=test@gmail.com" and "name=pending-assessment-resource::request_privacy_assessment=YES"
         And I go to the first resource in the dataset
         And I press the element with xpath "//a[contains(string(), 'Manage')]"
         And I fill in "privacy_assessment_result" with "New privacy_assessment_result"
