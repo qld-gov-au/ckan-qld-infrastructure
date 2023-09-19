@@ -165,7 +165,24 @@ Resources:
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
 
 {% else %}
-          #Everything that isn't the below rules for CMS resources should go to CKAN
+          #Everything that isn't the below rules for CMS resources should go to CKAN except _tracking
+          - PathPattern: /_tracking # ckan tracking ping path
+            TargetOriginId: 'WebOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            CachePolicyId: !Ref CachePolicyCkan
+            Compress: true
+            ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+
           - PathPattern: /index.* #If anyone reaches the homepage on an "index" url
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
