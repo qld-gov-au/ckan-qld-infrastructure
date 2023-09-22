@@ -40,3 +40,11 @@ Feature: Organization APIs
 
         When I view the "test-organisation" organisation API "not including" users
         Then I should see an element with xpath "//*[contains(string(), '"success": true') and contains(string(), '"name": "test-organisation"')]"
+
+    Scenario: Organisation list is accessible via the dashboard
+        Given "SysAdmin" as the persona
+        When I log in
+        And I go to the dashboard
+        And I press "My Organisations"
+        Then I should see "Test Organisation"
+        And I should see an element with xpath "//a[contains(@href, 'organization/new') and contains(string(), 'Add Organisation')]"
