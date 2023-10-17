@@ -1,4 +1,4 @@
----
+
 service_name: OpenData
 service_name_lower: "{{ service_name | lower }}"
 title: Data
@@ -79,7 +79,7 @@ extensions:
       description: "CKAN Extension for Data Requests"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-datarequests.git"
-      version: "2.2.1-qgov.9"
+      version: "2.2.1-qgov.10"
 
     CKANExtYTP: &CKANExtYTP
       name: "ckanext-ytp-comments-{{ Environment }}"
