@@ -23,32 +23,19 @@ Feature: Engagement Reporting
             | TestOrgAdmin  |
             | TestOrgEditor |
 
-    Scenario: As a data request organisation admin, when I view my engagement report, I can verify the number of data requests is correct and increments
-        Given "DataRequestOrgAdmin" as the persona
-        When I log in
-        And I go to my reports page
-        And I press "Engagement Report"
-        And I press the element with xpath "//button[contains(string(), 'Show')]"
-        Then I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-title') and string()='Data requests' and position()=1]"
-        And I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-data') and string()='30' and position()=2]"
-
-        When I create a datarequest
-        And I go to my reports page
-        And I press "Engagement Report"
-        And I press the element with xpath "//button[contains(string(), 'Show')]"
-        Then I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-title') and string()='Data requests' and position()=1]"
-        And I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-data') and string()='31' and position()=2]"
-
     Scenario: As an admin user of my organisation, when I view my engagement report, I can verify the numbers are correct and increment
         Given "ReportingOrgAdmin" as the persona
         When I log in
         And I go to my reports page
         And I press "Engagement Report"
+        And I take a debugging screenshot
         And I press the element with xpath "//button[contains(string(), 'Show')]"
         Then I should see an element with xpath "//tr[@id='dataset-followers']/td[contains(@class, 'metric-title') and string()='Dataset followers' and position()=1]"
         And I should see an element with xpath "//tr[@id='dataset-followers']/td[contains(@class, 'metric-data') and string()='0' and position()=2]"
         And I should see an element with xpath "//tr[@id='dataset-comments']/td[contains(@class, 'metric-title') and string()='Dataset comments' and position()=1]"
         And I should see an element with xpath "//tr[@id='dataset-comments']/td[contains(@class, 'metric-data') and string()='0' and position()=2]"
+        And I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-title') and string()='Data requests' and position()=1]"
+        And I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-data') and string()='1' and position()=2]"
         And I should see an element with xpath "//tr[@id='datarequest-comments']/td[contains(@class, 'metric-title') and string()='Data request comments' and position()=1]"
         And I should see an element with xpath "//tr[@id='datarequest-comments']/td[contains(@class, 'metric-data') and string()='0' and position()=2]"
         And I should see an element with xpath "//tr[contains(@class, 'closing-circumstance')]/td[position()=1]/a[contains(@href, '/closed?') and contains(string(), 'To be released as open data at a later date')]"
@@ -62,6 +49,7 @@ Feature: Engagement Reporting
         And I submit a comment with subject "Test subject" and comment "This is a test comment"
         And I go to data request "Reporting Request" comments
         And I submit a comment with subject "Test subject" and comment "This is a test comment"
+        And I create a data request in the "Reporting Organisation" organisation
         And I go to data request "Reporting Request"
         And I press the element with xpath "//a[contains(string(), 'Close')]"
         And I select "To be released as open data at a later date" from "close_circumstance"
@@ -75,6 +63,8 @@ Feature: Engagement Reporting
         And I should see an element with xpath "//tr[@id='dataset-followers']/td[contains(@class, 'metric-data') and string()='1' and position()=2]"
         And I should see an element with xpath "//tr[@id='dataset-comments']/td[contains(@class, 'metric-title') and string()='Dataset comments' and position()=1]"
         And I should see an element with xpath "//tr[@id='dataset-comments']/td[contains(@class, 'metric-data') and string()='1' and position()=2]"
+        And I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-title') and string()='Data requests' and position()=1]"
+        And I should see an element with xpath "//tr[@id='datarequests-total']/td[contains(@class, 'metric-data') and string()='2' and position()=2]"
         And I should see an element with xpath "//tr[@id='datarequest-comments']/td[contains(@class, 'metric-title') and string()='Data request comments' and position()=1]"
         And I should see an element with xpath "//tr[@id='datarequest-comments']/td[contains(@class, 'metric-data') and string()='1' and position()=2]"
         And I should see an element with xpath "//tr[contains(@class, 'closing-circumstance')]/td[position()=1]/a[contains(@href, '/closed?') and contains(string(), 'To be released as open data at a later date')]"
