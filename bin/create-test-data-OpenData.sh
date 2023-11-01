@@ -2,8 +2,7 @@
 ##
 # Create example content specific to Open Data BDD tests.
 #
-set -e
-set -x
+set -ex
 
 ##
 # BEGIN: Add sysadmin config values.

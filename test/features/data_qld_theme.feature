@@ -92,7 +92,7 @@ Feature: Theme customisations (Publications and OpenData)
     Scenario: As a publisher, when I create a resource with an API entry, I can download it in various formats
         Given "TestOrgEditor" as the persona
         When I log in
-        And I create a dataset and resource with key-value parameters "license=other-open::private=False" and "format=CSV::upload=csv_resource.csv"
+        And I create a dataset and resource with key-value parameters "license=other-open" and "format=CSV::upload=csv_resource.csv"
         And I wait for 10 seconds
         And I press "Test Resource"
         Then I should see an element with xpath "//a[contains(string(), 'Data API')]"
