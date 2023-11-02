@@ -54,6 +54,16 @@ Feature: Data Request
         And I should see an element with the css selector "span.error-block" within 1 seconds
         And I should see "Description cannot be empty" within 1 seconds
 
+    Scenario: When a logged-in user submits a Data Request containing profanity they should receive an error message and the request will not be created
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I go to the data requests page
+        And I press "Add data request"
+        And I fill in title with random text
+        And I fill in "description" with "He had sheep, and oxen, and he asses, and menservants, and maidservants, and she asses, and camels."
+        And I press the element with xpath "//button[contains(@class, 'btn-primary') and contains(string(), 'Create data request')]"
+        Then I should see "Blocked due to profanity" within 5 seconds
+
     Scenario: Data request creator and Sysadmin can see a 'Close' button on the data request detail page for opened data requests
         Given "SysAdmin" as the persona
         When I log in
@@ -91,6 +101,51 @@ Feature: Data Request
         And I press the element with xpath "//button[contains(@class, 'btn-danger') and contains(string(), 'Close data request')]"
         Then I should see an element with xpath "//i[contains(@class, 'icon-lock')]"
         And I should not see an element with xpath "//a[contains(string(), 'Close')]"
+
+    Scenario: Delete all data requests for a user
+        # Use a different profile so we don't delete any other test requests
+        Given "TestOrgAdmin" as the persona
+        When I log in
+        And I create a datarequest
+        And I create a datarequest
+        And I create a datarequest
+        And I go to the "test_org_admin" profile page
+        And I take a debugging screenshot
+        And I press the element with xpath "//ul[contains(@class, 'nav-tabs')]//a[contains(string(), 'Data Requests')]"
+        And I take a debugging screenshot
+        Then I should see an element with xpath "//a[@title='Delete' and contains(@class, 'btn-danger')]"
+        And I should not see an element with xpath "//a[contains(@class, 'btn-danger-serious')]"
+
+        Given "SysAdmin" as the persona
+        When I log out
+        And I log in
+        And I go to the "test_org_admin" profile page
+        And I take a debugging screenshot
+        And I press the element with xpath "//ul[contains(@class, 'nav-tabs')]//a[contains(string(), 'Data Requests')]"
+        And I take a debugging screenshot
+        Then I should see an element with xpath "//a[@title='Delete' and contains(@class, 'btn-danger')]"
+        And I should see an element with xpath "//a[contains(@title, 'Delete all') and contains(@class, 'btn-danger-serious')]"
+
+        When I press the element with xpath "//a[contains(@title, 'Delete all') and contains(@class, 'btn-danger-serious')][1]"
+        And I take a debugging screenshot
+        And I confirm the dialog containing "Are you sure you want to" if present
+        And I take a debugging screenshot
+        Then I should see an element with xpath "//div[contains(@class, 'alert') and contains(string(), 'Deleted') and contains(string(), 'data request(s)')]"
+
+        When I go to the "test_org_admin" profile page
+        And I press the element with xpath "//ul[contains(@class, 'nav-tabs')]//a[contains(string(), 'Data Requests')]"
+        Then I should see "No data requests found"
+
+    Scenario: An unprivileged user who tries to create multiple data requests close together should see an error
+        Given "CKANUser" as the persona
+        When I log in
+        And I create a datarequest
+        And I go to the data requests page
+        And I press "Add data request"
+        And I fill in title with random text
+        And I fill in "description" with "Test throttling"
+        And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
+        Then I should see "Too many requests submitted, please wait"
 
     Scenario: As an org admin I can re-open a closed data request
         Given "DataRequestOrgAdmin" as the persona

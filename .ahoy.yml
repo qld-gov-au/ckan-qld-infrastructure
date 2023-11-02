@@ -148,8 +148,7 @@ commands:
       if [ "$BEHAVE_TAG" = "" ]; then
         # Run reporting tests last so numbers are consistent
         (ahoy cli "behave -k --tags=-OpenData --tags=-Publications ${*:-test/features}" \
-         && ahoy cli "behave -k --tags $VARS_TYPE --tags=-reporting ${*:-test/features}" \
-         && ahoy cli "behave -k --tags $VARS_TYPE --tags=reporting ${*:-test/features}" \
+         && ahoy cli "behave -k --tags $VARS_TYPE ${*:-test/features}" \
         ) || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       else
         # run tests with the specified tag

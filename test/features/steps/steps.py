@@ -741,13 +741,23 @@ def go_to_data_request(context, subject):
 def create_datarequest(context):
     assert context.persona
     context.execute_steps(u"""
+        When I create a data request in the "Open Data Administration" organisation
+    """)
+
+
+@when(u'I create a data request in the "{organisation_name}" organisation')
+def create_datarequest_for_org(context, organisation_name):
+    assert context.persona
+    context.execute_steps(u"""
         When I go to the data requests page
         And I press "Add data request"
         And I fill in title with random text
         And I fill in "description" with "Test description"
-        And I execute the script "$('#field-organizations option:contains("Open Data Administration")').attr('selected', true)"
+        And I execute the script "$('#field-organizations option:contains("{0}")').attr('selected', true)"
+        And I take a debugging screenshot
         And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
-    """)
+        And I take a debugging screenshot
+    """.format(organisation_name))
 
 
 @when(u'I go to data request "{subject}" comments')
