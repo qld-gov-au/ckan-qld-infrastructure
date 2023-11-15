@@ -71,7 +71,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "7.2.7"
+      version: "7.2.8"
 
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
