@@ -96,7 +96,7 @@ def log_in_directly(context):
     assert context.persona, "A persona is required to log in, found [{}] in context. Have you configured the personas in before_scenario?".format(context.persona)
     context.execute_steps(u"""
         When I attempt to log in with password "$password"
-        Then I should see an element with xpath "//a[@title='Log out']"
+        Then I should see an element with xpath "//*[@title='Log out']/i[contains(@class, 'fa-sign-out')]"
     """)
 
 
@@ -573,7 +573,7 @@ def go_to_admin_config(context):
 @when(u'I log out')
 def log_out(context):
     context.execute_steps(u"""
-        When I visit "/user/_logout"
+        When I press the element with xpath "//*[@title='Log out']"
         Then I should see "Log in"
     """)
 
