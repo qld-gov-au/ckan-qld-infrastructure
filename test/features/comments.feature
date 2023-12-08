@@ -60,6 +60,16 @@ Feature: Comments
         Then I should see "Comment blocked due to profanity" within 5 seconds
 
     @comment-add @comment-profane
+    Scenario: When a logged-in user submits a comment containing profanity with special symbols on a dataset they should receive an error message and the comment will not appear
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I create a dataset with key-value parameters "notes=Profane Dataset Comment with regex characters"
+        And I go to dataset "$last_generated_name" comments
+        Then I should see the add comment form
+        When I submit a comment with subject "Test subject" and comment "Rachel Lindt's cape name is Bi+ch."
+        Then I should see "Comment blocked due to profanity" within 5 seconds
+
+    @comment-add @comment-profane
     Scenario: When a logged-in user submits a comment containing whitelisted profanity on a Dataset the comment should display within 10 seconds
         Given "TestOrgEditor" as the persona
         When I log in
