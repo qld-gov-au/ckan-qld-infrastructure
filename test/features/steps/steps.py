@@ -24,6 +24,7 @@ if not hasattr(forms, 'fill_in_elem_by_name'):
 
 URL_RE = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|\
                     (?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I | re.S | re.U)
+SINGLE_QUOTE_RE = re.compile(r"(^|[^\\])'")
 
 dataset_default_schema = """
     {"fields": [
@@ -152,7 +153,8 @@ def confirm_dialog_if_present(context, text):
         return
     button_xpath = parent_xpath + "//button[contains(@class, 'btn-primary')]"
     context.execute_steps(u"""
-        When I press the element with xpath "{0}"
+        When I take a debugging screenshot
+        And I press the element with xpath "{0}"
     """.format(button_xpath))
 
 
@@ -658,6 +660,13 @@ def comment_form_not_visible(context):
     """)
 
 
+def escape_for_javascript_string(text):
+    """ Escape a text so that it's suitable to be injected into a
+    single-quoted JavaScript string.
+    """
+    return SINGLE_QUOTE_RE.sub(r"\1\\'", text)
+
+
 @when(u'I submit a comment with subject "{subject}" and comment "{comment}"')
 def submit_comment_with_subject_and_comment(context, subject, comment):
     """
@@ -670,10 +679,10 @@ def submit_comment_with_subject_and_comment(context, subject, comment):
     """
     context.browser.execute_script("""
         document.querySelector('form#comment_form input[name="subject"]').value = '%s';
-        """ % subject)
+        """ % escape_for_javascript_string(subject))
     context.browser.execute_script("""
         document.querySelector('form#comment_form textarea[name="comment"]').value = '%s';
-        """ % comment)
+        """ % escape_for_javascript_string(comment))
     context.browser.execute_script("""
         document.querySelector('form#comment_form .form-actions input[type="submit"]').click();
         """)
