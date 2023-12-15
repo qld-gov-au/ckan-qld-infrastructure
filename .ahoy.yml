@@ -146,7 +146,6 @@ commands:
       ahoy start-mailmock &
       sleep 5
       if [ "$BEHAVE_TAG" = "" ]; then
-        # Run reporting tests last so numbers are consistent
         (ahoy cli "behave -k --tags=-OpenData --tags=-Publications ${*:-test/features}" \
          && ahoy cli "behave -k --tags $VARS_TYPE ${*:-test/features}" \
         ) || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
