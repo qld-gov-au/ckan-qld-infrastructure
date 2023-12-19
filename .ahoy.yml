@@ -149,9 +149,17 @@ commands:
         (ahoy cli "behave -k --tags=-OpenData --tags=-Publications ${*:-test/features}" \
          && ahoy cli "behave -k --tags $VARS_TYPE ${*:-test/features}" \
         ) || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
+      elif [ "$BEHAVE_TAG" = "app" ]; then
+        # run app-specific tests
+        ahoy cli "behave -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=$VARS_TYPE" \
+          || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
+      elif [ "$BEHAVE_TAG" = "authenticated" ]; then
+        # run any tests that don't have a specific tag
+        ahoy cli "behave -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=-OpenData --tags=-Publications" \
+          || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       else
         # run tests with the specified tag
-        ahoy cli "behave -k ${*:-test/features} --tags=$BEHAVE_TAG" \
+        ahoy cli "behave -k ${*:-test/features} --tags=$BEHAVE_TAG --tags=-OpenData --tags=-Publications" \
           || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       fi
       ahoy stop-mailmock

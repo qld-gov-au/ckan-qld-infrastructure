@@ -9,19 +9,21 @@ on:
 jobs:
   test:
     strategy:
+      fail-fast: true
       matrix:
         application: [OpenData, Publications]
         python-version: [py3]
         target_environment: [DEV]
-      fail-fast: false
+        behave-tag: [smoke, unauthenticated, app, authenticated]
 
-    name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} infrastructure build
+    name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} ${{ matrix.behave-tag }} infrastructure build
     runs-on: ubuntu-latest
     container: drevops/ci-builder:23.7.0
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
       PYTHON_VERSION: ${{ matrix.python-version }}
+      BEHAVE_TAG: ${{ matrix.behave-tag }}
 
     steps:
       - uses: actions/checkout@v3
@@ -35,7 +37,8 @@ jobs:
         run: bin/test-lint.sh
         timeout-minutes: 30
 
-      - name: Test
+      - name: Unit tests
+        if: ${{ matrix.behave-tag == 'smoke' }}
         run: bin/test.sh
         timeout-minutes: 40
 
@@ -57,6 +60,6 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} screenshots
+          name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} ${{ matrix.behave-tag }} screenshots
           path: /tmp/artifacts/behave/screenshots
         timeout-minutes: 1
