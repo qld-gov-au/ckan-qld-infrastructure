@@ -54,7 +54,7 @@ extensions:
       description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
-      version: "1.2.0"
+      version: "1.2.1"
 
   PROD:
     <<: *default_extensions
