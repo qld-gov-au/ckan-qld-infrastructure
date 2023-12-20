@@ -6,10 +6,10 @@ import six
 import yaml
 
 
-def check_version(current_version, repo_name):
-    latest_tag = os.popen("./get_latest_tag.sh " + repo_name, 'r').readline().strip()
+def check_version(current_version, repo_name, branch=''):
+    latest_tag = os.popen("./get_latest_tag.sh " + repo_name + ' ' + branch, 'r').readline().strip()
     if latest_tag and latest_tag != current_version:
-        print("{}: {} is using version [{}] but [{}] is available".format(
+        print("{}: {} is using version [{}] but [{}] is newer".format(
             app, repo_name, current_version, latest_tag
         ))
 
@@ -21,10 +21,11 @@ for app in ['OpenData', 'Publications', 'CKANTest']:
     for key, value in six.iteritems(extensions):
         check_version(value['version'], value['shortname'])
 
-template_parameters = yaml.safe_load(open('vars/CKAN-Stack.var.yml'))[
-    'cloudformation_stacks'][0]['template_parameters']
+stack_vars = yaml.safe_load(open('vars/CKAN-Stack.var.yml'))
+template_parameters = stack_vars['cloudformation_stacks'][0]['template_parameters']
 match = re.search("[^']'([-a-z0-9.]+)'[^']", template_parameters['CookbookRevision'])
 if match:
     check_version(match.group(1), 'ckan_cookbook')
 else:
     print("Unable to locate cookbook version in " + template_parameters['CookbookRevision'])
+check_version(stack_vars['ckan_tag'], 'ckan', stack_vars['ckan_qgov_branch'])

@@ -47,7 +47,7 @@ wait_for_deployment () {
   DEPLOYMENT_ID=$1
   debug "$MESSAGE: waiting for deployment $DEPLOYMENT_ID..."
   STATUS=$(aws opsworks describe-deployments $REGION_SNIPPET --deployment-id $DEPLOYMENT_ID --query "Deployments|[0].Status" --output text) || exit 1
-  for retry in `seq 1 90`; do
+  for retry in `seq 1 180`; do
     if [ "$STATUS" = "running" ]; then
       sleep 10
       STATUS=$(aws opsworks describe-deployments $REGION_SNIPPET --deployment-id $DEPLOYMENT_ID --query "Deployments|[0].Status" --output text) || exit 1
