@@ -15,14 +15,14 @@ git --git-dir="$GIT_DIR" fetch --tags >/dev/null
 TAG=$(git --git-dir="$GIT_DIR" tag -l --sort=committerdate | tail -1)
 BRANCH="$2"
 if [ "$BRANCH" = "" ]; then
-    if (git --git-dir="$GIT_DIR" branch -r |grep origin/main 2>&1 >/dev/null); then
+    if (git --git-dir="$GIT_DIR" branch -r |grep origin/main) 2>&1 >/dev/null; then
         BRANCH=main
-    elif (git --git-dir="$GIT_DIR" branch -r |grep origin/master 2>&1 >/dev/null); then
+    elif (git --git-dir="$GIT_DIR" branch -r |grep origin/master) 2>&1 >/dev/null; then
         BRANCH=master
     fi
 fi
 
-if [ "$BRANCH" = "" ]; then
+if [ "$BRANCH" = "" ] || [ "$BRANCH" = "none" ]; then
     echo $TAG
 else
     DIFF=$(git --git-dir="$GIT_DIR" diff --stat "$TAG" "origin/$BRANCH")
