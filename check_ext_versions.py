@@ -19,7 +19,7 @@ for app in ['OpenData', 'Publications', 'CKANTest']:
     extensions_file = os.environ.get('EXTENSIONS_FILE', 'vars/shared-{}.var.yml'.format(app))
     extensions = yaml.safe_load(open(extensions_file))['extensions'][target_environment]
     for key, value in six.iteritems(extensions):
-        check_version(value['version'], value['shortname'])
+        check_version(value['version'], value['shortname'], '' if 'qld-gov-au' in value['url'] else 'none')
 
 stack_vars = yaml.safe_load(open('vars/CKAN-Stack.var.yml'))
 template_parameters = stack_vars['cloudformation_stacks'][0]['template_parameters']
