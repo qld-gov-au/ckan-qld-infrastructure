@@ -128,6 +128,7 @@ Resources:
       DBInstanceClass: !Ref DBClass
       DBName: !Ref DBName
       DBSubnetGroupName: !Ref DBSubnetGroup
+      DBParameterGroupName: !Ref DBParameters
       Engine: !Ref DBEngine
       EngineVersion: !Ref DBEngineVersion
       MasterUserPassword: !Ref DBPassword
@@ -169,3 +170,11 @@ Resources:
           - Database
           - Endpoint.Address
 
+  DBParameters:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      DBParameterGroupName: !Sub "${Environment}DatabaseParameters"
+      Description: Setup parameters for Queensland Government databases
+      Family: !Sub "${DBEngine}${DBEngineVersion}"
+      Parameters:
+        datestyle: "ISO, DMY"
