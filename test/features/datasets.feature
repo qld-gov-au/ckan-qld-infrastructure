@@ -14,9 +14,13 @@ Feature: Dataset APIs
         Then I should see "created the dataset"
         When I press "View this version"
         Then I should see "You're currently viewing an old version of this dataset."
-        When I go to dataset "$last_generated_name"
-        And I press the element with xpath "//a[contains(@href, '/dataset/activity/') and contains(string(), 'Activity Stream')]"
+
+        When I go back
         And I press "Changes"
         Then I should see "View changes from"
         And I should see an element with xpath "//select[@name='old_id']"
         And I should see an element with xpath "//select[@name='new_id']"
+
+        When I go back
+        And I press the element with xpath "//li[contains(@class, 'new-package')]/preceding-sibling::li[1]//a[contains(string(), 'Changes')]"
+        Then I should see "Added resource"
