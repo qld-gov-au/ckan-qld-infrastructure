@@ -41,7 +41,7 @@ curl -LsH "Authorization: ${API_KEY}" \
     ${CKAN_ACTION_URL}/package_create
 
 # Populate Archiver data for test dataset
-ckan_cli archiver update-test public-test-dataset
+ckan_cli archiver update public-test-dataset
 
 ##
 # BEGIN: Create a Data Request organisation with test users for admin, editor and member and default data requests
