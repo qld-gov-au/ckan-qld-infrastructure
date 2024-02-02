@@ -92,7 +92,9 @@ commands:
     usage: Install test site data.
     cmd: |
       ahoy title "Installing a fresh site"
+      ahoy start-ckan-job-workers
       ahoy cli '$APP_DIR/bin/init.sh && $APP_DIR/bin/create-test-data.sh'
+      ahoy stop-ckan-job-workers
 
   clean:
     usage: Remove containers and all build files.
