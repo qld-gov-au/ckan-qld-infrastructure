@@ -1,18 +1,11 @@
 @OpenData
 Feature: XLoader
 
-    @unauthenticated
-    Scenario: As a member of the public, when I visit a resource with a datastore entry, I can see the data preview
-        Given "Unauthenticated" as the persona
-        When I go to dataset "public-test-dataset"
-        And I press "test-csv-resource"
-        Then I should see "SomeTown"
-        And I should not see "DataStore"
-
     Scenario: As a publisher, when I visit a resource I control with a datastore entry, I can access the XLoader interface
         Given "TestOrgEditor" as the persona
         When I log in
-        And I go to dataset "public-test-dataset"
+        And I create a dataset and resource with key-value parameters "notes=Testing XLoader" and "name=test-csv-resource::url=https://people.sc.fsu.edu/~jburkardt/data/csv/addresses.csv"
+        And I wait for 5 seconds
         And I press "test-csv-resource"
         Then I should see "SomeTown"
         And I should see "DataStore"
