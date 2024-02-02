@@ -34,14 +34,12 @@ curl -LsH "Authorization: ${API_KEY}" \
 "license_id": "other-open", "data_driven_application": "NO", "security_classification": "PUBLIC",
 "notes": "public test", "de_identified_data": "NO", "resources": [
     {"name": "test-resource", "description": "Test resource description",
-     "url": "https://example.com/foo", "format": "HTML", "size": 1024},
-    {"name": "test-csv-resource", "description": "Test CSV resource description",
-     "url": "https://people.sc.fsu.edu/~jburkardt/data/csv/addresses.csv", "format": "CSV", "size": 328}
+     "url": "https://example.com/foo", "format": "HTML", "size": 1024}
 ]}' \
     ${CKAN_ACTION_URL}/package_create
 
 # Populate Archiver data for test dataset
-ckan_cli archiver update public-test-dataset
+ckan_cli archiver update-test public-test-dataset
 
 ##
 # BEGIN: Create a Data Request organisation with test users for admin, editor and member and default data requests
