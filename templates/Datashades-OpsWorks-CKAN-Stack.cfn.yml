@@ -444,6 +444,7 @@ Resources:
               - !Ref "AWS::AccountId"
               - ":role/aws-opsworks-service-role"
       UseCustomCookbooks: true
+      UseOpsworksSecurityGroups: false
       VpcId:
         Fn::ImportValue: !Ref StackVPC
 
