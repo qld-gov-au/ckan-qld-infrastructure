@@ -471,6 +471,9 @@ Resources:
       Shortname: !Sub "${ApplicationId}-solr"
       StackId: !Ref OpsWorksStack
       Type: custom
+      Tags:
+        - Key: Layer
+          Value: solr
       VolumeConfigurations:
         - MountPoint: "/mnt/local_data"
           NumberOfDisks: 1
@@ -503,6 +506,9 @@ Resources:
       Shortname: !Sub "${ApplicationId}-web"
       StackId: !Ref OpsWorksStack
       Type: custom
+      Tags:
+        - Key: Layer
+          Value: web
       LoadBasedAutoScaling:
         Enable: Yes
         UpScaling:
@@ -549,6 +555,9 @@ Resources:
       Shortname: !Sub "${ApplicationId}-batch"
       StackId: !Ref OpsWorksStack
       Type: custom
+      Tags:
+        - Key: Layer
+          Value: batch
       LoadBasedAutoScaling:
         Enable: Yes
         UpScaling:
