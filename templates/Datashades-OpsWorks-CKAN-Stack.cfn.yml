@@ -393,6 +393,7 @@ Resources:
         datashades:
           ckan_web:
             title: !Sub "${ApplicationTitle} | Queensland Government"
+            site_domain: !Ref SiteDomain
             email_domain: !Ref EmailDomain
             adminpw: !Ref CKANAdminPW
             adminemail: !Ref CKANAdminEmail
