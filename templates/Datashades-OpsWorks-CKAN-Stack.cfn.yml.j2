@@ -407,9 +407,31 @@ Resources:
             google:
               gtm_container_id: !Ref GTMContainerId
               analytics_id: !Ref AnalyticsId
+            ckan_app:
+              name: !Sub "${ApplicationName}-${Environment}"
+              shortname: !Sub "${ApplicationId}-${Environment}"
+              app_source:
+                type: git
+                url: !Ref CKANSource
+                version: !Ref CKANRevision
+            plugin_apps:
+{% for plugin in extensions[Environment] %}
+              - name: "{{ extensions[Environment][plugin].name }}"
+                shortname: "{{ extensions[Environment][plugin].shortname }}"
+                app_source:
+                  type: "{{ extensions[Environment][plugin].type }}"
+                  url: "{{ extensions[Environment][plugin].url }}"
+                  revision: "{{ extensions[Environment][plugin].version}}"
+{% endfor %}
           jumpbox:
             bucket: !Ref AdminPubKeyBucket
             usergroup: !Ref AdminUserGroup
+          solr_app:
+            name: !Sub "${ApplicationName}-${Environment}-solr"
+            shortname: !Sub "${ApplicationId}-${Environment}-solr"
+            app_source:
+              type: archive
+              url: !Ref SolrSource
           postgres:
             password: !Ref PGDBPassword
           redis:
