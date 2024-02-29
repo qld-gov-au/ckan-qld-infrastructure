@@ -413,7 +413,7 @@ Resources:
               app_source:
                 type: git
                 url: !Ref CKANSource
-                version: !Ref CKANRevision
+                revision: !Ref CKANRevision
             plugin_apps:
 {% for plugin in extensions[Environment] %}
               - name: "{{ extensions[Environment][plugin].name }}"
