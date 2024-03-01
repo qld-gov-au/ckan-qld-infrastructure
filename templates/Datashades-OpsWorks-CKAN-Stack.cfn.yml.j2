@@ -395,9 +395,6 @@ Resources:
             title: !Sub "${ApplicationTitle} | Queensland Government"
             site_domain: !Ref SiteDomain
             email_domain: !Ref EmailDomain
-            adminpw: !Ref CKANAdminPW
-            adminemail: !Ref CKANAdminEmail
-            beaker_secret: !Ref BeakerSecret
             dbuser: !Ref PGDBUser
             dbname: !Ref ApplicationName
             dsuser: !Sub "${PGDBUser}_datastore"
@@ -432,8 +429,6 @@ Resources:
             app_source:
               type: archive
               url: !Ref SolrSource
-          postgres:
-            password: !Ref PGDBPassword
           redis:
             hostname:
               Fn::ImportValue: !Ref CacheAddress
