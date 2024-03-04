@@ -352,6 +352,7 @@ Resources:
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/*"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/db/${ApplicationId}_*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
         - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
