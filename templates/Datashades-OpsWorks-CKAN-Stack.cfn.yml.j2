@@ -109,10 +109,6 @@ Parameters:
   DefaultEC2Key:
     Description: Select an existing SSH key
     Type: AWS::EC2::KeyPair::KeyName
-  AdminUserGroup:
-    Description: Valid Linux group name
-    Type: String
-    Default: link
   CKANAdminPW:
     NoEcho: true
     Description: Password must be at least 8 characters up to a maximum of 64 characters in length.
@@ -124,10 +120,6 @@ Parameters:
   CKANAdminEmail:
     Description: Valid Email Address
     Type: String
-  AdminPubKeyBucket:
-    Description: S3 Bucket URL
-    Type: String
-    Default: s3://link-opsworks/keys/
   StackVPC:
     Description: The exported name of the existing VPC ID.
     Type: String
@@ -360,6 +352,7 @@ Resources:
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/*"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/db/${ApplicationId}_*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
         - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
@@ -395,13 +388,6 @@ Resources:
             title: !Sub "${ApplicationTitle} | Queensland Government"
             site_domain: !Ref SiteDomain
             email_domain: !Ref EmailDomain
-            adminpw: !Ref CKANAdminPW
-            adminemail: !Ref CKANAdminEmail
-            beaker_secret: !Ref BeakerSecret
-            dbuser: !Ref PGDBUser
-            dbname: !Ref ApplicationName
-            dsuser: !Sub "${PGDBUser}_datastore"
-            dsname: !Sub "${ApplicationName}_datastore"
             dsenable: !Ref EnableDataStore
             endpoint: /
             google:
@@ -423,17 +409,12 @@ Resources:
                   url: "{{ extensions[Environment][plugin].url }}"
                   revision: "{{ extensions[Environment][plugin].version}}"
 {% endfor %}
-          jumpbox:
-            bucket: !Ref AdminPubKeyBucket
-            usergroup: !Ref AdminUserGroup
           solr_app:
             name: !Sub "${ApplicationName}-${Environment}-solr"
             shortname: !Sub "${ApplicationId}-${Environment}-solr"
             app_source:
               type: archive
               url: !Ref SolrSource
-          postgres:
-            password: !Ref PGDBPassword
           redis:
             hostname:
               Fn::ImportValue: !Ref CacheAddress
