@@ -44,6 +44,24 @@ wait_for_deployment () {
   fi
 }
 
+find_load_balancer () {
+  # Finds the first load balancer whose tags all match the deployment,
+  # and outputs its identifying name
+  for lb_name in `aws elb describe-load-balancers --query "LoadBalancerDescriptions[].LoadBalancerName" --output text`; do
+    LB_ENV=$(aws elb describe-tags --load-balancer-name $lb_name --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Environment' && Value=='$ENVIRONMENT']" --output text)
+    if [ "$LB_ENV" = "" ]; then continue; fi
+
+    LB_SERVICE=$(aws elb describe-tags --load-balancer-name $lb_name --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Service' && Value=='$SERVICE']" --output text)
+    if [ "$LB_SERVICE" = "" ]; then continue; fi
+
+    LB_LAYER=$(aws elb describe-tags --load-balancer-name $lb_name --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Layer' && Value=='$LAYER_NAME']" --output text)
+    if [ "$LB_LAYER" = "" ]; then continue; fi
+
+    echo "$lb_name"
+    break
+  done
+}
+
 deploy () {
   for truthy in `echo "y t true T 1" |xargs echo`; do
     if [ "$PARALLEL" = "$truthy" ]; then
@@ -69,10 +87,10 @@ deploy () {
       debug "No eligible instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME"
     else
       debug "Target instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME: $INSTANCE_IDS"
-      ELB_NAME=$(aws elb describe-load-balancers --load-balancer-name "${ENVIRONMENT}-${SERVICE}ELB" --query "LoadBalancerDescriptions[0].LoadBalancerName" --output text)
+      ELB_NAME=$(find_load_balancer)
       for instance in $INSTANCE_IDS; do
         if [ "$ELB_NAME" != "" ]; then
-          debug "Deregistering instance from load balancer, resulting registered instances:"
+          debug "Deregistering instance from load balancer $ELB_NAME, resulting registered instances:"
           debug $(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
         fi
         TARGET_SPEC="--instance-ids $instance"
@@ -80,7 +98,7 @@ deploy () {
         wait_for_deployment $DEPLOYMENT_ID
         DEPLOYMENT_SUCCESS=$?
         if [ "$ELB_NAME" != "" ]; then
-          debug "Registering instance with load balancer, resulting registered instances:"
+          debug "Registering instance with load balancer $ELB_NAME, resulting registered instances:"
           debug $(aws elb register-instances-with-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
         fi
         if [ "$DEPLOYMENT_SUCCESS" != "0" ]; then exit 1; fi
