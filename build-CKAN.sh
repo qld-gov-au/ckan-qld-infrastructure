@@ -36,6 +36,7 @@ run-shared-resource-playbooks () {
 }
 
 run-deployment () {
+  run-playbook "chef-json"
   PARALLEL=1 ./opsworks-deploy.sh update_custom_cookbooks $STACK_NAME
   ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-web & WEB_PID=$!
   PARALLEL=1 ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-batch & BATCH_PID=$!
