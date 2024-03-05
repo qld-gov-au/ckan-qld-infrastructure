@@ -1,6 +1,7 @@
 *.pyc
 *.retry
 templates/chef.json
+templates/chef-source.json
 templates/cloudfront.cfn.yml
 templates/security_groups.cfn.yml
 templates/Datashades-OpsWorks-CKAN-Extensions.cfn.yml
