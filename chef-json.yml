@@ -1,0 +1,59 @@
+---
+- name: Generate Chef custom JSON
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars/CKAN-Stack.var.yml
+  pre_tasks:
+
+    - name: get basic_facts
+      set_fact:
+        basic_fact={{ item }}
+      when: item.Environment == Environment
+      with_items: "{{ basic_facts }}"
+
+    - name: set facts to environment from basic_fact
+      set_fact: "{{ item.key }}={{ item.value }}"
+      with_dict: "{{ basic_fact }}"
+      when: basic_fact is defined
+
+    - name: Identify cloudformation stack
+      set_fact:
+        Stack_Name: "{{ item.name }}"
+        state: "{{ item.state }}"
+        template_parameters: "{{ item.template_parameters }}"
+      when: item.template_parameters.Environment == Environment
+      with_items: "{{ cloudformation_stacks }}"
+
+    - name: Describe cloudformation stack
+      cloudformation_facts:
+        region: "{{ region }}"
+        stack_name: "{{ Stack_Name }}"
+        stack_resources: true
+      register: stack
+
+    - name: set facts to environment from stack parameters
+      set_fact: "{{ item.key }}={{ item.value }}"
+      with_dict: "{{ stack.ansible_facts.cloudformation[Stack_Name].stack_parameters }}"
+
+    - name: Identify hosted zone cloudformation stack
+      set_fact:
+        Zone_Stack_Name: "CKAN-{{ Environment }}-hosted-zone"
+
+    - name: Describe hosted zone cloudformation stack
+      cloudformation_facts:
+        region: "{{ region }}"
+        stack_name: "{{ Zone_Stack_Name }}"
+        stack_resources: true
+      register: hosted_zone
+
+    - name: set internal TLD from hosted zone
+      set_fact:
+        InternalHostedZoneTLD: "{{ hosted_zone.ansible_facts.cloudformation[Zone_Stack_Name].stack_outputs.ZoneTLD }}"
+
+  tasks:
+
+    - name: Prepare custom JSON
+      template:
+        src: chef.json.j2
+        dest: templates/chef.json

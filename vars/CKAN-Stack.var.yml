@@ -25,7 +25,7 @@ common_stack: &common_stack
     EmailDomain: "{{ RootDomain }}"
     SiteDomain: "{{ SiteDomain }}"
     RootDomain: "{{ RootDomain }}"
-    ACMCertificateARN: "{{ ACMCertificateARNForDefaultRegion }}"
+    ACMCertificateARN: "{{ ACMCertificateARNForDefaultRegion | default('') }}"
     CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
     StackVPC: "CKANVpc-{{ Environment }}"
     InternalStackZoneTLD: "{{ Environment }}CKANPrivateTLD"
