@@ -48,17 +48,12 @@ find_load_balancer () {
   # Finds the first load balancer whose tags all match the deployment,
   # and outputs its identifying name
   for lb_name in `aws elb describe-load-balancers --query "LoadBalancerDescriptions[].LoadBalancerName" --output text`; do
-    LB_ENV=$(aws elb describe-tags --load-balancer-name $lb_name --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Environment' && Value=='$ENVIRONMENT']" --output text)
-    if [ "$LB_ENV" = "" ]; then continue; fi
-
-    LB_SERVICE=$(aws elb describe-tags --load-balancer-name $lb_name --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Service' && Value=='$SERVICE']" --output text)
-    if [ "$LB_SERVICE" = "" ]; then continue; fi
-
-    LB_LAYER=$(aws elb describe-tags --load-balancer-name $lb_name --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Layer' && Value=='$LAYER_NAME']" --output text)
-    if [ "$LB_LAYER" = "" ]; then continue; fi
-
-    echo "$lb_name"
-    break
+    LB_TAGS=$(aws elb describe-tags --load-balancer-name $lb_name --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Environment' || Key=='Service' || Key == 'Layer']" --output text)
+    if (echo $LB_TAGS | grep -E "Environment\s+$ENVIRONMENT" >/dev/null 2>&1) \
+      && (echo $LB_TAGS | grep -E "Service\s+$SERVICE" >/dev/null 2>&1) \
+      && (echo $LB_TAGS | grep -E "Layer\s+$LAYER_NAME" >/dev/null 2>&1); then
+        echo "$lb_name"
+    fi
   done
 }
 
