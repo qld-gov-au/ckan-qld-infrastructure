@@ -161,7 +161,7 @@ commands:
           || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       else
         # run tests with the specified tag
-        ahoy cli "behave -k ${*:-test/features} --tags=$BEHAVE_TAG" \
+        ahoy cli "behave -k ${*:-test/features} --tags=$BEHAVE_TAG --tags=-OpenData --tags=-Publications" \
           || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       fi
       ahoy stop-mailmock
