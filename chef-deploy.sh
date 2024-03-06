@@ -49,9 +49,9 @@ find_load_balancer () {
   # and outputs its identifying name
   for lb_name in `aws elb describe-load-balancers --query "LoadBalancerDescriptions[].LoadBalancerName" --output text`; do
     LB_TAGS=$(aws elb describe-tags --load-balancer-name $lb_name --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Environment' || Key=='Service' || Key == 'Layer']" --output text)
-    if (echo $LB_TAGS | grep -E "Environment\s+$ENVIRONMENT" >/dev/null 2>&1) \
-      && (echo $LB_TAGS | grep -E "Service\s+$SERVICE" >/dev/null 2>&1) \
-      && (echo $LB_TAGS | grep -E "Layer\s+$LAYER_NAME" >/dev/null 2>&1); then
+    if (echo $LB_TAGS | grep -E "(\s|^)Environment\s+$ENVIRONMENT(\s|$)" >/dev/null 2>&1) \
+      && (echo $LB_TAGS | grep -E "(\s|^)Service\s+$SERVICE(\s|$)" >/dev/null 2>&1) \
+      && (echo $LB_TAGS | grep -E "(\s|^)Layer\s+$LAYER_NAME(\s|$)" >/dev/null 2>&1); then
         echo "$lb_name"
     fi
   done
@@ -85,16 +85,16 @@ deploy () {
       ELB_NAME=$(find_load_balancer)
       for instance in $INSTANCE_IDS; do
         if [ "$ELB_NAME" != "" ]; then
-          debug "Deregistering instance from load balancer $ELB_NAME, resulting registered instances:"
-          debug $(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
+          OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
+          debug "Deregistered instance from load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
         fi
         TARGET_SPEC="--instance-ids $instance"
         DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $instance --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":["'"$CUSTOM_JSON"'"],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
         wait_for_deployment $DEPLOYMENT_ID
         DEPLOYMENT_SUCCESS=$?
         if [ "$ELB_NAME" != "" ]; then
-          debug "Registering instance with load balancer $ELB_NAME, resulting registered instances:"
-          debug $(aws elb register-instances-with-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
+          OUTPUT=$(aws elb register-instances-with-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
+          debug "Registered instance with load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
         fi
         if [ "$DEPLOYMENT_SUCCESS" != "0" ]; then exit 1; fi
       done
