@@ -36,6 +36,8 @@ wait_for_deployment () {
       sleep 10
       STATUS=$(aws ssm list-commands $REGION_SNIPPET --command-id $DEPLOYMENT_ID --query "Commands|[0].Status" --output text) || exit 1
       debug "Deployment $DEPLOYMENT_ID: $STATUS"
+    else
+      break
     fi
   done
   if [ "$STATUS" != "Success" ]; then
@@ -60,7 +62,7 @@ find_load_balancer () {
 deploy () {
   for truthy in `echo "y t true T 1" |xargs echo`; do
     if [ "$PARALLEL" = "$truthy" ]; then
-      debug "$MESSAGE: Parallel enabled, will deploy to entire stack/layer simultaneously"
+      debug "$MESSAGE: Parallel enabled, will deploy to all target instances simultaneously"
       PARALLEL=true
     fi
   done
@@ -70,7 +72,7 @@ deploy () {
     if [ "$LAYER_NAME" != "" ]; then
         TARGET_SPEC=${TARGET_SPEC}',{"Key":"tag:Layer","Values":["'"$LAYER_NAME"'"]}'
     fi
-    DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --targets "[$TARGET_SPEC]" --parameters '{'"$CHEF_SOURCE"',"RunList":["recipe["'"$RUN_LIST"'"]"],"JsonAttributesSources":[""],"JsonAttributesContent":["'"$CUSTOM_JSON"'"],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
+    DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --targets "[$TARGET_SPEC]" --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":["'"$CUSTOM_JSON"'"],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
     wait_for_deployment $DEPLOYMENT_ID || exit 1
   else
     INSTANCE_IDENTIFIER_SNIPPET="--filters Name=tag:Environment,Values=$ENVIRONMENT Name=tag:Service,Values=$SERVICE Name=instance-state-name,Values=running"
@@ -103,12 +105,4 @@ deploy () {
   fi
 }
 
-if [ "$COMMAND" = "start" ]; then
-  start_servers
-elif [ "$COMMAND" = "stop" ]; then
-  stop_servers "$RECIPE_NAME"
-elif [ "$COMMAND" = "get_stopped_instances" ]; then
-  get_stopped_instances
-else
-  deploy
-fi
+deploy
