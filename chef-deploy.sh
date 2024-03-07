@@ -67,41 +67,37 @@ deploy () {
     fi
   done
 
+  INSTANCE_IDENTIFIER_SNIPPET="--filters Name=tag:Environment,Values=$ENVIRONMENT Name=tag:Service,Values=$SERVICE Name=instance-state-name,Values=running"
+  if [ "$LAYER_NAME" != "" ]; then
+      INSTANCE_IDENTIFIER_SNIPPET="${INSTANCE_IDENTIFIER_SNIPPET} Name=tag:Layer,Values=$LAYER_NAME"
+  fi
+  INSTANCE_IDS=$(aws ec2 describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Reservations[].Instances[].InstanceId" --output text) || exit 1
+  if [ "$INSTANCE_IDS" = "" ]; then
+    debug "No eligible instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME"
+    exit 1
+  else
+    debug "Target instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME: $INSTANCE_IDS"
+  fi
   if [ "$PARALLEL" = "true" ]; then
-    TARGET_SPEC='{"Key":"tag:Environment","Values":["'"$ENVIRONMENT"'"]},{"Key":"tag:Service","Values":["'"$SERVICE"'"]}'
-    if [ "$LAYER_NAME" != "" ]; then
-        TARGET_SPEC=${TARGET_SPEC}',{"Key":"tag:Layer","Values":["'"$LAYER_NAME"'"]}'
-    fi
-    DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --targets "[$TARGET_SPEC]" --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":["'"$CUSTOM_JSON"'"],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
+    DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":["'"$CUSTOM_JSON"'"],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
     wait_for_deployment $DEPLOYMENT_ID || exit 1
   else
-    INSTANCE_IDENTIFIER_SNIPPET="--filters Name=tag:Environment,Values=$ENVIRONMENT Name=tag:Service,Values=$SERVICE Name=instance-state-name,Values=running"
-    if [ "$LAYER_NAME" != "" ]; then
-        INSTANCE_IDENTIFIER_SNIPPET="${INSTANCE_IDENTIFIER_SNIPPET} Name=tag:Layer,Values=$LAYER_NAME"
-    fi
-    INSTANCE_IDS=$(aws ec2 describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Reservations[].Instances[].InstanceId" --output text) || exit 1
-    if [ "$INSTANCE_IDS" = "" ]; then
-      debug "No eligible instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME"
-    else
-      debug "Target instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME: $INSTANCE_IDS"
-      ELB_NAME=$(find_load_balancer)
-      for instance in $INSTANCE_IDS; do
-        if [ "$ELB_NAME" != "" ]; then
-          OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
-          debug "Deregistered instance from load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
-        fi
-        TARGET_SPEC="--instance-ids $instance"
-        DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $instance --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":["'"$CUSTOM_JSON"'"],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
-        wait_for_deployment $DEPLOYMENT_ID
-        DEPLOYMENT_SUCCESS=$?
-        if [ "$ELB_NAME" != "" ]; then
-          OUTPUT=$(aws elb register-instances-with-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
-          debug "Registered instance with load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
-        fi
-        if [ "$DEPLOYMENT_SUCCESS" != "0" ]; then exit 1; fi
-      done
-      debug "$MESSAGE: success"
-    fi
+    ELB_NAME=$(find_load_balancer)
+    for instance in $INSTANCE_IDS; do
+      if [ "$ELB_NAME" != "" ]; then
+        OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
+        debug "Deregistered instance $instance from load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
+      fi
+      DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $instance --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":["'"$CUSTOM_JSON"'"],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
+      wait_for_deployment $DEPLOYMENT_ID
+      DEPLOYMENT_SUCCESS=$?
+      if [ "$ELB_NAME" != "" ]; then
+        OUTPUT=$(aws elb register-instances-with-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
+        debug "Registered instance with load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
+      fi
+      if [ "$DEPLOYMENT_SUCCESS" != "0" ]; then exit 1; fi
+    done
+    debug "$MESSAGE: success"
   fi
 }
 
