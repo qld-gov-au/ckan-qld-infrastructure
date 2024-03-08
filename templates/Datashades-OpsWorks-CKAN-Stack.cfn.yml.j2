@@ -310,6 +310,14 @@ Resources:
                     - ""
                     - - "arn:aws:route53:::hostedzone/"
                       - Fn::ImportValue: !Ref InternalStackZone
+              # allow the servers to retrieve a subset of SSM Parameter Store values
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
         - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
