@@ -37,20 +37,13 @@ run-shared-resource-playbooks () {
 
 run-deployment () {
   run-playbook "chef-json"
-  PARALLEL=1 ./opsworks-deploy.sh update_custom_cookbooks $STACK_NAME
-  ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-web & WEB_PID=$!
-  PARALLEL=1 ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-batch & BATCH_PID=$!
+  ./chef-deploy.sh datashades::ckanweb-setup,datashades::ckanweb-deploy $INSTANCE_NAME $ENVIRONMENT web & WEB_PID=$!
+  PARALLEL=1 ./chef-deploy.sh datashades::ckanbatch-setup,datashades::ckanbatch-deploy,datashades::ckanbatch-configure $INSTANCE_NAME $ENVIRONMENT batch & BATCH_PID=$!
   wait $WEB_PID
+  PARALLEL=1 ./chef-deploy.sh datashades::ckanweb-configure $INSTANCE_NAME $ENVIRONMENT web
   wait $BATCH_PID
-  STOPPED_INSTANCES=$(./opsworks-deploy.sh get_stopped_instances $STACK_NAME ${INSTANCE_SHORTNAME}-solr)
-  if [ "$STOPPED_INSTANCES" = "" ]; then
-    ./opsworks-deploy.sh execute_recipes $STACK_NAME ${INSTANCE_SHORTNAME}-solr datashades::solr-deploy || exit 1
-  else
-    ./opsworks-deploy.sh start $STACK_NAME ${INSTANCE_SHORTNAME}-solr
-    ./opsworks-deploy.sh setup $STACK_NAME ${INSTANCE_SHORTNAME}-solr
-    ./opsworks-deploy.sh stop $STACK_NAME ${INSTANCE_SHORTNAME}-solr "$STOPPED_INSTANCES"
-  fi
-  PARALLEL=1 ./opsworks-deploy.sh configure $STACK_NAME
+  ./chef-deploy.sh datashades::solr-setup,datashades::solr-deploy $INSTANCE_NAME $ENVIRONMENT solr  || exit 1
+  PARALLEL=1 ./chef-deploy.sh datashades::solr-configure $INSTANCE_NAME $ENVIRONMENT solr
 }
 
 run-all-playbooks () {
@@ -61,7 +54,6 @@ run-all-playbooks () {
   fi
   run-playbook "CloudFormation" "vars/s3_buckets.var.yml"
   run-playbook "CKAN-Stack"
-  run-playbook "CKAN-extensions"
   run-playbook "CloudFormation" "vars/instances-${INSTANCE_NAME}.var.yml"
   run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
   run-playbook "cloudfront"
@@ -72,10 +64,19 @@ if [ $# -ge 3 ]; then
   if [ "$3" = "deploy" ]; then
     run-deployment
   elif [ "$3" = "setup" ]; then
-    PARALLEL=1 ./opsworks-deploy.sh setup $STACK_NAME
+    run-playbook "chef-json"
+    PARALLEL=1 ./chef-deploy.sh datashades::ckanweb-setup,datashades::ckanweb-deploy,datashades::ckanweb-configure $INSTANCE_NAME $ENVIRONMENT web & WEB_PID=$!
+    PARALLEL=1 ./chef-deploy.sh datashades::ckanbatch-setup,datashades::ckanbatch-deploy,datashades::ckanbatch-configure $INSTANCE_NAME $ENVIRONMENT batch & BATCH_PID=$!
+    PARALLEL=1 ./chef-deploy.sh datashades::solr-setup,datashades::solr-deploy,datashades::solr-configure $INSTANCE_NAME $ENVIRONMENT solr
+    wait $WEB_PID
+    wait $BATCH_PID
   elif [ "$3" = "configure" ]; then
-    PARALLEL=1 ./opsworks-deploy.sh update_custom_cookbooks $STACK_NAME
-    PARALLEL=1 ./opsworks-deploy.sh configure $STACK_NAME
+    run-playbook "chef-json"
+    PARALLEL=1 ./chef-deploy.sh datashades::ckanweb-configure $INSTANCE_NAME $ENVIRONMENT web & WEB_PID=$!
+    PARALLEL=1 ./chef-deploy.sh datashades::ckanbatch-configure $INSTANCE_NAME $ENVIRONMENT batch & BATCH_PID=$!
+    PARALLEL=1 ./chef-deploy.sh datashades::solr-configure $INSTANCE_NAME $ENVIRONMENT solr
+    wait $WEB_PID
+    wait $BATCH_PID
   else
     # run custom playbook
     run-playbook "$3" "$4"
