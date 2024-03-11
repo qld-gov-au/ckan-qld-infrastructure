@@ -26,7 +26,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: PROD
-      SolrEC2Size: t3a.small
+      SolrEC2Size: t3a.medium
       WebEC2Size: t3a.medium
       BatchEC2Size: t3a.medium
       WebEC2Count: 5 #We have been running on 2 auto and 3 manually created instances, time to make it IasC
@@ -40,7 +40,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: STAGING
       WebEC2Count: 2
-      SolrEC2Size: t3a.small
+      SolrEC2Size: t3a.medium
       WebEC2Size: t3a.medium
       BatchEC2Size: t3a.medium
     tags:
