@@ -1,7 +1,7 @@
 ---
-opsAccount: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/opsVpcAccount', region=region) }}"
-opsRole: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/opsVpcRole', region=region) }}"
-opsVpcID:  "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/opsVpcId', region=region) }}"
+opsAccount: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcAccount', region=region) }}"
+opsRole: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcRole', region=region) }}"
+opsVpcID:  "{{ lookup('aws_ssm', '/config/CKAN/opsVpcId', region=region) }}"
 
 common_stack: &common_stack
   # VPC stacks cannot be properly torn down via Ansible
@@ -12,13 +12,13 @@ common_stack: &common_stack
   template_parameters: &common_stack_template_parameters
     ApplicationName: "CKAN"
     AZCount: '3'
-    BambooAgentIp: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/cicdIpA', region=region) }}"
-    BambooAgentIp2: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/cicdIpB', region=region) }}"
+    BambooAgentIp: "{{ lookup('aws_ssm', '/config/CKAN/cicdIpA', region=region) }}"
+    BambooAgentIp2: "{{ lookup('aws_ssm', '/config/CKAN/cicdIpB', region=region) }}"
     NatGateways: 'true'
     VPCNamePrefix: CKAN
     VPCPeeringEnabled: "{{ VPCPeeringEnabled | default('false') }} "
     VPCPeeringID: "{{ VPCPeeringID| default('') }}"
-    VPCPeeringCidr: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/opsVpcCidr', region=region) }}"
+    VPCPeeringCidr: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcCidr', region=region) }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "CKAN"
