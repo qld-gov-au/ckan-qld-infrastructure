@@ -8,8 +8,8 @@ common_stack: &common_stack
     DBEngine: postgres
     DBEngineVersion: 12
     DBName: ckan
-    DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
-    DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
+    DBPassword: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
+    DBUsername: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
     DBPrivileges: "ALL"
     PubliclyAccessible: "false"
     PreferredMaintenanceWindow: "wed:19:00-wed:19:45"

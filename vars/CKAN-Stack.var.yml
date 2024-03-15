@@ -1,8 +1,8 @@
 ---
-NonProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdNonProduction', region=region) }}"
-ProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdProduction', region=region) }}"
-NonProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdNonProduction', region=region) }}"
-ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', region=region) }}"
+NonProductionGTMId: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/GtmIdNonProduction', region=region) }}"
+ProductionGTMId: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/GtmIdProduction', region=region) }}"
+NonProductionAnalyticsId: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/GaIdNonProduction', region=region) }}"
+ProductionAnalyticsId: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/GaIdProduction', region=region) }}"
 
 solr_url: "http://archive.apache.org/dist/lucene/solr/8.11.2/solr-8.11.2.zip"
 ckan_tag: "ckan-2.10.3-qgov.5"
@@ -40,10 +40,10 @@ common_stack: &common_stack
     CreateServiceRole: "yes"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     SSMKey: "{{ SSMKey | default('') }}"
-    DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
+    DefaultEC2Key: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
     CookbookRevision: "{{ CookbookRevision | default('7.0.1') }}"
-    LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
-    AttachmentsBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}" #/config/CKAN/PROD/app/opendata/s3AttachmentBucket
+    LogBucketName: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
+    AttachmentsBucketName: "{{ lookup('amazon.aws.aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}" #/config/CKAN/PROD/app/opendata/s3AttachmentBucket
     SolrSource: "{{ solr_url }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"

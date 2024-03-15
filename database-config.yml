@@ -31,12 +31,12 @@
     - name: Set variable (facts) dependencies
       set_fact:
         DBEndpoint: "{{ database.ansible_facts.cloudformation[Stack_Name].stack_outputs.DBEndpoint }}"
-        DBMasterPass: "{{ lookup('aws_ssm', MasterPassKey, region=region) }}"
-        DBMasterUser: "{{ lookup('aws_ssm', MasterUserKey, region=region) }}"
+        DBMasterPass: "{{ lookup('amazon.aws.aws_ssm', MasterPassKey, region=region) }}"
+        DBMasterUser: "{{ lookup('amazon.aws.aws_ssm', MasterUserKey, region=region) }}"
         DBName: "{{ service_name }}"
-        DBPass: "{{ lookup('aws_ssm', PassKey, region=region) }}"
+        DBPass: "{{ lookup('amazon.aws.aws_ssm', PassKey, region=region) }}"
         DBPort: "{{ database.ansible_facts.cloudformation[Stack_Name].stack_outputs.DBPort }}"
-        DBUser: "{{ lookup('aws_ssm', UserKey, region=region) }}"
+        DBUser: "{{ lookup('amazon.aws.aws_ssm', UserKey, region=region) }}"
 
   roles:
     - ansible-linux-postgres
