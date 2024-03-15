@@ -230,6 +230,6 @@ def main():
 
 # import module snippets
 from ansible.module_utils.basic import *
-from ansible_collections.amazon.aws.plugins.module_utils.ec2 import *
+from ansible.module_utils.ec2 import *
 
 main()
