@@ -109,17 +109,6 @@ Parameters:
   DefaultEC2Key:
     Description: Select an existing SSH key
     Type: AWS::EC2::KeyPair::KeyName
-  CKANAdminPW:
-    NoEcho: true
-    Description: Password must be at least 8 characters up to a maximum of 64 characters in length.
-    Type: String
-    MinLength: 8
-    MaxLength: 64
-    AllowedPattern: "[-a-zA-Z0-9_!@#$%^&*()|]*"
-    ConstraintDescription: Must be 8 - 64 characters.
-  CKANAdminEmail:
-    Description: Valid Email Address
-    Type: String
   StackVPC:
     Description: The exported name of the existing VPC ID.
     Type: String
@@ -147,23 +136,6 @@ Parameters:
   ACMCertificateARN:
     Description: ARN for certificate to be used by the application load balancer.
     Type: String
-  PGDBUser:
-    Description: Account name for (non-superuser) Postgres DB access.
-    Type: String
-  PGDBPassword:
-    NoEcho: true
-    Description: Password must be at least 8 alphanumeric characters up to a maximum of 64 characters in length.
-    Type: String
-    MinLength: 8
-    MaxLength: 64
-    AllowedPattern: "[a-zA-Z0-9]*"
-    ConstraintDescription: Must be 8 - 64 alphanumeric characters.
-  BeakerSecret:
-    NoEcho: true
-    Description: Secret key used by CKAN to hash login cookies.
-    Type: String
-    MinLength: 32
-    ConstraintDescription: Must be at least 32 characters.
   SSMKey:
     Type: String
     Description: KMS key for alias/aws/ssm
