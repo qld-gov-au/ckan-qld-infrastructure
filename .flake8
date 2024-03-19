@@ -4,6 +4,7 @@
 exclude =
     ckan
     library
+    lookup_plugins
 
 # Extended output format.
 format = pylint
