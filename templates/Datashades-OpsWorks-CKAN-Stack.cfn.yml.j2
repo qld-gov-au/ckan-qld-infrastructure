@@ -109,25 +109,6 @@ Parameters:
   DefaultEC2Key:
     Description: Select an existing SSH key
     Type: AWS::EC2::KeyPair::KeyName
-  AdminUserGroup:
-    Description: Valid Linux group name
-    Type: String
-    Default: link
-  CKANAdminPW:
-    NoEcho: true
-    Description: Password must be at least 8 characters up to a maximum of 64 characters in length.
-    Type: String
-    MinLength: 8
-    MaxLength: 64
-    AllowedPattern: "[-a-zA-Z0-9_!@#$%^&*()|]*"
-    ConstraintDescription: Must be 8 - 64 characters.
-  CKANAdminEmail:
-    Description: Valid Email Address
-    Type: String
-  AdminPubKeyBucket:
-    Description: S3 Bucket URL
-    Type: String
-    Default: s3://link-opsworks/keys/
   StackVPC:
     Description: The exported name of the existing VPC ID.
     Type: String
@@ -155,23 +136,6 @@ Parameters:
   ACMCertificateARN:
     Description: ARN for certificate to be used by the application load balancer.
     Type: String
-  PGDBUser:
-    Description: Account name for (non-superuser) Postgres DB access.
-    Type: String
-  PGDBPassword:
-    NoEcho: true
-    Description: Password must be at least 8 alphanumeric characters up to a maximum of 64 characters in length.
-    Type: String
-    MinLength: 8
-    MaxLength: 64
-    AllowedPattern: "[a-zA-Z0-9]*"
-    ConstraintDescription: Must be 8 - 64 alphanumeric characters.
-  BeakerSecret:
-    NoEcho: true
-    Description: Secret key used by CKAN to hash login cookies.
-    Type: String
-    MinLength: 32
-    ConstraintDescription: Must be at least 32 characters.
   SSMKey:
     Type: String
     Description: KMS key for alias/aws/ssm
@@ -318,6 +282,14 @@ Resources:
                     - ""
                     - - "arn:aws:route53:::hostedzone/"
                       - Fn::ImportValue: !Ref InternalStackZone
+              # allow the servers to retrieve a subset of SSM Parameter Store values
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
         - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
@@ -360,6 +332,7 @@ Resources:
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/*"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/db/${ApplicationId}_*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
         - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
@@ -393,24 +366,35 @@ Resources:
         datashades:
           ckan_web:
             title: !Sub "${ApplicationTitle} | Queensland Government"
+            site_domain: !Ref SiteDomain
             email_domain: !Ref EmailDomain
-            adminpw: !Ref CKANAdminPW
-            adminemail: !Ref CKANAdminEmail
-            beaker_secret: !Ref BeakerSecret
-            dbuser: !Ref PGDBUser
-            dbname: !Ref ApplicationName
-            dsuser: !Sub "${PGDBUser}_datastore"
-            dsname: !Sub "${ApplicationName}_datastore"
             dsenable: !Ref EnableDataStore
             endpoint: /
             google:
               gtm_container_id: !Ref GTMContainerId
               analytics_id: !Ref AnalyticsId
-          jumpbox:
-            bucket: !Ref AdminPubKeyBucket
-            usergroup: !Ref AdminUserGroup
-          postgres:
-            password: !Ref PGDBPassword
+            ckan_app:
+              name: !Sub "${ApplicationName}-${Environment}"
+              shortname: !Sub "${ApplicationId}-${Environment}"
+              app_source:
+                type: git
+                url: !Ref CKANSource
+                revision: !Ref CKANRevision
+            plugin_apps:
+{% for plugin in extensions[Environment] %}
+              - name: "{{ extensions[Environment][plugin].name }}"
+                shortname: "{{ extensions[Environment][plugin].shortname }}"
+                app_source:
+                  type: "{{ extensions[Environment][plugin].type }}"
+                  url: "{{ extensions[Environment][plugin].url }}"
+                  revision: "{{ extensions[Environment][plugin].version}}"
+{% endfor %}
+          solr_app:
+            name: !Sub "${ApplicationName}-${Environment}-solr"
+            shortname: !Sub "${ApplicationId}-${Environment}-solr"
+            app_source:
+              type: archive
+              url: !Ref SolrSource
           redis:
             hostname:
               Fn::ImportValue: !Ref CacheAddress
@@ -471,6 +455,9 @@ Resources:
       Shortname: !Sub "${ApplicationId}-solr"
       StackId: !Ref OpsWorksStack
       Type: custom
+      Tags:
+        - Key: Layer
+          Value: solr
       VolumeConfigurations:
         - MountPoint: "/mnt/local_data"
           NumberOfDisks: 1
@@ -503,6 +490,9 @@ Resources:
       Shortname: !Sub "${ApplicationId}-web"
       StackId: !Ref OpsWorksStack
       Type: custom
+      Tags:
+        - Key: Layer
+          Value: web
       LoadBasedAutoScaling:
         Enable: Yes
         UpScaling:
@@ -549,6 +539,9 @@ Resources:
       Shortname: !Sub "${ApplicationId}-batch"
       StackId: !Ref OpsWorksStack
       Type: custom
+      Tags:
+        - Key: Layer
+          Value: batch
       LoadBasedAutoScaling:
         Enable: Yes
         UpScaling:

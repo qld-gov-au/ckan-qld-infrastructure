@@ -1,0 +1,2 @@
+{% set ref_type = 'tags' if CookbookRevision | regex_search('^[0-9.]{5}') else 'remotes/origin' %}
+"SourceType":["Git"],"SourceInfo":["{\"repository\":\"{{ CookbookURL }}\",\"getOptions\":\"branch:refs/{{ ref_type }}/{{ CookbookRevision }}\"}"]

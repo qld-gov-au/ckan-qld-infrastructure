@@ -68,3 +68,13 @@ Resources:
       NumCacheNodes: !Ref NumCacheNodes
       VpcSecurityGroupIds:
         - Fn::ImportValue: !Sub "${Environment}${Platform}DatabaseSG"
+
+  EndpointAddress:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/common/cache_address"
+      Type: String
+      Value:
+        Fn::GetAtt:
+          - CacheCluster
+          - RedisEndpoint.Address

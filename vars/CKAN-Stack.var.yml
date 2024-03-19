@@ -5,14 +5,15 @@ NonProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdNonProduction'
 ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', region=region) }}"
 
 solr_url: "http://archive.apache.org/dist/lucene/solr/8.11.2/solr-8.11.2.zip"
-ckan_tag: "ckan-2.10.3-qgov.5"
-ckan_qgov_branch: "qgov-master-2.10.3"
+ckan_tag: "ckan-2.10.4-qgov.1"
+ckan_qgov_branch: "qgov-master-2.10.4"
 
 common_stack: &common_stack
   state: "{{ state | default('present')}}"
   region: "{{ region }}"
   disable_rollback: true
   template: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml"
+  template_jinja: "templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml.j2"
   template_parameters: &common_stack_template_parameters
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name | lower }}"
@@ -24,16 +25,11 @@ common_stack: &common_stack
     EmailDomain: "{{ RootDomain }}"
     SiteDomain: "{{ SiteDomain }}"
     RootDomain: "{{ RootDomain }}"
-    ACMCertificateARN: "{{ ACMCertificateARNForDefaultRegion }}"
+    ACMCertificateARN: "{{ ACMCertificateARNForDefaultRegion | default('') }}"
     CacheAddress: "{{ Environment }}CKANCacheClusterAddress"
     StackVPC: "CKANVpc-{{ Environment }}"
     InternalStackZoneTLD: "{{ Environment }}CKANPrivateTLD"
     InternalStackZone: "{{ Environment }}CKANPrivateHostedZone"
-    CKANAdminEmail: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/admin_email', region=region) }}"
-    CKANAdminPW: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/admin_password', region=region) }}"
-    PGDBUser: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + service_name_lower + '_user', region=region) }}"
-    PGDBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/' + service_name_lower + '_password', region=region) }}"
-    BeakerSecret: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/beaker_secret', region=region) }}"
     WebSubnets: "{{ Environment }}CKANWebSubnet"
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     AdminSG: "{{ Environment }}CKANManagementSG"
@@ -45,7 +41,7 @@ common_stack: &common_stack
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     SSMKey: "{{ SSMKey | default('') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
-    CookbookRevision: "{{ CookbookRevision | default('6.1.21') }}"
+    CookbookRevision: "{{ CookbookRevision | default('7.0.3') }}"
     LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
     AttachmentsBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}" #/config/CKAN/PROD/app/opendata/s3AttachmentBucket
     SolrSource: "{{ solr_url }}"

@@ -215,7 +215,7 @@ def main():
         client = boto3_conn(module, conn_type='client', resource='ec2', region=region, endpoint=ec2_url, **aws_connect_kwargs)
     except botocore.exceptions.NoCredentialsError as e:
         module.fail_json(msg="Can't authorize connection - "+str(e))
-    except Exception, e:
+    except Exception as e:
         module.fail_json(msg='Failed to connect to VPC: %s' % str(e))
 
     if peer_vpc_id is None:

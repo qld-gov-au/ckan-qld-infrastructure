@@ -50,6 +50,6 @@ Feature: Resource UI
     Scenario: Link resource with missing or invalid protocol should use HTTP
         Given "SysAdmin" as the persona
         When I log in
-        And I create a dataset and resource with key-value parameters "title=Non-HTTP resource" and "name=Non-HTTP link::url=git+https://github.com/ckan/ckan.git"
+        And I create a dataset and resource with key-value parameters "notes=Testing invalid link protocol" and "name=Non-HTTP link::url=git+https://github.com/ckan/ckan.git"
         And I press "Non-HTTP link"
         Then I should see "http://git+https://github.com/ckan/ckan.git"
