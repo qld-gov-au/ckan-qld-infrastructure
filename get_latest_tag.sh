@@ -12,7 +12,7 @@ fi
 
 git --git-dir="$GIT_DIR" fetch >/dev/null
 git --git-dir="$GIT_DIR" fetch --tags >/dev/null
-TAG=$(git --git-dir="$GIT_DIR" tag -l --sort=committerdate | tail -1)
+TAG=$(git --git-dir="$GIT_DIR" tag -l --sort=creatordate | tail -1)
 BRANCH="$2"
 if [ "$BRANCH" = "" ]; then
     if (git --git-dir="$GIT_DIR" branch -r |grep origin/main) 2>&1 >/dev/null; then
