@@ -280,6 +280,7 @@ Resources:
                   - ssm:GetParameters
                   - ssm:GetParametersByPath
                 Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/*"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
         - !Ref EBSTaggingPolicy
@@ -343,6 +344,27 @@ Resources:
 
   # Populate SSM Parameter Store with all the information needed to deploy.
   # This should allow a blank instance to set itself up based only on the tags applied to it.
+
+  CookbookTypeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/type"
+      Type: String
+      Value: !Ref CookbookURLType
+
+  CookbookUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/url"
+      Type: String
+      Value: !Ref CookbookURL
+
+  CookbookRevisionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/revision"
+      Type: String
+      Value: !Ref CookbookRevision
 
   PublicTLDParameter:
     Type: AWS::SSM::Parameter
