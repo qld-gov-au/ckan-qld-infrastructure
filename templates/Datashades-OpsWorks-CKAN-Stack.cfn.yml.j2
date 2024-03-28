@@ -351,182 +351,6 @@ Resources:
       Roles:
         - !Ref WebInstanceRole
 
-  # Populate SSM Parameter Store with all the information needed to deploy.
-  # This should allow a blank instance to set itself up based only on the tags applied to it.
-
-  CookbookTypeParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/type"
-      Type: String
-      Value: !Ref CookbookURLType
-
-  CookbookUrlParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/url"
-      Type: String
-      Value: !Ref CookbookURL
-
-  CookbookRevisionParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/revision"
-      Type: String
-      Value: !Ref CookbookRevision
-
-  PublicTLDParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/public_tld"
-      Type: String
-      Value: !Ref PublicTLD
-
-  InternalHostedZoneTLDParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/tld"
-      Type: String
-      Value:
-        Fn::ImportValue: !Ref InternalStackZoneTLD
-
-  TitleParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/title"
-      Type: String
-      Value: !Sub "${ApplicationTitle} | Queensland Government"
-
-  SiteDomainParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/site_domain"
-      Type: String
-      Value: !Ref SiteDomain
-
-  EmailDomainParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/email_domain"
-      Type: String
-      Value: !Ref EmailDomain
-
-  DataStoreEnableParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/ds_enable"
-      Type: String
-      Value: !Ref EnableDataStore
-
-  CKANAppNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/ckan_app/name"
-      Type: String
-      Value: !Sub "${ApplicationName}-${Environment}"
-
-  CKANAppShortNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/ckan_app/shortname"
-      Type: String
-      Value: !Sub "${ApplicationId}-${Environment}"
-
-  CKANAppSourceTypeParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/ckan_app/app_source/type"
-      Type: String
-      Value: git
-
-  CKANAppSourceURLParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/ckan_app/app_source/url"
-      Type: String
-      Value: !Ref CKANSource
-
-  CKANAppSourceRevisionParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/ckan_app/app_source/revision"
-      Type: String
-      Value: !Ref CKANRevision
-
-  SolrAppNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/solr_app/name"
-      Type: String
-      Value: !Sub "${ApplicationName}-${Environment}-solr"
-
-  SolrAppShortNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/solr_app/shortname"
-      Type: String
-      Value: !Sub "${ApplicationId}-${Environment}-solr"
-
-  SolrAppSourceTypeParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/solr_app/app_source/type"
-      Type: String
-      Value: archive
-
-  SolrAppSourceURLParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/solr_app/app_source/url"
-      Type: String
-      Value: !Ref SolrSource
-
-  PluginListParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_app_names"
-      Type: String
-      Value: "{{ extensions[Environment] | join(',') }}"
-
-{% for plugin in extensions[Environment] %}
-  {{ plugin }}AppNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/name"
-      Type: String
-      Value: "{{ extensions[Environment][plugin].name }}"
-
-  {{ plugin }}AppShortNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/shortname"
-      Type: String
-      Value: "{{ extensions[Environment][plugin].shortname }}"
-
-  {{ plugin }}AppSourceTypeParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/type"
-      Type: String
-      Value: git
-
-  {{ plugin }}AppSourceURLParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/url"
-      Type: String
-      Value: "{{ extensions[Environment][plugin].url }}"
-
-  {{ plugin }}AppSourceRevisionParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/revision"
-      Type: String
-      Value: "{{ extensions[Environment][plugin].version }}"
-{% endfor %}
-
-  # OpsWorks stack layers
-
   OpsWorksStack:
     Type: AWS::OpsWorks::Stack
     Properties:
@@ -539,6 +363,50 @@ Resources:
         Type: !Ref CookbookURLType
         # SshKey: !Sub "${CookbookSSHKey}\n"
         Url: !Ref CookbookURL
+      CustomJson:
+        datashades:
+          ckan_web:
+            title: !Sub "${ApplicationTitle} | Queensland Government"
+            site_domain: !Ref SiteDomain
+            email_domain: !Ref EmailDomain
+            dsenable: !Ref EnableDataStore
+            endpoint: /
+            google:
+              gtm_container_id: !Ref GTMContainerId
+              analytics_id: !Ref AnalyticsId
+            ckan_app:
+              name: !Sub "${ApplicationName}-${Environment}"
+              shortname: !Sub "${ApplicationId}-${Environment}"
+              app_source:
+                type: git
+                url: !Ref CKANSource
+                revision: !Ref CKANRevision
+            plugin_apps:
+{% for plugin in extensions[Environment] %}
+              - name: "{{ extensions[Environment][plugin].name }}"
+                shortname: "{{ extensions[Environment][plugin].shortname }}"
+                app_source:
+                  type: "{{ extensions[Environment][plugin].type }}"
+                  url: "{{ extensions[Environment][plugin].url }}"
+                  revision: "{{ extensions[Environment][plugin].version}}"
+{% endfor %}
+          solr_app:
+            name: !Sub "${ApplicationName}-${Environment}-solr"
+            shortname: !Sub "${ApplicationId}-${Environment}-solr"
+            app_source:
+              type: archive
+              url: !Ref SolrSource
+          redis:
+            hostname:
+              Fn::ImportValue: !Ref CacheAddress
+            port: !Ref CachePort
+          tld:
+            Fn::ImportValue: !Ref InternalStackZoneTLD
+          public_tld: !Ref PublicTLD
+          version: !Ref Environment
+          app_id: !Ref ApplicationId
+          log_bucket: !Ref LogBucketName
+          attachments_bucket: !Ref AttachmentsBucketName
       DefaultInstanceProfileArn:
         Fn::GetAtt:
           - InstanceRoleProfile
