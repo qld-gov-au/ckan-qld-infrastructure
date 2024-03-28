@@ -39,7 +39,6 @@ common_stack: &common_stack
     DatabaseSG: "{{ Environment }}CKANDatabaseSG"
     CreateServiceRole: "yes"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
-    SSMKey: "{{ SSMKey | default('') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
     CookbookRevision: "{{ CookbookRevision | default('7.0.3') }}"
     LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
