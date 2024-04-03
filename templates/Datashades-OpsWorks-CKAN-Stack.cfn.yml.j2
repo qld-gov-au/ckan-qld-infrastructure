@@ -186,6 +186,22 @@ Resources:
                 Effect: Allow
                 Resource: "*"
 
+  InstanceRoleProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - Fn::ImportValue:
+            !Sub "${Environment}${ApplicationName}InstanceRole"
+
+  WebInstanceRoleProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - Fn::ImportValue:
+            !Sub "${Environment}${ApplicationName}WebInstanceRole"
+
   # Populate SSM Parameter Store with all the information needed to deploy.
   # This should allow a blank instance to set itself up based only on the tags applied to it.
 
@@ -417,8 +433,9 @@ Resources:
           log_bucket: !Ref LogBucketName
           attachments_bucket: !Ref AttachmentsBucketName
       DefaultInstanceProfileArn:
-        Fn::ImportValue:
-          !Sub "${Environment}${ApplicationName}InstanceRole"
+        Fn::GetAtt:
+          - InstanceRoleProfile
+          - Arn
       DefaultOs: "Amazon Linux 2"
       DefaultSshKeyName: !Ref DefaultEC2Key
       DefaultSubnetId:
@@ -490,8 +507,9 @@ Resources:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppSG
       CustomInstanceProfileArn:
-        Fn::ImportValue:
-          !Sub "${Environment}${ApplicationName}WebInstanceRole"
+        Fn::GetAtt:
+          - WebInstanceRoleProfile
+          - Arn
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
       Name: !Sub "${ApplicationName}-Web"
@@ -538,8 +556,9 @@ Resources:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppSG
       CustomInstanceProfileArn:
-        Fn::ImportValue:
-          !Sub "${Environment}${ApplicationName}WebInstanceRole"
+        Fn::GetAtt:
+          - WebInstanceRoleProfile
+          - Arn
       EnableAutoHealing: true
       InstallUpdatesOnBoot: true
       Name: !Sub "${ApplicationName}-Batch"
