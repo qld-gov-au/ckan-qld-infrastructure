@@ -142,13 +142,6 @@ Resources:
         - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
         - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
 
-  InstanceRoleProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Path: /
-      Roles:
-        - !Ref InstanceRole
-
   WebInstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -185,28 +178,15 @@ Resources:
         - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
         - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
 
-  WebInstanceRoleProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Path: /
-      Roles:
-        - !Ref WebInstanceRole
-
 Outputs:
-  InstanceRoleARN:
-    Value:
-      Fn::GetAtt:
-        - InstanceRoleProfile
-        - Arn
+  InstanceRole:
+    Value: !Ref InstanceRole
     Description: Resource identifier for the global instance role
     Export:
       Name: !Sub "${Environment}${ApplicationName}InstanceRole"
 
-  WebInstanceRoleARN:
-    Value:
-      Fn::GetAtt:
-        - WebInstanceRoleProfile
-        - Arn
+  WebInstanceRole:
+    Value: !Ref WebInstanceRole
     Description: Resource identifier for the web instance role
     Export:
       Name: !Sub "${Environment}${ApplicationName}WebInstanceRole"
