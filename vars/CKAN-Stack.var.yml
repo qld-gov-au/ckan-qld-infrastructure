@@ -1,6 +1,11 @@
 ---
+NonProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdNonProduction', region=region) }}"
+ProductionGTMId: "{{ lookup('aws_ssm', '/config/CKAN/GtmIdProduction', region=region) }}"
+NonProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdNonProduction', region=region) }}"
+ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', region=region) }}"
+
 solr_url: "http://archive.apache.org/dist/lucene/solr/8.11.2/solr-8.11.2.zip"
-ckan_tag: "ckan-2.10.4-qgov.1"
+ckan_tag: "ckan-2.10.4-qgov.2"
 ckan_qgov_branch: "qgov-master-2.10.4"
 
 common_stack: &common_stack
@@ -34,9 +39,9 @@ common_stack: &common_stack
     DatabaseSG: "{{ Environment }}CKANDatabaseSG"
     CreateServiceRole: "yes"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
-    SSMKey: "{{ SSMKey | default('') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
     CookbookRevision: "{{ CookbookRevision | default('7.0.3') }}"
+    LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
     AttachmentsBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}" #/config/CKAN/PROD/app/opendata/s3AttachmentBucket
     SolrSource: "{{ solr_url }}"
   tags: &common_stack_tags
@@ -52,6 +57,8 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: PROD
+      GTMContainerId: "{{ ProductionGTMId }}"
+      AnalyticsId: "{{ ProductionAnalyticsId }}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
@@ -61,6 +68,8 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: STAGING
+      GTMContainerId: "{{ NonProductionGTMId }}"
+      AnalyticsId: "{{ NonProductionAnalyticsId }}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
@@ -70,6 +79,8 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: TRAINING
+      GTMContainerId: "{{ NonProductionGTMId }}"
+      AnalyticsId: "{{ NonProductionAnalyticsId }}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -84,6 +95,8 @@ cloudformation_stacks:
       CookbookURL: "{{ CookbookURL | default('https://github.com/qld-gov-au/opswx-ckan-cookbook.git') }}"
       CookbookURLType: "{{ CookbookURLType | default('git')}}"
       CookbookRevision: "{{ CookbookRevision | default('develop') }}"
+      GTMContainerId: "{{ NonProductionGTMId }}"
+      AnalyticsId: "{{ NonProductionAnalyticsId }}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"

@@ -1,0 +1,192 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Creates IAM roles with permissions needed for CKAN servers"
+
+Parameters:
+  ApplicationName:
+    Description: Name of the application (ie. GI or Services, etc)
+    Type: String
+  ApplicationId:
+    Description: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+    Type: String
+    ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
+    AllowedPattern: '[-_a-z0-9]*'
+  Environment:
+    Description: Select a stack version.
+    Type: String
+    Default: STAGING
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  InternalStackZone:
+    Description: Exported name of the Route53 hosted zone ID.
+    Type: String
+  SSMKey:
+    Type: String
+    Description: KMS key for alias/aws/ssm
+  AttachmentsBucketName:
+    Description: Name of the S3 Attachment bucket.
+    Type: String
+
+Resources:
+  SmtpRelayPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Provides access to retrieve SSM parameters related to the AWS SMTP relay, including KMS decryption, and send emails.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: ses:SendRawEmail
+            Resource: "*"
+          - Effect: Allow
+            Action: ssm:DescribeParameters
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:GetParameters
+              - ssm:GetParameter
+              - ssm:GetParametersByPath
+            Resource:
+              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay"
+              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
+          - Effect: Allow
+            Action: kms:Decrypt
+            Resource: !Ref SSMKey
+
+  AttachmentsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Provides access to s3 attachments bucket.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Action:
+            - s3:AbortMultipartUpload
+            - s3:ListMultipartUploadParts
+            - s3:ListBucket
+            - s3:*Upload*
+            - s3:GetObject
+            - s3:GetObjectAcl
+            - s3:GetObjectVersion
+            - s3:PutObject
+            - s3:PutObjectAcl
+            - s3:PutObjectTagging
+            - s3:DeleteObject
+            - s3:DeleteObjectTagging
+            - s3:GetBucketAcl
+            - s3:GetBucketCORS
+            - s3:GetBucketPolicy
+          Resource:
+            - !Sub "arn:aws:s3:::${AttachmentsBucketName}"
+            - !Sub "arn:aws:s3:::${AttachmentsBucketName}/*"
+        - Effect: Allow
+          Action:
+            - s3:ListAllMyBuckets
+          Resource:
+            - !Sub "arn:aws:s3:::"
+
+  EBSTaggingPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Allows EC2 instances to tag their EBS root volumes (eg for automatic backups)
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: ec2:CreateTags
+            Resource: "*"
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ApplicationName}-${Environment}-InstancePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # allow the service layer to update internal DNS
+              - Effect: Allow
+                Action:
+                  - route53:ChangeResourceRecordSets
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:route53:::hostedzone/"
+                      - Fn::ImportValue: !Ref InternalStackZone
+              # allow the servers to retrieve a subset of SSM Parameter Store values
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
+      ManagedPolicyArns:
+        - !Ref EBSTaggingPolicy
+        - !Ref SmtpRelayPolicy
+        - !Ref AttachmentsPolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
+        - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
+
+  WebInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ApplicationName}-${Environment}-WebInstancePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # allow the web layer to retrieve a subset of SSM Parameter Store values
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/db/${ApplicationId}_*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
+      ManagedPolicyArns:
+        - !Ref EBSTaggingPolicy
+        - !Ref SmtpRelayPolicy
+        - !Ref AttachmentsPolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
+        - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
+
+Outputs:
+  InstanceRole:
+    Value: !Ref InstanceRole
+    Description: Resource identifier for the global instance role
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}InstanceRole"
+
+  WebInstanceRole:
+    Value: !Ref WebInstanceRole
+    Description: Resource identifier for the web instance role
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebInstanceRole"
