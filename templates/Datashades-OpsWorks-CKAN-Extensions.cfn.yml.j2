@@ -28,25 +28,49 @@ Parameters:
     ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
     AllowedPattern: '[-_a-z0-9]*'
 
-
 Resources:
 
-  {% for key in EnvExtensions %}
-
-  {{ key }}:
-    Type: AWS::OpsWorks::App
+  PluginListParameter:
+    Type: AWS::SSM::Parameter
     Properties:
-      AppSource:
-        Type: "{{ EnvExtensions[key].type }}"
-        Url: "{{ EnvExtensions[key].url }}"
-        {% if EnvExtensions[key].version is defined %}Revision: "{{ EnvExtensions[key].version }}"{% endif %}
-      #new line required for jinja to not merge groups
-      Description: {{ EnvExtensions[key].description }}
-      EnableSsl: !!bool false
-      Name: "{{ EnvExtensions[key].name }}"
-      Shortname: "{{ EnvExtensions[key].shortname }}"
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStack
-      Type: "other"
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_app_names"
+      Type: String
+      Value: "{{ extensions[Environment] | join(',') }}"
 
-  {% endfor %}
+{% for plugin in extensions[Environment] %}
+  {{ plugin }}AppNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/name"
+      Type: String
+      Value: "{{ extensions[Environment][plugin].name }}"
+
+  {{ plugin }}AppShortNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/shortname"
+      Type: String
+      Value: "{{ extensions[Environment][plugin].shortname }}"
+
+  {{ plugin }}AppSourceTypeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/type"
+      Type: String
+      Value: git
+
+  {{ plugin }}AppSourceURLParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/url"
+      Type: String
+      Value: "{{ extensions[Environment][plugin].url }}"
+
+  {{ plugin }}AppSourceRevisionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/revision"
+      Type: String
+      Value: "{{ extensions[Environment][plugin].version }}"
+{% endfor %}
+
