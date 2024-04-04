@@ -9,3 +9,4 @@ mock
 pyOpenSSL>=23.0.0
 pytest-ckan
 selenium<4.10
+typer<0.12
