@@ -136,6 +136,9 @@ Parameters:
   ACMCertificateARN:
     Description: ARN for certificate to be used by the application load balancer.
     Type: String
+  SSMKey:
+    Type: String
+    Description: KMS key for alias/aws/ssm
   GTMContainerId:
     Description: Google Tag Manager container ID
     Type: String
@@ -186,21 +189,167 @@ Resources:
                 Effect: Allow
                 Resource: "*"
 
+  SmtpRelayPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Provides access to retrieve SSM parameters related to the AWS SMTP relay, including KMS decryption, and send emails.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: ses:SendRawEmail
+            Resource: "*"
+          - Effect: Allow
+            Action: ssm:DescribeParameters
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:GetParameters
+              - ssm:GetParameter
+              - ssm:GetParametersByPath
+            Resource:
+              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay"
+              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
+          - Effect: Allow
+            Action: kms:Decrypt
+            Resource: !Ref SSMKey
+
+  AttachmentsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Provides access to s3 attachments bucket.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Action:
+            - s3:AbortMultipartUpload
+            - s3:ListMultipartUploadParts
+            - s3:ListBucket
+            - s3:*Upload*
+            - s3:GetObject
+            - s3:GetObjectAcl
+            - s3:GetObjectVersion
+            - s3:PutObject
+            - s3:PutObjectAcl
+            - s3:PutObjectTagging
+            - s3:DeleteObject
+            - s3:DeleteObjectTagging
+            - s3:GetBucketAcl
+            - s3:GetBucketCORS
+            - s3:GetBucketPolicy
+          Resource:
+            - !Sub "arn:aws:s3:::${AttachmentsBucketName}"
+            - !Sub "arn:aws:s3:::${AttachmentsBucketName}/*"
+        - Effect: Allow
+          Action:
+            - s3:ListAllMyBuckets
+          Resource:
+            - !Sub "arn:aws:s3:::"
+
+  EBSTaggingPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Allows EC2 instances to tag their EBS root volumes (eg for automatic backups)
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: ec2:CreateTags
+            Resource: "*"
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ApplicationName}-${Environment}-CustomPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # allow the service layer to update internal DNS
+              - Effect: Allow
+                Action:
+                  - route53:ChangeResourceRecordSets
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:route53:::hostedzone/"
+                      - Fn::ImportValue: !Ref InternalStackZone
+              # allow the servers to retrieve a subset of SSM Parameter Store values
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
+      ManagedPolicyArns:
+        - !Ref EBSTaggingPolicy
+        - !Ref SmtpRelayPolicy
+        - !Ref AttachmentsPolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
+        - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
+
   InstanceRoleProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
       Roles:
-        - Fn::ImportValue:
-            !Sub "${Environment}${ApplicationName}InstanceRole"
+        - !Ref InstanceRole
+
+  WebInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ApplicationName}-${Environment}-Web-CustomPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # allow the web layer to retrieve a subset of SSM Parameter Store values
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/db/${ApplicationId}_*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
+      ManagedPolicyArns:
+        - !Ref EBSTaggingPolicy
+        - !Ref SmtpRelayPolicy
+        - !Ref AttachmentsPolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
+        - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
 
   WebInstanceRoleProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
       Roles:
-        - Fn::ImportValue:
-            !Sub "${Environment}${ApplicationName}WebInstanceRole"
+        - !Ref WebInstanceRole
 
   # Populate SSM Parameter Store with all the information needed to deploy.
   # This should allow a blank instance to set itself up based only on the tags applied to it.
@@ -331,50 +480,6 @@ Resources:
       Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/solr_app/app_source/url"
       Type: String
       Value: !Ref SolrSource
-
-  PluginListParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_app_names"
-      Type: String
-      Value: "{{ extensions[Environment] | join(',') }}"
-
-{% for plugin in extensions[Environment] %}
-  {{ plugin }}AppNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/name"
-      Type: String
-      Value: "{{ extensions[Environment][plugin].name }}"
-
-  {{ plugin }}AppShortNameParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/shortname"
-      Type: String
-      Value: "{{ extensions[Environment][plugin].shortname }}"
-
-  {{ plugin }}AppSourceTypeParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/type"
-      Type: String
-      Value: git
-
-  {{ plugin }}AppSourceURLParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/url"
-      Type: String
-      Value: "{{ extensions[Environment][plugin].url }}"
-
-  {{ plugin }}AppSourceRevisionParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/revision"
-      Type: String
-      Value: "{{ extensions[Environment][plugin].version }}"
-{% endfor %}
 
   OpsWorksStack:
     Type: AWS::OpsWorks::Stack

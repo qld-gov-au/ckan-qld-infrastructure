@@ -53,8 +53,8 @@ run-all-playbooks () {
     run-playbook "database-config"
   fi
   run-playbook "CloudFormation" "vars/s3_buckets.var.yml"
-  run-playbook "instance-roles"
   run-playbook "CKAN-Stack"
+  run-playbook "CloudFormation" "vars/CKAN-extensions.var.yml"
   run-playbook "CloudFormation" "vars/instances-${INSTANCE_NAME}.var.yml"
   run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
   run-playbook "cloudfront"
