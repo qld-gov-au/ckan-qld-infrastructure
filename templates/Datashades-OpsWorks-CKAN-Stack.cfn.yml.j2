@@ -247,6 +247,75 @@ Resources:
           Resource:
             - !Sub "arn:aws:s3:::"
 
+  RunCommandPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Allows instances to run SSM commands to boot themselves.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - ssm:SendCommand
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:*:document/AWS-ApplyChefRecipes"
+          - Effect: Allow
+            Action:
+              - ec2:DescribeTags
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/*"
+          - Effect: Allow
+            Action:
+              - ssm:SendCommand
+            Resource:
+              - !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
+            Condition:
+              StringEquals:
+                "ssm:resourceTag/Environment":
+                  !Ref Environment
+                "ssm:resourceTag/Service":
+                  !Ref ApplicationName
+
+  SetupInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref RunCommandPolicy
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  {% set instance_setup_source = lookup('ansible.builtin.file', 'files/instanceSetupLambda.js') | replace('\n', '') %}
+  {% set instance_setup_source_hash = instance_setup_source | hash('md5') | truncate(20, true, '') %}
+
+  InstanceSetupLambda{{ instance_setup_source_hash }}:
+    Type: AWS::Lambda::Function
+    Properties:
+      Architectures:
+        - arm64
+      Description: Run Systems Manager commands to set up instances.
+      FunctionName: !Sub "${ApplicationName}-${Environment}-setup-{{ instance_setup_source_hash }}"
+      Runtime: nodejs20.x
+      Code:
+        ZipFile: >
+          {{ instance_setup_source }}
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - SetupInstanceRole
+          - Arn
+      Timeout: 10
+
   EBSTaggingPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
