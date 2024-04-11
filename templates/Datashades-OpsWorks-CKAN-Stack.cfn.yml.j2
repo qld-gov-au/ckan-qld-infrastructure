@@ -250,7 +250,7 @@ Resources:
   RunCommandPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Description: Allows instances to run SSM commands to boot themselves.
+      Description: Privileges required to run SSM commands to set up instances.
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -281,7 +281,7 @@ Resources:
                 "ssm:resourceTag/Service":
                   !Ref ApplicationName
 
-  SetupInstanceRole:
+  InstanceSetupLambdaRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
