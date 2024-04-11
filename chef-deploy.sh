@@ -21,7 +21,6 @@ RUN_LIST="recipe[$(echo $COMMAND | sed 's/,/],recipe[/g')]"
 
 # Retrieve generated custom JSON
 CHEF_SOURCE=$(cat templates/chef-source.json | tr -d '\n')
-CUSTOM_JSON=$(cat templates/chef.json | tr -d '\n' | sed 's/"/\\"/g')
 
 REGION_SNIPPET="--region ap-southeast-2"
 MESSAGE="[$COMMAND on $SERVICE $ENVIRONMENT $LAYER_NAME]"
@@ -79,7 +78,7 @@ deploy () {
     debug "Target instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME: $INSTANCE_IDS"
   fi
   if [ "$PARALLEL" = "true" ]; then
-    DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":["'"$CUSTOM_JSON"'"],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
+    DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
     wait_for_deployment $DEPLOYMENT_ID || exit 1
   else
     ELB_NAME=$(find_load_balancer)
@@ -88,7 +87,7 @@ deploy () {
         OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
         debug "Deregistered instance $instance from load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
       fi
-      DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $instance --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":["'"$CUSTOM_JSON"'"],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
+      DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $instance --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
       wait_for_deployment $DEPLOYMENT_ID
       DEPLOYMENT_SUCCESS=$?
       if [ "$ELB_NAME" != "" ]; then

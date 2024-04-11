@@ -57,8 +57,3 @@
       template:
         src: chef-source.json.j2
         dest: templates/chef-source.json
-
-    - name: Prepare custom JSON
-      template:
-        src: chef.json.j2
-        dest: templates/chef.json

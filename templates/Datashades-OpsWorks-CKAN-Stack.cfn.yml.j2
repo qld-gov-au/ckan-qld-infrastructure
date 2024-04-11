@@ -494,50 +494,6 @@ Resources:
         Type: !Ref CookbookURLType
         # SshKey: !Sub "${CookbookSSHKey}\n"
         Url: !Ref CookbookURL
-      CustomJson:
-        datashades:
-          ckan_web:
-            title: !Sub "${ApplicationTitle} | Queensland Government"
-            site_domain: !Ref SiteDomain
-            email_domain: !Ref EmailDomain
-            dsenable: !Ref EnableDataStore
-            endpoint: /
-            google:
-              gtm_container_id: !Ref GTMContainerId
-              analytics_id: !Ref AnalyticsId
-            ckan_app:
-              name: !Sub "${ApplicationName}-${Environment}"
-              shortname: !Sub "${ApplicationId}-${Environment}"
-              app_source:
-                type: git
-                url: !Ref CKANSource
-                revision: !Ref CKANRevision
-            plugin_apps:
-{% for plugin in extensions[Environment] %}
-              - name: "{{ extensions[Environment][plugin].name }}"
-                shortname: "{{ extensions[Environment][plugin].shortname }}"
-                app_source:
-                  type: "{{ extensions[Environment][plugin].type }}"
-                  url: "{{ extensions[Environment][plugin].url }}"
-                  revision: "{{ extensions[Environment][plugin].version}}"
-{% endfor %}
-          solr_app:
-            name: !Sub "${ApplicationName}-${Environment}-solr"
-            shortname: !Sub "${ApplicationId}-${Environment}-solr"
-            app_source:
-              type: archive
-              url: !Ref SolrSource
-          redis:
-            hostname:
-              Fn::ImportValue: !Ref CacheAddress
-            port: !Ref CachePort
-          tld:
-            Fn::ImportValue: !Ref InternalStackZoneTLD
-          public_tld: !Ref PublicTLD
-          version: !Ref Environment
-          app_id: !Ref ApplicationId
-          log_bucket: !Ref LogBucketName
-          attachments_bucket: !Ref AttachmentsBucketName
       DefaultInstanceProfileArn:
         Fn::GetAtt:
           - InstanceRoleProfile
