@@ -295,8 +295,7 @@ Resources:
         - !Ref RunCommandPolicy
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
-  {% set instance_setup_source = lookup('ansible.builtin.file', 'files/instanceSetupLambda.js') | replace('\n', '') %}
-  {% set instance_setup_source_hash = instance_setup_source | hash('md5') | truncate(20, true, '') %}
+  {% set instance_setup_source = lookup('file', 'files/instanceSetupLambda.js') | replace('\n', '\n          ') %}
 
   InstanceSetupLambda{{ instance_setup_source_hash }}:
     Type: AWS::Lambda::Function
