@@ -315,6 +315,28 @@ Resources:
           - Arn
       Timeout: 10
 
+  # Create subscription as a separate resource instead of inline,
+  # because otherwise it doesn't get cleaned up if the topic is deleted
+  InstanceStartTopic:
+    Type: AWS::SNS::Topic
+  InstanceStartSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref InstanceStartTopic
+      Endpoint: !Ref InstanceSetupLambda{{ instance_setup_source_hash }}
+      Protocol: lambda
+
+  InstanceSetupInvokingPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Privileges required to invoke the setup function for an instance.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "lambda:InvokeFunction"
+            Resource: !Ref InstanceSetupLambda{{ instance_setup_source_hash }}
+
   EBSTaggingPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -365,6 +387,7 @@ Resources:
         - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
         - !Ref AttachmentsPolicy
+        - !Ref InstanceSetupInvokingPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
@@ -408,6 +431,7 @@ Resources:
         - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
         - !Ref AttachmentsPolicy
+        - !Ref InstanceSetupInvokingPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
@@ -716,35 +740,6 @@ Resources:
           NumberOfDisks: 1
           Size: 32
 
-  OpwxAppCKAN:
-    Type: AWS::OpsWorks::App
-    Properties:
-      Domains:
-        - !Ref SiteDomain #list 0 is used for site_url
-      AppSource:
-        Type: git
-        Url: !Ref CKANSource
-        Revision: !Ref CKANRevision
-      Description: "CKAN Data Management System"
-      EnableSsl: false
-      Name: !Sub "${ApplicationName}-${Environment}"
-      Shortname: !Sub "${ApplicationId}-${Environment}"
-      StackId: !Ref OpsWorksStack
-      Type: other
-
-  OpwxAppSolr:
-    Type: AWS::OpsWorks::App
-    Properties:
-      AppSource:
-        Type: archive
-        Url: !Ref SolrSource
-      Description: "Apache Solr"
-      EnableSsl: false
-      Name: !Sub "${ApplicationName}-${Environment}-solr"
-      Shortname: !Sub "${ApplicationId}-${Environment}-solr"
-      StackId: !Ref OpsWorksStack
-      Type: other
-
   CKANELB:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
@@ -825,17 +820,17 @@ Outputs:
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksBatchLayer"
 
-  CKANApp:
-    Value: !Ref OpwxAppCKAN
-    Description: CKAN Application Id
+  InstanceSetupFunction:
+    Value: !Ref "InstanceSetupLambda{{ instance_setup_source_hash }}"
+    Description: Lambda function to set up an instance
     Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksCKANApplication"
+      Name: !Sub "${Environment}${ApplicationName}InstanceSetupFunction"
 
-  SolrApp:
-    Value: !Ref OpwxAppSolr
-    Description: SolrCloud Application Id
+  InstanceStartSubscription:
+    Value: !Ref InstanceStartSubscription
+    Description: SNS subscription for instances starting
     Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrApplication"
+      Name: !Sub "${Environment}${ApplicationName}InstanceStartSubscription"
 
   WebELBDNSName:
     Value: !Ref WebELBDNSName
