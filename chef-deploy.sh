@@ -32,7 +32,7 @@ wait_for_deployment () {
   STATUS=$(aws ssm list-commands $REGION_SNIPPET --command-id $DEPLOYMENT_ID --query "Commands|[0].Status" --output text) || exit 1
   for retry in `seq 1 180`; do
     if [ "$STATUS" = "Pending" ] || [ "$STATUS" = "InProgress" ]; then
-      sleep 10
+      sleep 20
       STATUS=$(aws ssm list-commands $REGION_SNIPPET --command-id $DEPLOYMENT_ID --query "Commands|[0].Status" --output text) || exit 1
       debug "Deployment $DEPLOYMENT_ID: $STATUS"
     else
