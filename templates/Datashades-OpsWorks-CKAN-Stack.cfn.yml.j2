@@ -247,6 +247,74 @@ Resources:
           Resource:
             - !Sub "arn:aws:s3:::"
 
+  RunCommandPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Privileges required to run SSM commands to set up instances.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - ssm:SendCommand
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:*:document/AWS-ApplyChefRecipes"
+          - Effect: Allow
+            Action:
+              - ec2:DescribeTags
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/*"
+          - Effect: Allow
+            Action:
+              - ssm:SendCommand
+            Resource:
+              - !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
+            Condition:
+              StringEquals:
+                "ssm:resourceTag/Environment":
+                  !Ref Environment
+                "ssm:resourceTag/Service":
+                  !Ref ApplicationName
+
+  InstanceSetupLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref RunCommandPolicy
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  {% set instance_setup_source = lookup('file', 'files/instanceSetupLambda.js') | replace('\n', '\n          ') %}
+
+  InstanceSetupLambda{{ instance_setup_source_hash }}:
+    Type: AWS::Lambda::Function
+    Properties:
+      Architectures:
+        - arm64
+      Description: Run Systems Manager commands to set up instances.
+      FunctionName: !Sub "${ApplicationName}-${Environment}-setup-{{ instance_setup_source_hash }}"
+      Runtime: nodejs20.x
+      Code:
+        ZipFile: >
+          {{ instance_setup_source }}
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - SetupInstanceRole
+          - Arn
+      Timeout: 10
+
   EBSTaggingPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -494,50 +562,6 @@ Resources:
         Type: !Ref CookbookURLType
         # SshKey: !Sub "${CookbookSSHKey}\n"
         Url: !Ref CookbookURL
-      CustomJson:
-        datashades:
-          ckan_web:
-            title: !Sub "${ApplicationTitle} | Queensland Government"
-            site_domain: !Ref SiteDomain
-            email_domain: !Ref EmailDomain
-            dsenable: !Ref EnableDataStore
-            endpoint: /
-            google:
-              gtm_container_id: !Ref GTMContainerId
-              analytics_id: !Ref AnalyticsId
-            ckan_app:
-              name: !Sub "${ApplicationName}-${Environment}"
-              shortname: !Sub "${ApplicationId}-${Environment}"
-              app_source:
-                type: git
-                url: !Ref CKANSource
-                revision: !Ref CKANRevision
-            plugin_apps:
-{% for plugin in extensions[Environment] %}
-              - name: "{{ extensions[Environment][plugin].name }}"
-                shortname: "{{ extensions[Environment][plugin].shortname }}"
-                app_source:
-                  type: "{{ extensions[Environment][plugin].type }}"
-                  url: "{{ extensions[Environment][plugin].url }}"
-                  revision: "{{ extensions[Environment][plugin].version}}"
-{% endfor %}
-          solr_app:
-            name: !Sub "${ApplicationName}-${Environment}-solr"
-            shortname: !Sub "${ApplicationId}-${Environment}-solr"
-            app_source:
-              type: archive
-              url: !Ref SolrSource
-          redis:
-            hostname:
-              Fn::ImportValue: !Ref CacheAddress
-            port: !Ref CachePort
-          tld:
-            Fn::ImportValue: !Ref InternalStackZoneTLD
-          public_tld: !Ref PublicTLD
-          version: !Ref Environment
-          app_id: !Ref ApplicationId
-          log_bucket: !Ref LogBucketName
-          attachments_bucket: !Ref AttachmentsBucketName
       DefaultInstanceProfileArn:
         Fn::GetAtt:
           - InstanceRoleProfile
