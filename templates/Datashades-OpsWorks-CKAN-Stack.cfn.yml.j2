@@ -358,6 +358,7 @@ Resources:
                   - ssm:GetParametersByPath
                 Resource:
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/ckan_app/*"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/solr_app/*"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
