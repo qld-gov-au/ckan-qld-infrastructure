@@ -311,7 +311,7 @@ Resources:
       Handler: index.handler
       Role:
         Fn::GetAtt:
-          - SetupInstanceRole
+          - InstanceSetupLambdaRole
           - Arn
       Timeout: 10
 
