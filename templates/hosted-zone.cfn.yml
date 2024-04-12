@@ -36,7 +36,7 @@ Resources:
     Properties:
       Name: !Sub "/config/CKAN/${Environment}/common/tld"
       Type: String
-      Value: !GetAtt HostedZone.Name
+      Value: !Sub "${Environment}.ckan.internal"
 
 Outputs:
   ZoneID:
