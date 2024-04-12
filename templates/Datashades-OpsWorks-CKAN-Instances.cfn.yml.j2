@@ -3,8 +3,11 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Creates instances for OpsWorks CKAN NFS Stack.'
 
 Parameters:
+  ApplicationName:
+    Description: Name of the application (eg OpenData)
+    Type: String
   ApplicationId:
-    Description: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+    Description: All-lowercase identifier for the application (eg 'opendata')
     Type: String
     ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
     AllowedPattern: '[-_a-z0-9]*'
@@ -123,6 +126,9 @@ Parameters:
     Description: The operating system to install on all instances.
     Type: String
     Default: "Amazon Linux 2"
+  DefaultEC2Key:
+    Description: Select an existing SSH key
+    Type: AWS::EC2::KeyPair::KeyName
 
 Conditions:
   2PlusServiceInstances:
@@ -502,3 +508,56 @@ Resources:
 {% endif %}
 
 {% endfor %}
+
+  # Autoscaling instances
+
+  BatchLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub "${Environment}-${ApplicationName}-batch-LaunchTemplate"
+      LaunchTemplateData:
+        BlockDeviceMappings:
+          - DeviceName: "/dev/xvda"
+            Ebs:
+              DeleteOnTermination: true
+              VolumeSize: 100
+              VolumeType: "sc1"
+          - DeviceName: "/dev/sdi"
+            Ebs:
+              DeleteOnTermination: true
+              VolumeSize: 32
+              VolumeType: "gp2"
+        IamInstanceProfile:
+          Fn::ImportValue !Sub "${Environment}${ApplicationName}WebInstanceProfile"
+        ImageId: ami-03b836d87d294e89e
+        InstanceType: t3a.micro
+        KeyName: !Ref DefaultEC2Key
+        SecurityGroupIds:
+          - Fn::ImportValue: !Ref AdminSG
+          - Fn::ImportValue: !Ref AppSG
+
+  BatchScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-batch-ASG"
+      DefaultInstanceWarmup: 300
+      MinSize: 1
+      MaxSize: !Ref BatchEC2Count
+      LaunchTemplate:
+        LaunchTemplateId:
+          Fn::ImportValue:
+            !Sub "${Environment}${ApplicationName}BatchLaunchTemplate"
+        Version:
+          Fn::ImportValue:
+            !Sub "${Environment}${ApplicationName}BatchLaunchTemplateVersion"
+      LifecycleHookSpecificationList:
+        - LifecycleHookName: !Sub "${Environment}-${ApplicationId}-batch-instance-start-hook"
+          LifecycleTransition: autoscaling:EC2_INSTANCE_LAUNCHING
+          NotificationTargetARN:
+            Fn::ImportValue:
+              !Sub "${Environment}${ApplicationName}InstanceStartSubscription"
+      VPCZoneIdentifier:
+        - Fn::ImportValue: !Sub "${AppSubnets}A"
+        - Fn::ImportValue: !Sub "${AppSubnets}B"
+        - Fn::ImportValue: !Sub "${AppSubnets}C"
+

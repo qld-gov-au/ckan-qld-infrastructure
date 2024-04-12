@@ -836,3 +836,13 @@ Outputs:
     Value: !Ref WebELBDNSName
     Export:
       Name: !Sub "${Environment}${ApplicationName}WebElbDNSName"
+
+  InstanceProfile:
+    Value: !GetAtt InstanceRoleProfile.Arn
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}InstanceProfile"
+
+  WebInstanceProfile:
+    Value: !GetAtt WebInstanceRoleProfile.Arn
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebInstanceProfile"

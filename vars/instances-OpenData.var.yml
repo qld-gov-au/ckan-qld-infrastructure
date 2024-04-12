@@ -6,13 +6,17 @@ common_stack: &common_stack
   template: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml"
   template_jinja: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml.j2"
   template_parameters: &common_stack_template_parameters
+    ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name_lower }}"
     OpsWorksStackID: "{{ Environment }}{{ service_name }}OpsWorksStack"
     SolrLayerID: "{{ Environment }}{{ service_name }}OpsWorksSolrLayer"
     WebLayerID: "{{ Environment }}{{ service_name }}OpsWorksWebLayer"
+    WebEC2Size: t3a.medium
     BatchLayerID: "{{ Environment }}{{ service_name }}OpsWorksBatchLayer"
+    BatchEC2Size: t3a.medium
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
+    DefaultEC2Key: "{{ ec2_key }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
@@ -27,8 +31,6 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: PROD
       SolrEC2Size: t3a.medium
-      WebEC2Size: t3a.medium
-      BatchEC2Size: t3a.medium
       WebEC2Count: 5 #We have been running on 2 auto and 3 manually created instances, time to make it IasC
     tags:
       <<: *common_stack_tags
@@ -41,8 +43,6 @@ cloudformation_stacks:
       Environment: STAGING
       WebEC2Count: 2
       SolrEC2Size: t3a.medium
-      WebEC2Size: t3a.medium
-      BatchEC2Size: t3a.medium
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -53,8 +53,6 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: TRAINING
       SolrEC2Size: t3a.small
-      WebEC2Size: t3a.micro
-      BatchEC2Size: t3a.medium
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -66,8 +64,6 @@ cloudformation_stacks:
       Environment: DEV
       WebEC2Count: 2
       SolrEC2Size: t3a.small
-      WebEC2Size: t3a.medium
-      BatchEC2Size: t3a.medium
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
