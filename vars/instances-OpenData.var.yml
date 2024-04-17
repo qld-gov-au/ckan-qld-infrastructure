@@ -53,6 +53,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: TRAINING
       SolrEC2Size: t3a.small
+      SolrEC2Count: 1
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -64,6 +65,7 @@ cloudformation_stacks:
       Environment: DEV
       WebEC2Count: 2
       SolrEC2Size: t3a.small
+      SolrEC2Count: 1
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"

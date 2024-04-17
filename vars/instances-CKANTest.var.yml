@@ -49,6 +49,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: TRAINING
       SolrEC2Size: t3a.micro
+      SolrEC2Count: 1
       BatchEC2Size: t3a.micro
     tags:
       <<: *common_stack_tags
@@ -61,6 +62,7 @@ cloudformation_stacks:
       Environment: DEV
       WebEC2Count: 2
       SolrEC2Size: t3a.micro
+      SolrEC2Count: 1
       WebEC2Size: t3a.micro
       BatchEC2Size: t3a.micro
     tags:
