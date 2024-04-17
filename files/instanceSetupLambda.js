@@ -1,8 +1,26 @@
 const { EC2Client, DescribeTagsCommand } = require('@aws-sdk/client-ec2');
 const { SSMClient, GetParametersCommand, SendCommandCommand } = require('@aws-sdk/client-ssm');
+const { AutoScalingClient, CompleteLifecycleActionCommand } = require('@aws-sdk/client-auto-scaling');
+
+function recordCompletion(event, success) {
+  const instanceId = event['EC2InstanceId'];
+  if ('AutoScalingGroupName' in event && 'LifecycleHookName' in event) {
+    const autoscaling = new AutoScalingClient();
+    const autoscalingGroupName = event['AutoScalingGroupName'];
+    const lifecycleHookName = event['LifecycleHookName'];
+    return autoscaling.send(new CompleteLifecycleActionCommand({
+      AutoScalingGroupName: autoscalingGroupName,
+      LifecycleHookName: lifecycleHookName,
+      InstanceId: instanceId,
+      LifecycleActionResult: success? "CONTINUE" : "ABANDON"
+    }));
+  } else {
+    return Promise.resolve({"success": success});
+  }
+}
 
 exports.handler = async (event) => {
-  const instanceId = event['instance-id'];
+  const instanceId = event['EC2InstanceId'];
   const ec2 = new EC2Client();
   var environment, service, layer;
   const data = await ec2.send(new DescribeTagsCommand({
@@ -24,7 +42,7 @@ exports.handler = async (event) => {
   }
   if (!environment || !service || !layer) {
     console.log("Missing tag on target instance; need Environment and Service and Layer");
-    return;
+    return recordCompletion(event, false);
   }
   var cookbookType, cookbookURL, cookbookRevision;
   const ssm = new SSMClient();
@@ -46,13 +64,13 @@ exports.handler = async (event) => {
   }
   if (!cookbookURL) {
     console.log("Missing cookbook URL");
-    return;
+    return recordCompletion(event, false);
   }
   var sourceInfo;
   if (cookbookType == 'git') {
     if (!cookbookRevision) {
       console.log("Missing cookbook revision");
-      return;
+      return recordCompletion(event, false);
     }
     var refType;
     if (/^[0-9.]{5}/.test(cookbookRevision)) {
@@ -74,7 +92,7 @@ exports.handler = async (event) => {
   }
   const runList=`recipe[${recipePrefix}-setup],recipe[${recipePrefix}-deploy],recipe[${recipePrefix}-configure]`;
 
-  return await ssm.send(new SendCommandCommand({
+  await ssm.send(new SendCommandCommand({
     DocumentName: "AWS-ApplyChefRecipes",
     DocumentVersion: '\$DEFAULT',
     InstanceIds: [ instanceId ],
@@ -88,4 +106,6 @@ exports.handler = async (event) => {
       ComplianceType: ["Custom:Chef"]
     }
   }));
+
+  return recordCompletion(event, true);
 };

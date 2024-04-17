@@ -521,43 +521,52 @@ Resources:
             Ebs:
               DeleteOnTermination: true
               VolumeSize: 100
-              VolumeType: "sc1"
+              VolumeType: "gp2"
           - DeviceName: "/dev/sdi"
             Ebs:
               DeleteOnTermination: true
               VolumeSize: 32
               VolumeType: "gp2"
         IamInstanceProfile:
-          Fn::ImportValue !Sub "${Environment}${ApplicationName}WebInstanceProfile"
+          Arn:
+            Fn::ImportValue: !Sub "${Environment}${ApplicationName}WebInstanceProfile"
         ImageId: ami-03b836d87d294e89e
-        InstanceType: t3a.micro
+        InstanceType: !Ref BatchEC2Size
         KeyName: !Ref DefaultEC2Key
         SecurityGroupIds:
-          - Fn::ImportValue: !Ref AdminSG
-          - Fn::ImportValue: !Ref AppSG
+          - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
+          - Fn::ImportValue: !Sub "${Environment}CKANAppAsgSG"
+        UserData:
+          Fn::Base64: !Sub
+            - |
+              #!/bin/sh
+              if ! (grep '/mnt/local_data' /etc/fstab >/dev/null); then
+                mkdir /mnt/local_data
+                mkfs -t xfs /dev/sdi
+                echo '/dev/sdi /mnt/local_data xfs defaults,nofail 0 2' >> /etc/fstab
+                mount -a
+              fi
+              metadata_token=`curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 60" http://169.254.169.254/latest/api/token` && \
+              INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $metadata_token" http://169.254.169.254/latest/meta-data/instance-id) && \
+              aws lambda invoke --region "${AWS::Region}" --function-name "${FunctionName}" --payload '{"EC2InstanceId": "'$INSTANCE_ID'"}' /var/log/instance-setup.log.`date '+%s'`
+            - FunctionName:
+                Fn::ImportValue: !Sub "${Environment}${ApplicationName}InstanceSetupFunction"
 
   BatchScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-batch-ASG"
       DefaultInstanceWarmup: 300
-      MinSize: 1
-      MaxSize: !Ref BatchEC2Count
+      MinSize: !Ref BatchEC2Count
+      MaxSize: 6
       LaunchTemplate:
-        LaunchTemplateId:
-          Fn::ImportValue:
-            !Sub "${Environment}${ApplicationName}BatchLaunchTemplate"
-        Version:
-          Fn::ImportValue:
-            !Sub "${Environment}${ApplicationName}BatchLaunchTemplateVersion"
-      LifecycleHookSpecificationList:
-        - LifecycleHookName: !Sub "${Environment}-${ApplicationId}-batch-instance-start-hook"
-          LifecycleTransition: autoscaling:EC2_INSTANCE_LAUNCHING
-          NotificationTargetARN:
-            Fn::ImportValue:
-              !Sub "${Environment}${ApplicationName}InstanceStartSubscription"
+        LaunchTemplateId: !Ref BatchLaunchTemplate
+        Version: !GetAtt BatchLaunchTemplate.LatestVersionNumber
       VPCZoneIdentifier:
         - Fn::ImportValue: !Sub "${AppSubnets}A"
         - Fn::ImportValue: !Sub "${AppSubnets}B"
         - Fn::ImportValue: !Sub "${AppSubnets}C"
-
+      Tags:
+        - Key: Layer
+          Value: batch
+          PropagateAtLaunch: true
