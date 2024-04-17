@@ -570,3 +570,21 @@ Resources:
         - Key: Layer
           Value: batch
           PropagateAtLaunch: true
+
+{% if item.tags["PowerManaged"] == "Yes" %}
+  BatchScalingIn:
+    Type: AWS::AutoScaling::ScheduledAction
+    Properties:
+      AutoScalingGroupName: !Ref BatchScalingGroup
+      MinSize: '0'
+      MaxSize: '0'
+      Recurrence: "0 10 * * *"
+
+  BatchScalingOut:
+    Type: AWS::AutoScaling::ScheduledAction
+    Properties:
+      AutoScalingGroupName: !Ref BatchScalingGroup
+      MinSize: !Ref BatchEC2Count
+      MaxSize: 6
+      Recurrence: "0 20 * * *"
+{% endif %}
