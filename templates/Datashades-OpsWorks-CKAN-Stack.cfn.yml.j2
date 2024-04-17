@@ -816,6 +816,11 @@ Outputs:
     Export:
       Name: !Sub "${Environment}${ApplicationName}InstanceSetupFunction"
 
+  WebELBName:
+    Value: !Ref CKANELB
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebElbName"
+
   WebELBDNSName:
     Value: !Ref WebELBDNSName
     Export:

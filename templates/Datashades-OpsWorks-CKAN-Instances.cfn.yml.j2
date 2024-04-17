@@ -511,10 +511,11 @@ Resources:
 
   # Autoscaling instances
 
-  BatchLaunchTemplate:
+{% for layer in ['Batch', 'Web', 'Solr'] %}
+  {{ layer }}LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
-      LaunchTemplateName: !Sub "${Environment}-${ApplicationName}-batch-LaunchTemplate"
+      LaunchTemplateName: !Sub "${Environment}-${ApplicationName}-{{ layer|lower }}-LaunchTemplate"
       LaunchTemplateData:
         BlockDeviceMappings:
           - DeviceName: "/dev/xvda"
@@ -531,7 +532,7 @@ Resources:
           Arn:
             Fn::ImportValue: !Sub "${Environment}${ApplicationName}WebInstanceProfile"
         ImageId: ami-03b836d87d294e89e
-        InstanceType: !Ref BatchEC2Size
+        InstanceType: !Ref {{ layer }}EC2Size
         KeyName: !Ref DefaultEC2Key
         SecurityGroupIds:
           - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
@@ -552,39 +553,46 @@ Resources:
             - FunctionName:
                 Fn::ImportValue: !Sub "${Environment}${ApplicationName}InstanceSetupFunction"
 
-  BatchScalingGroup:
+  {{ layer }}ScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
-      AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-batch-ASG"
+      AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-{{ layer }}-ASG"
       DefaultInstanceWarmup: 300
-      MinSize: !Ref BatchEC2Count
+      DesiredCapacity: !Ref {{ layer }}EC2Count
+      MinSize: !Ref {{ layer }}EC2Count
       MaxSize: 6
       LaunchTemplate:
-        LaunchTemplateId: !Ref BatchLaunchTemplate
-        Version: !GetAtt BatchLaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref {{ layer }}LaunchTemplate
+        Version: !GetAtt {{ layer }}LaunchTemplate.LatestVersionNumber
+{% if layer == 'Web' %}
+      LoadBalancerNames:
+        - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}ElbName"
+{% endif %}
       VPCZoneIdentifier:
         - Fn::ImportValue: !Sub "${AppSubnets}A"
         - Fn::ImportValue: !Sub "${AppSubnets}B"
         - Fn::ImportValue: !Sub "${AppSubnets}C"
       Tags:
         - Key: Layer
-          Value: batch
+          Value: {{ layer|lower }}
           PropagateAtLaunch: true
 
 {% if item.tags["PowerManaged"] == "Yes" %}
-  BatchScalingIn:
+  {{ layer }}ScalingIn:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
-      AutoScalingGroupName: !Ref BatchScalingGroup
+      AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
       MinSize: '0'
       MaxSize: '0'
       Recurrence: "0 10 * * *"
 
-  BatchScalingOut:
+  {{ layer }}ScalingOut:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
-      AutoScalingGroupName: !Ref BatchScalingGroup
-      MinSize: !Ref BatchEC2Count
+      AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
+      MinSize: !Ref {{ layer }}EC2Count
       MaxSize: 6
       Recurrence: "0 20 * * *"
 {% endif %}
+
+{% endfor %}
