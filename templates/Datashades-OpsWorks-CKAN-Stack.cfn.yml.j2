@@ -437,6 +437,13 @@ Resources:
   # Populate SSM Parameter Store with all the information needed to deploy.
   # This should allow a blank instance to set itself up based only on the tags applied to it.
 
+  InstanceSetupFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name"
+      Type: String
+      Value: !Ref "InstanceSetupLambda{{ instance_setup_source_hash }}"
+
   CookbookTypeParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -862,12 +869,6 @@ Outputs:
     Description: Batch Layer Id
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksBatchLayer"
-
-  InstanceSetupFunction:
-    Value: !Ref "InstanceSetupLambda{{ instance_setup_source_hash }}"
-    Description: Lambda function to set up an instance
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}InstanceSetupFunction"
 
   WebELBName:
     Value: !Ref CKANELB
