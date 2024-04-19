@@ -566,8 +566,8 @@ Resources:
         LaunchTemplateId: !Ref {{ layer }}LaunchTemplate
         Version: !GetAtt {{ layer }}LaunchTemplate.LatestVersionNumber
 {% if layer == 'Web' %}
-      LoadBalancerNames:
-        - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}ElbName"
+      TargetGroupARNs:
+        - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}AlbTargetGroup"
 {% endif %}
       VPCZoneIdentifier:
         - Fn::ImportValue: !Sub "${AppSubnets}A"
