@@ -172,8 +172,7 @@ Resources:
               Service: opsworks.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        -
-          PolicyName: "aws-opsworks-service-policy"
+        - PolicyName: "aws-opsworks-service-policy"
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -309,10 +308,7 @@ Resources:
         ZipFile: >
           {{ instance_setup_source }}
       Handler: index.handler
-      Role:
-        Fn::GetAtt:
-          - InstanceSetupLambdaRole
-          - Arn
+      Role: !GetAtt InstanceSetupLambdaRole.Arn
       Timeout: 10
 
   # Create subscription as a separate resource instead of inline,
@@ -335,7 +331,7 @@ Resources:
         Statement:
           - Effect: Allow
             Action: "lambda:InvokeFunction"
-            Resource: !Ref InstanceSetupLambda{{ instance_setup_source_hash }}
+            Resource: !GetAtt InstanceSetupLambda{{ instance_setup_source_hash }}.Arn
 
   EBSTaggingPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -594,8 +590,7 @@ Resources:
       DefaultOs: "Amazon Linux 2"
       DefaultSshKeyName: !Ref DefaultEC2Key
       DefaultSubnetId:
-        Fn::ImportValue:
-          !Sub "${AppSubnets}A"
+        Fn::ImportValue: !Sub "${AppSubnets}A"
       Name: !Sub "${ApplicationName}_${Environment}"
       ServiceRoleArn:
         Fn::If:
@@ -766,12 +761,9 @@ Resources:
         - Fn::ImportValue: !Ref AppLBSG
         - Fn::ImportValue: !Ref CloudFrontSG
       Subnets:
-        - Fn::ImportValue:
-            !Sub "${WebSubnets}A"
-        - Fn::ImportValue:
-            !Sub "${WebSubnets}B"
-        - Fn::ImportValue:
-            !Sub "${WebSubnets}C"
+        - Fn::ImportValue: !Sub "${WebSubnets}A"
+        - Fn::ImportValue: !Sub "${WebSubnets}B"
+        - Fn::ImportValue: !Sub "${WebSubnets}C"
 
   ELBAttachment:
     Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
@@ -786,14 +778,8 @@ Resources:
       Name: !Sub "${ApplicationId}.${RootDomain}"
       HostedZoneName: !Sub "${PublicStackZoneTLD}."
       AliasTarget:
-        HostedZoneId:
-          Fn::GetAtt:
-            - CKANELB
-            - CanonicalHostedZoneNameID
-        DNSName:
-          Fn::GetAtt:
-            - CKANELB
-            - DNSName
+        HostedZoneId: !GetAtt CKANELB.CanonicalHostedZoneNameID
+        DNSName: !GetAtt CKANELB.DNSName
 
 Outputs:
   StackID:
