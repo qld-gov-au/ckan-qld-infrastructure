@@ -311,17 +311,6 @@ Resources:
       Role: !GetAtt InstanceSetupLambdaRole.Arn
       Timeout: 10
 
-  # Create subscription as a separate resource instead of inline,
-  # because otherwise it doesn't get cleaned up if the topic is deleted
-  InstanceStartTopic:
-    Type: AWS::SNS::Topic
-  InstanceStartSubscription:
-    Type: AWS::SNS::Subscription
-    Properties:
-      TopicArn: !Ref InstanceStartTopic
-      Endpoint: !Ref InstanceSetupLambda{{ instance_setup_source_hash }}
-      Protocol: lambda
-
   InstanceSetupInvokingPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -811,12 +800,6 @@ Outputs:
     Description: Lambda function to set up an instance
     Export:
       Name: !Sub "${Environment}${ApplicationName}InstanceSetupFunction"
-
-  InstanceStartSubscription:
-    Value: !Ref InstanceStartSubscription
-    Description: SNS subscription for instances starting
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}InstanceStartSubscription"
 
   WebELBDNSName:
     Value: !Ref WebELBDNSName
