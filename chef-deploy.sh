@@ -58,6 +58,24 @@ find_load_balancer () {
   done
 }
 
+deploy_instances () {
+  instances="$@"
+  if [ "$instances" = "" ]; then return; fi
+  if [ "$ELB_NAME" != "" ]; then
+    OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances $instances --query "Instances[].InstanceId" --output text)
+    debug "Deregistered instance(s) $instances from load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
+  fi
+  debug "$MESSAGE: Deploying to instance(s) $instances"
+  DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $instances --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
+  wait_for_deployment $DEPLOYMENT_ID
+  DEPLOYMENT_SUCCESS=$?
+  if [ "$ELB_NAME" != "" ]; then
+    OUTPUT=$(aws elb register-instances-with-load-balancer --load-balancer-name "$ELB_NAME" --instances $instances --query "Instances[].InstanceId" --output text)
+    debug "Registered instance(s) with load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
+  fi
+  if [ "$DEPLOYMENT_SUCCESS" != "0" ]; then exit 1; fi
+}
+
 deploy () {
   for truthy in `echo "y t true T 1" |xargs echo`; do
     if [ "$PARALLEL" = "$truthy" ]; then
@@ -81,21 +99,11 @@ deploy () {
     DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
     wait_for_deployment $DEPLOYMENT_ID || exit 1
   else
-    ELB_NAME=$(find_load_balancer)
-    for instance in $INSTANCE_IDS; do
-      if [ "$ELB_NAME" != "" ]; then
-        OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
-        debug "Deregistered instance $instance from load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
-      fi
-      DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $instance --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
-      wait_for_deployment $DEPLOYMENT_ID
-      DEPLOYMENT_SUCCESS=$?
-      if [ "$ELB_NAME" != "" ]; then
-        OUTPUT=$(aws elb register-instances-with-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
-        debug "Registered instance with load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
-      fi
-      if [ "$DEPLOYMENT_SUCCESS" != "0" ]; then exit 1; fi
-    done
+    export ELB_NAME=$(find_load_balancer)
+    # deploy to odd-numbered instances
+    deploy_instances "$(echo $INSTANCE_IDS | tr '[:blank:]' '\n' |awk 'NR%2==1' | tr '\n' '\t')"
+    # deploy to even-numbered instances
+    deploy_instances "$(echo $INSTANCE_IDS | tr '[:blank:]' '\n' |awk 'NR%2==0' | tr '\n' '\t')"
     debug "$MESSAGE: success"
   fi
 }
