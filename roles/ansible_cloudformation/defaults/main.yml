@@ -1,5 +1,4 @@
 ---
-ec2_key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
 
 common_stack:
   state: "{{ state | default('present')}}"

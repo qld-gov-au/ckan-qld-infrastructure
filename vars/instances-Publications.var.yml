@@ -15,7 +15,7 @@ common_stack: &common_stack
     BatchEC2Size: t3.micro
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
-    DefaultEC2Key: "{{ ec2_key }}"
+    DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
