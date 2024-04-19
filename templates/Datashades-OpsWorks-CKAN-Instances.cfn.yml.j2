@@ -558,7 +558,7 @@ Resources:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-{{ layer }}-ASG"
-      DefaultInstanceWarmup: 300
+      DefaultInstanceWarmup: 2000
       DesiredCapacity: !Ref {{ layer }}EC2Count
       MinSize: !Ref {{ layer }}EC2Count
       MaxSize: 6
@@ -568,6 +568,8 @@ Resources:
 {% if layer == 'Web' %}
       TargetGroupARNs:
         - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}AlbTargetGroup"
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 2000
 {% endif %}
       VPCZoneIdentifier:
         - Fn::ImportValue: !Sub "${AppSubnets}A"
