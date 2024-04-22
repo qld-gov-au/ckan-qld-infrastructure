@@ -126,6 +126,10 @@ Parameters:
     Description: The operating system to install on all instances.
     Type: String
     Default: "Amazon Linux 2"
+  ImageId:
+    Description: The Amazon Machine Image ID to use for launching instances. Defaults to Amazon Linux 2.
+    Type: String
+    Default: "ami-03b836d87d294e89e"
   DefaultEC2Key:
     Description: Select an existing SSH key
     Type: AWS::EC2::KeyPair::KeyName
@@ -531,7 +535,7 @@ Resources:
         IamInstanceProfile:
           Arn:
             Fn::ImportValue: !Sub "${Environment}${ApplicationName}WebInstanceProfile"
-        ImageId: ami-03b836d87d294e89e
+        ImageId: !Ref ImageId
         InstanceType: !Ref {{ layer }}EC2Size
         KeyName: !Ref DefaultEC2Key
         SecurityGroupIds:
