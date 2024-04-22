@@ -279,6 +279,11 @@ Resources:
                   !Ref Environment
                 "ssm:resourceTag/Service":
                   !Ref ApplicationName
+          - Effect: Allow
+            Action:
+              - autoscaling:CompleteLifecycleAction
+            Resource:
+              - !Sub "arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*"
 
   InstanceSetupLambdaRole:
     Type: AWS::IAM::Role
@@ -352,11 +357,10 @@ Resources:
               - Effect: Allow
                 Action:
                   - route53:ChangeResourceRecordSets
-                Resource:
-                  Fn::Join:
-                    - ""
-                    - - "arn:aws:route53:::hostedzone/"
-                      - Fn::ImportValue: !Ref InternalStackZone
+                Resource: !Sub
+                  - "arn:aws:route53:::hostedzone/${Zone}"
+                  - Zone:
+                      Fn::ImportValue: !Ref InternalStackZone
               # allow the servers to retrieve a subset of SSM Parameter Store values
               - Effect: Allow
                 Action:
@@ -432,6 +436,13 @@ Resources:
 
   # Populate SSM Parameter Store with all the information needed to deploy.
   # This should allow a blank instance to set itself up based only on the tags applied to it.
+
+  InstanceSetupFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name"
+      Type: String
+      Value: !Ref "InstanceSetupLambda{{ instance_setup_source_hash }}"
 
   CookbookTypeParameter:
     Type: AWS::SSM::Parameter
@@ -754,6 +765,70 @@ Resources:
         - Fn::ImportValue: !Sub "${WebSubnets}B"
         - Fn::ImportValue: !Sub "${WebSubnets}C"
 
+  # Application Load Balancer structure is more complex than classic.
+  # The LoadBalancer defines configuration values like logging config and security groups.
+  # The Listener is external-facing, defining the port, certificate, etc,
+  # and links the LoadBalancer to the TargetGroup.
+  # The TargetGroup defines properties like health checks for a group of servers.
+  # Autoscaling groups can then point at the TargetGroup to have their servers participate.
+
+  CKANALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub "${Environment}-${ApplicationName}-ALB"
+      Type: application
+      Scheme: "internet-facing"
+      LoadBalancerAttributes:
+        # CloudFront covers our logging needs
+        - Key: access_logs.s3.enabled
+          Value: false
+      SecurityGroups:
+        - Fn::ImportValue: !Ref AppLBSG
+        - Fn::ImportValue: !Ref CloudFrontSG
+      Subnets:
+        - Fn::ImportValue: !Sub "${WebSubnets}A"
+        - Fn::ImportValue: !Sub "${WebSubnets}B"
+        - Fn::ImportValue: !Sub "${WebSubnets}C"
+
+  CKANALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref ACMCertificateARN
+      DefaultActions:
+        - TargetGroupArn: !Ref CKANALBTargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref CKANALB
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+
+  CKANALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${Environment}-${ApplicationName}-ALB-target"
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /api/action/status_show
+      HealthCheckPort: '80'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 20
+      HealthyThresholdCount: 2
+      Port: 80
+      Protocol: HTTP
+      TargetType: instance
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 60
+        - Key: stickiness.enabled
+          Value: true
+        - Key: stickiness.type
+          Value: lb_cookie
+        - Key: stickiness.lb_cookie.duration_seconds
+          Value: 3600
+      VpcId:
+        Fn::ImportValue: !Ref StackVPC
+
   ELBAttachment:
     Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
     Properties:
@@ -795,13 +870,27 @@ Outputs:
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksBatchLayer"
 
-  InstanceSetupFunction:
-    Value: !Ref "InstanceSetupLambda{{ instance_setup_source_hash }}"
-    Description: Lambda function to set up an instance
+  WebELBName:
+    Value: !Ref CKANELB
     Export:
-      Name: !Sub "${Environment}${ApplicationName}InstanceSetupFunction"
+      Name: !Sub "${Environment}${ApplicationName}WebElbName"
 
   WebELBDNSName:
     Value: !Ref WebELBDNSName
     Export:
       Name: !Sub "${Environment}${ApplicationName}WebElbDNSName"
+
+  WebALBTargetGroup:
+    Value: !Ref CKANALBTargetGroup
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebAlbTargetGroup"
+
+  InstanceProfile:
+    Value: !GetAtt InstanceRoleProfile.Arn
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}InstanceProfile"
+
+  WebInstanceProfile:
+    Value: !GetAtt WebInstanceRoleProfile.Arn
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebInstanceProfile"

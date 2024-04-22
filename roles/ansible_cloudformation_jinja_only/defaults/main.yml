@@ -1,5 +1,4 @@
 ---
-
 common_stack:
   state: "{{ state | default('present')}}"
   region: "{{ region | default('ap-southeast-2')}}"
