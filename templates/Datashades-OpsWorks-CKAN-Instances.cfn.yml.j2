@@ -534,13 +534,13 @@ Resources:
               VolumeType: "gp2"
         IamInstanceProfile:
           Arn:
-            Fn::ImportValue: !Sub "${Environment}${ApplicationName}WebInstanceProfile"
+            Fn::ImportValue: !Sub "${Environment}${ApplicationName}{% if layer != 'Solr' %}Web{% endif %}InstanceProfile"
         ImageId: !Ref ImageId
         InstanceType: !Ref {{ layer }}EC2Size
         KeyName: !Ref DefaultEC2Key
         SecurityGroupIds:
           - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
-          - Fn::ImportValue: !Sub "${Environment}CKANAppAsgSG"
+          - Fn::ImportValue: !Sub "${Environment}CKAN{% if layer == 'Solr' %}Database{% else %}AppAsg{% endif %}SG"
         UserData:
           Fn::Base64:
             Fn::Sub: |
