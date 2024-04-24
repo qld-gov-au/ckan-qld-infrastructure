@@ -618,8 +618,6 @@ Resources:
           - "datashades::solr-deploy"
         Configure:
           - "datashades::solr-configure"
-        Shutdown:
-          - "datashades::solr-shutdown"
       AutoAssignElasticIps: false
       AutoAssignPublicIps: false
       CustomSecurityGroupIds:
@@ -651,8 +649,6 @@ Resources:
           - "datashades::ckanweb-deploy"
         Configure:
           - "datashades::ckanweb-configure"
-        Shutdown:
-          - "datashades::ckanweb-shutdown"
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppSG
@@ -700,8 +696,6 @@ Resources:
           - "datashades::ckanbatch-deploy"
         Configure:
           - "datashades::ckanbatch-configure"
-        Shutdown:
-          - "datashades::ckanbatch-shutdown"
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppSG
