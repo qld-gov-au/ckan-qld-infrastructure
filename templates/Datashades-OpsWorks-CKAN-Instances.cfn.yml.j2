@@ -534,13 +534,13 @@ Resources:
               VolumeType: "gp2"
         IamInstanceProfile:
           Arn:
-            Fn::ImportValue: !Sub "${Environment}${ApplicationName}WebInstanceProfile"
+            Fn::ImportValue: !Sub "${Environment}${ApplicationName}{% if layer != 'Solr' %}Web{% endif %}InstanceProfile"
         ImageId: !Ref ImageId
         InstanceType: !Ref {{ layer }}EC2Size
         KeyName: !Ref DefaultEC2Key
         SecurityGroupIds:
           - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
-          - Fn::ImportValue: !Sub "${Environment}CKANAppAsgSG"
+          - Fn::ImportValue: !Sub "${Environment}CKAN{% if layer == 'Solr' %}Database{% else %}AppAsg{% endif %}SG"
         UserData:
           Fn::Base64:
             Fn::Sub: |
@@ -553,7 +553,7 @@ Resources:
               fi
               metadata_token=`curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 60" http://169.254.169.254/latest/api/token` && \
               INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $metadata_token" http://169.254.169.254/latest/meta-data/instance-id) && \
-              aws ec2 create-tags --region "${AWS::Region}" --resources $INSTANCE_ID --tags "Key=Name,Value=${Environment}-${ApplicationName}-{{ layer }}-$INSTANCE_ID"
+              aws ec2 create-tags --region "${AWS::Region}" --resources $INSTANCE_ID --tags "Key=Name,Value=${ApplicationName}_${Environment}-{{ layer }}-$INSTANCE_ID"
               FUNCTION_NAME=$(aws ssm get-parameter --region "${AWS::Region}" --name "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name" --query "Parameter.Value" --output text)
               aws lambda invoke --region "${AWS::Region}" --function-name "$FUNCTION_NAME" --payload '{"EC2InstanceId": "'$INSTANCE_ID'"}' /var/log/instance-setup.log.`date '+%s'`
 
