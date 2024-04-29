@@ -45,15 +45,60 @@ wait_for_deployment () {
   fi
 }
 
+wait_for_instance_refresh () {
+  DEPLOYMENT_ID=$1
+  debug "$MESSAGE: waiting for instance refresh $DEPLOYMENT_ID..."
+  STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || exit 1
+  for retry in `seq 1 180`; do
+    if [ "$STATUS" = "Pending" ] || [ "$STATUS" = "InProgress" ]; then
+      sleep 10
+      STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || exit 1
+      debug "Instance refresh $DEPLOYMENT_ID: $STATUS"
+    else
+      break
+    fi
+  done
+  if [ "$STATUS" != "Success" ]; then
+    debug "Failed instance refresh $DEPLOYMENT_ID, status $STATUS - aborting"
+    exit 1
+  fi
+}
+
 find_load_balancer () {
   # Finds the first load balancer whose tags all match the deployment,
   # and outputs its identifying name
-  for lb_name in `aws elb describe-load-balancers --query "LoadBalancerDescriptions[].LoadBalancerName" --output text`; do
-    LB_TAGS=$(aws elb describe-tags --load-balancer-name $lb_name --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Environment' || Key=='Service' || Key == 'Layer']" --output text)
-    if (echo $LB_TAGS | grep -E "(\s|^)Environment\s+$ENVIRONMENT(\s|$)" >/dev/null 2>&1) \
-      && (echo $LB_TAGS | grep -E "(\s|^)Service\s+$SERVICE(\s|$)" >/dev/null 2>&1) \
-      && (echo $LB_TAGS | grep -E "(\s|^)Layer\s+$LAYER_NAME(\s|$)" >/dev/null 2>&1); then
-        echo "$lb_name"
+  for target_id in `aws elb describe-load-balancers --query "LoadBalancerDescriptions[].LoadBalancerName" --output text`; do
+    TAGS=$(aws elb describe-tags --load-balancer-name $target_id --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Environment' || Key=='Service' || Key == 'Layer']" --output text)
+    if (echo $TAGS | grep -E "(\s|^)Environment\s+$ENVIRONMENT(\s|$)" >/dev/null 2>&1) \
+      && (echo $TAGS | grep -E "(\s|^)Service\s+$SERVICE(\s|$)" >/dev/null 2>&1) \
+      && (echo $TAGS | grep -E "(\s|^)Layer\s+$LAYER_NAME(\s|$)" >/dev/null 2>&1); then
+        echo "$target_id"
+    fi
+  done
+}
+
+find_load_balancer_v2 () {
+  # Finds the first application load balancer whose tags all match the deployment,
+  # and outputs its identifying name
+  for target_id in `aws elbv2 describe-load-balancers --query "LoadBalancers[].LoadBalancerArn" --output text`; do
+    TAGS=$(aws elbv2 describe-tags --resource-arns $target_id --query "TagDescriptions[].Tags[].{Key: Key, Value: Value}[?Key=='Environment' || Key=='Service' || Key == 'Layer']" --output text)
+    if (echo $TAGS | grep -E "(\s|^)Environment\s+$ENVIRONMENT(\s|$)" >/dev/null 2>&1) \
+      && (echo $TAGS | grep -E "(\s|^)Service\s+$SERVICE(\s|$)" >/dev/null 2>&1) \
+      && (echo $TAGS | grep -E "(\s|^)Layer\s+$LAYER_NAME(\s|$)" >/dev/null 2>&1); then
+        echo "$target_id"
+    fi
+  done
+}
+
+find_autoscaling_group () {
+  # Finds the first autoscaling group whose tags all match the deployment,
+  # and outputs its identifying name
+  for target_id in `aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[].AutoScalingGroupName" --output text`; do
+    TAGS=$(aws autoscaling describe-tags --filters Name=auto-scaling-group,Values=$target_id --query "Tags[].{Key: Key, Value: Value}[?Key=='Environment' || Key=='Service' || Key == 'Layer']" --output text)
+    if (echo $TAGS | grep -E "(\s|^)Environment\s+$ENVIRONMENT(\s|$)" >/dev/null 2>&1) \
+      && (echo $TAGS | grep -E "(\s|^)Service\s+$SERVICE(\s|$)" >/dev/null 2>&1) \
+      && (echo $TAGS | grep -E "(\s|^)Layer\s+$LAYER_NAME(\s|$)" >/dev/null 2>&1); then
+        echo "$target_id"
     fi
   done
 }
@@ -70,18 +115,40 @@ deploy () {
   if [ "$LAYER_NAME" != "" ]; then
       INSTANCE_IDENTIFIER_SNIPPET="${INSTANCE_IDENTIFIER_SNIPPET} Name=tag:Layer,Values=$LAYER_NAME"
   fi
+  if [ "$PARALLEL" != "true" ]; then
+    ELB_NAME=$(find_load_balancer)
+    debug "Classic load balancer: $ELB_NAME"
+    ALB_NAME=$(find_load_balancer_v2)
+    debug "Application load balancer: $ALB_NAME"
+    if [ "$ALB_NAME" != "" ]; then
+      # Only iterate through OpsWorks instances, not autoscaling ones.
+      # This is because removing a load-balanced instance from the pool
+      # causes it to fail health checks and be replaced by the autoscaling group.
+      INSTANCE_IDENTIFIER_SNIPPET="${INSTANCE_IDENTIFIER_SNIPPET} Name=tag-key,Values=opsworks:instance"
+      ASG_NAME=$(find_autoscaling_group)
+      debug "Autoscaling group: $ASG_NAME"
+    fi
+  fi
   INSTANCE_IDS=$(aws ec2 describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Reservations[].Instances[].InstanceId" --output text) || exit 1
   if [ "$INSTANCE_IDS" = "" ]; then
-    debug "No eligible instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME"
-    exit 1
+    if [ "$ASG_NAME" = "" ]; then
+      debug "No eligible instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME"
+      exit 1
+    fi
   else
     debug "Target instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME: $INSTANCE_IDS"
+  fi
+  if [ "$ASG_NAME" != "" ]; then
+    debug "Target autoscaling group: $ASG_NAME"
   fi
   if [ "$PARALLEL" = "true" ]; then
     DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
     wait_for_deployment $DEPLOYMENT_ID || exit 1
   else
-    ELB_NAME=$(find_load_balancer)
+    if [ "$ASG_NAME" != "" ]; then
+      debug "Triggering instance refresh for autoscaling group $ASG_NAME..."
+      INSTANCE_REFRESH_ID=$(aws autoscaling start-instance-refresh $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --query "InstanceRefreshId" --output text)
+    fi
     for instance in $INSTANCE_IDS; do
       if [ "$ELB_NAME" != "" ]; then
         OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
@@ -96,6 +163,7 @@ deploy () {
       fi
       if [ "$DEPLOYMENT_SUCCESS" != "0" ]; then exit 1; fi
     done
+    wait_for_instance_refresh $INSTANCE_REFRESH_ID
     debug "$MESSAGE: success"
   fi
 }
