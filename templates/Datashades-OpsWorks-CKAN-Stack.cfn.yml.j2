@@ -783,6 +783,9 @@ Resources:
         - Fn::ImportValue: !Sub "${WebSubnets}A"
         - Fn::ImportValue: !Sub "${WebSubnets}B"
         - Fn::ImportValue: !Sub "${WebSubnets}C"
+      Tags:
+        - Key: Layer
+          Value: web
 
   CKANALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
