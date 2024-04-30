@@ -51,7 +51,7 @@ wait_for_instance_refresh () {
   STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || exit 1
   for retry in `seq 1 180`; do
     if [ "$STATUS" = "Pending" ] || [ "$STATUS" = "InProgress" ]; then
-      sleep 10
+      sleep 20
       STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || exit 1
       debug "Instance refresh $DEPLOYMENT_ID: $STATUS"
     else
@@ -132,11 +132,11 @@ deploy () {
   INSTANCE_IDS=$(aws ec2 describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Reservations[].Instances[].InstanceId" --output text) || exit 1
   if [ "$INSTANCE_IDS" = "" ]; then
     if [ "$ASG_NAME" = "" ]; then
-      debug "No eligible instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME"
+      debug "No instance(s) matching '$INSTANCE_IDENTIFIER_SNIPPET'"
       exit 1
     fi
   else
-    debug "Target instance(s) in $SERVICE $ENVIRONMENT $LAYER_NAME: $INSTANCE_IDS"
+    debug "Target instance(s) matching '$INSTANCE_IDENTIFIER_SNIPPET': $INSTANCE_IDS"
   fi
   if [ "$ASG_NAME" != "" ]; then
     debug "Target autoscaling group: $ASG_NAME"
