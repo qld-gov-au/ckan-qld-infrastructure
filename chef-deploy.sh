@@ -150,6 +150,9 @@ deploy () {
       INSTANCE_REFRESH_ID=$(aws autoscaling start-instance-refresh $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --query "InstanceRefreshId" --output text)
     fi
     for instance in $INSTANCE_IDS; do
+      # double-check that instance is still running
+      INSTANCE_STATE=$(aws ec2 describe-instances --filters Name=instance-id,Values=$instance --query "Reservations[].Instances[0].State.Name" --output text)
+      if [ "$INSTANCE_STATE" != "running" ]; then continue; fi
       if [ "$ELB_NAME" != "" ]; then
         OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
         debug "Deregistered instance $instance from load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
