@@ -10,10 +10,13 @@ common_stack: &common_stack
     ApplicationId: "{{ service_name_lower }}"
     OpsWorksStackID: "{{ Environment }}{{ service_name }}OpsWorksStack"
     SolrLayerID: "{{ Environment }}{{ service_name }}OpsWorksSolrLayer"
+    SolrImageID: "ami-0db57769637120945"
     WebLayerID: "{{ Environment }}{{ service_name }}OpsWorksWebLayer"
     WebEC2Size: t3a.medium
+    WebImageId: "ami-06ee65395f3227133"
     BatchLayerID: "{{ Environment }}{{ service_name }}OpsWorksBatchLayer"
     BatchEC2Size: t3a.medium
+    BatchImageID: "ami-00126961217adc996"
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
@@ -66,9 +69,6 @@ cloudformation_stacks:
       WebEC2Count: 2
       SolrEC2Size: t3a.small
       SolrEC2Count: 1
-      WebImageId: "ami-06ee65395f3227133"
-      BatchImageID: "ami-00126961217adc996"
-      SolrImageID: "ami-0db57769637120945"
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
