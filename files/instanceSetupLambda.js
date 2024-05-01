@@ -21,6 +21,15 @@ function recordCompletion(event, success) {
 
 exports.handler = async (event) => {
   const instanceId = event['EC2InstanceId'];
+  if ('phase' in event) {
+      const deployPhase = event['phase'];
+      if (!(deployPhase in ['setup', 'deploy', 'configure'])) {
+        console.log("Invalid deployment phase, must be one of 'setup', 'deploy', 'configure'");
+        return recordCompletion(event, false);
+      }
+  } else {
+      const deployPhase = 'setup';
+  }
   const ec2 = new EC2Client();
   var environment, service, layer;
   const data = await ec2.send(new DescribeTagsCommand({
@@ -90,7 +99,12 @@ exports.handler = async (event) => {
   } else {
     recipePrefix = `datashades::${layer}`;
   }
-  const runList=`recipe[${recipePrefix}-setup],recipe[${recipePrefix}-deploy],recipe[${recipePrefix}-configure]`;
+  var runList = `recipe[${recipePrefix}-configure]`;
+  if (deployPhase !== 'configure') {
+    runList = `recipe[${recipePrefix}-deploy],${runList}`;
+  if (deployPhase === 'setup') {
+    runList = `recipe[${recipePrefix}-setup],${runList}`;
+  }
 
   await ssm.send(new SendCommandCommand({
     DocumentName: "AWS-ApplyChefRecipes",
