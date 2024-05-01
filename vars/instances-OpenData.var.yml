@@ -11,6 +11,7 @@ common_stack: &common_stack
     OpsWorksStackID: "{{ Environment }}{{ service_name }}OpsWorksStack"
     SolrLayerID: "{{ Environment }}{{ service_name }}OpsWorksSolrLayer"
     WebLayerID: "{{ Environment }}{{ service_name }}OpsWorksWebLayer"
+    WebImageId: "ami-06ee65395f3227133"
     WebEC2Size: t3a.medium
     BatchLayerID: "{{ Environment }}{{ service_name }}OpsWorksBatchLayer"
     BatchEC2Size: t3a.medium
