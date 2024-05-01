@@ -65,6 +65,9 @@ cloudformation_stacks:
       SolrEC2Count: 1
       WebEC2Size: t3a.micro
       BatchEC2Size: t3a.micro
+      WebImageId: ami-0fb8beef992676506
+      BatchImageId: ami-0b15900d98789714c
+      SolrImageId: ami-0d0f085df2345fa0e
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
