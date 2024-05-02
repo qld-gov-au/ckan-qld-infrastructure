@@ -258,7 +258,7 @@ Resources:
       TargetGroupARNs:
         - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}AlbTargetGroup"
       HealthCheckType: ELB
-      HealthCheckGracePeriod: 30
+      HealthCheckGracePeriod: 600
 {% endif %}
       VPCZoneIdentifier:
         - Fn::ImportValue: !Sub "${AppSubnets}A"
