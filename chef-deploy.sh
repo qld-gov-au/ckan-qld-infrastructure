@@ -147,7 +147,7 @@ deploy () {
   else
     if [ "$ASG_NAME" != "" ]; then
       debug "Triggering instance refresh for autoscaling group $ASG_NAME..."
-      INSTANCE_REFRESH_ID=$(aws autoscaling start-instance-refresh $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --query "InstanceRefreshId" --output text)
+      INSTANCE_REFRESH_ID=$(aws autoscaling start-instance-refresh $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --query "InstanceRefreshId" --output text) || exit 1
     fi
     for instance in $INSTANCE_IDS; do
       # double-check that instance is still running
