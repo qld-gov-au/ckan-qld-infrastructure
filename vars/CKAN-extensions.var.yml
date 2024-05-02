@@ -9,7 +9,6 @@ common_stack: &common_stack
   template_parameters: &common_stack_template_parameters
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name | lower }}"
-    OpsWorksStack: "{{ Environment }}{{ service_name }}OpsWorksStack"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"

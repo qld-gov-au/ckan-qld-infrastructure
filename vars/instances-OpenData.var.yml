@@ -8,13 +8,9 @@ common_stack: &common_stack
   template_parameters: &common_stack_template_parameters
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name_lower }}"
-    OpsWorksStackID: "{{ Environment }}{{ service_name }}OpsWorksStack"
-    SolrLayerID: "{{ Environment }}{{ service_name }}OpsWorksSolrLayer"
     SolrImageId: "ami-0db57769637120945"
-    WebLayerID: "{{ Environment }}{{ service_name }}OpsWorksWebLayer"
-    WebEC2Size: t3a.medium
     WebImageId: "ami-06ee65395f3227133"
-    BatchLayerID: "{{ Environment }}{{ service_name }}OpsWorksBatchLayer"
+    WebEC2Size: t3a.medium
     BatchEC2Size: t3a.medium
     BatchImageId: "ami-00126961217adc996"
     AppSubnets: "{{ Environment }}CKANAppSubnet"
