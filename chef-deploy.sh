@@ -58,7 +58,7 @@ wait_for_instance_refresh () {
       break
     fi
   done
-  if [ "$STATUS" != "Success" ]; then
+  if [ "$STATUS" != "Successful" ]; then
     debug "Failed instance refresh $DEPLOYMENT_ID, status $STATUS - aborting"
     exit 1
   fi
