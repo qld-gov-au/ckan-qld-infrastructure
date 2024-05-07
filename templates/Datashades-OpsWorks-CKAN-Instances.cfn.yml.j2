@@ -241,7 +241,8 @@ Resources:
               INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $metadata_token" http://169.254.169.254/latest/meta-data/instance-id) && \
               aws ec2 create-tags --region "${AWS::Region}" --resources $INSTANCE_ID --tags "Key=Name,Value=${ApplicationName}_${Environment}-{{ layer }}-$INSTANCE_ID"
               FUNCTION_NAME=$(aws ssm get-parameter --region "${AWS::Region}" --name "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name" --query "Parameter.Value" --output text)
-              aws lambda invoke --region "${AWS::Region}" --function-name "$FUNCTION_NAME" --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "$DEPLOY_PHASE"}' /var/log/instance-setup.log.`date '+%s'`
+              echo "Invoking '$DEPLOY_PHASE' command on instance $INSTANCE_ID"
+              aws lambda invoke --region "${AWS::Region}" --function-name "$FUNCTION_NAME" --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "'$DEPLOY_PHASE'"}' /var/log/instance-setup.log.`date '+%s'`
 
   {{ layer }}ScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
