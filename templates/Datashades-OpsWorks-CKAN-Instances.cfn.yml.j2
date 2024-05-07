@@ -258,9 +258,11 @@ Resources:
         - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}AlbTargetGroup"
       HealthCheckType: ELB
       HealthCheckGracePeriod: 1200
-      DefaultInstanceWarmup: 1200
-{% else %}
+{% endif %}
+{% if layer == 'Batch' %}
       DefaultInstanceWarmup: 600
+{% else %}
+      DefaultInstanceWarmup: 1200
 {% endif %}
       VPCZoneIdentifier:
         - Fn::ImportValue: !Sub "${AppSubnets}A"
