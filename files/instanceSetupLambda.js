@@ -102,6 +102,7 @@ exports.handler = async (event) => {
   var runList = `recipe[${recipePrefix}-configure]`;
   if (deployPhase !== 'configure') {
     runList = `recipe[${recipePrefix}-deploy],${runList}`;
+  }
   if (deployPhase === 'setup') {
     runList = `recipe[${recipePrefix}-setup],${runList}`;
   }
