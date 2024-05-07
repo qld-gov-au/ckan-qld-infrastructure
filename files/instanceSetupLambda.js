@@ -21,14 +21,10 @@ function recordCompletion(event, success) {
 
 exports.handler = async (event) => {
   const instanceId = event['EC2InstanceId'];
-  if ('phase' in event) {
-      const deployPhase = event['phase'];
-      if (!(deployPhase in ['setup', 'deploy', 'configure'])) {
-        console.log("Invalid deployment phase, must be one of 'setup', 'deploy', 'configure'");
-        return recordCompletion(event, false);
-      }
-  } else {
-      const deployPhase = 'setup';
+  const deployPhase = 'phase' in event ? event['phase'] : 'setup';
+  if (!(deployPhase in ['setup', 'deploy', 'configure'])) {
+    console.log("Invalid deployment phase, must be one of 'setup', 'deploy', 'configure'");
+    return recordCompletion(event, false);
   }
   const ec2 = new EC2Client();
   var environment, service, layer;
