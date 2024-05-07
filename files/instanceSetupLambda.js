@@ -23,7 +23,7 @@ exports.handler = async (event) => {
   const instanceId = event['EC2InstanceId'];
   const deployPhase = 'phase' in event ? event['phase'] : 'setup';
   if (!(deployPhase in ['setup', 'deploy', 'configure'])) {
-    console.log("Invalid deployment phase, must be one of 'setup', 'deploy', 'configure'");
+    console.log("Invalid deployment phase '" + deployPhase + "', must be one of 'setup', 'deploy', 'configure'");
     return recordCompletion(event, false);
   }
   const ec2 = new EC2Client();
