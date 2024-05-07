@@ -8,9 +8,6 @@ common_stack: &common_stack
   template_parameters: &common_stack_template_parameters
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name_lower }}"
-    SolrImageId: ami-0d0f085df2345fa0e
-    WebImageId: ami-0fb8beef992676506
-    BatchImageId: ami-0b15900d98789714c
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
