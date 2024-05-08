@@ -107,6 +107,8 @@ exports.handler = async (event) => {
     DocumentName: "AWS-ApplyChefRecipes",
     DocumentVersion: '\$DEFAULT',
     InstanceIds: [ instanceId ],
+    OutputS3BucketName: "osssio-ckan-web-logs",
+    OutputS3KeyPrefix: "run_command",
     Parameters: {
       SourceType: [cookbookType],
       SourceInfo: [sourceInfo],
