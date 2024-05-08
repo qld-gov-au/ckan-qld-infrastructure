@@ -58,7 +58,7 @@ wait_for_instance_refresh () {
       break
     fi
   done
-  if [ "$STATUS" != "Success" ]; then
+  if [ "$STATUS" != "Successful" ]; then
     debug "Failed instance refresh $DEPLOYMENT_ID, status $STATUS - aborting"
     exit 1
   fi
@@ -140,6 +140,7 @@ deploy () {
   fi
   if [ "$ASG_NAME" != "" ]; then
     debug "Target autoscaling group: $ASG_NAME"
+    export ASG_NAME
   fi
   if [ "$PARALLEL" = "true" ]; then
     DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)

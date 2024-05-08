@@ -378,9 +378,10 @@ Resources:
         - !Ref AttachmentsPolicy
         - !Ref InstanceSetupInvokingPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
         - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy # to write CloudWatch logs
         - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
 
   InstanceRoleProfile:
@@ -422,9 +423,10 @@ Resources:
         - !Ref AttachmentsPolicy
         - !Ref InstanceSetupInvokingPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
         - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy # to write CloudWatch logs
         - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
 
   WebInstanceRoleProfile:

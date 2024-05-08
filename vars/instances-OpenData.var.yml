@@ -8,7 +8,6 @@ common_stack: &common_stack
   template_parameters: &common_stack_template_parameters
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name_lower }}"
-    WebImageId: "ami-06ee65395f3227133"
     WebEC2Size: t3a.medium
     BatchEC2Size: t3a.medium
     AppSubnets: "{{ Environment }}CKANAppSubnet"

@@ -239,13 +239,12 @@ Resources:
               INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $metadata_token" http://169.254.169.254/latest/meta-data/instance-id) && \
               aws ec2 create-tags --region "${AWS::Region}" --resources $INSTANCE_ID --tags "Key=Name,Value=${ApplicationName}_${Environment}-{{ layer }}-$INSTANCE_ID"
               FUNCTION_NAME=$(aws ssm get-parameter --region "${AWS::Region}" --name "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name" --query "Parameter.Value" --output text)
-              aws lambda invoke --region "${AWS::Region}" --function-name "$FUNCTION_NAME" --payload '{"EC2InstanceId": "'$INSTANCE_ID'"}' /var/log/instance-setup.log.`date '+%s'`
+              aws lambda invoke --region "${AWS::Region}" --function-name "$FUNCTION_NAME" --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "setup"}' /var/log/instance-setup.log.`date '+%s'`
 
   {{ layer }}ScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-{{ layer }}-ASG"
-      DefaultInstanceWarmup: 2000
       DesiredCapacity: !Ref {{ layer }}EC2Count
       MinSize: !Ref {{ layer }}EC2Count
       MaxSize: 6
@@ -256,7 +255,12 @@ Resources:
       TargetGroupARNs:
         - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}AlbTargetGroup"
       HealthCheckType: ELB
-      HealthCheckGracePeriod: 2000
+      HealthCheckGracePeriod: 1200
+{% endif %}
+{% if layer == 'Batch' %}
+      DefaultInstanceWarmup: 600
+{% else %}
+      DefaultInstanceWarmup: 1200
 {% endif %}
       VPCZoneIdentifier:
         - Fn::ImportValue: !Sub "${AppSubnets}A"
