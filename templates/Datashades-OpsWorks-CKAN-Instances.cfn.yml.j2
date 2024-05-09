@@ -246,7 +246,7 @@ Resources:
     Properties:
       AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-{{ layer }}-ASG"
       DesiredCapacity: !Ref {{ layer }}EC2Count
-      MinSize: !Ref {{ layer }}EC2Count
+      MinSize: 1
       MaxSize: 6
       LaunchTemplate:
         LaunchTemplateId: !Ref {{ layer }}LaunchTemplate
@@ -284,7 +284,7 @@ Resources:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
-      MinSize: !Ref {{ layer }}EC2Count
+      MinSize: 1
       MaxSize: 6
       Recurrence: "0 20 * * *"
 {% endif %}
