@@ -246,6 +246,27 @@ Resources:
           Resource:
             - !Sub "arn:aws:s3:::"
 
+  LoggingPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Provides access to S3 logging bucket.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:GetBucketLocation
+              - s3:GetEncryptionConfiguration
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:ListMultipartUploadParts
+              - s3:ListMultipartUploads
+              - s3:PutObject
+            Resource:
+              - !Sub "arn:aws:s3:::${LogBucketName}"
+              - !Sub "arn:aws:s3:::${LogBucketName}/*"
+
   RunCommandPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -376,6 +397,7 @@ Resources:
         - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
         - !Ref AttachmentsPolicy
+        - !Ref LoggingPolicy
         - !Ref InstanceSetupInvokingPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
@@ -421,6 +443,7 @@ Resources:
         - !Ref EBSTaggingPolicy
         - !Ref SmtpRelayPolicy
         - !Ref AttachmentsPolicy
+        - !Ref LoggingPolicy
         - !Ref InstanceSetupInvokingPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
