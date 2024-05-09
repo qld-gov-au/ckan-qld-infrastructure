@@ -246,7 +246,7 @@ Resources:
     Properties:
       AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-{{ layer }}-ASG"
       DesiredCapacity: !Ref {{ layer }}EC2Count
-      MinSize: {{ (template_parameters | int) - 1}}
+      MinSize: {{ (item.template_parameters['WebEC2Count'] | int) - 1}}
       MaxSize: 6
       LaunchTemplate:
         LaunchTemplateId: !Ref {{ layer }}LaunchTemplate
