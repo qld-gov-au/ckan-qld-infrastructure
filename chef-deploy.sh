@@ -29,11 +29,11 @@ debug "$MESSAGE: commencing..."
 wait_for_deployment () {
   DEPLOYMENT_ID=$1
   debug "$MESSAGE: waiting for deployment $DEPLOYMENT_ID..."
-  STATUS=$(aws ssm list-commands $REGION_SNIPPET --command-id $DEPLOYMENT_ID --query "Commands|[0].Status" --output text) || exit 1
+  STATUS=$(aws ssm list-commands $REGION_SNIPPET --command-id $DEPLOYMENT_ID --query "Commands|[0].Status" --output text) || return 1
   for retry in `seq 1 180`; do
     if [ "$STATUS" = "Pending" ] || [ "$STATUS" = "InProgress" ]; then
       sleep 20
-      STATUS=$(aws ssm list-commands $REGION_SNIPPET --command-id $DEPLOYMENT_ID --query "Commands|[0].Status" --output text) || exit 1
+      STATUS=$(aws ssm list-commands $REGION_SNIPPET --command-id $DEPLOYMENT_ID --query "Commands|[0].Status" --output text) || return 1
       debug "Deployment $DEPLOYMENT_ID: $STATUS"
     else
       break
@@ -41,18 +41,18 @@ wait_for_deployment () {
   done
   if [ "$STATUS" != "Success" ]; then
     debug "Failed to deploy $DEPLOYMENT_ID, status $STATUS - aborting"
-    exit 1
+    return 1
   fi
 }
 
 wait_for_instance_refresh () {
   DEPLOYMENT_ID=$1
   debug "$MESSAGE: waiting for instance refresh $DEPLOYMENT_ID..."
-  STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || exit 1
+  STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || return 1
   for retry in `seq 1 180`; do
     if [ "$STATUS" = "Pending" ] || [ "$STATUS" = "InProgress" ]; then
       sleep 20
-      STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || exit 1
+      STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || return 1
       debug "Instance refresh $DEPLOYMENT_ID: $STATUS"
     else
       break
@@ -60,7 +60,7 @@ wait_for_instance_refresh () {
   done
   if [ "$STATUS" != "Successful" ]; then
     debug "Failed instance refresh $DEPLOYMENT_ID, status $STATUS - aborting"
-    exit 1
+    return 1
   fi
 }
 
@@ -125,11 +125,11 @@ deploy () {
       debug "Autoscaling group: $ASG_NAME"
     fi
   fi
-  INSTANCE_IDS=$(aws ec2 describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Reservations[].Instances[].InstanceId" --output text) || exit 1
+  INSTANCE_IDS=$(aws ec2 describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Reservations[].Instances[].InstanceId" --output text) || return 1
   if [ "$INSTANCE_IDS" = "" ]; then
     if [ "$ASG_NAME" = "" ]; then
       debug "No instance(s) matching '$INSTANCE_IDENTIFIER_SNIPPET'"
-      exit 1
+      return 1
     fi
   else
     debug "Target instance(s) matching '$INSTANCE_IDENTIFIER_SNIPPET': $INSTANCE_IDS"
@@ -140,7 +140,7 @@ deploy () {
   fi
   if [ "$PARALLEL" = "true" ]; then
     DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
-    wait_for_deployment $DEPLOYMENT_ID || exit 1
+    wait_for_deployment $DEPLOYMENT_ID || return 1
   else
     for instance in $INSTANCE_IDS; do
       # double-check that instance is still running
@@ -164,7 +164,7 @@ deploy () {
         OUTPUT=$(aws elb register-instances-with-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
         debug "Registered instance with load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
       fi
-      if [ "$DEPLOYMENT_SUCCESS" != "0" ]; then exit 1; fi
+      if [ "$DEPLOYMENT_SUCCESS" != "0" ]; then return 1; fi
     done
     debug "$MESSAGE: success"
   fi
