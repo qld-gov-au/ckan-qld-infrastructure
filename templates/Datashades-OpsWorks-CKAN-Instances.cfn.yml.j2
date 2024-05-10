@@ -188,8 +188,13 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref {{ layer }}LaunchTemplate
         Version: !GetAtt {{ layer }}LaunchTemplate.LatestVersionNumber
+{% if layer == 'Solr' %}
+      DefaultInstanceWarmup: 600
+      HealthCheckGracePeriod: 600
+{% else %}
       DefaultInstanceWarmup: 1200
       HealthCheckGracePeriod: 1200
+{% endif %}
 {% if layer == 'Web' %}
       TargetGroupARNs:
         - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}AlbTargetGroup"
@@ -209,6 +214,7 @@ Resources:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
+      DesiredCapacity: 0
       MinSize: '0'
       MaxSize: '0'
       Recurrence: "0 10 * * *"
@@ -217,6 +223,7 @@ Resources:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
+      DesiredCapacity: !Ref {{ layer }}EC2Count
       MinSize: {{ minInstanceCount }}
       MaxSize: 6
       Recurrence: "0 20 * * *"
