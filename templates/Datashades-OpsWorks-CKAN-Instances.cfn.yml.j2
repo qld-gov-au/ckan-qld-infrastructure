@@ -214,6 +214,7 @@ Resources:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
+      DesiredCapacity: 0
       MinSize: '0'
       MaxSize: '0'
       Recurrence: "0 10 * * *"
@@ -222,6 +223,7 @@ Resources:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
+      DesiredCapacity: !Ref {{ layer }}EC2Count
       MinSize: {{ minInstanceCount }}
       MaxSize: 6
       Recurrence: "0 20 * * *"
