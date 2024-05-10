@@ -188,31 +188,6 @@ Resources:
                 Effect: Allow
                 Resource: "*"
 
-  SmtpRelayPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      Description: Provides access to retrieve SSM parameters related to the AWS SMTP relay, including KMS decryption, and send emails.
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action: ses:SendRawEmail
-            Resource: "*"
-          - Effect: Allow
-            Action: ssm:DescribeParameters
-            Resource: "*"
-          - Effect: Allow
-            Action:
-              - ssm:GetParameters
-              - ssm:GetParameter
-              - ssm:GetParametersByPath
-            Resource:
-              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay"
-              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
-          - Effect: Allow
-            Action: kms:Decrypt
-            Resource: !Ref SSMKey
-
   AttachmentsPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -245,27 +220,6 @@ Resources:
             - s3:ListAllMyBuckets
           Resource:
             - !Sub "arn:aws:s3:::"
-
-  LoggingPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      Description: Provides access to S3 logging bucket.
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action:
-              - s3:AbortMultipartUpload
-              - s3:GetBucketLocation
-              - s3:GetEncryptionConfiguration
-              - s3:GetObject
-              - s3:ListBucket
-              - s3:ListMultipartUploadParts
-              - s3:ListMultipartUploads
-              - s3:PutObject
-            Resource:
-              - !Sub "arn:aws:s3:::${LogBucketName}"
-              - !Sub "arn:aws:s3:::${LogBucketName}/*"
 
   RunCommandPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -337,27 +291,53 @@ Resources:
       Role: !GetAtt InstanceSetupLambdaRole.Arn
       Timeout: 10
 
-  InstanceSetupInvokingPolicy:
+  InstancePolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Description: Privileges required to invoke the setup function for an instance.
+      Description: Permissions needed by all instances
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
-          - Effect: Allow
-            Action: "lambda:InvokeFunction"
-            Resource: !GetAtt InstanceSetupLambda{{ instance_setup_source_hash }}.Arn
-
-  EBSTaggingPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      Description: Allows EC2 instances to tag their EBS root volumes (eg for automatic backups)
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
+          # allow EC2 instances to tag their EBS root volumes for automatic backups
           - Effect: Allow
             Action: ec2:CreateTags
             Resource: "*"
+          # allow email relay
+          - Effect: Allow
+            Action: ses:SendRawEmail
+            Resource: "*"
+          - Effect: Allow
+            Action: ssm:DescribeParameters
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:GetParameters
+              - ssm:GetParameter
+              - ssm:GetParametersByPath
+            Resource:
+              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay"
+              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
+          - Effect: Allow
+            Action: kms:Decrypt
+            Resource: !Ref SSMKey
+          # allow invoking the setup function on instance start
+          - Effect: Allow
+            Action: "lambda:InvokeFunction"
+            Resource: !GetAtt InstanceSetupLambda{{ instance_setup_source_hash }}.Arn
+          # allow sending logs to the shared S3 bucket
+          - Effect: Allow
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:GetBucketLocation
+              - s3:GetEncryptionConfiguration
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:ListMultipartUploadParts
+              - s3:ListMultipartUploads
+              - s3:PutObject
+            Resource:
+              - !Sub "arn:aws:s3:::${LogBucketName}"
+              - !Sub "arn:aws:s3:::${LogBucketName}/*"
 
   InstanceRole:
     Type: AWS::IAM::Role
@@ -394,11 +374,7 @@ Resources:
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/solr_app/*"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
-        - !Ref EBSTaggingPolicy
-        - !Ref SmtpRelayPolicy
-        - !Ref AttachmentsPolicy
-        - !Ref LoggingPolicy
-        - !Ref InstanceSetupInvokingPolicy
+        - !Ref InstancePolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
@@ -440,11 +416,8 @@ Resources:
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/db/${ApplicationId}_*"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
-        - !Ref EBSTaggingPolicy
-        - !Ref SmtpRelayPolicy
+        - !Ref InstancePolicy
         - !Ref AttachmentsPolicy
-        - !Ref LoggingPolicy
-        - !Ref InstanceSetupInvokingPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
