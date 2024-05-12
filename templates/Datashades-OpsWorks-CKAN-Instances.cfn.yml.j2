@@ -103,7 +103,7 @@ Parameters:
   WebEC2Count:
     Description: The number of active EC2 instances to create in the web layer.
     Type: Number
-    Default: 1
+    Default: 2
     MinValue: 1
     MaxValue: 6
   AppSubnets:
@@ -125,75 +125,6 @@ Parameters:
   DefaultEC2Key:
     Description: Select an existing SSH key
     Type: AWS::EC2::KeyPair::KeyName
-
-Conditions:
-  2PlusServiceInstances:
-    !Equals [ !Ref SolrEC2Count, 2 ]
-  2PlusWebInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '2'
-    - !Condition 3PlusWebInstances
-  3PlusWebInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '3'
-    - !Condition 4PlusWebInstances
-  4PlusWebInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '4'
-    - !Condition 5PlusWebInstances
-  5PlusWebInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '5'
-    - !Condition 6PlusWebInstances
-  6PlusWebInstances:
-    Fn::Equals:
-    - Ref: WebEC2Count
-    - '6'
-
-  BatchLayerNeeded: #batch is background
-    !Not [!Equals [!Ref BatchEC2Size, none]]
-  1PlusBatchInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '1'
-    - !Condition 2PlusBatchInstances
-  2PlusBatchInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '2'
-    - !Condition 3PlusBatchInstances
-  3PlusBatchInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '3'
-    - !Condition 4PlusBatchInstances
-  4PlusBatchInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '4'
-    - !Condition 5PlusBatchInstances
-  5PlusBatchInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '5'
-    - !Condition 6PlusBatchInstances
-  6PlusBatchInstances:
-    Fn::Equals:
-    - Ref: BatchEC2Count
-    - '6'
 
 Resources:
 
@@ -241,26 +172,33 @@ Resources:
               FUNCTION_NAME=$(aws ssm get-parameter --region "${AWS::Region}" --name "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name" --query "Parameter.Value" --output text)
               aws lambda invoke --region "${AWS::Region}" --function-name "$FUNCTION_NAME" --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "setup"}' /var/log/instance-setup.log.`date '+%s'`
 
+{% if layer == 'Web' %}
+{% set minInstanceCount = (item.template_parameters['WebEC2Count'] | int) - 1 %}
+{% else %}
+{% set minInstanceCount = 1 %}
+{% endif %}
+
   {{ layer }}ScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-{{ layer }}-ASG"
       DesiredCapacity: !Ref {{ layer }}EC2Count
-      MinSize: !Ref {{ layer }}EC2Count
+      MinSize: {{ minInstanceCount }}
       MaxSize: 6
       LaunchTemplate:
         LaunchTemplateId: !Ref {{ layer }}LaunchTemplate
         Version: !GetAtt {{ layer }}LaunchTemplate.LatestVersionNumber
+{% if layer == 'Solr' %}
+      DefaultInstanceWarmup: 600
+      HealthCheckGracePeriod: 600
+{% else %}
+      DefaultInstanceWarmup: 1200
+      HealthCheckGracePeriod: 1200
+{% endif %}
 {% if layer == 'Web' %}
       TargetGroupARNs:
         - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}AlbTargetGroup"
       HealthCheckType: ELB
-      HealthCheckGracePeriod: 1200
-{% endif %}
-{% if layer == 'Batch' %}
-      DefaultInstanceWarmup: 600
-{% else %}
-      DefaultInstanceWarmup: 1200
 {% endif %}
       VPCZoneIdentifier:
         - Fn::ImportValue: !Sub "${AppSubnets}A"
@@ -276,6 +214,7 @@ Resources:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
+      DesiredCapacity: 0
       MinSize: '0'
       MaxSize: '0'
       Recurrence: "0 10 * * *"
@@ -284,7 +223,8 @@ Resources:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
       AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
-      MinSize: !Ref {{ layer }}EC2Count
+      DesiredCapacity: !Ref {{ layer }}EC2Count
+      MinSize: {{ minInstanceCount }}
       MaxSize: 6
       Recurrence: "0 20 * * *"
 {% endif %}

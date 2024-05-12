@@ -66,6 +66,7 @@ cloudformation_stacks:
       Environment: DEV
       SolrEC2Size: t3a.micro
       SolrEC2Count: 1
+      WebEC2Count: 1
       WebEC2Size: t3a.micro
       BatchEC2Size: t3a.micro
     tags:

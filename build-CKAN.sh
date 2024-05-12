@@ -37,13 +37,11 @@ run-shared-resource-playbooks () {
 
 run-deployment () {
   run-playbook "chef-json"
-  ./chef-deploy.sh datashades::ckanweb-setup,datashades::ckanweb-deploy $INSTANCE_NAME $ENVIRONMENT web & WEB_PID=$!
+  ./chef-deploy.sh datashades::ckanweb-setup,datashades::ckanweb-deploy,datashades::ckanweb-configure $INSTANCE_NAME $ENVIRONMENT web & WEB_PID=$!
   PARALLEL=1 ./chef-deploy.sh datashades::ckanbatch-setup,datashades::ckanbatch-deploy,datashades::ckanbatch-configure $INSTANCE_NAME $ENVIRONMENT batch & BATCH_PID=$!
   wait $WEB_PID
-  PARALLEL=1 ./chef-deploy.sh datashades::ckanweb-configure $INSTANCE_NAME $ENVIRONMENT web
   wait $BATCH_PID
-  ./chef-deploy.sh datashades::solr-setup,datashades::solr-deploy $INSTANCE_NAME $ENVIRONMENT solr  || exit 1
-  PARALLEL=1 ./chef-deploy.sh datashades::solr-configure $INSTANCE_NAME $ENVIRONMENT solr
+  ./chef-deploy.sh datashades::solr-setup,datashades::solr-deploy,datashades::solr-configure $INSTANCE_NAME $ENVIRONMENT solr  || exit 1
 }
 
 run-all-playbooks () {

@@ -56,7 +56,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: DEV
-      WebEC2Count: 2
+      WebEC2Count: 1
       SolrEC2Size: t3a.micro
       SolrEC2Count: 1
       WebEC2Size: t3a.micro
