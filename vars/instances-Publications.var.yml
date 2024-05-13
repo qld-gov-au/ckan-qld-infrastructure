@@ -6,14 +6,12 @@ common_stack: &common_stack
   template: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml"
   template_jinja: "templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml.j2"
   template_parameters: &common_stack_template_parameters
+    ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name_lower }}"
-    OpsWorksStackID: "{{ Environment }}{{ service_name }}OpsWorksStack"
-    SolrLayerID: "{{ Environment }}{{ service_name }}OpsWorksSolrLayer"
-    WebLayerID: "{{ Environment }}{{ service_name }}OpsWorksWebLayer"
-    BatchLayerID: "{{ Environment }}{{ service_name }}OpsWorksBatchLayer"
     BatchEC2Size: t3.micro
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
+    DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
@@ -54,6 +52,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: TRAINING
       SolrEC2Size: t3a.small
+      SolrEC2Count: 1
       WebEC2Size: t3a.small
       BatchEC2Size: t3a.micro
     tags:
@@ -66,6 +65,8 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: DEV
       SolrEC2Size: t3a.micro
+      SolrEC2Count: 1
+      WebEC2Count: 1
       WebEC2Size: t3a.micro
       BatchEC2Size: t3a.micro
     tags:

@@ -3,8 +3,11 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Creates instances for OpsWorks CKAN NFS Stack.'
 
 Parameters:
+  ApplicationName:
+    Description: Name of the application (eg OpenData)
+    Type: String
   ApplicationId:
-    Description: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+    Description: All-lowercase identifier for the application (eg 'opendata')
     Type: String
     ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
     AllowedPattern: '[-_a-z0-9]*'
@@ -100,405 +103,130 @@ Parameters:
   WebEC2Count:
     Description: The number of active EC2 instances to create in the web layer.
     Type: Number
-    Default: 1
+    Default: 2
     MinValue: 1
     MaxValue: 6
-  OpsWorksStackID:
-    Description: The exported name of the OpsWorks Stack ID.
-    Type: String
-  SolrLayerID:
-    Description: The exported name of the OpsWorks Solr Layer ID.
-    Type: String
-  WebLayerID:
-    Description: The exported name of the OpsWorks web Layer ID.
-    Type: String
-  BatchLayerID:
-    Description: The exported name of the OpsWorks batch layer ID.
-    Type: String
   AppSubnets:
     Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'. Only needed for HA configurations.
     Type: String
     Default: none
-  OperatingSystem:
-    Description: The operating system to install on all instances.
+  BatchImageId:
+    Description: The Amazon Machine Image ID to use for launching batch instances. Defaults to Amazon Linux 2.
     Type: String
-    Default: "Amazon Linux 2"
-
-Conditions:
-  2PlusServiceInstances:
-    !Equals [ !Ref SolrEC2Count, 2 ]
-  2PlusWebInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '2'
-    - !Condition 3PlusWebInstances
-  3PlusWebInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '3'
-    - !Condition 4PlusWebInstances
-  4PlusWebInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '4'
-    - !Condition 5PlusWebInstances
-  5PlusWebInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: WebEC2Count
-      - '5'
-    - !Condition 6PlusWebInstances
-  6PlusWebInstances:
-    Fn::Equals:
-    - Ref: WebEC2Count
-    - '6'
-
-  BatchLayerNeeded: #batch is background
-    !Not [!Equals [!Ref BatchEC2Size, none]]
-  1PlusBatchInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '1'
-    - !Condition 2PlusBatchInstances
-  2PlusBatchInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '2'
-    - !Condition 3PlusBatchInstances
-  3PlusBatchInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '3'
-    - !Condition 4PlusBatchInstances
-  4PlusBatchInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '4'
-    - !Condition 5PlusBatchInstances
-  5PlusBatchInstances:
-    Fn::Or:
-    - Fn::Equals:
-      - Ref: BatchEC2Count
-      - '5'
-    - !Condition 6PlusBatchInstances
-  6PlusBatchInstances:
-    Fn::Equals:
-    - Ref: BatchEC2Count
-    - '6'
+    Default: "ami-03b836d87d294e89e"
+  WebImageId:
+    Description: The Amazon Machine Image ID to use for launching web instances. Defaults to Amazon Linux 2.
+    Type: String
+    Default: "ami-03b836d87d294e89e"
+  SolrImageId:
+    Description: The Amazon Machine Image ID to use for launching Solr instances. Defaults to Amazon Linux 2.
+    Type: String
+    Default: "ami-03b836d87d294e89e"
+  DefaultEC2Key:
+    Description: Select an existing SSH key
+    Type: AWS::EC2::KeyPair::KeyName
 
 Resources:
-  #solr 1
-  OpswxEC2Solr1AmazonLinux2b:
-    Type: AWS::OpsWorks::Instance
+
+  # Autoscaling instances
+
+{% for layer in ['Batch', 'Web', 'Solr'] %}
+  {{ layer }}LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
     Properties:
-      Hostname: !Sub "${ApplicationId}-solr1{% if item.tags["PowerManaged"] == "Yes" %}-PM{% endif %}-al2b"
-      RootDeviceType: ebs
-      BlockDeviceMappings:
-        - DeviceName: "ROOT_DEVICE"
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 100
-            VolumeType: "gp2"
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref SolrEC2Size
-      Os: !Ref OperatingSystem
-      LayerIds:
-        - Fn::ImportValue: !Ref SolrLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
+      LaunchTemplateName: !Sub "${Environment}-${ApplicationName}-{{ layer|lower }}-LaunchTemplate"
+      LaunchTemplateData:
+        BlockDeviceMappings:
+          - DeviceName: "/dev/xvda"
+            Ebs:
+              DeleteOnTermination: true
+              VolumeSize: 100
+              VolumeType: "gp2"
+          - DeviceName: "/dev/sdi"
+            Ebs:
+              DeleteOnTermination: true
+              VolumeSize: 32
+              VolumeType: "gp2"
+        IamInstanceProfile:
+          Arn:
+            Fn::ImportValue: !Sub "${Environment}${ApplicationName}{% if layer != 'Solr' %}Web{% endif %}InstanceProfile"
+        ImageId: !Ref {{ layer }}ImageId
+        InstanceType: !Ref {{ layer }}EC2Size
+        KeyName: !Ref DefaultEC2Key
+        SecurityGroupIds:
+          - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
+          - Fn::ImportValue: !Sub "${Environment}CKAN{% if layer == 'Solr' %}Database{% else %}AppAsg{% endif %}SG"
+        UserData:
+          Fn::Base64:
+            Fn::Sub: |
+              #!/bin/sh
+              if ! (grep '/mnt/local_data' /etc/fstab >/dev/null); then
+                mkdir /mnt/local_data
+                mkfs -t xfs /dev/sdi
+                echo '/dev/sdi /mnt/local_data xfs defaults,nofail 0 2' >> /etc/fstab
+                mount -a
+              fi
+              metadata_token=`curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 60" http://169.254.169.254/latest/api/token` && \
+              INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $metadata_token" http://169.254.169.254/latest/meta-data/instance-id) && \
+              aws ec2 create-tags --region "${AWS::Region}" --resources $INSTANCE_ID --tags "Key=Name,Value=${ApplicationName}_${Environment}-{{ layer }}-$INSTANCE_ID"
+              FUNCTION_NAME=$(aws ssm get-parameter --region "${AWS::Region}" --name "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name" --query "Parameter.Value" --output text)
+              aws lambda invoke --region "${AWS::Region}" --function-name "$FUNCTION_NAME" --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "setup"}' /var/log/instance-setup.log.`date '+%s'`
+
+{% if layer == 'Web' %}
+{% set minInstanceCount = (item.template_parameters['WebEC2Count'] | int) - 1 %}
+{% else %}
+{% set minInstanceCount = 1 %}
 {% endif %}
 
-  #solr 2
-  OpswxEC2Solr2AmazonLinux2b:
-    Condition: 2PlusServiceInstances
-    Type: AWS::OpsWorks::Instance
+  {{ layer }}ScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
-      Hostname: !Sub "${ApplicationId}-solr2-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-B-al2b"
-      RootDeviceType: ebs
-      BlockDeviceMappings:
-        - DeviceName: "ROOT_DEVICE"
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 100
-            VolumeType: "gp2"
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref SolrEC2Size
-      Os: !Ref OperatingSystem
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}B" #todo, can only change if hostname also is changed
-      LayerIds:
-        - Fn::ImportValue: !Ref SolrLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
+      AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-{{ layer }}-ASG"
+      DesiredCapacity: !Ref {{ layer }}EC2Count
+      MinSize: {{ minInstanceCount }}
+      MaxSize: 6
+      LaunchTemplate:
+        LaunchTemplateId: !Ref {{ layer }}LaunchTemplate
+        Version: !GetAtt {{ layer }}LaunchTemplate.LatestVersionNumber
+{% if layer == 'Solr' %}
+      DefaultInstanceWarmup: 600
+      HealthCheckGracePeriod: 600
+{% else %}
+      DefaultInstanceWarmup: 1200
+      HealthCheckGracePeriod: 1200
 {% endif %}
-
-  #web1 OpswxEC2Web1PM or OpswxEC2Web1AO
-  OpswxEC2Web1{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2b:
-    Type: AWS::OpsWorks::Instance
-    DependsOn:
-      - OpswxEC2Solr1AmazonLinux2b
-    Properties:
-      Hostname: !Sub "${ApplicationId}-web1-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-A-al2b"
-      RootDeviceType: ebs
-      BlockDeviceMappings:
-        - DeviceName: "ROOT_DEVICE"
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 100
-            VolumeType: "gp2"
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref WebEC2Size
-      Os: !Ref OperatingSystem
-      LayerIds:
-        - Fn::ImportValue: !Ref WebLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
+{% if layer == 'Web' %}
+      TargetGroupARNs:
+        - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}AlbTargetGroup"
+      HealthCheckType: ELB
 {% endif %}
+      VPCZoneIdentifier:
+        - Fn::ImportValue: !Sub "${AppSubnets}A"
+        - Fn::ImportValue: !Sub "${AppSubnets}B"
+        - Fn::ImportValue: !Sub "${AppSubnets}C"
+      Tags:
+        - Key: Layer
+          Value: {{ layer|lower }}
+          PropagateAtLaunch: true
 
-#OpswxEC2Web2PM ~ OpswxEC2Web6PM
-#OpswxEC2Web2AO ~ OpswxEC2Web6AO
-{% set subnetLetters = ["C","A","B"] %}
-{% for loopingTimes in range(2, 7) %}
-  OpswxEC2Web{{ loopingTimes }}{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2b:
-    Condition: {{ loopingTimes }}PlusWebInstances
-    DependsOn:
-      - OpswxEC2Solr1AmazonLinux2b
-      - OpswxEC2Web{{ loopingTimes - 1 }}{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2b
-    Type: AWS::OpsWorks::Instance
-    Properties:
-      Hostname: !Sub "${ApplicationId}-web{{ loopingTimes }}-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-{{ subnetLetters[ loopingTimes % 3 ] }}-al2b"
-      RootDeviceType: ebs
-      BlockDeviceMappings:
-        - DeviceName: "ROOT_DEVICE"
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 100
-            VolumeType: "gp2"
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref WebEC2Size
-      Os: !Ref OperatingSystem
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}{{ subnetLetters[ loopingTimes % 3 ] }}"
-
-      LayerIds:
-        - Fn::ImportValue: !Ref WebLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
 {% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endif %}
-
-{% endfor %}
-
-
-#legacy load servers
-  OpswxEC2Web1LoadAmazonLinux2b:
-    Type: AWS::OpsWorks::Instance
-    DependsOn:
-      - OpswxEC2Solr1AmazonLinux2b
+  {{ layer }}ScalingIn:
+    Type: AWS::AutoScaling::ScheduledAction
     Properties:
-      AutoScalingType: load
-      Hostname: !Sub "${ApplicationId}-web1-load-Sub-A-al2b"
-      RootDeviceType: ebs
-      BlockDeviceMappings:
-        - DeviceName: "ROOT_DEVICE"
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 100
-            VolumeType: "gp2"
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref WebEC2Size
-      Os: !Ref OperatingSystem
-      LayerIds:
-        - Fn::ImportValue: !Ref WebLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
+      AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
+      DesiredCapacity: 0
+      MinSize: '0'
+      MaxSize: '0'
+      Recurrence: "0 10 * * *"
 
-  OpswxEC2Web2LoadAmazonLinux2b:
-    Condition: 2PlusWebInstances
-    Type: AWS::OpsWorks::Instance
-    DependsOn:
-      - OpswxEC2Web1LoadAmazonLinux2b
+  {{ layer }}ScalingOut:
+    Type: AWS::AutoScaling::ScheduledAction
     Properties:
-      AutoScalingType: load
-      Hostname: !Sub "${ApplicationId}-web2-load-Sub-C-al2b"
-      RootDeviceType: ebs
-      BlockDeviceMappings:
-        - DeviceName: "ROOT_DEVICE"
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 100
-            VolumeType: "gp2"
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref WebEC2Size
-      Os: !Ref OperatingSystem
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}C"
-      LayerIds:
-        - Fn::ImportValue: !Ref WebLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-
-
-  OpswxEC2Batch1LoadAmazonLinux2b:
-    Condition: BatchLayerNeeded
-    DependsOn:
-      - OpswxEC2Solr1AmazonLinux2b
-    Type: AWS::OpsWorks::Instance
-    Properties:
-      AutoScalingType: load
-      Hostname: !Sub "${ApplicationId}-batch1-load-Sub-A-al2b"
-      RootDeviceType: ebs
-      BlockDeviceMappings:
-        - DeviceName: "ROOT_DEVICE"
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 100
-            VolumeType: "gp2"
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref BatchEC2Size
-      Os: !Ref OperatingSystem
-      LayerIds:
-        - Fn::ImportValue: !Ref BatchLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-
-#OpswxEC2Batch1PM ~ OpswxEC2Batch6PM
-#OpswxEC2Batch1AO ~ OpswxEC2Batch6AO
-{% for loopingTimes in range(1, 7) %}
-  OpswxEC2Batch{{ loopingTimes }}{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}AmazonLinux2b:
-    Condition: {{ loopingTimes }}PlusBatchInstances
-    DependsOn:
-      - OpswxEC2Solr1AmazonLinux2b
-    Type: AWS::OpsWorks::Instance
-    Properties:
-      Hostname: !Sub "${ApplicationId}-batch{{ loopingTimes }}-{% if item.tags["PowerManaged"] == "Yes" %}PM{% else %}AO{% endif %}-Sub-{{ subnetLetters[ loopingTimes % 3 ] }}-al2b"
-      RootDeviceType: ebs
-      BlockDeviceMappings:
-        - DeviceName: "ROOT_DEVICE"
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 100
-            VolumeType: "gp2"
-      InstallUpdatesOnBoot: true
-      InstanceType: !Ref BatchEC2Size
-      Os: !Ref OperatingSystem
-      LayerIds:
-        - Fn::ImportValue: !Ref BatchLayerID
-      StackId:
-        Fn::ImportValue: !Ref OpsWorksStackID
-      SubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}{{ subnetLetters[ loopingTimes % 3 ] }}"
-{% if item.tags["PowerManaged"] == "Yes" %}
-      AutoScalingType: timer
-      # Monday-Friday 06:00-20:00 GMT+10
-      TimeBasedAutoScaling:
-        Sunday:
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for day in ["Monday","Tuesday","Wednesday","Thursday"] %}
-        {{ day }}:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% for hour in range(20, 24) %}
-          "{{ hour }}": "on"
-{% endfor %}
-{% endfor %}
-        Friday:
-{% for hour in range(0, 10) %}
-          "{{ hour }}": "on"
-{% endfor %}
+      AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
+      DesiredCapacity: !Ref {{ layer }}EC2Count
+      MinSize: {{ minInstanceCount }}
+      MaxSize: 6
+      Recurrence: "0 20 * * *"
 {% endif %}
 
 {% endfor %}

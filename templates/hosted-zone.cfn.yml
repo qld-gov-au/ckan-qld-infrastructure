@@ -31,6 +31,13 @@ Resources:
       HostedZoneConfig:
         Comment: !Sub "Internal resources for the ${Environment} Open Data and Publications environments"
 
+  InternalHostedZoneTLDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/common/tld"
+      Type: String
+      Value: !Sub "${Environment}.ckan.internal"
+
 Outputs:
   ZoneID:
     Value: !Ref HostedZone

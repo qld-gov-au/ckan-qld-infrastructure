@@ -47,18 +47,9 @@
         stack_resources: true
       register: hosted_zone
 
-    - name: set internal TLD from hosted zone
-      set_fact:
-        InternalHostedZoneTLD: "{{ hosted_zone.ansible_facts.cloudformation[Zone_Stack_Name].stack_outputs.ZoneTLD }}"
-
   tasks:
 
     - name: Prepare chef source JSON
       template:
         src: chef-source.json.j2
         dest: templates/chef-source.json
-
-    - name: Prepare custom JSON
-      template:
-        src: chef.json.j2
-        dest: templates/chef.json

@@ -172,8 +172,7 @@ Resources:
               Service: opsworks.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        -
-          PolicyName: "aws-opsworks-service-policy"
+        - PolicyName: "aws-opsworks-service-policy"
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -188,31 +187,6 @@ Resources:
                   - "rds:*"
                 Effect: Allow
                 Resource: "*"
-
-  SmtpRelayPolicy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      Description: Provides access to retrieve SSM parameters related to the AWS SMTP relay, including KMS decryption, and send emails.
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action: ses:SendRawEmail
-            Resource: "*"
-          - Effect: Allow
-            Action: ssm:DescribeParameters
-            Resource: "*"
-          - Effect: Allow
-            Action:
-              - ssm:GetParameters
-              - ssm:GetParameter
-              - ssm:GetParametersByPath
-            Resource:
-              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay"
-              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
-          - Effect: Allow
-            Action: kms:Decrypt
-            Resource: !Ref SSMKey
 
   AttachmentsPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -247,16 +221,123 @@ Resources:
           Resource:
             - !Sub "arn:aws:s3:::"
 
-  EBSTaggingPolicy:
+  RunCommandPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Description: Allows EC2 instances to tag their EBS root volumes (eg for automatic backups)
+      Description: Privileges required to run SSM commands to set up instances.
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
+            Action:
+              - ssm:SendCommand
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:*:document/AWS-ApplyChefRecipes"
+          - Effect: Allow
+            Action:
+              - ec2:DescribeTags
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/*"
+          - Effect: Allow
+            Action:
+              - ssm:SendCommand
+            Resource:
+              - !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
+            Condition:
+              StringEquals:
+                "ssm:resourceTag/Environment":
+                  !Ref Environment
+                "ssm:resourceTag/Service":
+                  !Ref ApplicationName
+          - Effect: Allow
+            Action:
+              - autoscaling:CompleteLifecycleAction
+            Resource:
+              - !Sub "arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*"
+
+  InstanceSetupLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref RunCommandPolicy
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  {% set instance_setup_source = lookup('file', 'files/instanceSetupLambda.js') | replace('\n', '\n          ') %}
+
+  InstanceSetupLambda{{ instance_setup_source_hash }}:
+    Type: AWS::Lambda::Function
+    Properties:
+      Architectures:
+        - arm64
+      Description: Run Systems Manager commands to set up instances.
+      FunctionName: !Sub "${ApplicationName}-${Environment}-setup-{{ instance_setup_source_hash }}"
+      Runtime: nodejs20.x
+      Code:
+        ZipFile: >
+          {{ instance_setup_source }}
+      Handler: index.handler
+      Role: !GetAtt InstanceSetupLambdaRole.Arn
+      Timeout: 10
+
+  InstancePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Permissions needed by all instances
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # allow EC2 instances to tag their EBS root volumes for automatic backups
+          - Effect: Allow
             Action: ec2:CreateTags
             Resource: "*"
+          # allow email relay
+          - Effect: Allow
+            Action: ses:SendRawEmail
+            Resource: "*"
+          - Effect: Allow
+            Action: ssm:DescribeParameters
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:GetParameters
+              - ssm:GetParameter
+              - ssm:GetParametersByPath
+            Resource:
+              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay"
+              - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
+          - Effect: Allow
+            Action: kms:Decrypt
+            Resource: !Ref SSMKey
+          # allow invoking the setup function on instance start
+          - Effect: Allow
+            Action: "lambda:InvokeFunction"
+            Resource: !GetAtt InstanceSetupLambda{{ instance_setup_source_hash }}.Arn
+          # allow sending logs to the shared S3 bucket
+          - Effect: Allow
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:GetBucketLocation
+              - s3:GetEncryptionConfiguration
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:ListMultipartUploadParts
+              - s3:ListMultipartUploads
+              - s3:PutObject
+            Resource:
+              - !Sub "arn:aws:s3:::${LogBucketName}"
+              - !Sub "arn:aws:s3:::${LogBucketName}/*"
 
   InstanceRole:
     Type: AWS::IAM::Role
@@ -277,11 +358,10 @@ Resources:
               - Effect: Allow
                 Action:
                   - route53:ChangeResourceRecordSets
-                Resource:
-                  Fn::Join:
-                    - ""
-                    - - "arn:aws:route53:::hostedzone/"
-                      - Fn::ImportValue: !Ref InternalStackZone
+                Resource: !Sub
+                  - "arn:aws:route53:::hostedzone/${Zone}"
+                  - Zone:
+                      Fn::ImportValue: !Ref InternalStackZone
               # allow the servers to retrieve a subset of SSM Parameter Store values
               - Effect: Allow
                 Action:
@@ -290,15 +370,16 @@ Resources:
                   - ssm:GetParametersByPath
                 Resource:
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/ckan_app/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/solr_app/*"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
-        - !Ref EBSTaggingPolicy
-        - !Ref SmtpRelayPolicy
-        - !Ref AttachmentsPolicy
+        - !Ref InstancePolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
         - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy # to write CloudWatch logs
         - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
 
   InstanceRoleProfile:
@@ -335,13 +416,13 @@ Resources:
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/db/${ApplicationId}_*"
                   - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
       ManagedPolicyArns:
-        - !Ref EBSTaggingPolicy
-        - !Ref SmtpRelayPolicy
+        - !Ref InstancePolicy
         - !Ref AttachmentsPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
         - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy # to write CloudWatch logs
         - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
 
   WebInstanceRoleProfile:
@@ -353,6 +434,13 @@ Resources:
 
   # Populate SSM Parameter Store with all the information needed to deploy.
   # This should allow a blank instance to set itself up based only on the tags applied to it.
+
+  InstanceSetupFunctionNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name"
+      Type: String
+      Value: !Ref "InstanceSetupLambda{{ instance_setup_source_hash }}"
 
   CookbookTypeParameter:
     Type: AWS::SSM::Parameter
@@ -493,50 +581,6 @@ Resources:
         Type: !Ref CookbookURLType
         # SshKey: !Sub "${CookbookSSHKey}\n"
         Url: !Ref CookbookURL
-      CustomJson:
-        datashades:
-          ckan_web:
-            title: !Sub "${ApplicationTitle} | Queensland Government"
-            site_domain: !Ref SiteDomain
-            email_domain: !Ref EmailDomain
-            dsenable: !Ref EnableDataStore
-            endpoint: /
-            google:
-              gtm_container_id: !Ref GTMContainerId
-              analytics_id: !Ref AnalyticsId
-            ckan_app:
-              name: !Sub "${ApplicationName}-${Environment}"
-              shortname: !Sub "${ApplicationId}-${Environment}"
-              app_source:
-                type: git
-                url: !Ref CKANSource
-                revision: !Ref CKANRevision
-            plugin_apps:
-{% for plugin in extensions[Environment] %}
-              - name: "{{ extensions[Environment][plugin].name }}"
-                shortname: "{{ extensions[Environment][plugin].shortname }}"
-                app_source:
-                  type: "{{ extensions[Environment][plugin].type }}"
-                  url: "{{ extensions[Environment][plugin].url }}"
-                  revision: "{{ extensions[Environment][plugin].version}}"
-{% endfor %}
-          solr_app:
-            name: !Sub "${ApplicationName}-${Environment}-solr"
-            shortname: !Sub "${ApplicationId}-${Environment}-solr"
-            app_source:
-              type: archive
-              url: !Ref SolrSource
-          redis:
-            hostname:
-              Fn::ImportValue: !Ref CacheAddress
-            port: !Ref CachePort
-          tld:
-            Fn::ImportValue: !Ref InternalStackZoneTLD
-          public_tld: !Ref PublicTLD
-          version: !Ref Environment
-          app_id: !Ref ApplicationId
-          log_bucket: !Ref LogBucketName
-          attachments_bucket: !Ref AttachmentsBucketName
       DefaultInstanceProfileArn:
         Fn::GetAtt:
           - InstanceRoleProfile
@@ -544,8 +588,7 @@ Resources:
       DefaultOs: "Amazon Linux 2"
       DefaultSshKeyName: !Ref DefaultEC2Key
       DefaultSubnetId:
-        Fn::ImportValue:
-          !Sub "${AppSubnets}A"
+        Fn::ImportValue: !Sub "${AppSubnets}A"
       Name: !Sub "${ApplicationName}_${Environment}"
       ServiceRoleArn:
         Fn::If:
@@ -573,8 +616,6 @@ Resources:
           - "datashades::solr-deploy"
         Configure:
           - "datashades::solr-configure"
-        Shutdown:
-          - "datashades::solr-shutdown"
       AutoAssignElasticIps: false
       AutoAssignPublicIps: false
       CustomSecurityGroupIds:
@@ -606,8 +647,6 @@ Resources:
           - "datashades::ckanweb-deploy"
         Configure:
           - "datashades::ckanweb-configure"
-        Shutdown:
-          - "datashades::ckanweb-shutdown"
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppSG
@@ -655,8 +694,6 @@ Resources:
           - "datashades::ckanbatch-deploy"
         Configure:
           - "datashades::ckanbatch-configure"
-        Shutdown:
-          - "datashades::ckanbatch-shutdown"
       CustomSecurityGroupIds:
         - Fn::ImportValue: !Ref AdminSG
         - Fn::ImportValue: !Ref AppSG
@@ -690,35 +727,6 @@ Resources:
           NumberOfDisks: 1
           Size: 32
 
-  OpwxAppCKAN:
-    Type: AWS::OpsWorks::App
-    Properties:
-      Domains:
-        - !Ref SiteDomain #list 0 is used for site_url
-      AppSource:
-        Type: git
-        Url: !Ref CKANSource
-        Revision: !Ref CKANRevision
-      Description: "CKAN Data Management System"
-      EnableSsl: false
-      Name: !Sub "${ApplicationName}-${Environment}"
-      Shortname: !Sub "${ApplicationId}-${Environment}"
-      StackId: !Ref OpsWorksStack
-      Type: other
-
-  OpwxAppSolr:
-    Type: AWS::OpsWorks::App
-    Properties:
-      AppSource:
-        Type: archive
-        Url: !Ref SolrSource
-      Description: "Apache Solr"
-      EnableSsl: false
-      Name: !Sub "${ApplicationName}-${Environment}-solr"
-      Shortname: !Sub "${ApplicationId}-${Environment}-solr"
-      StackId: !Ref OpsWorksStack
-      Type: other
-
   CKANELB:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
@@ -745,12 +753,76 @@ Resources:
         - Fn::ImportValue: !Ref AppLBSG
         - Fn::ImportValue: !Ref CloudFrontSG
       Subnets:
-        - Fn::ImportValue:
-            !Sub "${WebSubnets}A"
-        - Fn::ImportValue:
-            !Sub "${WebSubnets}B"
-        - Fn::ImportValue:
-            !Sub "${WebSubnets}C"
+        - Fn::ImportValue: !Sub "${WebSubnets}A"
+        - Fn::ImportValue: !Sub "${WebSubnets}B"
+        - Fn::ImportValue: !Sub "${WebSubnets}C"
+
+  # Application Load Balancer structure is more complex than classic.
+  # The LoadBalancer defines configuration values like logging config and security groups.
+  # The Listener is external-facing, defining the port, certificate, etc,
+  # and links the LoadBalancer to the TargetGroup.
+  # The TargetGroup defines properties like health checks for a group of servers.
+  # Autoscaling groups can then point at the TargetGroup to have their servers participate.
+
+  CKANALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub "${Environment}-${ApplicationName}-ALB"
+      Type: application
+      Scheme: "internet-facing"
+      LoadBalancerAttributes:
+        # CloudFront covers our logging needs
+        - Key: access_logs.s3.enabled
+          Value: false
+      SecurityGroups:
+        - Fn::ImportValue: !Ref AppLBSG
+        - Fn::ImportValue: !Ref CloudFrontSG
+      Subnets:
+        - Fn::ImportValue: !Sub "${WebSubnets}A"
+        - Fn::ImportValue: !Sub "${WebSubnets}B"
+        - Fn::ImportValue: !Sub "${WebSubnets}C"
+      Tags:
+        - Key: Layer
+          Value: web
+
+  CKANALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref ACMCertificateARN
+      DefaultActions:
+        - TargetGroupArn: !Ref CKANALBTargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref CKANALB
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+
+  CKANALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${Environment}-${ApplicationName}-ALB-target"
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /api/action/status_show
+      HealthCheckPort: '80'
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 20
+      HealthyThresholdCount: 2
+      Port: 80
+      Protocol: HTTP
+      TargetType: instance
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 60
+        - Key: stickiness.enabled
+          Value: true
+        - Key: stickiness.type
+          Value: lb_cookie
+        - Key: stickiness.lb_cookie.duration_seconds
+          Value: 3600
+      VpcId:
+        Fn::ImportValue: !Ref StackVPC
 
   ELBAttachment:
     Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
@@ -765,14 +837,8 @@ Resources:
       Name: !Sub "${ApplicationId}.${RootDomain}"
       HostedZoneName: !Sub "${PublicStackZoneTLD}."
       AliasTarget:
-        HostedZoneId:
-          Fn::GetAtt:
-            - CKANELB
-            - CanonicalHostedZoneNameID
-        DNSName:
-          Fn::GetAtt:
-            - CKANELB
-            - DNSName
+        HostedZoneId: !GetAtt CKANALB.CanonicalHostedZoneID
+        DNSName: !GetAtt CKANALB.DNSName
 
 Outputs:
   StackID:
@@ -799,19 +865,27 @@ Outputs:
     Export:
       Name: !Sub "${Environment}${ApplicationName}OpsWorksBatchLayer"
 
-  CKANApp:
-    Value: !Ref OpwxAppCKAN
-    Description: CKAN Application Id
+  WebELBName:
+    Value: !Ref CKANELB
     Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksCKANApplication"
-
-  SolrApp:
-    Value: !Ref OpwxAppSolr
-    Description: SolrCloud Application Id
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrApplication"
+      Name: !Sub "${Environment}${ApplicationName}WebElbName"
 
   WebELBDNSName:
     Value: !Ref WebELBDNSName
     Export:
       Name: !Sub "${Environment}${ApplicationName}WebElbDNSName"
+
+  WebALBTargetGroup:
+    Value: !Ref CKANALBTargetGroup
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebAlbTargetGroup"
+
+  InstanceProfile:
+    Value: !GetAtt InstanceRoleProfile.Arn
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}InstanceProfile"
+
+  WebInstanceProfile:
+    Value: !GetAtt WebInstanceRoleProfile.Arn
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebInstanceProfile"
