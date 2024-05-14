@@ -173,7 +173,7 @@ Resources:
               aws lambda invoke --region "${AWS::Region}" --function-name "$FUNCTION_NAME" --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "setup"}' /var/log/instance-setup.log.`date '+%s'`
 
 {% if layer == 'Web' %}
-{% set minInstanceCount = (item.template_parameters['WebEC2Count'] | int) - 1 %}
+{% set minInstanceCount = (item.template_parameters['WebEC2Count'] | default('2') | int) - 1 %}
 {% else %}
 {% set minInstanceCount = 1 %}
 {% endif %}
