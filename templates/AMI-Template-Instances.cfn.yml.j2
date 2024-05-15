@@ -1,0 +1,31 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Creates archetype instances for generating machine image templates.'
+
+Parameters:
+  ApplicationName:
+    Description: Name of the application (eg OpenData)
+    Type: String
+  Environment:
+    Description: The target production vs non-production environment.
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+
+Resources:
+
+{% for layer in ['Batch', 'Web', 'Solr'] %}
+  {{ layer }}TemplateInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId:
+          Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}LaunchTemplateId"
+      Tags:
+        - Key: Layer
+          Value: {{ layer|lower }}
+{% endfor %}
