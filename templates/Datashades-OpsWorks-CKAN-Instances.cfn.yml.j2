@@ -209,7 +209,7 @@ Resources:
           Value: {{ layer|lower }}
           PropagateAtLaunch: true
 
-{% if item.tags["PowerManaged"] == "Yes" %}
+{% if item.tags["PowerManaged"] == "Yes" and layer != 'Solr' %}
   {{ layer }}ScalingIn:
     Type: AWS::AutoScaling::ScheduledAction
     Properties:
