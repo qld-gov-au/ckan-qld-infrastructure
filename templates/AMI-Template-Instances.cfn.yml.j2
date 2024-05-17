@@ -6,6 +6,11 @@ Parameters:
   ApplicationName:
     Description: Name of the application (eg OpenData)
     Type: String
+  ApplicationId:
+    Description: All-lowercase identifier for the application (eg 'gi', 'services', etc)
+    Type: String
+    ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
+    AllowedPattern: '[-_a-z0-9]*'
   Environment:
     Description: The target production vs non-production environment.
     Type: String
@@ -15,16 +20,305 @@ Parameters:
       - TRAINING
       - STAGING
       - PROD
+  SSMKey:
+    Type: String
+    Description: KMS key for alias/aws/ssm
+  LogBucketName:
+    Description: Name of the S3 logging bucket.
+    Type: String
+  AttachmentsBucketName:
+    Description: Name of the S3 Attachment bucket.
+    Type: String
+  InternalStackZone:
+    Description: Exported name of the Route53 hosted zone ID.
+    Type: String
+  DefaultEC2Key:
+    Description: Select an existing SSH key
+    Type: AWS::EC2::KeyPair::KeyName
+  AppSubnets:
+    Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'. Only needed for HA configurations.
+    Type: String
+    Default: none
 
 Resources:
+
+  AttachmentsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Provides access to s3 attachments bucket.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Action:
+            - s3:AbortMultipartUpload
+            - s3:ListMultipartUploadParts
+            - s3:ListBucket
+            - s3:*Upload*
+            - s3:GetObject
+            - s3:GetObjectAcl
+            - s3:GetObjectVersion
+            - s3:PutObject
+            - s3:PutObjectAcl
+            - s3:PutObjectTagging
+            - s3:DeleteObject
+            - s3:DeleteObjectTagging
+            - s3:GetBucketAcl
+            - s3:GetBucketCORS
+            - s3:GetBucketPolicy
+          Resource:
+            - !Sub "arn:aws:s3:::${AttachmentsBucketName}"
+            - !Sub "arn:aws:s3:::${AttachmentsBucketName}/*"
+        - Effect: Allow
+          Action:
+            - s3:ListAllMyBuckets
+          Resource:
+            - !Sub "arn:aws:s3:::"
+
+  InstancePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Permissions needed by all instances
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: ec2:CreateTags
+            Resource: "*"
+          - Effect: Allow
+            Action: ses:SendRawEmail
+            Resource: "*"
+          - Effect: Allow
+            Action: ssm:DescribeParameters
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:GetParameters
+              - ssm:GetParameter
+              - ssm:GetParametersByPath
+            Resource: !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/smtpRelay/*"
+          - Effect: Allow
+            Action: kms:Decrypt
+            Resource: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/894e4401-3e07-4e1d-9b25-2c598da1474b"
+          - Effect: Allow
+            Action: "lambda:InvokeFunction"
+            Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*"
+          - Effect: Allow
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:GetBucketLocation
+              - s3:GetEncryptionConfiguration
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:ListMultipartUploadParts
+              - s3:ListMultipartUploads
+              - s3:PutObject
+            Resource: !Sub "arn:aws:s3:::${LogBucketName}/*"
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ApplicationName}-${Environment}-TemplateInstancePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # allow the service layer to update internal DNS
+              - Effect: Allow
+                Action:
+                  - route53:ChangeResourceRecordSets
+                Resource: !Sub
+                  - "arn:aws:route53:::hostedzone/${Zone}"
+                  - Zone:
+                      Fn::ImportValue: !Ref InternalStackZone
+              # allow the servers to retrieve a subset of SSM Parameter Store values
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/ckan_app/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/solr_app/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
+      ManagedPolicyArns:
+        - !Ref InstancePolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
+        - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy # to write CloudWatch logs
+        - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
+
+  InstanceRoleProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref InstanceRole
+
+  WebInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub "${ApplicationName}-${Environment}-Web-TemplateInstancePolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # allow the web layer to retrieve a subset of SSM Parameter Store values
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/app/${ApplicationId}/*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/db/${ApplicationId}_*"
+                  - !Sub "arn:aws:ssm:*:*:parameter/config/CKAN/${Environment}/common/*"
+      ManagedPolicyArns:
+        - !Ref InstancePolicy
+        - !Ref AttachmentsPolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
+        - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy # to write CloudWatch logs
+        - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
+
+  WebInstanceRoleProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref WebInstanceRole
+
+  RunCommandPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Privileges required to run SSM commands to set up instances.
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - ssm:SendCommand
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:*:document/AWS-ApplyChefRecipes"
+          - Effect: Allow
+            Action:
+              - ec2:DescribeTags
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
+            Resource:
+              - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/*"
+          - Effect: Allow
+            Action:
+              - ssm:SendCommand
+            Resource:
+              - !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
+            Condition:
+              StringEquals:
+                "ssm:resourceTag/Environment":
+                  !Ref Environment
+                "ssm:resourceTag/Service":
+                  !Ref ApplicationName
+          - Effect: Allow
+            Action:
+              - autoscaling:CompleteLifecycleAction
+            Resource:
+              - !Sub "arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*"
+
+  InstanceSetupLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Ref RunCommandPolicy
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  {% set instance_setup_source = lookup('file', 'files/instanceSetupLambda.js') | replace('\n', '\n          ') %}
+
+  InstanceSetupLambda{{ instance_setup_source_hash }}:
+    Type: AWS::Lambda::Function
+    Properties:
+      Architectures:
+        - arm64
+      Description: Run Systems Manager commands to set up template instances for generating AMIs.
+      FunctionName: !Sub "${ApplicationName}-${Environment}-template-setup-{{ instance_setup_source_hash }}"
+      Runtime: nodejs20.x
+      Code:
+        ZipFile: >
+          {{ instance_setup_source }}
+      Handler: index.handler
+      Role: !GetAtt InstanceSetupLambdaRole.Arn
+      Timeout: 10
 
 {% for layer in ['Batch', 'Web', 'Solr'] %}
   {{ layer }}TemplateInstance:
     Type: AWS::EC2::Instance
     Properties:
-      LaunchTemplate:
-        LaunchTemplateId:
-          Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}LaunchTemplateId"
+      BlockDeviceMappings:
+        - DeviceName: "/dev/xvda"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 100
+            VolumeType: "gp2"
+        - DeviceName: "/dev/sdi"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 32
+            VolumeType: "gp2"
+      IamInstanceProfile: !Ref {% if layer != 'Solr' %}Web{% endif %}InstanceRoleProfile
+      ImageId: "ami-0d71fe73adf7a9887"
+      InstanceType: "t3a.small"
+      KeyName: !Ref DefaultEC2Key
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          GroupSet:
+            - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
+            - Fn::ImportValue: !Sub "${Environment}CKAN{% if layer == 'Solr' %}Database{% else %}AppAsg{% endif %}SG"
+          SubnetId:
+            Fn::ImportValue: !Sub "${AppSubnets}A"
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/sh
+            if ! (grep '/mnt/local_data' /etc/fstab >/dev/null); then
+              mkdir /mnt/local_data
+              mkfs -t xfs /dev/sdi
+              echo '/dev/sdi /mnt/local_data xfs defaults,nofail 0 2' >> /etc/fstab
+              mount -a
+            fi
+            metadata_token=`curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 60" http://169.254.169.254/latest/api/token` && \
+            INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $metadata_token" http://169.254.169.254/latest/meta-data/instance-id) && \
+            aws ec2 create-tags --region "${AWS::Region}" --resources $INSTANCE_ID --tags "Key=Name,Value=${ApplicationName}_${Environment}-{{ layer }}-ami-template"
+            FUNCTION_NAME="${ApplicationName}-${Environment}-template-setup-{{ instance_setup_source_hash }}"
+            aws lambda invoke --region "${AWS::Region}" --function-name "$FUNCTION_NAME" --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "deploy"}' /var/log/instance-setup.log.`date '+%s'`
       Tags:
         - Key: Layer
           Value: {{ layer|lower }}

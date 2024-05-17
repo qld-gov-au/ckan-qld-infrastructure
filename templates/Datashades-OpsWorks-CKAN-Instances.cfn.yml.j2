@@ -230,12 +230,3 @@ Resources:
 {% endif %}
 
 {% endfor %}
-
-Outputs:
-
-{% for layer in ['Batch', 'Web', 'Solr'] %}
-  {{ layer }}LaunchTemplateId:
-    Value: !Ref {{ layer }}LaunchTemplate
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}{{ layer }}LaunchTemplateId"
-{% endfor %}
