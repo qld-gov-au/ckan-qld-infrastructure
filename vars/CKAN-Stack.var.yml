@@ -37,7 +37,6 @@ common_stack: &common_stack
     CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
     AppSG: "{{ Environment }}CKANAppAsgSG"
     DatabaseSG: "{{ Environment }}CKANDatabaseSG"
-    CreateServiceRole: "yes"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     SSMKey: "{{ SSMKey | default('') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
