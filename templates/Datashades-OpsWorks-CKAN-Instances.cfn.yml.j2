@@ -209,6 +209,16 @@ Resources:
           Value: {{ layer|lower }}
           PropagateAtLaunch: true
 
+  {{ layer }}DynamicScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 50
+
 {% if item.tags["PowerManaged"] == "Yes" and layer != 'Solr' %}
   {{ layer }}ScalingIn:
     Type: AWS::AutoScaling::ScheduledAction
