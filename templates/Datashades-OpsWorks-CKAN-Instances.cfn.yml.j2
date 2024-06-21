@@ -166,11 +166,16 @@ Resources:
                 echo '/dev/sdi /mnt/local_data xfs defaults,nofail 0 2' >> /etc/fstab
                 mount -a
               fi
+              yum install chef || yum install -y libxcrypt-compat "https://packages.chef.io/files/stable/chef/14.15.6/el/7/chef-14.15.6-1.el7.x86_64.rpm"
+              REGION="--region ${AWS::Region}"
               metadata_token=`curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 60" http://169.254.169.254/latest/api/token` && \
               INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $metadata_token" http://169.254.169.254/latest/meta-data/instance-id) && \
-              aws ec2 create-tags --region "${AWS::Region}" --resources $INSTANCE_ID --tags "Key=Name,Value=${ApplicationName}_${Environment}-{{ layer }}-$INSTANCE_ID"
-              FUNCTION_NAME=$(aws ssm get-parameter --region "${AWS::Region}" --name "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name" --query "Parameter.Value" --output text)
-              aws lambda invoke --region "${AWS::Region}" --function-name "$FUNCTION_NAME" --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "setup"}' /var/log/instance-setup.log.`date '+%s'`
+              aws ec2 create-tags $REGION --resources $INSTANCE_ID --tags "Key=Name,Value=${ApplicationName}_${Environment}-{{ layer }}-$INSTANCE_ID"
+              FUNCTION_NAME=$(aws ssm get-parameter $REGION --name "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name" --query "Parameter.Value" --output text)
+              if (aws --version |grep -o 'aws-cli/[2-9]'); then
+                PAYLOAD_FORMAT="--cli-binary-format raw-in-base64-out"
+              fi
+              aws lambda invoke $REGION --function-name "$FUNCTION_NAME" $PAYLOAD_FORMAT --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "setup"}' /var/log/instance-setup.log.`date '+%s'`
 
 {% if layer == 'Web' %}
 {% set minInstanceCount = (item.template_parameters['WebEC2Count'] | default('2') | int) - 1 %}
