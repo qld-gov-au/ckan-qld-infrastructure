@@ -147,8 +147,17 @@ deploy () {
       INSTANCE_STATE=$(aws ec2 describe-instances --filters Name=instance-id,Values=$instance --query "Reservations[].Instances[0].State.Name" --output text)
       if [ "$INSTANCE_STATE" != "running" ]; then continue; fi
       if [ "$ASG_NAME" != "" ] && (aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].Instances[?InstanceId=='$instance'].InstanceId" --output text |grep "$instance" >/dev/null); then
+        # Check if the group is already at minimum capacity
+        CAPACITIES=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name TRAINING-CKANTest-Web-ASG --query "AutoScalingGroups[0].{min: MinSize, desired: DesiredCapacity}" --output text)
+        CAPACITY_1=`echo $CAPACITIES | awk '{print $1}'`
+        CAPACITY_2=`echo $CAPACITIES | awk '{print $2}'`
+        if [ "$CAPACITY_1" = "$CAPACITY_2" ]; then
+          DECREMENT_BEHAVIOUR="--no-should-decrement-desired-capacity"
+        else
+          DECREMENT_BEHAVIOUR="--should-decrement-desired-capacity"
+        fi
         # Instances in standby will not get traffic nor health checks, allowing us to update them without interruption
-        OUTPUT=$(aws autoscaling enter-standby --auto-scaling-group-name "$ASG_NAME" --should-decrement-desired-capacity --instance-ids $instance --query "Activities[].Description" --output text)
+        OUTPUT=$(aws autoscaling enter-standby --auto-scaling-group-name "$ASG_NAME" $DECREMENT_BEHAVIOUR --instance-ids $instance --query "Activities[].Description" --output text)
         debug "$OUTPUT"
       elif [ "$ELB_NAME" != "" ]; then
         OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
