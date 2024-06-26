@@ -152,6 +152,7 @@ deploy () {
         CAPACITY_1=`echo $CAPACITIES | awk '{print $1}'`
         CAPACITY_2=`echo $CAPACITIES | awk '{print $2}'`
         if [ "$CAPACITY_1" = "$CAPACITY_2" ]; then
+          debug "Capacity is at minimum ($CAPACITY_1 = $CAPACITY_2), new instance will be started"
           DECREMENT_BEHAVIOUR="--no-should-decrement-desired-capacity"
         else
           DECREMENT_BEHAVIOUR="--should-decrement-desired-capacity"
