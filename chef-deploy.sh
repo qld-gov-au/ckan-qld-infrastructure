@@ -148,7 +148,7 @@ deploy () {
       if [ "$INSTANCE_STATE" != "running" ]; then continue; fi
       if [ "$ASG_NAME" != "" ] && (aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].Instances[?InstanceId=='$instance'].InstanceId" --output text |grep "$instance" >/dev/null); then
         # Check if the group is already at minimum capacity
-        CAPACITIES=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name TRAINING-CKANTest-Web-ASG --query "AutoScalingGroups[0].{min: MinSize, desired: DesiredCapacity}" --output text)
+        CAPACITIES=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].{min: MinSize, desired: DesiredCapacity}" --output text)
         CAPACITY_1=`echo $CAPACITIES | awk '{print $1}'`
         CAPACITY_2=`echo $CAPACITIES | awk '{print $2}'`
         if [ "$CAPACITY_1" = "$CAPACITY_2" ]; then
