@@ -25,7 +25,6 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: PROD
-      WebEC2Count: 2
       SolrEC2Size: t3a.small
       WebEC2Size: t3a.small
       BatchEC2Size: t3a.micro
@@ -38,7 +37,6 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: STAGING
-      WebEC2Count: 2
       SolrEC2Size: t3a.small
       WebEC2Size: t3a.small
       BatchEC2Size: t3a.micro
