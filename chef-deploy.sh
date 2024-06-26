@@ -164,8 +164,7 @@ deploy () {
         debug "Deregistered instance $instance from load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
       fi
       DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $instance --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
-      wait_for_deployment $DEPLOYMENT_ID
-      DEPLOYMENT_SUCCESS=$?
+      wait_for_deployment $DEPLOYMENT_ID || DEPLOYMENT_SUCCESS=$?
       if [ "$ASG_NAME" != "" ]; then
         OUTPUT=$(aws autoscaling exit-standby --auto-scaling-group-name "$ASG_NAME" --instance-ids $instance --query "Activities[].Description" --output text)
         debug "$OUTPUT"
