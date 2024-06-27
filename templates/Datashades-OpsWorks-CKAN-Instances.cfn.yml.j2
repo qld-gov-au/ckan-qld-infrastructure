@@ -182,18 +182,12 @@ Resources:
               fi
               aws lambda invoke $REGION --function-name "$FUNCTION_NAME" $PAYLOAD_FORMAT --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "setup"}' /var/log/instance-setup.log.`date '+%s'`
 
-{% if layer == 'Web' %}
-{% set minInstanceCount = (item.template_parameters['WebEC2Count'] | default('2') | int) - 1 %}
-{% else %}
-{% set minInstanceCount = 1 %}
-{% endif %}
-
   {{ layer }}ScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: !Sub "${Environment}-${ApplicationName}-{{ layer }}-ASG"
       DesiredCapacity: !Ref {{ layer }}EC2Count
-      MinSize: {{ minInstanceCount }}
+      MinSize: !Ref {{ layer }}EC2Count
       MaxSize: 6
       LaunchTemplate:
         LaunchTemplateId: !Ref {{ layer }}LaunchTemplate
@@ -244,7 +238,7 @@ Resources:
     Properties:
       AutoScalingGroupName: !Ref {{ layer }}ScalingGroup
       DesiredCapacity: !Ref {{ layer }}EC2Count
-      MinSize: {{ minInstanceCount }}
+      MinSize: !Ref {{ layer }}EC2Count
       MaxSize: 6
       Recurrence: "0 20 * * *"
 {% endif %}
