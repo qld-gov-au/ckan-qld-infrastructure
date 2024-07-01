@@ -113,6 +113,7 @@ Parameters:
   BatchImageId:
     Description: The Amazon Machine Image ID to use for launching batch instances. Defaults to Amazon Linux 2.
     Type: String
+    # Customised image based on Amazon Linux 2, preinstalling some basics
     Default: "ami-0d71fe73adf7a9887"
   WebImageId:
     Description: The Amazon Machine Image ID to use for launching web instances. Defaults to Amazon Linux 2.
@@ -168,7 +169,7 @@ Resources:
               fi
               if ! (yum install chef); then
                 for i in `seq 1 5`; do
-                  yum install -y libxcrypt-compat "https://packages.chef.io/files/stable/chef/14.15.6/el/7/chef-14.15.6-1.el7.x86_64.rpm" && break
+                  yum install -y libxcrypt-compat "https://packages.chef.io/files/stable/chef/18.4.12/el/7/chef-18.4.12-1.el7.x86_64.rpm" && break
                   sleep 5
                 done
               fi
