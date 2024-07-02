@@ -1,4 +1,7 @@
 ---
+# Amazon Linux 2023: al2023-ami-2023.4.20240611.0-kernel-6.1-x86_64
+ami_al2023: "ami-0e326862c8e74c0fe"
+
 common_stack: &common_stack
   state: "{{ state | default('present')}}"
   region: "{{ region }}"
@@ -27,7 +30,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: PROD
       SolrEC2Size: t3a.medium
-      WebEC2Count: 5 #We have been running on 2 auto and 3 manually created instances, time to make it IasC
+      WebEC2Count: 5
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
@@ -37,7 +40,6 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: STAGING
-      WebEC2Count: 2
       SolrEC2Size: t3a.medium
     tags:
       <<: *common_stack_tags
@@ -62,6 +64,9 @@ cloudformation_stacks:
       WebEC2Count: 1
       SolrEC2Size: t3a.small
       SolrEC2Count: 1
+      BatchImageId: "{{ ami_al2023 }}"
+      WebImageId: "{{ ami_al2023 }}"
+      SolrImageId: "{{ ami_al2023 }}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"

@@ -1,4 +1,7 @@
 ---
+# Amazon Linux 2023: al2023-ami-2023.4.20240611.0-kernel-6.1-x86_64
+ami_al2023: "ami-0e326862c8e74c0fe"
+
 common_stack: &common_stack
   state: "{{ state | default('present')}}"
   region: "{{ region }}"
@@ -25,7 +28,6 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: PROD
-      WebEC2Count: 2
       SolrEC2Size: t3a.small
       WebEC2Size: t3a.small
       BatchEC2Size: t3a.micro
@@ -38,7 +40,6 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: STAGING
-      WebEC2Count: 2
       SolrEC2Size: t3a.small
       WebEC2Size: t3a.small
       BatchEC2Size: t3a.micro
@@ -69,6 +70,9 @@ cloudformation_stacks:
       WebEC2Count: 1
       WebEC2Size: t3a.micro
       BatchEC2Size: t3a.micro
+      BatchImageId: "{{ ami_al2023 }}"
+      WebImageId: "{{ ami_al2023 }}"
+      SolrImageId: "{{ ami_al2023 }}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"

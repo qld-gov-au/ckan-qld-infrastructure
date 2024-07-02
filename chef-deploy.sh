@@ -146,18 +146,32 @@ deploy () {
       # double-check that instance is still running
       INSTANCE_STATE=$(aws ec2 describe-instances --filters Name=instance-id,Values=$instance --query "Reservations[].Instances[0].State.Name" --output text)
       if [ "$INSTANCE_STATE" != "running" ]; then continue; fi
-      if [ "$ASG_NAME" != "" ] && (aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].Instances[?InstanceId=='$instance'].InstanceId" --output text |grep "$instance" >/dev/null); then
+      if [ "$ASG_NAME" != "" ] && (aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].Instances[?InstanceId=='$instance' && LifecycleState=='InService'].InstanceId" --output text |grep "$instance" >/dev/null); then
+        IN_ASG="true"
+        # Check if the group is already at minimum capacity
+        CAPACITIES=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].{min: MinSize, desired: DesiredCapacity}" --output text)
+        CAPACITY_1=`echo $CAPACITIES | awk '{print $1}'`
+        CAPACITY_2=`echo $CAPACITIES | awk '{print $2}'`
+        if [ "$CAPACITY_1" = "$CAPACITY_2" ]; then
+          debug "Capacity is at minimum ($CAPACITY_1 = $CAPACITY_2), new instance will be started"
+          DECREMENT_BEHAVIOUR="--no-should-decrement-desired-capacity"
+        else
+          DECREMENT_BEHAVIOUR="--should-decrement-desired-capacity"
+        fi
         # Instances in standby will not get traffic nor health checks, allowing us to update them without interruption
-        OUTPUT=$(aws autoscaling enter-standby --auto-scaling-group-name "$ASG_NAME" --should-decrement-desired-capacity --instance-ids $instance --query "Activities[].Description" --output text)
+        OUTPUT=$(aws autoscaling enter-standby --auto-scaling-group-name "$ASG_NAME" $DECREMENT_BEHAVIOUR --instance-ids $instance --query "Activities[].Description" --output text)
         debug "$OUTPUT"
       elif [ "$ELB_NAME" != "" ]; then
         OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
         debug "Deregistered instance $instance from load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
       fi
       DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $instance --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
-      wait_for_deployment $DEPLOYMENT_ID
-      DEPLOYMENT_SUCCESS=$?
-      if [ "$ASG_NAME" != "" ]; then
+      DEPLOYMENT_SUCCESS=0
+      wait_for_deployment $DEPLOYMENT_ID || DEPLOYMENT_SUCCESS=$?
+      if [ "$IN_ASG" = "true" ]; then
+        # reactivate the instance if we put it into standby
+        # NB If it was in standby before we started, then we will deploy to it
+        # but leave it in standby.
         OUTPUT=$(aws autoscaling exit-standby --auto-scaling-group-name "$ASG_NAME" --instance-ids $instance --query "Activities[].Description" --output text)
         debug "$OUTPUT"
       elif [ "$ELB_NAME" != "" ]; then
