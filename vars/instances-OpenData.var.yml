@@ -16,6 +16,9 @@ common_stack: &common_stack
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
+    BatchImageId: "{{ ami_al2023 }}"
+    WebImageId: "{{ ami_al2023 }}"
+    SolrImageId: "{{ ami_al2023 }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
@@ -64,9 +67,6 @@ cloudformation_stacks:
       WebEC2Count: 1
       SolrEC2Size: t3a.small
       SolrEC2Count: 1
-      BatchImageId: "{{ ami_al2023 }}"
-      WebImageId: "{{ ami_al2023 }}"
-      SolrImageId: "{{ ami_al2023 }}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
