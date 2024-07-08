@@ -48,6 +48,13 @@ Resources:
           Negated: false
           Type: "XssMatch"
 
+  WAFWebACLIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/common/waf_acl_id"
+      Type: String
+      Value: !Ref WebACL
+
 Outputs:
   WebACLId:
     Value:

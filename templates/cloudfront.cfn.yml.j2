@@ -379,8 +379,7 @@ Resources:
           S3OriginConfig:
             OriginAccessIdentity: ""
         PriceClass: PriceClass_All
-        WebACLId:
-          Fn::ImportValue: !Ref WebACLId
+        WebACLId: !Ref WebACLId
         HttpVersion: 'http2and3'
         IPV6Enabled: 'true'
         ViewerCertificate:
