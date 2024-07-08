@@ -11,7 +11,7 @@ cloudformation_stacks:
     template_jinja: "{{ template }}.j2"
     template_parameters:
       OriginReadTimeout: 180 #service increase requested, we now have 3 min wait available
-      WebOrigin: "{{ Environment }}{{ service_name }}WebElbDNSName"
+      WebOrigin: "{{ service_name_lower }}.{{ RootDomain }}"
       CmsOrigin: "{{ CmsOrigin }}"
       WebACLId: "{{ Environment }}CKANWebACLId"
       Environment: "{{ Environment }}"
