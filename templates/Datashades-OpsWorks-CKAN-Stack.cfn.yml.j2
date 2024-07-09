@@ -602,6 +602,13 @@ Resources:
         HostedZoneId: !GetAtt CKANALB.CanonicalHostedZoneID
         DNSName: !GetAtt CKANALB.DNSName
 
+  WebELBDNSNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/web_loadbalancer_dns_name"
+      Type: String
+      Value: !GetAtt CKANALB.DNSName
+
 Outputs:
   WebELBDNSName:
     Value: !Ref WebELBDNSName
