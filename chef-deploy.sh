@@ -51,7 +51,7 @@ wait_for_instance_refresh () {
   STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || return 1
   for retry in `seq 1 180`; do
     if [ "$STATUS" = "Pending" ] || [ "$STATUS" = "InProgress" ]; then
-      sleep 20
+      sleep 30
       STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || return 1
       debug "Instance refresh $DEPLOYMENT_ID: $STATUS"
     else
@@ -146,7 +146,7 @@ deploy () {
     done
   fi
   if [ "$REFRESH" = "true" ]; then
-    INSTANCE_REFRESH_ID=$(aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME --query "InstanceRefreshId" --output text)
+    INSTANCE_REFRESH_ID=$(aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME --preferences '{"MinHealthyPercentage": 50}' --query "InstanceRefreshId" --output text)
     wait_for_instance_refresh $INSTANCE_REFRESH_ID
   elif [ "$PARALLEL" = "true" ]; then
     DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" $REGION_SNIPPET --query "Command.CommandId" --output text)
