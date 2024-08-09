@@ -115,12 +115,8 @@ deploy () {
   if [ "$LAYER_NAME" != "" ]; then
       INSTANCE_IDENTIFIER_SNIPPET="${INSTANCE_IDENTIFIER_SNIPPET} Name=tag:Layer,Values=$LAYER_NAME"
   fi
-  ALB_NAME=$(find_load_balancer_v2)
-  debug "Application load balancer: $ALB_NAME"
-  if [ "$ALB_NAME" != "" ]; then
-    ASG_NAME=$(find_autoscaling_group)
-    debug "Autoscaling group: $ASG_NAME"
-  fi
+  ASG_NAME=$(find_autoscaling_group)
+  debug "Autoscaling group: $ASG_NAME"
   INSTANCE_IDS=$(aws ec2 describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Reservations[].Instances[].InstanceId" --output text) || return 1
   if [ "$INSTANCE_IDS" = "" ]; then
     if [ "$ASG_NAME" = "" ]; then
