@@ -115,15 +115,13 @@ deploy () {
   if [ "$LAYER_NAME" != "" ]; then
       INSTANCE_IDENTIFIER_SNIPPET="${INSTANCE_IDENTIFIER_SNIPPET} Name=tag:Layer,Values=$LAYER_NAME"
   fi
-  if [ "$PARALLEL" != "true" ]; then
-    ELB_NAME=$(find_load_balancer)
-    debug "Classic load balancer: $ELB_NAME"
-    ALB_NAME=$(find_load_balancer_v2)
-    debug "Application load balancer: $ALB_NAME"
-    if [ "$ALB_NAME" != "" ]; then
-      ASG_NAME=$(find_autoscaling_group)
-      debug "Autoscaling group: $ASG_NAME"
-    fi
+  ELB_NAME=$(find_load_balancer)
+  debug "Classic load balancer: $ELB_NAME"
+  ALB_NAME=$(find_load_balancer_v2)
+  debug "Application load balancer: $ALB_NAME"
+  if [ "$ALB_NAME" != "" ]; then
+    ASG_NAME=$(find_autoscaling_group)
+    debug "Autoscaling group: $ASG_NAME"
   fi
   INSTANCE_IDS=$(aws ec2 describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Reservations[].Instances[].InstanceId" --output text) || return 1
   if [ "$INSTANCE_IDS" = "" ]; then
@@ -135,11 +133,23 @@ deploy () {
     debug "Target instance(s) matching '$INSTANCE_IDENTIFIER_SNIPPET': $INSTANCE_IDS"
   fi
   if [ "$ASG_NAME" != "" ]; then
+    # if any instance is based on an obsolete launch template, launch an instance refresh
     debug "Target autoscaling group: $ASG_NAME"
-    export ASG_NAME
+    ASG_TEMPLATE_VERSION=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].LaunchTemplate.Version" --output text)
+    INSTANCE_TEMPLATE_VERSIONS=$(aws autoscaling describe-auto-scaling-instances --instance-ids $INSTANCE_IDS --query "AutoScalingInstances[].LaunchTemplate.Version" --output text)
+    for instance_version in $INSTANCE_TEMPLATE_VERSIONS; do
+      if [ "$instance_version" != "$ASG_TEMPLATE_VERSION" ]; then
+        debug "Found an instance running launch template version $instance_version instead of $ASG_TEMPLATE_VERSION, will trigger instance refresh instead of deployment"
+        REFRESH=true
+        break
+      fi
+    done
   fi
-  if [ "$PARALLEL" = "true" ]; then
-    DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
+  if [ "$REFRESH" = "true" ]; then
+    INSTANCE_REFRESH_ID=$(aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME --query "InstanceRefreshId" --output text)
+    wait_for_instance_refresh $INSTANCE_REFRESH_ID
+  elif [ "$PARALLEL" = "true" ]; then
+    DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" $REGION_SNIPPET --query "Command.CommandId" --output text)
     wait_for_deployment $DEPLOYMENT_ID || return 1
   else
     for instance in $INSTANCE_IDS; do
