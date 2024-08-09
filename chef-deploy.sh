@@ -133,8 +133,14 @@ deploy () {
     debug "Target instance(s) matching '$INSTANCE_IDENTIFIER_SNIPPET': $INSTANCE_IDS"
   fi
   if [ "$ASG_NAME" != "" ]; then
-    # if any instance is based on an obsolete launch template, launch an instance refresh
     debug "Target autoscaling group: $ASG_NAME"
+
+    # CloudFormation does not automatically replace existing instances
+    # when an ASG is updated to point to a new launch template.
+    # This gives the end user flexibility in how that replacement occurs.
+    #
+    # If any instance is based on an obsolete launch template,
+    # launch an instance refresh instead of a Chef deployment.
     ASG_TEMPLATE_VERSION=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].LaunchTemplate.Version" --output text)
     INSTANCE_TEMPLATE_VERSIONS=$(aws autoscaling describe-auto-scaling-instances --instance-ids $INSTANCE_IDS --query "AutoScalingInstances[].LaunchTemplate.Version" --output text)
     for instance_version in $INSTANCE_TEMPLATE_VERSIONS; do
