@@ -51,7 +51,7 @@ wait_for_instance_refresh () {
   STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || return 1
   for retry in `seq 1 180`; do
     if [ "$STATUS" = "Pending" ] || [ "$STATUS" = "InProgress" ]; then
-      sleep 20
+      sleep 30
       STATUS=$(aws autoscaling describe-instance-refreshes $REGION_SNIPPET --auto-scaling-group-name $ASG_NAME --instance-refresh-ids $DEPLOYMENT_ID --query "InstanceRefreshes|[0].Status" --output text) || return 1
       debug "Instance refresh $DEPLOYMENT_ID: $STATUS"
     else
@@ -115,16 +115,8 @@ deploy () {
   if [ "$LAYER_NAME" != "" ]; then
       INSTANCE_IDENTIFIER_SNIPPET="${INSTANCE_IDENTIFIER_SNIPPET} Name=tag:Layer,Values=$LAYER_NAME"
   fi
-  if [ "$PARALLEL" != "true" ]; then
-    ELB_NAME=$(find_load_balancer)
-    debug "Classic load balancer: $ELB_NAME"
-    ALB_NAME=$(find_load_balancer_v2)
-    debug "Application load balancer: $ALB_NAME"
-    if [ "$ALB_NAME" != "" ]; then
-      ASG_NAME=$(find_autoscaling_group)
-      debug "Autoscaling group: $ASG_NAME"
-    fi
-  fi
+  ASG_NAME=$(find_autoscaling_group)
+  debug "Autoscaling group: $ASG_NAME"
   INSTANCE_IDS=$(aws ec2 describe-instances $REGION_SNIPPET $INSTANCE_IDENTIFIER_SNIPPET --query "Reservations[].Instances[].InstanceId" --output text) || return 1
   if [ "$INSTANCE_IDS" = "" ]; then
     if [ "$ASG_NAME" = "" ]; then
@@ -136,10 +128,28 @@ deploy () {
   fi
   if [ "$ASG_NAME" != "" ]; then
     debug "Target autoscaling group: $ASG_NAME"
-    export ASG_NAME
+
+    # CloudFormation does not automatically replace existing instances
+    # when an ASG is updated to point to a new launch template.
+    # This gives the end user flexibility in how that replacement occurs.
+    #
+    # If any instance is based on an obsolete launch template,
+    # launch an instance refresh instead of a Chef deployment.
+    ASG_TEMPLATE_VERSION=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-name $ASG_NAME --query "AutoScalingGroups[0].LaunchTemplate.Version" --output text)
+    INSTANCE_TEMPLATE_VERSIONS=$(aws autoscaling describe-auto-scaling-instances --instance-ids $INSTANCE_IDS --query "AutoScalingInstances[].LaunchTemplate.Version" --output text)
+    for instance_version in $INSTANCE_TEMPLATE_VERSIONS; do
+      if [ "$instance_version" != "$ASG_TEMPLATE_VERSION" ]; then
+        debug "Found an instance running launch template version $instance_version instead of $ASG_TEMPLATE_VERSION, will trigger instance refresh instead of deployment"
+        REFRESH=true
+        break
+      fi
+    done
   fi
-  if [ "$PARALLEL" = "true" ]; then
-    DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
+  if [ "$REFRESH" = "true" ]; then
+    INSTANCE_REFRESH_ID=$(aws autoscaling start-instance-refresh --auto-scaling-group-name $ASG_NAME --preferences '{"MinHealthyPercentage": 50}' --query "InstanceRefreshId" --output text)
+    wait_for_instance_refresh $INSTANCE_REFRESH_ID
+  elif [ "$PARALLEL" = "true" ]; then
+    DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $INSTANCE_IDS --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" $REGION_SNIPPET --query "Command.CommandId" --output text)
     wait_for_deployment $DEPLOYMENT_ID || return 1
   else
     for instance in $INSTANCE_IDS; do
@@ -161,9 +171,6 @@ deploy () {
         # Instances in standby will not get traffic nor health checks, allowing us to update them without interruption
         OUTPUT=$(aws autoscaling enter-standby --auto-scaling-group-name "$ASG_NAME" $DECREMENT_BEHAVIOUR --instance-ids $instance --query "Activities[].Description" --output text)
         debug "$OUTPUT"
-      elif [ "$ELB_NAME" != "" ]; then
-        OUTPUT=$(aws elb deregister-instances-from-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
-        debug "Deregistered instance $instance from load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
       fi
       DEPLOYMENT_ID=$(aws ssm send-command --document-name "AWS-ApplyChefRecipes" --document-version "\$DEFAULT" --instance-ids $instance --parameters '{'"$CHEF_SOURCE"',"RunList":["'"$RUN_LIST"'"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["14"],"ChefClientArguments":[""],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]}' --timeout-seconds 3600 --max-concurrency "50" --max-errors "0" --output-s3-bucket-name "osssio-ckan-web-logs" --output-s3-key-prefix "run_command" --region ap-southeast-2 --query "Command.CommandId" --output text)
       DEPLOYMENT_SUCCESS=0
@@ -174,9 +181,6 @@ deploy () {
         # but leave it in standby.
         OUTPUT=$(aws autoscaling exit-standby --auto-scaling-group-name "$ASG_NAME" --instance-ids $instance --query "Activities[].Description" --output text)
         debug "$OUTPUT"
-      elif [ "$ELB_NAME" != "" ]; then
-        OUTPUT=$(aws elb register-instances-with-load-balancer --load-balancer-name "$ELB_NAME" --instances "$instance" --query "Instances[].InstanceId" --output text)
-        debug "Registered instance with load balancer $ELB_NAME, resulting registered instances: $OUTPUT"
       fi
       if [ "$DEPLOYMENT_SUCCESS" != "0" ]; then return 1; fi
     done
