@@ -173,7 +173,7 @@ Resources:
   DBParameters:
     Type: AWS::RDS::DBParameterGroup
     Properties:
-      DBParameterGroupName: !Sub "${Environment}DatabaseParameters"
+      DBParameterGroupName: !Sub "${Environment}-${DBEngine}${DBEngineVersion}-DatabaseParameters"
       Description: Setup parameters for Queensland Government databases
       Family: !Sub "${DBEngine}${DBEngineVersion}"
       Parameters:
