@@ -146,7 +146,7 @@ Resources:
           - DeviceName: "/dev/sdi"
             Ebs:
               DeleteOnTermination: true
-              VolumeSize: 32
+              VolumeSize: {% if layer == 'Solr' %}100{% else %}32{% endif %}
               VolumeType: "gp2"
         IamInstanceProfile:
           Arn:
