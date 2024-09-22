@@ -21,6 +21,12 @@ function recordCompletion(event, success) {
 
 exports.handler = async (event) => {
   const instanceId = event['EC2InstanceId'];
+  /*
+   * Possible deployment types include:
+   * - 'setup': Full end-to-end configuration, from vanilla operating system to live instance.
+   * - 'deploy': Take a vanilla operating system and set up a warm instance, but do not make it active.
+   * - 'configure': Take a warm instance and make it active.
+   */
   const deployPhase = 'phase' in event ? event['phase'] : 'setup';
   if (!['setup', 'deploy', 'configure'].includes(deployPhase)) {
     console.log("Invalid deployment phase '" + deployPhase + "', must be one of 'setup', 'deploy', 'configure'");
@@ -95,12 +101,15 @@ exports.handler = async (event) => {
   } else {
     recipePrefix = `datashades::${layer}`;
   }
-  var runList = `recipe[${recipePrefix}-configure]`;
-  if (deployPhase !== 'configure') {
-    runList = `recipe[${recipePrefix}-deploy],${runList}`;
+  var runList = "";
+  if (deployPhase !== 'deploy') {
+    runList = `recipe[${recipePrefix}-configure]`;
   }
   if (deployPhase === 'setup') {
-    runList = `recipe[${recipePrefix}-setup],${runList}`;
+    runList = `,${runList}`;
+  }
+  if (deployPhase !== 'configure') {
+    runList = `recipe[${recipePrefix}-setup],recipe[${recipePrefix}-deploy]${runList}`;
   }
 
   await ssm.send(new SendCommandCommand({
