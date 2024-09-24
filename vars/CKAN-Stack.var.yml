@@ -44,6 +44,7 @@ common_stack: &common_stack
     LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
     AttachmentsBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}" #/config/CKAN/PROD/app/opendata/s3AttachmentBucket
     SolrSource: "{{ solr_url }}"
+    PurlEndpoint: "https://test.smartservice.qld.gov.au/services/url/translate/v3.json?sourceurl={source}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
@@ -59,6 +60,7 @@ cloudformation_stacks:
       Environment: PROD
       GTMContainerId: "{{ ProductionGTMId }}"
       AnalyticsId: "{{ ProductionAnalyticsId }}"
+      PurlEndpoint: "https://www.smartservice.qld.gov.au/services/url/translate/v3.json?sourceurl={source}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
