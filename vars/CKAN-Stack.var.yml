@@ -6,7 +6,7 @@ ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', regi
 
 solr_url: "https://archive.apache.org/dist/lucene/solr/8.11.2/solr-8.11.2.zip"
 ckan_tag: "ckan-2.10.4-qgov.4"
-ckan_qgov_branch: "qgov-master-2.10.4"
+ckan_qgov_branch: "qgov-master-2.10.5"
 
 common_stack: &common_stack
   state: "{{ state | default('present')}}"
@@ -40,10 +40,11 @@ common_stack: &common_stack
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     SSMKey: "{{ SSMKey | default('') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
-    CookbookRevision: "{{ CookbookRevision | default('7.1.5') }}"
+    CookbookRevision: "{{ CookbookRevision | default('7.1.6') }}"
     LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
     AttachmentsBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}" #/config/CKAN/PROD/app/opendata/s3AttachmentBucket
     SolrSource: "{{ solr_url }}"
+    PurlEndpoint: "https://test.smartservice.qld.gov.au/services/url/translate/v3.json?sourceurl={source}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
@@ -59,6 +60,7 @@ cloudformation_stacks:
       Environment: PROD
       GTMContainerId: "{{ ProductionGTMId }}"
       AnalyticsId: "{{ ProductionAnalyticsId }}"
+      PurlEndpoint: "https://www.smartservice.qld.gov.au/services/url/translate/v3.json?sourceurl={source}"
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
