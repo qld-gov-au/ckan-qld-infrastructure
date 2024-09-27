@@ -178,3 +178,4 @@ Resources:
       Family: !Sub "${DBEngine}${DBEngineVersion}"
       Parameters:
         datestyle: "ISO, DMY"
+        rds.adaptive_autovacuum: 1
