@@ -26,7 +26,7 @@ jobs:
       BEHAVE_TAG: ${{ matrix.behave-tag }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         timeout-minutes: 2
 
       - name: Build
@@ -58,7 +58,7 @@ jobs:
 
       - name: Upload screenshots
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} ${{ matrix.behave-tag }} screenshots
           path: /tmp/artifacts/behave/screenshots
