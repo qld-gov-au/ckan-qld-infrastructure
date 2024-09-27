@@ -294,12 +294,20 @@ def fill_in_default_link_resource_fields(context):
 @when(u'I upload "{file_name}" of type "{file_format}" to resource')
 def upload_file_to_resource(context, file_name, file_format):
     context.execute_steps(u"""
-        When I execute the script "$('#resource-upload-button').trigger(click);"
+        When I execute the script "$('#resource-upload-button').trigger('click');"
         And I attach the file "{file_name}" to "upload"
         # Don't quote the injected string since it can have trailing spaces
         And I execute the script "document.getElementById('field-format').value='{file_format}'"
         And I fill in "size" with "1024" if present
     """.format(file_name=file_name, file_format=file_format))
+
+
+@when(u'I upload schema file "{file_name}" to resource')
+def upload_schema_file_to_resource(context, file_name):
+    context.execute_steps(u"""
+        When I execute the script "$('#field-schema-json ~ a.btn-remove-url').trigger('click');"
+        And I attach the file "{file_name}" to "schema_upload"
+    """.format(file_name=file_name))
 
 
 @when(u'I go to group page')
@@ -527,6 +535,12 @@ def create_resource_from_params(context, resource_params):
             if value == "default":
                 value = resource_default_schema
             _enter_manual_schema(context, value)
+        elif key == "schema_upload":
+            if value == "default":
+                value = "test-resource_schemea.json"
+            context.execute_steps(u"""
+                When I upload schema file "{0}" to resource
+            """.format(value))
         else:
             context.execute_steps(u"""
                 When I fill in "{0}" with "{1}" if present
