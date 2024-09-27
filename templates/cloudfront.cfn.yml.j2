@@ -176,7 +176,7 @@ Resources:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
 
-{% for path in ['/index.*', '/_*', '/', '/home*', '/article', '/article/*', '/visualisations*', '/news-and-case-studies*', '/logout*', '/oauth-account-manager*'] %}
+{% for path in ['/index.*', '/_*', '/', '/home*', '/article*', '/visualisations*', '/news-and-case-studies*', '/logout*', '/oauth-account-manager*'] %}
           - PathPattern: "{{ path }}"
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
