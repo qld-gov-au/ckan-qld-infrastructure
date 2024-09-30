@@ -11,9 +11,9 @@ cloudformation_stacks:
     template_jinja: "{{ template }}.j2"
     template_parameters:
       OriginReadTimeout: 180 #service increase requested, we now have 3 min wait available
-      WebOrigin: "{{ Environment }}{{ service_name }}WebElbDNSName"
+      WebOrigin: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/web_loadbalancer_dns_name') }}"
       CmsOrigin: "{{ CmsOrigin }}"
-      WebACLId: "{{ Environment }}CKANWebACLId"
+      WebACLId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/common/waf_acl_id', region='us-east-1') }}"
       Environment: "{{ Environment }}"
       Platform: "{{ service_name }}"
       ACMCertificateARN: "{{ ACMCertificateARNForUsEast1 }}"

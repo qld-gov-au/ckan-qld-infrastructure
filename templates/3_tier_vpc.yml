@@ -1168,12 +1168,12 @@ Resources:
   PrivateRouteTable:
     Properties:
       Tags:
-      - Key: Name
-        Value: !Sub "${VPCNamePrefix}Vpc-${Environment}-PrivateRoutes"
+        - Key: Name
+          Value: !Sub "${VPCNamePrefix}Vpc-${Environment}-PrivateRoutes"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::RouteTable
-## private RouteTableB to E
+  ## private RouteTableB to E
   PrivateNATGatewayRouteB:
     Condition: 2PlusAZsNatGateways
     DependsOn: NATGatewayB
@@ -1584,7 +1584,6 @@ Resources:
       SubnetId:
         Ref: WebSubnetE
     Type: AWS::EC2::SubnetRouteTableAssociation
-  #Allow s3 root for listing as well as get set on folders
   S3Endpoint:
     Type: "AWS::EC2::VPCEndpoint"
     Properties:
