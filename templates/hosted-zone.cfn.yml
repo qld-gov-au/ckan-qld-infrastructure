@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: "Creates a private hosted zone to hold an OpsWorks CKAN Stack."
+Description: Creates metadata needed to deploy CKAN Stack extensions.
 
 Parameters:
   Environment:

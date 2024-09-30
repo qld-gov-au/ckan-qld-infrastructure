@@ -104,6 +104,7 @@ exports.handler = async (event) => {
   }
 
   await ssm.send(new SendCommandCommand({
+    Comment: `Running '${deployPhase}' on ${service} ${environment} instance ${instanceId}`,
     DocumentName: "AWS-ApplyChefRecipes",
     DocumentVersion: '\$DEFAULT',
     InstanceIds: [ instanceId ],
@@ -113,7 +114,7 @@ exports.handler = async (event) => {
       SourceType: [cookbookType],
       SourceInfo: [sourceInfo],
       RunList: [runList],
-      ChefClientVersion: ["14"],
+      ChefClientVersion: ["None"],
       WhyRun: ["False"],
       ComplianceSeverity: ["None"],
       ComplianceType: ["Custom:Chef"]

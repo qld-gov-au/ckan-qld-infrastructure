@@ -2,13 +2,13 @@
 
 Author: qol.development@smartservice.qld.gov.au
 
-**Full one click deployment of Datashared AWS OpsWorks Stack via Ansible**
+**Full one click deployment of CKAN AWS Stack via Ansible**
 
 This stands up the www.data.qld.gov.au and www.publications.qld.gov.au aws stacks using:
 * SSM
 * RDS
 * Redis Cluster
-* OpsWorks
+* EC2 Autoscaling
 * Cloudfront with Lambda@Edge
 * and may more features
 
@@ -25,7 +25,7 @@ This stands up the www.data.qld.gov.au and www.publications.qld.gov.au aws stack
 For the system to work with updates to the lambda function, you must;
 * first add a new version to cloudfront-lambdaAtEdge.cfn.yml which references the changed lambda function (there is no need for a new lambda function)
 * export the new version from said cloudformation template
-* update the cloudfront.yml ansible script to load the new version property name. 
+* update the cloudfront.yml ansible script to load the new version property name.
 * you can delete previous versions after a successful real, do note that cloudfront will hold onto a lambda function and versions until its 'replication' finishes.
 
 **QOL 2019 update**
@@ -60,7 +60,7 @@ Common issues during set up are as follows:
 
 It's assumed that you:
 
-* have a pretty good working knowledge of AWS, CloudFormation, OpsWorks, and CKAN and its requirements such as Solr and Postgres. Those will be necessary to troubleshoot builds when you haven't provided the correct parameters or some other obstacle gets in your way.
+* have a pretty good working knowledge of AWS, CloudFormation, EC2 Autoscaling, and CKAN and its requirements such as Solr and Postgres. Those will be necessary to troubleshoot builds when you haven't provided the correct parameters or some other obstacle gets in your way.
 * have built, installed and successfully run CKAN manually on some kind of single node configuration. If not, this stack isn't designed to be something to cut your teeth on. It's been designed to be relatively foolproof, but not completely so.
 * know your way around the Linux command line reasonably well and know how to deal with error logs, dependency conflicts etc.
 
@@ -118,7 +118,7 @@ and automated system maintenance.
 
 Our hope and expectation is that it benefits the wider Public Data community and progresses the Open Data ideal.
 
-Current AWS costs for 2 CKAN applications by 4 envirionments is just shy of 3k USD a month. 
+Current AWS costs for 2 CKAN applications by 4 environments is just shy of 3k USD a month.
 
 ## TODO ##
 Make requirements-dev look up vars/shared-${app}.var.yml and test all environment plugins

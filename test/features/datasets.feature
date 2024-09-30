@@ -1,3 +1,4 @@
+@dataset
 Feature: Dataset APIs
 
     Scenario: Creative Commons BY-NC-SA 4.0 licence is an option for datasets
