@@ -144,6 +144,9 @@ Parameters:
   AttachmentsBucketName:
     Description: Name of the S3 Attachment bucket.
     Type: String
+  PurlEndpoint:
+    Description: Endpoint to contact for URL lookups.
+    Type: String
 
 Resources:
   AttachmentsPolicy:
@@ -524,6 +527,13 @@ Resources:
       Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/solr_app/app_source/url"
       Type: String
       Value: !Ref SolrSource
+
+  PURLEndpointParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/purl_endpoint"
+      Type: String
+      Value: !Ref PurlEndpoint
 
   # Application Load Balancer structure is more complex than classic.
   # The LoadBalancer defines configuration values like logging config and security groups.

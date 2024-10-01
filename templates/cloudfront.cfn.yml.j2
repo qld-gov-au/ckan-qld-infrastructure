@@ -147,7 +147,8 @@ Resources:
         CacheBehaviors:
 
 {% if CmsOrigin == "" %}
-          - PathPattern: /assets/*
+{% for path in ['/assets/*', '/dataset/*/resource/*/download/*'] %}
+          - PathPattern: "{{ path }}"
             TargetOriginId: 'WebOrigin'
             CachePolicyId: !Ref CachePolicyCMS
             Compress: true
@@ -155,15 +156,7 @@ Resources:
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /dataset/*/resource/*/download/*
-            TargetOriginId: 'WebOrigin'
-            CachePolicyId: !Ref CachePolicyCMS
-            Compress: true
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-
+{% endfor %}
 {% else %}
           #Everything that isn't the below rules for CMS resources should go to CKAN except _tracking
           - PathPattern: /_tracking # ckan tracking ping path
@@ -183,24 +176,8 @@ Resources:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
 
-          - PathPattern: /index.* #If anyone reaches the homepage on an "index" url
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            # ForwardedValues, MinTTL, MaxTTL, DefaultTTL #This field is deprecated. Use a cache policy instead of this field.
-            CachePolicyId: !Ref CachePolicyCMS
-            Compress: true
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /_* # /_resources, /__data, /__lib, /__fudge, /_admin, /_edit, /_login, /_editplusapi, /_nocache, /_noproxycache, /_recache, /_performance, /_audit_info, /_designs, /_global, /__internal-api, /_media, /__streamline, /_web_services
+{% for path in ['/index.*', '/_*', '/', '/home*', '/article*', '/visualisations*', '/news-and-case-studies*', '/logout*', '/oauth-account-manager*'] %}
+          - PathPattern: "{{ path }}"
             TargetOriginId: 'CmsOrigin'
             AllowedMethods:
               - GET
@@ -216,102 +193,7 @@ Resources:
             LambdaFunctionAssociations:
               - EventType: 'viewer-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: / #The homepage
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            CachePolicyId: !Ref CachePolicyCMS
-            Compress: true
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /home* #The homepage
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            CachePolicyId: !Ref CachePolicyCMS
-            Compress: true
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /article #Not sure if this page exists but just in case, a top level article page
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            CachePolicyId: !Ref CachePolicyCMS
-            Compress: true
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /article/* #sub pages of article, also including things like /articles/blahblah/_admin
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            CachePolicyId: !Ref CachePolicyCMS
-            Compress: true
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /logout* #SSO
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            CachePolicyId: !Ref CachePolicyCMS
-            Compress: true
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
-          - PathPattern: /oauth-account-manager* #SSO
-            TargetOriginId: 'CmsOrigin'
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-              - PUT
-              - PATCH
-              - POST
-              - DELETE
-            CachePolicyId: !Ref CachePolicyCMS
-            Compress: true
-            ViewerProtocolPolicy: redirect-to-https
-            LambdaFunctionAssociations:
-              - EventType: 'viewer-request'
-                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+{% endfor %}
 {% endif %}
 
           - PathPattern: !Sub "/${AttachmentBucketName}/*" # S3 uploaded files

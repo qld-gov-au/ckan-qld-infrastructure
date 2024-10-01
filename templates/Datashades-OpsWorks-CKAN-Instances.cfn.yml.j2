@@ -132,6 +132,7 @@ Resources:
   # Autoscaling instances
 
 {% for layer in ['Batch', 'Web', 'Solr'] %}
+{% set disk_size = 100 if layer == 'Solr' else 32 %}
   {{ layer }}LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -146,7 +147,7 @@ Resources:
           - DeviceName: "/dev/sdi"
             Ebs:
               DeleteOnTermination: true
-              VolumeSize: 32
+              VolumeSize: {{ disk_size }}
               VolumeType: "gp2"
         IamInstanceProfile:
           Arn:
