@@ -263,3 +263,4 @@ basic_facts:
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "oss.squizedge.net"
     CKANRevision: "ckan-2.10.5-qgov.1"
+    CookbookRevision: "QOLSVC-5478-single-sign-on"
