@@ -15,7 +15,7 @@ jobs:
         application: [OpenData, Publications]
         python-version: [py3]
         target_environment: [STAGING]
-        behave-tag: [smoke, unauthenticated, app, authenticated]
+        behave-tag: [smoke, unauthenticated, multi_plugin, app, authenticated]
 
     name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} ${{ matrix.behave-tag }} infrastructure build
     runs-on: ubuntu-latest
