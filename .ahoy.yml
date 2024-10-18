@@ -153,7 +153,7 @@ commands:
         ) || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       elif [ "$BEHAVE_TAG" = "app" ]; then
         # run app-specific tests
-        ahoy cli "behave -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=$VARS_TYPE" \
+        ahoy cli "behave -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=$VARS_TYPE  --tags=-multi_plugin" \
           || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       elif [ "$BEHAVE_TAG" = "authenticated" ]; then
         # run any tests that don't have a specific tag

@@ -1,5 +1,6 @@
 @dataset_schema
 @OpenData
+@multi_plugin
 Feature: Dataset Schema
 
     Scenario Outline: Add new dataset metadata fields for default data schema validation

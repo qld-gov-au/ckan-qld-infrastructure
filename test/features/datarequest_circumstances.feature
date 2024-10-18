@@ -1,5 +1,6 @@
 @data-requests-circumstances
 @OpenData
+@multi_plugin
 Feature: Datarequest-circumstances
 
     Scenario: As a sysadmin user when I go to the admin config page I can view the data requests closing circumstances textarea

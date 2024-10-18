@@ -1,5 +1,6 @@
 @reporting
 @OpenData
+@multi_plugin
 Feature: Engagement Reporting
 
     Scenario Outline: As a user with admin or editor role capacity of an organisation, I can view 'My Reports' tab in the dashboard and show the engagement report with filters

@@ -1,5 +1,6 @@
 @reporting
 @OpenData
+@multi_plugin
 Feature: Reporting
 
     @unauthenticated

@@ -1,5 +1,6 @@
 @config
 @OpenData
+@multi_plugin
 Feature: Data Validation
 
     Scenario Outline: As a sysadmin, admin and editor user of the dataset organisation I can see the 'JSON' button

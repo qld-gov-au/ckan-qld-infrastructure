@@ -1,5 +1,6 @@
 @comments
 @OpenData
+@multi_plugin
 Feature: Comments
 
     @unauthenticated

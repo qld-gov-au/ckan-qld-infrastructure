@@ -6,7 +6,6 @@ enable_datastore: "yes"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: data.qld.gov.au
 
-#yaml anchors https://confluence.atlassian.com/bitbucket/yaml-anchors-960154027.html
 extensions:
   default: &default_extensions
     CKANExtXLoader: &CKANExtXLoader
@@ -20,7 +19,7 @@ extensions:
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
       shortname: "ckanext-qgov"
-      description: "CKAN Extension for Queensland Government Open Data"
+      description: "CKAN Extension for Queensland Government sites"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-qgov.git"
       version: "7.0.0"
@@ -71,7 +70,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "7.2.13"
+      version: "7.3.0"
 
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
@@ -161,13 +160,21 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-resource-visibility.git"
       version: "2.1.1"
 
+    CKANExtOIDC: &CKANExtOIDC
+      name: "ckanext-oidc-pkce-{{ Environment }}"
+      shortname: "ckanext-oidc-pkce"
+      description: "CKAN Extension for single sign-on capability"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-oidc-pkce"
+      version: "0.4.0-qgov.1"
+
   PROD:
     <<: *default_extensions
 
-  TRAINING:
+  STAGING:
     <<: *default_extensions
 
-  STAGING:
+  TRAINING:
     <<: *default_extensions
 
   DEV:
@@ -240,6 +247,10 @@ extensions:
       <<: *CKANExtResourceVisibility
       version: "master"
 
+    CKANExtOIDC:
+      <<: *CKANExtOIDC
+      version: "master"
+
 basic_facts:
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -254,4 +265,3 @@ basic_facts:
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "oss.squizedge.net"
-    CKANRevision: "ckan-2.10.5-qgov.1"
