@@ -179,3 +179,4 @@ Resources:
       Parameters:
         datestyle: "ISO, DMY"
         rds.adaptive_autovacuum: 1
+        rds.force_ssl: 0

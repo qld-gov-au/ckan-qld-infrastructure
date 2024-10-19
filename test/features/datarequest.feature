@@ -1,5 +1,6 @@
 @datarequest
 @OpenData
+@multi_plugin
 Feature: Data Request
 
     @unauthenticated
