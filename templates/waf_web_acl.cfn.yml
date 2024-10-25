@@ -21,8 +21,19 @@ Resources:
         MetricName: "WafWebACL"
         SampledRequestsEnabled: true
       Rules:
-        - Name: !Sub "${Environment}-${Platform}-XSSRule"
+        - Name: !Sub "${Environment}-${Platform}-RateLimitRule"
           Priority: 1
+          Action:
+            Block: {}
+          Statement:
+            RateBasedStatement:
+              AggregateKeyType: "IP"
+              Limit: 5000
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: "RateLimitRule"
+        - Name: !Sub "${Environment}-${Platform}-XSSRule"
+          Priority: 2
           Action:
             Block: {}
           Statement:
