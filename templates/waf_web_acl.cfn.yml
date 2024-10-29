@@ -28,6 +28,7 @@ Resources:
           Statement:
             RateBasedStatement:
               AggregateKeyType: "IP"
+              EvaluationWindowSec: 300
               Limit: 5000
           VisibilityConfig:
             CloudWatchMetricsEnabled: true
