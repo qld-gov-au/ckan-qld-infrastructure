@@ -7,8 +7,8 @@ Feature: XLoader
         When I log in
         And I create a dataset and resource with key-value parameters "notes=Testing XLoader" and "name=test-csv-resource::url=https://people.sc.fsu.edu/~jburkardt/data/csv/addresses.csv::format=CSV"
         # Wait for XLoader to run
-        And I wait for 10 seconds
         And I press "test-csv-resource"
+        And I reload page every 3 seconds until I see an element with xpath "//*[contains(string(), 'DataStore')]" but not more than 6 times
         Then I should see "DataStore"
 
         When I press "DataStore"
