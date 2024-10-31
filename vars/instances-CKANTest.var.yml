@@ -1,4 +1,7 @@
 ---
+# Amazon Linux 2023: al2023-ami-2023.4.20240611.0-kernel-6.1-x86_64
+ami_al2023: "ami-0e326862c8e74c0fe"
+
 common_stack: &common_stack
   state: "{{ state | default('present')}}"
   region: "{{ region }}"
@@ -11,6 +14,9 @@ common_stack: &common_stack
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
+    BatchImageId: "{{ ami_al2023 }}"
+    WebImageId: "{{ ami_al2023 }}"
+    SolrImageId: "{{ ami_al2023 }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
@@ -24,7 +30,6 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: PROD
-      WebEC2Count: 2
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
@@ -34,7 +39,6 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: STAGING
-      WebEC2Count: 2
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"

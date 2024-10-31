@@ -7,14 +7,14 @@ enable_datastore: "no"
 public_tld: publications.qld.gov.au
 
 extensions:
-  default:  &default_extensions
+  default: &default_extensions
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government sites"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-qgov.git"
-      version: "6.0.3"
+      version: "7.0.0"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       name: "ckanext-s3filestore-{{ Environment }}"
@@ -30,7 +30,7 @@ extensions:
       description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
-      version: "0.0.2"
+      version: "0.1.0"
 
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
       name: "ckanext-publications-qld-theme-{{ Environment }}"
@@ -56,13 +56,25 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
       version: "1.2.1"
 
+    CKANExtOIDC: &CKANExtOIDC
+      name: "ckanext-oidc-pkce-{{ Environment }}"
+      shortname: "ckanext-oidc-pkce"
+      description: "CKAN Extension for single sign-on capability"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-oidc-pkce"
+      version: "0.4.0-qgov.1"
+
   PROD:
     <<: *default_extensions
+
   STAGING:
     <<: *default_extensions
+
   TRAINING:
     <<: *default_extensions
+
   DEV:
+    <<: *default_extensions
     CKANExtQGOV:
       <<: *CKANExtQGOV
       version: "develop"
@@ -85,6 +97,10 @@ extensions:
 
     CKANExtCSRFFilter:
       <<: *CKANExtCSRFFilter
+      version: "develop"
+
+    CKANExtOIDC:
+      <<: *CKANExtOIDC
       version: "develop"
 
 basic_facts:

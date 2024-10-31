@@ -6,7 +6,7 @@ common_stack: &common_stack
   template: "templates/database.cfn.yml"
   template_parameters: &common_stack_template_parameters
     DBEngine: postgres
-    DBEngineVersion: 12
+    DBEngineVersion: 15
     DBName: ckan
     DBPassword: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_password', region=region) }}"
     DBUsername: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/db/master_user', region=region) }}"
@@ -70,7 +70,7 @@ cloudformation_stacks:
     name: CKAN-DEV-RDS
     template_parameters:
       <<: *common_stack_template_parameters
-      DBEngineVersion: 13
+      DBEngineVersion: 15
       DBAllocatedStorage: "200"
       DBClass: db.t3.medium
       StorageEncrypted: "False"

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: "Creates an OpsWorks CKAN Stack."
+Description: "Creates permissions and metadata for a CKAN stack."
 
 Parameters:
   CookbookURL:
@@ -84,13 +84,6 @@ Parameters:
     Type: String
     MinLength: 6
     MaxLength: 254
-  CreateServiceRole:
-    Description: Required if OpsWorks stacks have never been created in this account.
-    Type: String
-    Default: "no"
-    AllowedValues:
-      - "yes"
-      - "no"
   EnableDataStore:
     Description: Whether or not to support the DataStore.
     Type: String
@@ -151,43 +144,11 @@ Parameters:
   AttachmentsBucketName:
     Description: Name of the S3 Attachment bucket.
     Type: String
-
-Conditions:
-  ProvisionServiceRole:
-    Fn::Equals:
-      - "yes"
-      - !Ref CreateServiceRole
+  PurlEndpoint:
+    Description: Endpoint to contact for URL lookups.
+    Type: String
 
 Resources:
-  OpsWorksServiceRole:
-    Condition: ProvisionServiceRole
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          -
-            Effect: Allow
-            Principal:
-              Service: opsworks.amazonaws.com
-            Action: sts:AssumeRole
-      Policies:
-        - PolicyName: "aws-opsworks-service-policy"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Action:
-                  - "ec2:*"
-                  - iam:PassRole
-                  - cloudwatch:GetMetricStatistics
-                  - cloudwatch:DescribeAlarms
-                  - "ecs:*"
-                  - "elasticloadbalancing:*"
-                  - "rds:*"
-                Effect: Allow
-                Resource: "*"
-
   AttachmentsPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -377,7 +338,6 @@ Resources:
         - !Ref InstancePolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
         - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
         - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy # to write CloudWatch logs
         - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
@@ -420,7 +380,6 @@ Resources:
         - !Ref AttachmentsPolicy
         - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-        - arn:aws:iam::aws:policy/AWSOpsWorksCloudWatchLogs
         - arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess # for domain name lookups
         - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy # to write CloudWatch logs
         - arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess # for domain name lookups
@@ -569,193 +528,12 @@ Resources:
       Type: String
       Value: !Ref SolrSource
 
-  OpsWorksStack:
-    Type: AWS::OpsWorks::Stack
+  PURLEndpointParameter:
+    Type: AWS::SSM::Parameter
     Properties:
-      AgentVersion: LATEST
-      ConfigurationManager:
-        Name: Chef
-        Version: 12
-      CustomCookbooksSource:
-        Revision: !Ref CookbookRevision
-        Type: !Ref CookbookURLType
-        # SshKey: !Sub "${CookbookSSHKey}\n"
-        Url: !Ref CookbookURL
-      DefaultInstanceProfileArn:
-        Fn::GetAtt:
-          - InstanceRoleProfile
-          - Arn
-      DefaultOs: "Amazon Linux 2"
-      DefaultSshKeyName: !Ref DefaultEC2Key
-      DefaultSubnetId:
-        Fn::ImportValue: !Sub "${AppSubnets}A"
-      Name: !Sub "${ApplicationName}_${Environment}"
-      ServiceRoleArn:
-        Fn::If:
-          - ProvisionServiceRole
-          - Fn::GetAtt:
-            - OpsWorksServiceRole
-            - Arn
-          - Fn::Join:
-            - ""
-            - - "arn:aws:iam::"
-              - !Ref "AWS::AccountId"
-              - ":role/aws-opsworks-service-role"
-      UseCustomCookbooks: true
-      UseOpsworksSecurityGroups: false
-      VpcId:
-        Fn::ImportValue: !Ref StackVPC
-
-  OpsWorksSolrLayer:
-    Type: AWS::OpsWorks::Layer
-    Properties:
-      CustomRecipes:
-        Setup:
-          - "datashades::solr-setup"
-        Deploy:
-          - "datashades::solr-deploy"
-        Configure:
-          - "datashades::solr-configure"
-      AutoAssignElasticIps: false
-      AutoAssignPublicIps: false
-      CustomSecurityGroupIds:
-        - Fn::ImportValue: !Ref AdminSG
-        - Fn::ImportValue: !Ref DatabaseSG
-      EnableAutoHealing: true
-      InstallUpdatesOnBoot: true
-      Name: !Sub "${ApplicationName}-Solr"
-      Shortname: !Sub "${ApplicationId}-solr"
-      StackId: !Ref OpsWorksStack
-      Type: custom
-      Tags:
-        - Key: Layer
-          Value: solr
-      VolumeConfigurations:
-        - MountPoint: "/mnt/local_data"
-          NumberOfDisks: 1
-          Size: 32
-
-  OpsWorksWebLayer:
-    Type: AWS::OpsWorks::Layer
-    Properties:
-      AutoAssignElasticIps: false
-      AutoAssignPublicIps: false
-      CustomRecipes:
-        Setup:
-          - "datashades::ckanweb-setup"
-        Deploy:
-          - "datashades::ckanweb-deploy"
-        Configure:
-          - "datashades::ckanweb-configure"
-      CustomSecurityGroupIds:
-        - Fn::ImportValue: !Ref AdminSG
-        - Fn::ImportValue: !Ref AppSG
-      CustomInstanceProfileArn:
-        Fn::GetAtt:
-          - WebInstanceRoleProfile
-          - Arn
-      EnableAutoHealing: true
-      InstallUpdatesOnBoot: true
-      Name: !Sub "${ApplicationName}-Web"
-      Shortname: !Sub "${ApplicationId}-web"
-      StackId: !Ref OpsWorksStack
-      Type: custom
-      Tags:
-        - Key: Layer
-          Value: web
-      LoadBasedAutoScaling:
-        Enable: Yes
-        UpScaling:
-          CpuThreshold: 80
-          MemoryThreshold: 80
-          IgnoreMetricsTime: 20
-          InstanceCount: 1
-          ThresholdsWaitTime: 5
-        DownScaling:
-          CpuThreshold: 30
-          MemoryThreshold: 30
-          IgnoreMetricsTime: 20
-          InstanceCount: 1
-          ThresholdsWaitTime: 10
-      VolumeConfigurations:
-        - MountPoint: "/mnt/local_data"
-          NumberOfDisks: 1
-          Size: 32
-
-  OpsWorksBatchLayer:
-    Type: AWS::OpsWorks::Layer
-    Properties:
-      AutoAssignElasticIps: false
-      AutoAssignPublicIps: false
-      CustomRecipes:
-        Setup:
-          - "datashades::ckanbatch-setup"
-        Deploy:
-          - "datashades::ckanbatch-deploy"
-        Configure:
-          - "datashades::ckanbatch-configure"
-      CustomSecurityGroupIds:
-        - Fn::ImportValue: !Ref AdminSG
-        - Fn::ImportValue: !Ref AppSG
-      CustomInstanceProfileArn:
-        Fn::GetAtt:
-          - WebInstanceRoleProfile
-          - Arn
-      EnableAutoHealing: true
-      InstallUpdatesOnBoot: true
-      Name: !Sub "${ApplicationName}-Batch"
-      Shortname: !Sub "${ApplicationId}-batch"
-      StackId: !Ref OpsWorksStack
-      Type: custom
-      Tags:
-        - Key: Layer
-          Value: batch
-      LoadBasedAutoScaling:
-        Enable: Yes
-        UpScaling:
-          CpuThreshold: 80
-          IgnoreMetricsTime: 20
-          InstanceCount: 1
-          ThresholdsWaitTime: 5
-        DownScaling:
-          CpuThreshold: 30
-          IgnoreMetricsTime: 20
-          InstanceCount: 1
-          ThresholdsWaitTime: 10
-      VolumeConfigurations:
-        - MountPoint: "/mnt/local_data"
-          NumberOfDisks: 1
-          Size: 32
-
-  CKANELB:
-    Type: AWS::ElasticLoadBalancing::LoadBalancer
-    Properties:
-      LoadBalancerName: !Sub "${Environment}-${ApplicationName}ELB"
-      CrossZone: true
-      HealthCheck:
-        Target: "HTTP:80/api/action/status_show"
-        HealthyThreshold: 2
-        UnhealthyThreshold: 6
-        Interval: 30
-        Timeout: 20
-      Listeners:
-        - LoadBalancerPort: 443
-          InstancePort: 80
-          Protocol: HTTPS
-          SSLCertificateId: !Ref ACMCertificateARN
-          PolicyNames:
-            - sticky-LB-1hour
-      LBCookieStickinessPolicy:
-        - PolicyName: sticky-LB-1hour
-          CookieExpirationPeriod: 3600
-      Scheme: "internet-facing"
-      SecurityGroups:
-        - Fn::ImportValue: !Ref AppLBSG
-        - Fn::ImportValue: !Ref CloudFrontSG
-      Subnets:
-        - Fn::ImportValue: !Sub "${WebSubnets}A"
-        - Fn::ImportValue: !Sub "${WebSubnets}B"
-        - Fn::ImportValue: !Sub "${WebSubnets}C"
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/purl_endpoint"
+      Type: String
+      Value: !Ref PurlEndpoint
 
   # Application Load Balancer structure is more complex than classic.
   # The LoadBalancer defines configuration values like logging config and security groups.
@@ -824,12 +602,6 @@ Resources:
       VpcId:
         Fn::ImportValue: !Ref StackVPC
 
-  ELBAttachment:
-    Type: AWS::OpsWorks::ElasticLoadBalancerAttachment
-    Properties:
-      ElasticLoadBalancerName: !Ref CKANELB
-      LayerId: !Ref OpsWorksWebLayer
-
   WebELBDNSName:
     Type: AWS::Route53::RecordSet
     Properties:
@@ -840,36 +612,14 @@ Resources:
         HostedZoneId: !GetAtt CKANALB.CanonicalHostedZoneID
         DNSName: !GetAtt CKANALB.DNSName
 
+  WebELBDNSNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/web_loadbalancer_dns_name"
+      Type: String
+      Value: !GetAtt CKANALB.DNSName
+
 Outputs:
-  StackID:
-    Value: !Ref OpsWorksStack
-    Description: OpsWorks Stack Id
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksStack"
-
-  SolrLayer:
-    Value: !Ref OpsWorksSolrLayer
-    Description: SolrCloud Layer Id
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksSolrLayer"
-
-  WebLayer:
-    Value: !Ref OpsWorksWebLayer
-    Description: Web Layer Id
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksWebLayer"
-
-  BatchLayer:
-    Value: !Ref OpsWorksBatchLayer
-    Description: Batch Layer Id
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}OpsWorksBatchLayer"
-
-  WebELBName:
-    Value: !Ref CKANELB
-    Export:
-      Name: !Sub "${Environment}${ApplicationName}WebElbName"
-
   WebELBDNSName:
     Value: !Ref WebELBDNSName
     Export:

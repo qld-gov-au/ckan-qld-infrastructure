@@ -8,6 +8,47 @@ Parameters:
     Type: String
     Default: CKAN
 Resources:
+  WebACLv2:
+    Type: "AWS::WAFv2::WebACL"
+    Properties:
+      Name: !Sub "${Environment}-${Platform}-WebACLv2"
+      Description: !Sub "${Environment} ${Platform} WAFv2 Web ACL to block traffic based on defined rules."
+      Scope: CLOUDFRONT
+      DefaultAction:
+        Allow: {}
+      VisibilityConfig:
+        CloudWatchMetricsEnabled: true
+        MetricName: "WafWebACL"
+        SampledRequestsEnabled: true
+      Rules:
+        - Name: !Sub "${Environment}-${Platform}-RateLimitRule"
+          Priority: 1
+          Action:
+            Block: {}
+          Statement:
+            RateBasedStatement:
+              AggregateKeyType: "IP"
+              EvaluationWindowSec: 300
+              Limit: 5000
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: "RateLimitRule"
+        - Name: !Sub "${Environment}-${Platform}-XSSRule"
+          Priority: 2
+          Action:
+            Block: {}
+          Statement:
+            XssMatchStatement:
+              FieldToMatch:
+                UriPath: {}
+              TextTransformations:
+                - Priority: 0
+                  Type: NONE
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: "XSSRule"
+            SampledRequestsEnabled: true
+
   WebACL:
     Type: "AWS::WAF::WebACL"
     Properties:
@@ -47,6 +88,13 @@ Resources:
             Ref: "DetectXSS"
           Negated: false
           Type: "XssMatch"
+
+  WAFWebACLIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/config/CKAN/${Environment}/common/waf_acl_id"
+      Type: String
+      Value: !GetAtt WebACLv2.Arn
 
 Outputs:
   WebACLId:
