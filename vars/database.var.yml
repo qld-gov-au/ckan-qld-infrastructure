@@ -32,6 +32,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       DBAllocatedStorage: "600"
       DBClass: db.m5.large
+      DBMaxParallelWorkersPerGather: 0 #increase if have more than 4 cpu core
       StorageEncrypted: "True"
       PreferredMaintenanceWindow: "sat:17:00-sat:17:30"
       Environment: PROD
@@ -46,6 +47,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       DBAllocatedStorage: '300'
       DBClass: db.t3.large
+      DBMaxParallelWorkersPerGather: 0 #increase if have more than 4 cpu core
       StorageEncrypted: "True"
       Environment: STAGING
       MultiAZ: "true"
@@ -59,6 +61,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       DBAllocatedStorage: "100"
       DBClass: db.t3.medium
+      DBMaxParallelWorkersPerGather: 0 #increase if have more than 4 cpu core
       StorageEncrypted: "False"
       Environment: TRAINING
       MultiAZ: "false"
@@ -73,6 +76,7 @@ cloudformation_stacks:
       DBEngineVersion: 15
       DBAllocatedStorage: "200"
       DBClass: db.t3.medium
+      DBMaxParallelWorkersPerGather: 0 #increase if have more than 4 cpu core
       StorageEncrypted: "False"
       Environment: DEV
       MultiAZ: "false"
