@@ -1,4 +1,4 @@
-@users
+@organisations
 Feature: Organization APIs
 
     Scenario Outline: Organisation membership is accessible to admins of the organisation

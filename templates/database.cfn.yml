@@ -27,6 +27,7 @@ Outputs:
     Value: !Ref Database
     Description: RDS Instance Id
 
+
 Parameters:
   DBAllocatedStorage:
     ConstraintDescription: must be between 5 and 1024Gb.
@@ -46,6 +47,13 @@ Parameters:
     ConstraintDescription: must select a valid database instance type.
     Description: Database instance class
     Type: String
+  DBMaxParallelWorkersPerGather:
+    Type: Number
+    Default: -1
+    Description: "Specify the max parallel workers per gather (0 - 100), or -1 for no setting."
+    MinValue: -1
+    MaxValue: 100
+
   DBName:
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
     ConstraintDescription: must begin with a letter and contain only 1-64 alphanumeric
@@ -116,6 +124,8 @@ Parameters:
   StackZone:
     Description: Exported name of the Route53 hosted zone ID.
     Type: String
+Conditions:
+  IsMaxParallelWorkersPerGatherSet: !Not [!Equals [!Ref DBMaxParallelWorkersPerGather, "-1"]]
 
 Resources:
   Database:
@@ -173,8 +183,18 @@ Resources:
   DBParameters:
     Type: AWS::RDS::DBParameterGroup
     Properties:
-      DBParameterGroupName: !Sub "${Environment}DatabaseParameters"
+      DBParameterGroupName: !Sub "${Environment}-${DBEngine}${DBEngineVersion}-DatabaseParameters"
       Description: Setup parameters for Queensland Government databases
       Family: !Sub "${DBEngine}${DBEngineVersion}"
       Parameters:
-        datestyle: "ISO, DMY"
+        Fn::If:
+          - IsMaxParallelWorkersPerGatherSet
+          - datestyle: "ISO, DMY"
+            rds.adaptive_autovacuum: 1
+            rds.force_ssl: 0
+            max_parallel_workers_per_gather: !Ref DBMaxParallelWorkersPerGather
+          #ELSE
+          - datestyle: "ISO, DMY"
+            rds.adaptive_autovacuum: 1
+            rds.force_ssl: 0
+
