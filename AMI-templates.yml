@@ -1,0 +1,39 @@
+---
+- name: Cloudformation Playbook
+  hosts: local
+  connection: local
+
+  pre_tasks:
+    - name: get basic_facts
+      set_fact:
+        basic_fact={{ item }}
+#        CKANSource={{ item.CKANSource }}
+      when: item.Environment == Environment
+      with_items: "{{ basic_facts }}"
+
+    - name: set facts to environment from basic_fact
+      set_fact: "{{ item.key }}={{ item.value }}"
+      with_dict: "{{ basic_fact }}"
+      when: basic_fact is defined
+
+    - name: kms alias fact
+      aws_kms_facts:
+        filters:
+          alias: "aws/ssm"
+        region: "{{ region }}"
+      register: ssmKeyFacts
+
+    - name: set KMS key from alias
+      set_fact:
+        SSMKey: "{{ ssmKeyFacts['keys'][0].key_arn }}"
+
+    - name: Generate Lambda file hash
+      shell: >
+        md5sum files/instanceSetupLambda.js | awk '{print substr($1, 1, 20)}'
+      register: hash_output
+    - set_fact:
+        instance_setup_source_hash: "{{ hash_output.stdout_lines[0] }}"
+
+    - include_vars: vars/AMI-template-instances.var.yml
+  roles:
+    - ansible_cloudformation

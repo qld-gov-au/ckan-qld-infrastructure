@@ -1,0 +1,31 @@
+---
+
+common_stack: &common_stack
+  state: "{{ state | default('present')}}"
+  region: "{{ region }}"
+  disable_rollback: true
+  template_jinja: "templates/AMI-Template-Instances.cfn.yml.j2"
+  template: "templates/AMI-Template-Instances.cfn.yml"
+  template_parameters: &common_stack_template_parameters
+    ApplicationName: "{{ service_name }}"
+    ApplicationId: "{{ service_name_lower }}"
+    Environment: "{{ Environment }}"
+    AppSubnets: "{{ Environment }}CKANAppSubnet"
+    LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
+    AttachmentsBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}"
+    SSMKey: "{{ SSMKey | default('') }}"
+    InternalStackZone: "{{ Environment }}CKANPrivateHostedZone"
+    DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
+  tags: &common_stack_tags
+    Environment: "{{ Environment }}"
+    Service: "{{ service_name }}"
+    Division: "{{ Division }}"
+    Owner: "{{ Owner }}"
+    Version: "1.0"
+
+cloudformation_stacks:
+  - <<: *common_stack
+    name: "{{ service_name }}-{{ Environment }}-AMI-Template-Instances"
+    template_parameters:
+      <<: *common_stack_template_parameters
+      Environment: "{{ Environment }}"
