@@ -14,7 +14,7 @@ extensions:
       description: "CKAN Express Loader Extension"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-xloader.git"
-      version: "1.0.1-qgov.14"
+      version: "1.0.1-qgov.16"
 
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
@@ -166,7 +166,7 @@ extensions:
       description: "CKAN Extension for single sign-on capability"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-oidc-pkce"
-      version: "0.4.0-qgov.1"
+      version: "0.4.0-qgov.2"
 
   PROD:
     <<: *default_extensions

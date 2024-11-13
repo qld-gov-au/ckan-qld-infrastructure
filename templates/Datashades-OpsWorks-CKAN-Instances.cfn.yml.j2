@@ -12,7 +12,7 @@ Parameters:
     ConstraintDescription: Must contain only lowercase/numeric/hyphen/underscore.
     AllowedPattern: '[-_a-z0-9]*'
   Environment:
-    Description: Select a stack version.
+    Description: The target production vs non-production environment.
     Type: String
     Default: STAGING
     AllowedValues:
@@ -245,4 +245,13 @@ Resources:
       Recurrence: "0 20 * * *"
 {% endif %}
 
+{% endfor %}
+
+Outputs:
+
+{% for layer in ['Batch', 'Web', 'Solr'] %}
+  {{ layer }}LaunchTemplateId:
+    Value: !Ref {{ layer }}LaunchTemplate
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}{{ layer }}LaunchTemplateId"
 {% endfor %}
