@@ -150,8 +150,8 @@ Resources:
               VolumeSize: {{ disk_size }}
               VolumeType: "gp2"
         IamInstanceProfile:
-          Arn:
-            Fn::ImportValue: !Sub "${Environment}${ApplicationName}{% if layer != 'Solr' %}Web{% endif %}InstanceProfile"
+          Name:
+            Fn::ImportValue: !Sub "${Environment}${ApplicationName}{% if layer != 'Solr' %}Web{% endif %}InstanceProfileName"
         ImageId: !Ref {{ layer }}ImageId
         InstanceType: !Ref {{ layer }}EC2Size
         KeyName: !Ref DefaultEC2Key
@@ -182,7 +182,13 @@ Resources:
               if (aws --version |grep -o 'aws-cli/[2-9]'); then
                 PAYLOAD_FORMAT="--cli-binary-format raw-in-base64-out"
               fi
-              aws lambda invoke $REGION --function-name "$FUNCTION_NAME" $PAYLOAD_FORMAT --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "setup"}' /var/log/instance-setup.log.`date '+%s'`
+              MY_AMI_ID=`curl -H "X-aws-ec2-metadata-token: $metadata_token" http://169.254.169.254/latest/meta-data/ami-id`
+              if [ "$MY_AMI_ID" = "{{ base_ami }}" ]; then
+                TARGET_PHASE=setup
+              else
+                TARGET_PHASE=configure
+              fi
+              aws lambda invoke $REGION --function-name "$FUNCTION_NAME" $PAYLOAD_FORMAT --payload '{"EC2InstanceId": "'$INSTANCE_ID'", "phase": "'$TARGET_PHASE'"}' /var/log/instance-setup.log.`date '+%s'`
 
   {{ layer }}ScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup

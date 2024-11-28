@@ -46,8 +46,10 @@ Resources:
             DeleteOnTermination: true
             VolumeSize: {{ disk_size }}
             VolumeType: "gp2"
-      IamInstanceProfile: !Ref {% if layer != 'Solr' %}Web{% endif %}InstanceRoleProfile
-      ImageId: "ami-0d71fe73adf7a9887"
+      IamInstanceProfile:
+        Fn::ImportValue: !Sub "${Environment}${ApplicationName}{% if layer != 'Solr' %}Web{% endif %}InstanceProfileName"
+      # Amazon Linux 2023: al2023-ami-2023.4.20240611.0-kernel-6.1-x86_64
+      ImageId: "{{ base_ami }}"
       InstanceType: "t3a.small"
       KeyName: !Ref DefaultEC2Key
       NetworkInterfaces:
@@ -67,13 +69,13 @@ Resources:
               echo '/dev/sdi /mnt/local_data xfs defaults,nofail 0 2' >> /etc/fstab
               mount -a
             fi
-              if ! (yum install chef); then
-                for i in `seq 1 5`; do
-                  yum install -y libxcrypt-compat "https://packages.chef.io/files/stable/chef/18.4.12/el/7/chef-18.4.12-1.el7.x86_64.rpm" && break
-                  sleep 5
-                done
-              fi
-              REGION="--region ${AWS::Region}"
+            if ! (yum install chef); then
+              for i in `seq 1 5`; do
+                yum install -y libxcrypt-compat "https://packages.chef.io/files/stable/chef/18.4.12/el/7/chef-18.4.12-1.el7.x86_64.rpm" && break
+                sleep 5
+              done
+            fi
+            REGION="--region ${AWS::Region}"
             metadata_token=`curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 60" http://169.254.169.254/latest/api/token` && \
             INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $metadata_token" http://169.254.169.254/latest/meta-data/instance-id) && \
             aws ec2 create-tags $REGION --resources $INSTANCE_ID --tags "Key=Name,Value=${ApplicationName}_${Environment}-{{ layer }}-ami-template"
@@ -85,4 +87,13 @@ Resources:
       Tags:
         - Key: Layer
           Value: {{ layer|lower }}
+{% endfor %}
+
+Outputs:
+
+{% for layer in ['Batch', 'Web', 'Solr'] %}
+  {{ layer }}TemplateInstanceId:
+    Value: !Ref {{ layer }}TemplateInstance
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}{{ layer }}TemplateInstanceId"
 {% endfor %}
