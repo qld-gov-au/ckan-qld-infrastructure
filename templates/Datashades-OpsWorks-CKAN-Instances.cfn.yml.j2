@@ -200,13 +200,8 @@ Resources:
       LaunchTemplate:
         LaunchTemplateId: !Ref {{ layer }}LaunchTemplate
         Version: !GetAtt {{ layer }}LaunchTemplate.LatestVersionNumber
-{% if layer == 'Solr' %}
-      DefaultInstanceWarmup: 600
-      HealthCheckGracePeriod: 600
-{% else %}
-      DefaultInstanceWarmup: 1200
-      HealthCheckGracePeriod: 1200
-{% endif %}
+      DefaultInstanceWarmup: 120
+      HealthCheckGracePeriod: 240
 {% if layer == 'Web' %}
       TargetGroupARNs:
         - Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ layer }}AlbTargetGroup"
