@@ -38,11 +38,13 @@ Resources:
       BlockDeviceMappings:
         - DeviceName: "/dev/xvda"
           Ebs:
+            Encrypted: true
             DeleteOnTermination: true
             VolumeSize: 100
             VolumeType: "gp2"
         - DeviceName: "/dev/sdi"
           Ebs:
+            Encrypted: true
             DeleteOnTermination: true
             VolumeSize: {{ disk_size }}
             VolumeType: "gp2"
