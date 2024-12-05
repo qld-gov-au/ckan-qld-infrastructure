@@ -95,9 +95,10 @@
           Name: "{{ InstanceName }}-{{ timestamp | replace(':', '-') }}"
           Environment: "{{ Environment }}"
           Service: "{{ service_name }}"
+          Layer: "{{ layer | lower }}"
           Division: "{{ Division }}"
           Owner: "{{ Owner }}"
-          Version: "1.0"
+          Version: "{{ image_version | default('1.0') }}"
       register: new_image
 
     - name: Record AMI ID
