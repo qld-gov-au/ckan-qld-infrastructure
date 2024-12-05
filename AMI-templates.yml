@@ -23,17 +23,7 @@
         region: "{{ region }}"
       register: ssmKeyFacts
 
-    - name: set KMS key from alias
-      set_fact:
-        SSMKey: "{{ ssmKeyFacts['keys'][0].key_arn }}"
-
-    - name: Generate Lambda file hash
-      shell: >
-        md5sum files/instanceSetupLambda.js | awk '{print substr($1, 1, 20)}'
-      register: hash_output
-    - set_fact:
-        instance_setup_source_hash: "{{ hash_output.stdout_lines[0] }}"
-
     - include_vars: vars/AMI-template-instances.var.yml
+
   roles:
     - ansible_cloudformation
