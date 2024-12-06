@@ -95,11 +95,12 @@
           Name: "{{ InstanceName }}-{{ timestamp | replace(':', '-') }}"
           Environment: "{{ Environment }}"
           Service: "{{ service_name }}"
+          Layer: "{{ layer | lower }}"
           Division: "{{ Division }}"
           Owner: "{{ Owner }}"
-          Version: "1.0"
+          Version: "{{ image_version | default('1.0') }}"
       register: new_image
 
     - name: Record AMI ID
       shell: |
-        aws ssm put-parameter --type String --name "/config/CKAN/{{ Environment }}/app/{{ service_name_lower }}/{{ layer }}AmiId" --value "{{ new_image.image_id }}"
+        aws ssm put-parameter --overwrite --type String --name "/config/CKAN/{{ Environment }}/app/{{ service_name_lower }}/{{ layer }}AmiId" --value "{{ new_image.image_id }}"

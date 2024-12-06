@@ -45,8 +45,21 @@ run-deployment () {
 }
 
 create-amis () {
-  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS timestamp=`date -u +%Y-%m-%dT%H:%M:%SZ`"
+  run-playbook "AMI-templates.yml" "state=absent"
+  # try to match an existing image instead of creating a new one
+  if [ "$IMAGE_VERSION" = "" ]; then
+    IMAGE_VERSION=`git rev-parse HEAD` || true
+  fi
+  if [ "$IMAGE_VERSION" != "" ]; then
+    echo "Checking for existing $ENVIRONMENT $INSTANCE_NAME images tagged with version ${IMAGE_VERSION}..."
+    IMAGE_IDS=$(aws ec2 describe-images --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=$INSTANCE_NAME" "Name=tag:Version,Values=$IMAGE_VERSION" --query "Images[].ImageId" --output text)
+    if [ "$IMAGE_IDS" != "" ]; then
+      echo "Found existing image(s): $IMAGE_IDS"
+      return 0
+    fi
+  fi
   run-playbook "AMI-templates.yml"
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS timestamp=`date -u +%Y-%m-%dT%H:%M:%SZ` image_version=$IMAGE_VERSION"
   run-playbook "create-AMI" "layer=Batch" & BATCH_PID=$!
   run-playbook "create-AMI" "layer=Web" & WEB_PID=$!
   run-playbook "create-AMI" "layer=Solr"
