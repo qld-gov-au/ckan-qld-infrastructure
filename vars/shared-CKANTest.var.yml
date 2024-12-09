@@ -86,7 +86,7 @@ extensions:
       description: "CKAN Extension for YTP Comments"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
-      version: "2.5.0-qgov.17"
+      version: "2.5.0"
 
     CKANExtHarvest: &CKANExtHarvest
       name: "ckanext-harvest-{{ Environment }}"
