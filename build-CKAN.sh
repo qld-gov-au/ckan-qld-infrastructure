@@ -35,7 +35,7 @@ run-shared-resource-playbooks () {
 
 run-deployment () {
   run-playbook "chef-json"
-  ./chef-deploy.sh datashades::ckanweb-configure $INSTANCE_NAME $ENVIRONMENT web & WEB_PID=$!
+  PARALLEL=1 ./chef-deploy.sh datashades::ckanweb-configure $INSTANCE_NAME $ENVIRONMENT web & WEB_PID=$!
   # Check if the web deployment immediately failed
   kill -0 $WEB_PID
   PARALLEL=1 ./chef-deploy.sh datashades::ckanbatch-configure $INSTANCE_NAME $ENVIRONMENT batch & BATCH_PID=$!
