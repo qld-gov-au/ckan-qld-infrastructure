@@ -74,7 +74,8 @@ create-amis () {
   run-playbook "AMI-templates.yml"
   ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS timestamp=`date -u +%Y-%m-%dT%H:%M:%SZ` image_version=$IMAGE_VERSION"
   for layer in Batch Web Solr; do
-    if [ "${layer}_IMAGE_ID" != "" ]; then
+    eval "image=\$${layer}_IMAGE_ID"
+    if [ "$image" = "" ]; then
       run-playbook "create-AMI" "layer=$layer" & eval "${layer}_PID=$!"
     fi
   done
