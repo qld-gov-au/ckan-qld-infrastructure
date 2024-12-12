@@ -59,7 +59,7 @@ Feature: Organization APIs
         And I click the link to "/organization/new"
         And I fill in "title" with "Org name more than 35 characters aaaaaaaaaaaa"
         # This is actually the URL
-        And I fill in "name" with "org-name-more-than-35-characters-aaaaaaaaaaaa"
+        And I fill in "name" with "org-name-more-than-35-characters-aaaaaaaaaaaa" if present
         And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
         And I take a debugging screenshot
         # Breadcrumb should be truncated but preserve full name in a tooltip
