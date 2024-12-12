@@ -132,7 +132,7 @@ def request_reset(context):
 @when(u'I fill in "{name}" with "{value}" if present')
 def fill_in_field_if_present(context, name, value):
     context.execute_steps(u"""
-        When I execute the script "field = $('#field-{0}'); if (!field.length) field = $('#{0}'); if (!field.length) field = $('[name={0}]'); field.val('{1}'); field.keyup();"
+        When I execute the script "field = $('#{0}'); if (!field.length) field = $('[name={0}]'); if (!field.length) field = $('#field-{0}'); field.val('{1}'); field.keyup();"
     """.format(name, value))
 
 
@@ -196,13 +196,24 @@ def go_to_new_resource_form(context, name):
 
 @when(u'I fill in title with random text')
 def title_random_text(context):
-    assert context.persona
     context.execute_steps(u"""
-        When I fill in "title" with "Test Title {0}"
-        And I fill in "name" with "test-title-{0}" if present
-        And I set "last_generated_title" to "Test Title {0}"
-        And I set "last_generated_name" to "test-title-{0}"
-    """.format(uuid.uuid4()))
+        When I fill in title with random text starting with "Test Title "
+    """)
+
+
+@when(u'I fill in title with random text starting with "{prefix}"')
+def title_random_text_with_prefix(context, prefix):
+    random_text = str(uuid.uuid4())
+    title = prefix + random_text
+    name = prefix.lower().replace(" ", "-") + random_text
+    assert context.persona
+    context.execute_steps(f"""
+        When I fill in "title" with "{title}"
+        And I fill in "name" with "{name}" if present
+        And I set "last_generated_title" to "{title}"
+        And I set "last_generated_name" to "{name}"
+        And I take a debugging screenshot
+    """)
 
 
 @when(u'I go to dataset page')
