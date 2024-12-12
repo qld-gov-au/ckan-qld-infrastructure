@@ -71,3 +71,7 @@ Feature: Organization APIs
         Then I should see an element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'Org name more than') and contains(string(), '...') and @title = 'Org name more than 35 characters aaaaaaaaaaaa']"
         When I press the element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'Org name more than') and contains(string(), '...') and @title = 'Org name more than 35 characters aaaaaaaaaaaa']"
         Then I should see an element with xpath "//li[contains(@class, 'nav-item') and contains(@class, 'active')]//a[contains(string(), 'Org name more than') and contains(string(), '...') and @title = 'Org name more than 35 characters aaaaaaaaaaaa']"
+        When I go to dataset page
+        Then I should see an element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'Org name more than') and contains(string(), '...') and @title = 'Org name more than 35 characters aaaaaaaaaaaa']"
+        When I press the element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'Org name more than') and contains(string(), '...') and @title = 'Org name more than 35 characters aaaaaaaaaaaa']"
+        Then I should see an element with xpath "//li[contains(@class, 'nav-item') and contains(@class, 'active')]//a[contains(string(), 'Org name more than') and contains(string(), '...') and @title = 'Org name more than 35 characters aaaaaaaaaaaa']"

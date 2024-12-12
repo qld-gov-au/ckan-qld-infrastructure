@@ -63,3 +63,8 @@ Feature: Group APIs
         Then I should see an element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'Group name more') and contains(string(), '...') and @title = '$group_title']"
         When I press the element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'Group name more') and contains(string(), '...') and @title = '$group_title']"
         Then I should see an element with xpath "//li[contains(@class, 'nav-item') and contains(@class, 'active')]//a[contains(string(), 'Group name more') and contains(string(), '...') and @title = '$group_title']"
+
+        When I go to dataset page
+        Then I should see an element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'Group name more') and contains(string(), '...') and @title = '$group_title']"
+        When I press the element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'Group name more') and contains(string(), '...') and @title = '$group_title']"
+        Then I should see an element with xpath "//li[contains(@class, 'nav-item') and contains(@class, 'active')]//a[contains(string(), 'Group name more') and contains(string(), '...') and @title = '$group_title']"
