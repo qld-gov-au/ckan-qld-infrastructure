@@ -51,3 +51,23 @@ Feature: Organization APIs
         And I press "My Organisations"
         Then I should see "Test Organisation"
         And I should see an element with xpath "//a[contains(@href, 'organization/new') and contains(string(), 'Add Organisation')]"
+
+    Scenario: As a sysadmin, when I create an organisation with a long name, it should be preserved
+        Given "SysAdmin" as the persona
+        When I log in
+        And I go to organisation page
+        And I click the link to "/organization/new"
+        And I fill in "title" with "Org name more than 35 characters aaaaaaaaaaaa"
+        # This is actually the URL
+        And I fill in "name" with "org-name-more-than-35-characters-aaaaaaaaaaaa"
+        And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
+        And I take a debugging screenshot
+        # Breadcrumb should be truncated but preserve full name in a tooltip
+        Then I should see an element with xpath "//ol[contains(@class, 'breadcrumb')]//a[contains(string(), 'Org name more than') and contains(string(), '...') and @title = 'Org name more than 35 characters aaaaaaaaaaaa']"
+
+        # Search facets should be truncated but preserve full name in a tooltip
+        When I create a dataset and resource with key-value parameters "notes=Testing long org name::owner_org=Org name more than 35 characters aaaaaaaaaaaa" and "name=Test"
+        And I press "Org name more than"
+        Then I should see an element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'Org name more than') and contains(string(), '...') and @title = 'Org name more than 35 characters aaaaaaaaaaaa']"
+        When I press the element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'Org name more than') and contains(string(), '...') and @title = 'Org name more than 35 characters aaaaaaaaaaaa']"
+        Then I should see an element with xpath "//li[contains(@class, 'nav-item') and contains(@class, 'active')]//a[contains(string(), 'Org name more than') and contains(string(), '...') and @title = 'Org name more than 35 characters aaaaaaaaaaaa']"
