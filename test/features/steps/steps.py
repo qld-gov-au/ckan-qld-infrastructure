@@ -264,6 +264,15 @@ def select_licence(context, licence_id):
     """.format(licence_id))
 
 
+@when(u'I select the organisation with title "{title}"')
+def select_organisation(context, title):
+    # Organisation requires special interaction due to fancy JavaScript
+    context.execute_steps(u"""
+        When I execute the script "org_uuid=$('#field-organizations').find('option:contains({0})').val(); $('#field-organizations').val(org_uuid).trigger('change')"
+        And I take a debugging screenshot
+    """.format(title))
+
+
 @when(u'I enter the resource URL "{url}"')
 def enter_resource_url(context, url):
     if url != "default":
@@ -453,8 +462,8 @@ def _create_dataset_from_params(context, params):
         if key == "owner_org":
             # Owner org uses UUIDs as its values, so we need to rely on displayed text
             context.execute_steps(u"""
-                When I select by text "{1}" from "{0}"
-            """.format(key, value))
+                When I select the organisation with title "{0}"
+            """.format(value))
         elif key in ["update_frequency", "request_privacy_assessment", "private"]:
             context.execute_steps(u"""
                 When I select "{1}" from "{0}"
