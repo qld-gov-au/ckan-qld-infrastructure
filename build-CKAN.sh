@@ -2,13 +2,11 @@
 #deploy CKAN base infrastructure
 
 #ensure we die if any function fails
-set -e
+set -ex
 
 VARS_FILE="$1"
 ENVIRONMENT="$2"
 ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS Environment=$ENVIRONMENT"
-
-set -x
 
 run-playbook () {
   if [ -z "$2" ]; then
@@ -37,13 +35,37 @@ run-shared-resource-playbooks () {
 
 run-deployment () {
   run-playbook "chef-json"
-  ./chef-deploy.sh datashades::ckanweb-setup,datashades::ckanweb-deploy,datashades::ckanweb-configure $INSTANCE_NAME $ENVIRONMENT web & WEB_PID=$!
+  ./chef-deploy.sh datashades::ckanweb-configure $INSTANCE_NAME $ENVIRONMENT web & WEB_PID=$!
   # Check if the web deployment immediately failed
   kill -0 $WEB_PID
-  PARALLEL=1 ./chef-deploy.sh datashades::ckanbatch-setup,datashades::ckanbatch-deploy,datashades::ckanbatch-configure $INSTANCE_NAME $ENVIRONMENT batch & BATCH_PID=$!
+  PARALLEL=1 ./chef-deploy.sh datashades::ckanbatch-configure $INSTANCE_NAME $ENVIRONMENT batch & BATCH_PID=$!
   wait $WEB_PID
   wait $BATCH_PID
-  ./chef-deploy.sh datashades::solr-setup,datashades::solr-deploy,datashades::solr-configure $INSTANCE_NAME $ENVIRONMENT solr  || exit 1
+  ./chef-deploy.sh datashades::solr-configure $INSTANCE_NAME $ENVIRONMENT solr || exit 1
+}
+
+create-amis () {
+  run-playbook "AMI-templates.yml" "state=absent"
+  # try to match an existing image instead of creating a new one
+  if [ "$IMAGE_VERSION" = "" ]; then
+    IMAGE_VERSION=`git rev-parse HEAD` || true
+  fi
+  if [ "$IMAGE_VERSION" != "" ]; then
+    echo "Checking for existing $ENVIRONMENT $INSTANCE_NAME images tagged with version ${IMAGE_VERSION}..."
+    IMAGE_IDS=$(aws ec2 describe-images --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=$INSTANCE_NAME" "Name=tag:Version,Values=$IMAGE_VERSION" --query "Images[].ImageId" --output text)
+    if [ "$IMAGE_IDS" != "" ]; then
+      echo "Found existing image(s): $IMAGE_IDS"
+      return 0
+    fi
+  fi
+  run-playbook "AMI-templates.yml"
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS timestamp=`date -u +%Y-%m-%dT%H:%M:%SZ` image_version=$IMAGE_VERSION"
+  run-playbook "create-AMI" "layer=Batch" & BATCH_PID=$!
+  run-playbook "create-AMI" "layer=Web" & WEB_PID=$!
+  run-playbook "create-AMI" "layer=Solr"
+  wait $BATCH_PID
+  wait $WEB_PID
+  run-playbook "AMI-templates.yml" "state=absent"
 }
 
 run-all-playbooks () {
@@ -55,6 +77,10 @@ run-all-playbooks () {
   run-playbook "CloudFormation" "vars/s3_buckets.var.yml"
   run-playbook "CKAN-Stack"
   run-playbook "CloudFormation" "vars/CKAN-extensions.var.yml"
+  if ! (create-amis); then
+    ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent" run-playbook "CloudFormation" "vars/AMI-template-instances.var.yml" || exit 1
+    exit 1
+  fi
   run-playbook "CloudFormation" "vars/instances-${INSTANCE_NAME}.var.yml"
   run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
   run-playbook "cloudfront"
@@ -78,6 +104,8 @@ if [ $# -ge 3 ]; then
     PARALLEL=1 ./chef-deploy.sh datashades::solr-configure $INSTANCE_NAME $ENVIRONMENT solr
     wait $WEB_PID
     wait $BATCH_PID
+  elif [ "$3" = "create-amis" ]; then
+    create-amis
   else
     # run custom playbook
     run-playbook "$3" "$4"

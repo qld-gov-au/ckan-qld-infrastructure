@@ -630,6 +630,16 @@ Outputs:
     Export:
       Name: !Sub "${Environment}${ApplicationName}WebAlbTargetGroup"
 
+  InstanceProfileName:
+    Value: !Ref InstanceRoleProfile
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}InstanceProfileName"
+
+  WebInstanceProfileName:
+    Value: !Ref WebInstanceRoleProfile
+    Export:
+      Name: !Sub "${Environment}${ApplicationName}WebInstanceProfileName"
+
   InstanceProfile:
     Value: !GetAtt InstanceRoleProfile.Arn
     Export:

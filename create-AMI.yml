@@ -1,0 +1,106 @@
+---
+- name: Create Amazon Machine Images
+  hosts: local
+  connection: local
+  vars_files:
+    - vars/AMI-template-instances.var.yml
+
+  pre_tasks:
+    - name: get basic_facts
+      set_fact:
+        basic_fact={{ item }}
+      when: item.Environment == Environment
+      with_items: "{{ basic_facts }}"
+
+    - name: set facts to environment from basic_fact
+      set_fact: "{{ item.key }}={{ item.value }}"
+      with_dict: "{{ basic_fact }}"
+      when: basic_fact is defined
+
+  tasks:
+    - name: Get stack name
+      set_fact:
+        stack_name: "{{ item.name }}"
+      when: item.template_parameters.Environment == Environment
+      with_items: "{{ cloudformation_stacks }}"
+
+    - name: Get current stack facts
+      cloudformation_facts:
+        region: "{{ region }}"
+        stack_name: "{{ stack_name }}"
+        stack_resources: true
+      register: opsworks_facts
+
+    - name: Set new instance facts
+      set_fact:
+        InstanceId: "{{ opsworks_facts.ansible_facts.cloudformation[stack_name].stack_outputs[layer + 'TemplateInstanceId'] }}"
+        InstanceName: "{{ Environment }}-{{ service_name_lower }}-{{ layer }}-image"
+
+    - name: Wait for instance startup
+      shell: |
+        STATUS=$(aws ec2 describe-instances --region {{ region }} --instance-ids {{ InstanceId }} --query "Reservations[].Instances[].State.Name" --output text) || return 1
+        echo "Instance {{ InstanceId }} status: $STATUS" >&2
+        for retry in `seq 1 6`; do
+          if [ "$STATUS" = "pending" ]; then
+            sleep 10
+            $(aws ec2 describe-instances --region {{ region }} --instance-ids {{ InstanceId }} --query "Reservations[].Instances[].State.Name" --output text) || return 1
+            echo "Instance {{ InstanceId }} status: $STATUS" >&2
+          else
+            break
+          fi
+        done
+        if [ "$STATUS" != "running" ]; then
+          echo "Failed to start {{ InstanceId }}, status $STATUS - aborting" >&2
+          exit 2
+        fi
+
+    - name: Wait for instance configuration
+      shell: |
+        STATUS=$(aws ssm list-commands --region {{ region }} --instance-id {{ InstanceId }} \
+          --filter "key=DocumentName,value=AWS-ApplyChefRecipes" --filter "key=InvokedAfter,value={{ timestamp }}" \
+          --query "Commands|[0].Status" --output text) || exit 1
+        echo "Deployment $DEPLOYMENT_ID: $STATUS" >&2
+        for retry in `seq 1 180`; do
+          if [ "$STATUS" = "Pending" ] || [ "$STATUS" = "InProgress" ] || [ "$STATUS" = "None" ]; then
+            sleep 20
+            STATUS=$(aws ssm list-commands --region {{ region }} --instance-id {{ InstanceId }} \
+              --filter "key=DocumentName,value=AWS-ApplyChefRecipes" --filter "key=InvokedAfter,value={{ timestamp }}" \
+              --query "Commands|[0].Status" --output text) || exit 1
+            echo "Instance {{ InstanceId }} deployment status: $STATUS" >&2
+          else
+            break
+          fi
+        done
+        if [ "$STATUS" != "Success" ]; then
+          echo "Failed to deploy $DEPLOYMENT_ID, status $STATUS - aborting" >&2
+          exit 2
+        fi
+
+    - name: Stop instance
+      ec2:
+        instance_ids:
+          - "{{ InstanceId }}"
+        region: "{{ region }}"
+        state: stopped
+        wait: True
+
+    - name: Create new ami
+      ec2_ami:
+        instance_id: "{{ InstanceId }}"
+        region: "{{ region }}"
+        wait: yes
+        name: "{{ InstanceName }}-{{ timestamp | replace(':', '-') }}"
+        description: "Base image for {{ Environment }} {{ service_name }} {{ layer }} layer"
+        tags:
+          Name: "{{ InstanceName }}-{{ timestamp | replace(':', '-') }}"
+          Environment: "{{ Environment }}"
+          Service: "{{ service_name }}"
+          Layer: "{{ layer | lower }}"
+          Division: "{{ Division }}"
+          Owner: "{{ Owner }}"
+          Version: "{{ image_version | default('1.0') }}"
+      register: new_image
+
+    - name: Record AMI ID
+      shell: |
+        aws ssm put-parameter --overwrite --type String --name "/config/CKAN/{{ Environment }}/app/{{ service_name_lower }}/{{ layer }}AmiId" --value "{{ new_image.image_id }}"
