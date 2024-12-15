@@ -65,7 +65,7 @@ echo "Creating test dataset for data request organisation:"
 
 api_call '{"name": "data_request_dataset", "title": "Dataset for data requests", "owner_org": "'"${DR_ORG_ID}"'",
 "update_frequency": "near-realtime", "author_email": "dr_admin@localhost", "version": "1.0", "license_id": "cc-by-4",
-"data_driven_application": "NO", "security_classification": "PUBLIC", "notes": "test", "de_identified_data": "NO"}'package_create
+"data_driven_application": "NO", "security_classification": "PUBLIC", "notes": "test", "de_identified_data": "NO"}' package_create
 
 echo "Creating test Data Request:"
 
