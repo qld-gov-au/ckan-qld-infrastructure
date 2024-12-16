@@ -38,7 +38,7 @@ commands:
       ahoy title "Building and starting Docker containers"
       sh bin/docker-compose.sh up -d "$@"
       echo "Initialising database schema"
-      ahoy cli '$APP_DIR/bin/init.sh'
+      ahoy cli '"${APP_DIR}"/bin/init.sh'
       echo "Waiting for containers to start listening..."
       ahoy cli "dockerize -wait tcp://ckan:5000 -timeout 1m"
       if sh bin/docker-compose.sh logs | grep -q "\[Error\]"; then exit 1; fi
@@ -79,9 +79,9 @@ commands:
     cmd: |
       CKAN_CONTAINER=$(sh bin/docker-compose.sh ps -q ckan)
       if [ "${#}" -ne 0 \]; then
-        docker exec $CKAN_CONTAINER sh -c '. ${APP_DIR}/bin/activate; cd $APP_DIR;'" $*"
+        docker exec $CKAN_CONTAINER sh -c '. "${APP_DIR}"/bin/activate; cd $APP_DIR;'" $*"
       else
-        docker exec $CKAN_CONTAINER sh -c '. ${APP_DIR}/bin/activate && cd $APP_DIR && sh'
+        docker exec $CKAN_CONTAINER sh -c '. "${APP_DIR}"/bin/activate && cd $APP_DIR && sh'
       fi
 
   doctor:
@@ -93,7 +93,7 @@ commands:
     cmd: |
       ahoy title "Installing a fresh site"
       ahoy start-ckan-job-workers
-      ahoy cli '$APP_DIR/bin/init.sh && $APP_DIR/bin/create-test-data.sh'
+      ahoy cli '"${APP_DIR}"/bin/init.sh && "${APP_DIR}"/bin/create-test-data.sh'
       ahoy stop-ckan-job-workers
 
   clean:
@@ -130,13 +130,13 @@ commands:
     cmd: |
       docker cp . $(sh bin/docker-compose.sh ps -q ckan):/srv/app/
       docker cp bin/ckan_cli $(sh bin/docker-compose.sh ps -q ckan):/usr/bin/
-      ahoy cli 'chmod -v u+x /usr/bin/ckan_cli $APP_DIR/bin/*; cp -v .docker/test-$VARS_TYPE.ini $CKAN_INI; $APP_DIR/bin/process-config.sh'
+      ahoy cli 'chmod -v u+x /usr/bin/ckan_cli "${APP_DIR}"/bin/*; cp -v .docker/test-$VARS_TYPE.ini $CKAN_INI; "${APP_DIR}"/bin/process-config.sh'
 
   test-unit:
     usage: Run unit tests.
     cmd: |
       ahoy title 'Run unit tests'
-      ahoy cli 'pytest --ckan-ini=${CKAN_INI} $APP_DIR/test' || \
+      ahoy cli 'pytest --ckan-ini=${CKAN_INI} "${APP_DIR}"/test' || \
       [ "${ALLOW_UNIT_FAIL:-0}" -eq 1 ]
 
   test-bdd:
@@ -172,7 +172,7 @@ commands:
     usage: Starts email mock server used for email BDD tests
     cmd: |
       ahoy title 'Starting mailmock'
-      ahoy cli 'mailmock -p 8025 -o ${APP_DIR}/test/emails' # for debugging mailmock email output remove --no-stdout
+      ahoy cli 'mailmock -p 8025 -o "${APP_DIR}"/test/emails' # for debugging mailmock email output remove --no-stdout
 
   stop-mailmock:
     usage: Stops email mock server used for email BDD tests

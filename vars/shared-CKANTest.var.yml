@@ -46,7 +46,7 @@ extensions:
       description: "CKAN Extension for DCAT"
       type: "git"
       url: "https://github.com/ckan/ckanext-dcat.git"
-      version: "v1.2.0"
+      version: "v2.1.0"
 
     CKANExtScheming: &CKANExtScheming
       name: "ckanext-scheming-{{ Environment }}"
@@ -265,3 +265,4 @@ basic_facts:
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "oss.squizedge.net"
+    CKANRevision: "ckan-2.11.1"
