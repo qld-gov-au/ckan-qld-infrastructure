@@ -20,7 +20,7 @@ add_user_if_needed () {
 }
 
 api_call () {
-    wget -O - --header="Authorization: ${API_KEY}" --post-data "$1" ${CKAN_ACTION_URL}/$2
+    wget -O - --header="Authorization: ${API_KEY}" --header="Content-Type: application/json" --post-data "$1" ${CKAN_ACTION_URL}/$2
 }
 
 add_user_if_needed "$CKAN_USER_NAME" "$CKAN_DISPLAY_NAME" "$CKAN_USER_EMAIL"
@@ -80,7 +80,7 @@ api_call '{"id": "'"${TEST_ORG_ID}"'", "object": "test_org_member", "object_type
 # Creating test data hierarchy which creates organisations assigned to datasets
 echo "Creating food-standards-agency organisation:"
 organisation_create=$( \
-    api_call "name=food-standards-agency&title=Food%20Standards%20Agency" organization_create
+    api_call '{"name": "food-standards-agency", "title": "Food Standards Agency"}' organization_create
 )
 echo ${organisation_create}
 
