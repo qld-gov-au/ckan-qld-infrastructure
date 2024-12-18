@@ -56,23 +56,27 @@
 
     - name: Wait for instance configuration
       shell: |
-        STATUS=$(aws ssm list-commands --region {{ region }} --instance-id {{ InstanceId }} \
-          --filter "key=DocumentName,value=AWS-ApplyChefRecipes" --filter "key=InvokedAfter,value={{ timestamp }}" \
-          --query "Commands|[0].Status" --output text) || exit 1
-        echo "Deployment $DEPLOYMENT_ID: $STATUS" >&2
+        DEPLOYMENT_ID=None
         for retry in `seq 1 180`; do
-          if [ "$STATUS" = "Pending" ] || [ "$STATUS" = "InProgress" ] || [ "$STATUS" = "None" ]; then
-            sleep 20
-            STATUS=$(aws ssm list-commands --region {{ region }} --instance-id {{ InstanceId }} \
-              --filter "key=DocumentName,value=AWS-ApplyChefRecipes" --filter "key=InvokedAfter,value={{ timestamp }}" \
-              --query "Commands|[0].Status" --output text) || exit 1
-            echo "Instance {{ InstanceId }} deployment status: $STATUS" >&2
-          else
-            break
+          if [ "$DEPLOYMENT_ID" = "None" ]; then
+            DEPLOYMENT_ID=$(aws ssm list-commands --region {{ region }} --instance-id {{ InstanceId }} \
+              --filters "key=DocumentName,value=AWS-ApplyChefRecipes" "key=InvokedAfter,value={{ timestamp }}" \
+              --query "Commands|[0].CommandId" --output text) || exit 1
           fi
+          if [ "$DEPLOYMENT_ID" = "None" ]; then
+            echo "Instance {{ InstanceId }} has no deployment yet..." >&2
+          else
+            STATUS=$(aws ssm list-commands --region {{ region }} --command-id $DEPLOYMENT_ID \
+              --query "Commands|[0].Status" --output text) || exit 1
+            echo "{{ layer }} Instance {{ InstanceId }} deployment [$DEPLOYMENT_ID] status: $STATUS" >&2
+            if [ "$STATUS" != "Pending" ] && [ "$STATUS" != "InProgress" ] && [ "$STATUS" != "None" ]; then
+              break
+            fi
+          fi
+          sleep 20
         done
         if [ "$STATUS" != "Success" ]; then
-          echo "Failed to deploy $DEPLOYMENT_ID, status $STATUS - aborting" >&2
+          echo "Failed to deploy to instance {{ InstanceId }}, status $STATUS - aborting" >&2
           exit 2
         fi
 
