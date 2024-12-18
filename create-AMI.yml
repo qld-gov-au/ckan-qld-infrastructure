@@ -60,7 +60,7 @@
         for retry in `seq 1 180`; do
           if [ "$DEPLOYMENT_ID" = "None" ]; then
             DEPLOYMENT_ID=$(aws ssm list-commands --region {{ region }} --instance-id {{ InstanceId }} \
-              --filter "key=DocumentName,value=AWS-ApplyChefRecipes" --filter "key=InvokedAfter,value={{ timestamp }}" \
+              --filters "key=DocumentName,value=AWS-ApplyChefRecipes" "key=InvokedAfter,value={{ timestamp }}" \
               --query "Commands|[0].CommandId" --output text) || exit 1
           fi
           if [ "$DEPLOYMENT_ID" = "None" ]; then
@@ -68,7 +68,7 @@
           else
             STATUS=$(aws ssm list-commands --region {{ region }} --command-id $DEPLOYMENT_ID \
               --query "Commands|[0].Status" --output text) || exit 1
-            echo "Instance {{ InstanceId }} deployment [$DEPLOYMENT_ID] status: $STATUS" >&2
+            echo "{{ layer }} Instance {{ InstanceId }} deployment [$DEPLOYMENT_ID] status: $STATUS" >&2
             if [ "$STATUS" != "Pending" ] && [ "$STATUS" != "InProgress" ] && [ "$STATUS" != "None" ]; then
               break
             fi
