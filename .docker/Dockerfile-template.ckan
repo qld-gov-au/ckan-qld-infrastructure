@@ -1,4 +1,8 @@
-FROM openknowledge/ckan-dev:{CKAN_VERSION}
+FROM ckan/ckan-dev:{CKAN_VERSION}
+
+# swap between root and unprivileged user
+ARG ORIGINAL_USER
+RUN ORIGINAL_USER=$(id -un)
 
 ARG SITE_URL=http://ckan:5000/
 ENV DEPLOY_ENV={DEPLOY_ENV}
@@ -10,9 +14,20 @@ ENV PYTHON={PYTHON}
 
 WORKDIR "${APP_DIR}"
 
-ENV DOCKERIZE_VERSION v0.6.1
-RUN apk add --no-cache build-base \
-    && curl -sL https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz \
+COPY .docker/test-$VARS_TYPE.ini $CKAN_INI
+
+COPY . "${APP_DIR}"/
+
+USER root
+
+COPY bin/ckan_cli /usr/bin/
+
+COPY vars/shared-{VARS_TYPE}.var.yml "${APP_DIR}"/bin/extensions.yml
+
+RUN chmod +x "${APP_DIR}"/bin/*.sh /usr/bin/ckan_cli
+
+ENV DOCKERIZE_VERSION=v0.6.1
+RUN wget -O - https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-linux-amd64-${DOCKERIZE_VERSION}.tar.gz \
         | tar -C /usr/local/bin -xzvf -
 
 # Install CKAN.
@@ -24,17 +39,11 @@ RUN cd $SRC_DIR/ckan \
     && git reset --hard && git clean -f \
     && git checkout '{CKAN_GIT_VERSION}'
 
-COPY .docker/test-$VARS_TYPE.ini $CKAN_INI
+RUN which ps || apt-get install -y procps
 
-COPY . ${APP_DIR}/
-
-COPY bin/ckan_cli /usr/bin/
-
-COPY vars/shared-{VARS_TYPE}.var.yml $APP_DIR/bin/extensions.yml
-
-RUN chmod +x ${APP_DIR}/bin/*.sh /usr/bin/ckan_cli
+USER "$ORIGINAL_USER"
 
 # Init current extension.
-RUN ${APP_DIR}/bin/init-ext.sh
+RUN "${APP_DIR}"/bin/init-ext.sh
 
 CMD ["/srv/app/bin/serve.sh"]

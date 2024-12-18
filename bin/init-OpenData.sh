@@ -30,5 +30,7 @@ if (ckan_cli datarequests --help); then
     fi
 fi
 
-#Initialise the Harvester database tables
-ckan_cli harvester initdb
+#Initialise the Harvester database tables if applicable
+if (ckan_cli harvester initdb --help); then
+    ckan_cli harvester initdb
+fi
