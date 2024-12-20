@@ -82,7 +82,7 @@ create-amis () {
   for layer in Batch Web Solr; do
     eval "PID=\$${layer}_PID"
     if [ "$PID" != "" ]; then
-      wait "$PID"
+      wait "$PID" || exit 1
     fi
   done
   run-playbook "AMI-templates.yml" "state=absent"
