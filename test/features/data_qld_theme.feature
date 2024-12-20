@@ -108,7 +108,7 @@ Feature: Theme customisations (Publications and OpenData)
     @OpenData
     Scenario: Open Data - Menu items are present and correct
         Given "Unauthenticated" as the persona
-        When I go to "/dataset"
+        When I go to dataset page
         Then I should see an element with xpath "//li[contains(@class, 'active')]/a[contains(string(), 'Data') and (@href='/dataset' or @href='/dataset/')]"
         And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'Visualisations') and @href='/visualisations']"
         And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'News and Case Studies') and @href='/news-and-case-studies']"

@@ -32,8 +32,10 @@ install_requirements () {
     done
 }
 
-. ${APP_DIR}/bin/activate
-
+. "${APP_DIR}"/bin/activate
+if [ "$CKAN_VERSION" = "2.9" ]; then
+    pip install "setuptools>=44.1.0,<71"
+fi
 install_requirements . dev-requirements requirements-dev
 EXTENSIONS_FILE=$APP_DIR/bin/extensions.yml $PYTHON $(dirname $0)/generate-ext-requirements.py
 pip install -r "/tmp/requirements-ext.txt"
@@ -41,8 +43,8 @@ for extension in . `ls -d $SRC_DIR/ckanext-*`; do
     install_requirements $extension requirements pip-requirements
 done
 # force version that declares itself to be incompatible but actually works
-pip install click==7.1.2
+pip install click==8.1.7
 install_requirements . dev-requirements requirements-dev
 
-. $APP_DIR/bin/process-config.sh
-. ${APP_DIR}/bin/deactivate
+. "${APP_DIR}"/bin/process-config.sh
+. "${APP_DIR}"/bin/deactivate

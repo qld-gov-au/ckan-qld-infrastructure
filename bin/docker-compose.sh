@@ -1,11 +1,8 @@
 #!/bin/sh
 
-# Pass commands to Docker Compose v1 or v2 depending on what is present
+set -x
 
-if (which docker-compose >/dev/null); then
-    # Docker Compose v1
-    docker-compose $*
-elif (docker compose ls >/dev/null); then
+if (docker compose ls >/dev/null); then
     # Docker Compose v2
     docker compose $*
 else

@@ -11,10 +11,6 @@ common_stack: &common_stack
     ApplicationId: "{{ service_name_lower }}"
     Environment: "{{ Environment }}"
     AppSubnets: "{{ Environment }}CKANAppSubnet"
-    LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
-    AttachmentsBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}"
-    SSMKey: "{{ SSMKey | default('') }}"
-    InternalStackZone: "{{ Environment }}CKANPrivateHostedZone"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
