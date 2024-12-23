@@ -32,10 +32,7 @@ Resources:
 
 {% for layer in ['Batch', 'Web', 'Solr'] %}
 {% if layer == 'Solr' %}{% set disk_size = 100 %}{% set security_group = 'DatabaseSG' %}
-{% else %}{% set disk_size = '32' %}{% set instance_profile_prefix = 'Web' %}
-{% if layer == 'Web' %}{% set security_group = 'WebAsgSG' %}
-{% else %}{% set security_group = 'AppAsgSG' %}
-{% endif %}
+{% else %}{% set disk_size = '32' %}{% set security_group = 'AppAsgSG' %}{% set instance_profile_prefix = 'Web' %}
 {% endif %}
   {{ layer }}TemplateInstance:
     Type: AWS::EC2::Instance

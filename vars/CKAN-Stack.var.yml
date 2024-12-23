@@ -32,7 +32,7 @@ common_stack: &common_stack
     InternalStackZone: "{{ Environment }}CKANPrivateHostedZone"
     WebSubnets: "{{ Environment }}CKANWebSubnet"
     AdminSG: "{{ Environment }}CKANManagementSG"
-    LoadBalancerSG: "{{ Environment }}CKANWebLoadBalancerSG"
+    LoadBalancerSG: "{{ Environment }}CKANAppLoadBalancerSG"
     CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
     DatabaseSG: "{{ Environment }}CKANDatabaseSG"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
