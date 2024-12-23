@@ -115,47 +115,19 @@ Resources:
     Properties:
       VpcId:
         Fn::ImportValue: !Ref VPC
-      GroupDescription: allow connections from specified CIDR ranges
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          SourceSecurityGroupId: !Ref WebAsg
+      GroupDescription: Load balancer for the client tier
 
   AppAsg:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId:
         Fn::ImportValue: !Ref VPC
-      GroupDescription: allow connections from specified CIDR ranges
+      GroupDescription: Client tier of a 2-tier architecture
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           SourceSecurityGroupId: !Ref AppLoadBalancer
-
-  WebLoadBalancer:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      VpcId:
-        Fn::ImportValue: !Ref VPC
-      GroupDescription: allow connections from specified CIDR ranges
-
-  WebAsg:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      VpcId:
-        Fn::ImportValue: !Ref VPC
-      GroupDescription: allow connections from specified CIDR ranges
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        SourceSecurityGroupId: !Ref WebLoadBalancer
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
-        SourceSecurityGroupId: !Ref WebLoadBalancer
 
   Database:
     Type: AWS::EC2::SecurityGroup
@@ -190,86 +162,34 @@ Outputs:
     Description: Shared services management group
     Value: !Ref Management
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "ManagementSG"
-  WebAsgSG:
-    Description: Web auto-scaling group security group
-    Value: !Ref WebAsg
-    Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "WebAsgSG"
-
-  WebLoadBalancerSG:
-    Description: Web load balancer security group
-    Value: !Ref WebLoadBalancer
-    Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "WebLoadBalancerSG"
+      Name: !Sub "${Environment}${Platform}ManagementSG"
 
   AppAsgSG:
     Description: Application auto-scaling group security group
     Value: !Ref AppAsg
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "AppAsgSG"
+      Name: !Sub "${Environment}${Platform}AppAsgSG"
 
   AppLoadBalancerSG:
     Description: App load balancer security group
     Value: !Ref AppLoadBalancer
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "AppLoadBalancerSG"
+      Name: !Sub "${Environment}${Platform}AppLoadBalancerSG"
 
   DatabaseSG:
     Description: Database security group
     Value: !Ref Database
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "DatabaseSG"
+      Name: !Sub "${Environment}${Platform}DatabaseSG"
 
   CloudfrontHTTPSG:
     Description: Cloudfront HTTP Security Group
     Value: !Ref CloudfrontHTTP
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "CloudfrontHTTPSG"
+      Name: !Sub "${Environment}${Platform}CloudfrontHTTPSG"
 
   CloudfrontHTTPSSG:
     Description: Cloudfront HTTPS Security Group
     Value: !Ref CloudfrontHTTPS
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "CloudfrontHTTPSSG"
-
+      Name: !Sub "${Environment}${Platform}CloudfrontHTTPSSG"
