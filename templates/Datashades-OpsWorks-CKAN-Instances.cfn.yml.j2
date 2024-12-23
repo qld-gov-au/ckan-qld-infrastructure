@@ -134,8 +134,8 @@ Resources:
 {% for layer in ['Batch', 'Web', 'Solr'] %}
 
 {% if layer == 'Solr' %}{% set disk_size = 100 %}{% set security_group = 'DatabaseSG' %}
-{% else %}{% set disk_size = '32' %}
-{% if layer == 'Web' %}{% set security_group = 'WebAsgSG' %}{% set instance_profile_prefix = 'Web' %}
+{% else %}{% set disk_size = '32' %}{% set instance_profile_prefix = 'Web' %}
+{% if layer == 'Web' %}{% set security_group = 'WebAsgSG' %}
 {% else %}{% set security_group = 'AppAsgSG' %}
 {% endif %}
 {% endif %}
