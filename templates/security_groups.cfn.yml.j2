@@ -162,34 +162,64 @@ Outputs:
     Description: Shared services management group
     Value: !Ref Management
     Export:
-      Name: !Sub "${Environment}${Platform}ManagementSG"
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "ManagementSG"
 
   AppAsgSG:
     Description: Application auto-scaling group security group
     Value: !Ref AppAsg
     Export:
-      Name: !Sub "${Environment}${Platform}AppAsgSG"
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "AppAsgSG"
 
   AppLoadBalancerSG:
     Description: App load balancer security group
     Value: !Ref AppLoadBalancer
     Export:
-      Name: !Sub "${Environment}${Platform}AppLoadBalancerSG"
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "AppLoadBalancerSG"
 
   DatabaseSG:
     Description: Database security group
     Value: !Ref Database
     Export:
-      Name: !Sub "${Environment}${Platform}DatabaseSG"
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "DatabaseSG"
 
   CloudfrontHTTPSG:
     Description: Cloudfront HTTP Security Group
     Value: !Ref CloudfrontHTTP
     Export:
-      Name: !Sub "${Environment}${Platform}CloudfrontHTTPSG"
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "CloudfrontHTTPSG"
 
   CloudfrontHTTPSSG:
     Description: Cloudfront HTTPS Security Group
     Value: !Ref CloudfrontHTTPS
     Export:
-      Name: !Sub "${Environment}${Platform}CloudfrontHTTPSSG"
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "CloudfrontHTTPSSG"
