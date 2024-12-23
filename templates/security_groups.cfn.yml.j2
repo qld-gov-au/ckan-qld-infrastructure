@@ -115,19 +115,47 @@ Resources:
     Properties:
       VpcId:
         Fn::ImportValue: !Ref VPC
-      GroupDescription: Load balancer for the client tier
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref WebAsg
 
   AppAsg:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId:
         Fn::ImportValue: !Ref VPC
-      GroupDescription: Client tier of a 2-tier architecture
+      GroupDescription: allow connections from specified CIDR ranges
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           SourceSecurityGroupId: !Ref AppLoadBalancer
+
+  WebLoadBalancer:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      GroupDescription: allow connections from specified CIDR ranges
+
+  WebAsg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        SourceSecurityGroupId: !Ref WebLoadBalancer
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        SourceSecurityGroupId: !Ref WebLoadBalancer
 
   Database:
     Type: AWS::EC2::SecurityGroup
