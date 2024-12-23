@@ -136,7 +136,6 @@ Resources:
 {% if layer == 'Solr' %}{% set disk_size = 100 %}{% set security_group = 'DatabaseSG' %}
 {% else %}{% set disk_size = '32' %}{% set security_group = 'AppAsgSG' %}{% set instance_profile_prefix = 'Web' %}
 {% endif %}
-{% endif %}
 
   {{ layer }}LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
