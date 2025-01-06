@@ -26,7 +26,7 @@ COPY vars/shared-{VARS_TYPE}.var.yml "${APP_DIR}"/bin/extensions.yml
 
 RUN chmod +x "${APP_DIR}"/bin/*.sh /usr/bin/ckan_cli
 
-ENV DOCKERIZE_VERSION=v0.6.1
+ENV DOCKERIZE_VERSION=v0.9.1
 RUN wget -O - https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-linux-amd64-${DOCKERIZE_VERSION}.tar.gz \
         | tar -C /usr/local/bin -xzvf -
 
@@ -40,6 +40,11 @@ RUN cd $SRC_DIR/ckan \
     && git checkout '{CKAN_GIT_VERSION}'
 
 RUN which ps || apt-get install -y procps
+
+# Install setuptools conditionally
+RUN if [ "$CKAN_VERSION" = "2.9" ]; then \
+        pip install "setuptools>=44.1.0,<71"; \
+    fi
 
 USER "$ORIGINAL_USER"
 

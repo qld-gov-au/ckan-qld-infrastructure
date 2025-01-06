@@ -11,6 +11,7 @@ from behave import when, then
 from behaving.personas.steps import *  # noqa: F401, F403
 from behaving.mail.steps import *  # noqa: F401, F403
 from behaving.web.steps import *  # noqa: F401, F403
+from behaving.web.steps.basic import should_see_within_timeout
 
 # Monkey-patch Selenium 3 to handle Python 3.9
 import base64
@@ -60,6 +61,11 @@ def go_to_home(context):
     context.execute_steps(u"""
         When I visit "/"
     """)
+
+
+@then(u'I should see text containing quotes `{text}`')
+def should_see_backquoted(context, text):
+    should_see_within_timeout(context, text, 5)
 
 
 @when(u'I go to register page')
@@ -186,6 +192,11 @@ def go_to_new_resource_form(context, name):
         context.execute_steps(u"""
             When I press "Next:"
         """)
+    elif context.browser.is_element_present_by_xpath("//*[contains(string(), 'Add new resource')]"):
+        # Existing dataset, browse to the resource form
+        context.execute_steps(u"""
+                   When I press "Add new resource"
+               """)
     else:
         # Existing dataset, browse to the resource form
         if context.browser.is_element_present_by_xpath(
@@ -257,7 +268,8 @@ def show_more_fields(context):
 @when(u'I edit the "{name}" dataset')
 def edit_dataset(context, name):
     context.execute_steps(u"""
-        When I visit "/dataset/edit/{0}"
+        When I go to dataset "{0}"
+        And I press the element with xpath "//div[contains(@class, 'action')]//a[contains(@href, '/dataset/edit/')]"
     """.format(name))
 
 
@@ -320,7 +332,7 @@ def fill_in_default_link_resource_fields(context):
 @when(u'I upload "{file_name}" of type "{file_format}" to resource')
 def upload_file_to_resource(context, file_name, file_format):
     context.execute_steps(u"""
-        When I execute the script "$('#resource-upload-button').trigger('click');"
+        When I execute the script "$('.resource-upload-field .btn-remove-url').trigger('click'); $('#resource-upload-button').trigger('click');"
         And I attach the file "{file_name}" to "upload"
         # Don't quote the injected string since it can have trailing spaces
         And I execute the script "document.getElementById('field-format').value='{file_format}'"
@@ -331,7 +343,7 @@ def upload_file_to_resource(context, file_name, file_format):
 @when(u'I upload schema file "{file_name}" to resource')
 def upload_schema_file_to_resource(context, file_name):
     context.execute_steps(u"""
-        When I execute the script "$('#field-schema-json ~ a.btn-remove-url').trigger('click');"
+        When I execute the script "$('div[data-module=resource-schema] a.btn-remove-url').trigger('click'); $('input[name=schema_upload]').show().parent().show().parent().show();"
         And I attach the file "{file_name}" to "schema_upload"
     """.format(file_name=file_name))
 
@@ -830,4 +842,14 @@ def data_usability_rating_visible(context, score):
 def go_to_reporting_page(context):
     context.execute_steps(u"""
         When I visit "/dashboard/reporting"
+    """)
+
+# ckanext-validation
+
+
+@then(u'I should see a validation timestamp')
+def should_see_validation_timestamp(context):
+    context.execute_steps(u"""
+        Then I should see "Validation timestamp"
+        And I should see an element with xpath "//th[contains(string(), 'Validation timestamp')]/../td[contains(string(), '-') and contains(string(), ':') and contains(string(), '.')]"
     """)

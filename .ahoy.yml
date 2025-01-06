@@ -136,7 +136,7 @@ commands:
     usage: Run unit tests.
     cmd: |
       ahoy title 'Run unit tests'
-      ahoy cli 'pytest --ckan-ini=${CKAN_INI} "${APP_DIR}"/test' || \
+      ahoy cli 'pytest --cov-report=xml --cov-append --ckan-ini=${CKAN_INI} "${APP_DIR}"/ckanext --junit-xml=test/junit/results.xml' || \
       [ "${ALLOW_UNIT_FAIL:-0}" -eq 1 ]
 
   test-bdd:
@@ -147,22 +147,23 @@ commands:
       ahoy start-ckan-job-workers
       ahoy start-mailmock &
       sleep 5
+      JUNIT_OUTPUT="--junit --junit-directory=test/junit/"
       if [ "$BEHAVE_TAG" = "" ]; then
-        (ahoy cli "behave -k --tags=-OpenData --tags=-Publications ${*:-test/features}" \
+        (ahoy cli "behave $JUNIT_OUTPUT -k --tags=-OpenData --tags=-Publications ${*:-test/features}" \
          && ahoy cli "behave -k --tags $VARS_TYPE ${*:-test/features}" \
         ) || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       elif [ "$BEHAVE_TAG" = "app" ]; then
         # run app-specific tests
-        ahoy cli "behave -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=$VARS_TYPE  --tags=-multi_plugin" \
+        ahoy cli "behave $JUNIT_OUTPUT -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=$VARS_TYPE  --tags=-multi_plugin" \
           || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       elif [ "$BEHAVE_TAG" = "authenticated" ]; then
         # run any tests that don't have a specific tag
-        ahoy cli "behave -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=-OpenData --tags=-Publications" \
+        ahoy cli "behave $JUNIT_OUTPUT -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=-OpenData --tags=-Publications" \
           || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       else
         # run shared or app-specific tests with the specific tag
         (ahoy cli "behave -k ${*:-test/features} --tags=$BEHAVE_TAG --tags=-OpenData --tags=-Publications" \
-         && ahoy cli "behave -k ${*:-test/features} --tags=$BEHAVE_TAG --tags=$VARS_TYPE" \
+         && ahoy cli "behave $JUNIT_OUTPUT -k ${*:-test/features} --tags=$BEHAVE_TAG --tags=$VARS_TYPE" \
         ) || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       fi
       ahoy stop-mailmock

@@ -33,15 +33,17 @@ install_requirements () {
 }
 
 . "${APP_DIR}"/bin/activate
-if [ "$CKAN_VERSION" = "2.9" ]; then
-    pip install "setuptools>=44.1.0,<71"
-fi
 install_requirements . dev-requirements requirements-dev
 EXTENSIONS_FILE=$APP_DIR/bin/extensions.yml $PYTHON $(dirname $0)/generate-ext-requirements.py
 pip install -r "/tmp/requirements-ext.txt"
 for extension in . `ls -d $SRC_DIR/ckanext-*`; do
     install_requirements $extension requirements pip-requirements
 done
+if [ "$CKAN_VERSION" = "2.9" ]; then
+  echo "CKAN 2.9 last supported Jinja2 is less than 3.1"
+  pip install "jinja2<3.1"
+fi
+
 # force version that declares itself to be incompatible but actually works
 pip install click==8.1.7
 install_requirements . dev-requirements requirements-dev
