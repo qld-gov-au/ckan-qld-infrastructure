@@ -65,7 +65,7 @@ def go_to_home(context):
 
 @then(u'I should see text containing quotes `{text}`')
 def should_see_backquoted(context, text):
-    should_see_within_timeout(context, text, 5)
+    should_see_within_timeout(context, text)
 
 
 @when(u'I go to register page')
@@ -195,8 +195,8 @@ def go_to_new_resource_form(context, name):
     elif context.browser.is_element_present_by_xpath("//*[contains(string(), 'Add new resource')]"):
         # Existing dataset, browse to the resource form
         context.execute_steps(u"""
-                   When I press "Add new resource"
-               """)
+            When I press "Add new resource"
+        """)
     else:
         # Existing dataset, browse to the resource form
         if context.browser.is_element_present_by_xpath(
@@ -271,6 +271,13 @@ def edit_dataset(context, name):
         When I go to dataset "{0}"
         And I press the element with xpath "//div[contains(@class, 'action')]//a[contains(@href, '/dataset/edit/')]"
     """.format(name))
+
+
+@when(u'I press the resource edit button')
+def press_edit_resource(context):
+    context.execute_steps(u"""
+        When I press the element with xpath "//div[contains(@class, 'action')]//a[contains(@href, '/resource/') and contains(@href, '/edit')]"
+    """)
 
 
 @when(u'I select the "{licence_id}" licence')
@@ -623,7 +630,7 @@ def go_to_admin_config(context):
 @when(u'I log out')
 def log_out(context):
     context.execute_steps(u"""
-        When I press the element with xpath "//*[@title='Log out']"
+        When I press the element with xpath "//*[@title='Log out' or @data-bs-title='Log out']"
         Then I should see "Log in"
     """)
 
