@@ -90,7 +90,7 @@ def log_in(context):
 @when(u'I expand the browser height')
 def expand_height(context):
     # Work around x=null bug in Selenium set_window_size
-    context.browser.driver.set_window_rect(x=0, y=0, width=1024, height=3072)
+    context.browser.driver.set_window_rect(x=0, y=0, width=1366, height=3072)
 
 
 @when(u'I log in directly')
@@ -771,7 +771,8 @@ def lock_account(context):
     for x in range(11):
         context.execute_steps(u"""
             When I attempt to log in with password "incorrect password"
-            Then I should see "Bad username or password or reCAPTCHA."
+            Then I should see "Bad username or password or "
+            And I should see "CAPTCHA."
         """)
 
 
