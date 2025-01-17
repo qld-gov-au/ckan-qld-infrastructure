@@ -62,7 +62,7 @@ extensions:
       description: "CKAN Extension for validating Data Packages"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation.git"
-      version: "v0.0.8-qgov.13"
+      version: "0.0.8-qgov.15"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
@@ -70,7 +70,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "7.3.1"
+      version: "7.3.2"
 
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
@@ -94,7 +94,7 @@ extensions:
       description: "CKAN Extension for Harvesting"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-harvest.git"
-      version: "v1.4.2.a"
+      version: "1.6.0-qgov.1"
 
     CKANExtHarvestDataQldGeoScience: &CKANExtHarvestDataQldGeoScience
       name: "ckanext-harvest-{{ Environment }}"
@@ -126,7 +126,7 @@ extensions:
       description: "CKAN Extension for Quality Assurance"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-qa.git"
-      version: "2.0.3-qgov.12"
+      version: "2.0.3-qgov.14"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"
@@ -150,7 +150,7 @@ extensions:
       description: "CKAN Extension for Schema Generation"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation-schema-generator.git"
-      version: "1.0.4"
+      version: "2.0.0"
 
     CKANExtResourceVisibility: &CKANExtResourceVisibility
       name: "ckanext-resource-visibility-{{ Environment }}"

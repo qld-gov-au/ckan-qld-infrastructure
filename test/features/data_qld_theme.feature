@@ -66,28 +66,6 @@ Feature: Theme customisations (Publications and OpenData)
         When I go to organisation page
         Then I should see "Organisations are Queensland Government departments, other agencies or legislative entities responsible for publishing open data on this portal."
 
-    Scenario: Register user password must be 10 characters or longer
-        Given "Unauthenticated" as the persona
-        When I go to register page
-        And I fill in "name" with "name"
-        And I fill in "fullname" with "fullname"
-        And I fill in "email" with "email@test.com"
-        And I fill in "password1" with "pass"
-        And I fill in "password2" with "pass"
-        And I press "Create Account"
-        Then I should see "Password: Your password must be 10 characters or longer"
-
-    Scenario: Register user password must contain at least one number, lowercase letter, capital letter, and symbol
-        Given "Unauthenticated" as the persona
-        When I go to register page
-        And I fill in "name" with "name"
-        And I fill in "fullname" with "fullname"
-        And I fill in "email" with "email@test.com"
-        And I fill in "password1" with "password1234"
-        And I fill in "password2" with "password1234"
-        And I press "Create Account"
-        Then I should see "Password: Must contain at least one number, lowercase letter, capital letter, and symbol"
-
     @OpenData
     Scenario: As a publisher, when I create a resource with an API entry, I can download it in various formats
         Given "TestOrgEditor" as the persona

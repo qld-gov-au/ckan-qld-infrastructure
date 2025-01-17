@@ -14,14 +14,9 @@ sed -i -e "s/##//" docker-compose.yml
 # Pull the latest images.
 ahoy pull
 
-PYTHON=python
+PYTHON=python3
 CKAN_GIT_VERSION=`sh ./retrieve-ckan-version.sh`
 CKAN_VERSION=$(echo $CKAN_GIT_VERSION |grep -Eo '[0-9]+[.][0-9]*')
-if [ "$PYTHON_VERSION" = "py2" ]; then
-    CKAN_VERSION="${CKAN_VERSION}-py2"
-else
-    PYTHON="${PYTHON}3"
-fi
 export CKAN_VERSION
 
 sed "s|{CKAN_VERSION}|$CKAN_VERSION|g" .docker/Dockerfile-template.ckan \
