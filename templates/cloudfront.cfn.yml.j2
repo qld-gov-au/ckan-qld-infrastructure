@@ -61,28 +61,33 @@ Resources:
     Properties:
       CachePolicyConfig:
         Comment: !Sub "${Service} Cache policy"
-        DefaultTTL: 1
-        MaxTTL: 1
-        MinTTL: 0
+        DefaultTTL: 5
+        MaxTTL: 31536000
+        MinTTL: 2
         Name: !Sub "${AWS::StackName}_CachePolicyCMS"
         ParametersInCacheKeyAndForwardedToOrigin:
           CookiesConfig:
-            CookieBehavior: "all" #none, whitelist, allExcept, all
+            CookieBehavior: "allExcept" #none, whitelist, allExcept, all
+            Cookies:
+              - "_dc_gtm_UA-7276966-13" #GTM/Google Analytics
+              - "_ga" #GTM/Google Analytics
+              - "_ga_6KF13E15B4" #GTM/Google Analytics
+              - "_gid" #GTM/Google Analytics
+              - "monsido" #Monsido
+              - "nmstat"
           EnableAcceptEncodingBrotli: true
           EnableAcceptEncodingGzip: true
           HeadersConfig:
             HeaderBehavior: "whitelist" #none, whitelist
             Headers: #max 10
-              - "Accept"
               - "Accept-Charset"
-              - "Accept-Language"
               - "Authorization"
-              - "Host"
               - "Origin"
-              - "Referer"
+              - "Accept"
               - "Access-Control-Request-Method"
               - "Access-Control-Request-Headers"
-              - "Accept-Datetime"
+              - "Host"
+              - "x-squizmatrix-jsapi-key"
           QueryStringsConfig:
             QueryStringBehavior: "all" #all, allExcept, none, whitelist
 
@@ -97,7 +102,14 @@ Resources:
         Name: !Sub "${AWS::StackName}_CachePolicyCkan"
         ParametersInCacheKeyAndForwardedToOrigin:
           CookiesConfig:
-            CookieBehavior: "all" #none, whitelist, allExcept, all
+            CookieBehavior: "allExcept" #none, whitelist, allExcept, all
+            Cookies:
+              - "_dc_gtm_UA-7276966-13" #GTM/Google Analytics
+              - "_ga" #GTM/Google Analytics
+              - "_ga_6KF13E15B4" #GTM/Google Analytics
+              - "_gid" #GTM/Google Analytics
+              - "monsido" #Monsido
+              - "nmstat"
           EnableAcceptEncodingBrotli: true
           EnableAcceptEncodingGzip: true
           HeadersConfig:
