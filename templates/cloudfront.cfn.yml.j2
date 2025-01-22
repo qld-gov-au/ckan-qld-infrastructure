@@ -245,7 +245,7 @@ Resources:
             LambdaFunctionAssociations:
               - EventType: 'origin-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
-{% for path in ['/api/3/action/datastore_sear*', '/api/action/datastore_searq*'] %}
+{% for path in ['/api/3/action/datastore_sear*', '/api/action/datastore_sear*'] %}
           - PathPattern: "{{ path }}" # datastore read endpoints
             TargetOriginId: 'WebOrigin'
             AllowedMethods:
