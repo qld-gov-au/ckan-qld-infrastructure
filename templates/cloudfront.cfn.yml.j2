@@ -134,7 +134,29 @@ Resources:
             HeaderBehavior: "none" #none, whitelist
           QueryStringsConfig:
             QueryStringBehavior: "all" #all, allExcept, none, whitelist
-
+  CachePolicyCKANAPI:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Comment: !Sub "${Service} API Cache policy"
+        DefaultTTL: 60
+        MaxTTL: 31536000
+        MinTTL: 60
+        Name: !Sub "${AWS::StackName}_CachePolicyAPI"
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: "none" #none, whitelist, allExcept, all
+          EnableAcceptEncodingBrotli: true
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: "whitelist" #none, whitelist
+            Headers: #max 10
+              - "Authorization"
+              - "Origin"
+              - "Accept"
+              - "Host"
+          QueryStringsConfig:
+            QueryStringBehavior: "all" #all, allExcept, none, whitelist
   DistributionConfig:
     DependsOn:
       - CachePolicyCkan
@@ -151,6 +173,7 @@ Resources:
           - PathPattern: "{{ path }}"
             TargetOriginId: 'WebOrigin'
             CachePolicyId: !Ref CachePolicyCMS
+            OriginRequestPolicyId: "33f36d7e-f396-46d9-90e0-52428a34d9dc" #AllViewerAndCloudFrontHeaders-2022-06
             Compress: true
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
@@ -170,6 +193,7 @@ Resources:
               - POST
               - DELETE
             CachePolicyId: !Ref CachePolicyCkan
+            OriginRequestPolicyId: "33f36d7e-f396-46d9-90e0-52428a34d9dc" #AllViewerAndCloudFrontHeaders-2022-06
             Compress: true
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
@@ -188,6 +212,7 @@ Resources:
               - POST
               - DELETE
             CachePolicyId: !Ref CachePolicyCMS
+            OriginRequestPolicyId: "33f36d7e-f396-46d9-90e0-52428a34d9dc" #AllViewerAndCloudFrontHeaders-2022-06
             Compress: true
             ViewerProtocolPolicy: redirect-to-https
             LambdaFunctionAssociations:
@@ -208,6 +233,25 @@ Resources:
             LambdaFunctionAssociations:
               - EventType: 'origin-request'
                 LambdaFunctionARN: !Ref LambdaAtEdgeOriginRequestVersion
+{% for path in ['/api/3/action/datastore_sear*', '/api/action/datastore_searq*'] %}
+          - PathPattern: "{{ path }}" # datastore read endpoints
+            TargetOriginId: 'WebOrigin'
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            CachePolicyId: !Ref CachePolicyCKANAPI
+            OriginRequestPolicyId: "33f36d7e-f396-46d9-90e0-52428a34d9dc" #AllViewerAndCloudFrontHeaders-2022-06
+            Compress: true
+            ViewerProtocolPolicy: redirect-to-https
+            LambdaFunctionAssociations:
+              - EventType: 'viewer-request'
+                LambdaFunctionARN: !Ref LambdaAtEdgeViewerRequestVersion
+{% endfor %}
         DefaultCacheBehavior:
           AllowedMethods:
             - GET
@@ -218,6 +262,7 @@ Resources:
             - PUT
             - PATCH
           CachePolicyId: !Ref CachePolicyCkan
+          OriginRequestPolicyId: "33f36d7e-f396-46d9-90e0-52428a34d9dc" #AllViewerAndCloudFrontHeaders-2022-06
           Compress: true
           TargetOriginId: 'WebOrigin'
           ViewerProtocolPolicy: redirect-to-https
