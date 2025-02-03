@@ -93,8 +93,8 @@ extensions:
       shortname: "ckanext-harvest"
       description: "CKAN Extension for Harvesting"
       type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-harvest.git"
-      version: "1.6.0-qgov.1"
+      url: "https://github.com/ckan/ckanext-harvest.git"
+      version: "v1.6.1"
 
     CKANExtHarvestDataQldGeoScience: &CKANExtHarvestDataQldGeoScience
       name: "ckanext-harvest-{{ Environment }}"
@@ -201,10 +201,6 @@ extensions:
 
     CKANExtDataRequests:
       <<: *CKANExtDataRequests
-      version: "master"
-
-    CKANExtHarvest:
-      <<: *CKANExtHarvest
       version: "master"
 
     CKANExtHarvestDataQldGeoScience:
