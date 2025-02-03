@@ -771,8 +771,7 @@ def lock_account(context):
     for x in range(11):
         context.execute_steps(u"""
             When I attempt to log in with password "incorrect password"
-            Then I should see "Bad username or password or "
-            And I should see "CAPTCHA."
+            Then I should see "Bad username or password."
         """)
 
 
