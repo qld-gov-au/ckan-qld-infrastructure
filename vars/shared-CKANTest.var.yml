@@ -158,7 +158,7 @@ extensions:
       description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-resource-visibility.git"
-      version: "2.1.1"
+      version: "2.1.2"
 
     CKANExtOIDC: &CKANExtOIDC
       name: "ckanext-oidc-pkce-{{ Environment }}"
