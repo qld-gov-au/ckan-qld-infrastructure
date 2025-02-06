@@ -2,6 +2,7 @@
 
 set -x
 
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
 # Pass commands to Docker Compose v1 or v2 depending on what is present
 
 if (docker compose ls >/dev/null); then

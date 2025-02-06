@@ -40,7 +40,15 @@ commands:
       echo "Initialising database schema"
       ahoy cli '"${APP_DIR}"/bin/init.sh'
       echo "Waiting for containers to start listening..."
-      ahoy cli "dockerize -wait tcp://ckan:5000 -timeout 1m"
+      for i in `seq 1 60`; do
+        if (ahoy cli "timeout 1 bash -c 'cat < /dev/null > /dev/tcp/ckan/5000'"); then
+          echo "CKAN became ready on attempt $i"
+          break
+        else
+          echo "CKAN not yet ready, retrying (attempt $i)..."
+          sleep 1
+        fi
+      done
       if sh bin/docker-compose.sh logs | grep -q "\[Error\]"; then exit 1; fi
       if sh bin/docker-compose.sh logs | grep -q "Exception"; then exit 1; fi
       docker ps -a --filter name=^/${COMPOSE_PROJECT_NAME}_
@@ -68,7 +76,13 @@ commands:
     usage: Show Docker logs.
     cmd: |
         ahoy title "Output logs"
-        sh bin/docker-compose.sh logs "$@"
+        # Loop through each container and wrap with github log groups
+        services=$(bin/docker-compose.sh ps --services)
+        for service in $services; do
+          echo "::group::$service"
+          sh bin/docker-compose.sh logs "$service"
+          echo "::endgroup::"
+        done
 
   pull:
     usage: Pull latest docker images.
@@ -136,7 +150,7 @@ commands:
     usage: Run unit tests.
     cmd: |
       ahoy title 'Run unit tests'
-      ahoy cli 'pytest --ckan-ini=${CKAN_INI} "${APP_DIR}"/test' || \
+      ahoy cli 'pytest --cov-report=xml --cov-append --ckan-ini=${CKAN_INI} "${APP_DIR}"/ckanext --junit-xml=test/junit/results.xml' || \
       [ "${ALLOW_UNIT_FAIL:-0}" -eq 1 ]
 
   test-bdd:
@@ -147,22 +161,23 @@ commands:
       ahoy start-ckan-job-workers
       ahoy start-mailmock &
       sleep 5
+      JUNIT_OUTPUT="--junit --junit-directory=test/junit/"
       if [ "$BEHAVE_TAG" = "" ]; then
-        (ahoy cli "behave -k --tags=-OpenData --tags=-Publications ${*:-test/features}" \
+        (ahoy cli "behave $JUNIT_OUTPUT -k --tags=-OpenData --tags=-Publications ${*:-test/features}" \
          && ahoy cli "behave -k --tags $VARS_TYPE ${*:-test/features}" \
         ) || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       elif [ "$BEHAVE_TAG" = "app" ]; then
         # run app-specific tests
-        ahoy cli "behave -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=$VARS_TYPE  --tags=-multi_plugin" \
+        ahoy cli "behave $JUNIT_OUTPUT -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=$VARS_TYPE  --tags=-multi_plugin" \
           || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       elif [ "$BEHAVE_TAG" = "authenticated" ]; then
         # run any tests that don't have a specific tag
-        ahoy cli "behave -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=-OpenData --tags=-Publications" \
+        ahoy cli "behave $JUNIT_OUTPUT -k ${*:-test/features} --tags=-unauthenticated --tags=-smoke --tags=-OpenData --tags=-Publications" \
           || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       else
         # run shared or app-specific tests with the specific tag
         (ahoy cli "behave -k ${*:-test/features} --tags=$BEHAVE_TAG --tags=-OpenData --tags=-Publications" \
-         && ahoy cli "behave -k ${*:-test/features} --tags=$BEHAVE_TAG --tags=$VARS_TYPE" \
+         && ahoy cli "behave $JUNIT_OUTPUT -k ${*:-test/features} --tags=$BEHAVE_TAG --tags=$VARS_TYPE" \
         ) || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       fi
       ahoy stop-mailmock

@@ -22,7 +22,7 @@ extensions:
       description: "CKAN Extension for Queensland Government sites"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-qgov.git"
-      version: "7.0.0"
+      version: "7.0.1"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       name: "ckanext-s3filestore-{{ Environment }}"
@@ -62,7 +62,7 @@ extensions:
       description: "CKAN Extension for validating Data Packages"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation.git"
-      version: "v0.0.8-qgov.13"
+      version: "0.0.8-qgov.15"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
@@ -70,7 +70,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "7.3.1"
+      version: "7.3.2"
 
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
@@ -93,8 +93,8 @@ extensions:
       shortname: "ckanext-harvest"
       description: "CKAN Extension for Harvesting"
       type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-harvest.git"
-      version: "v1.4.2.a"
+      url: "https://github.com/ckan/ckanext-harvest.git"
+      version: "v1.6.1"
 
     CKANExtHarvestDataQldGeoScience: &CKANExtHarvestDataQldGeoScience
       name: "ckanext-harvest-{{ Environment }}"
@@ -126,7 +126,7 @@ extensions:
       description: "CKAN Extension for Quality Assurance"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-qa.git"
-      version: "2.0.3-qgov.12"
+      version: "2.0.3-qgov.14"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"
@@ -150,7 +150,7 @@ extensions:
       description: "CKAN Extension for Schema Generation"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation-schema-generator.git"
-      version: "1.0.4"
+      version: "2.0.0"
 
     CKANExtResourceVisibility: &CKANExtResourceVisibility
       name: "ckanext-resource-visibility-{{ Environment }}"
@@ -201,10 +201,6 @@ extensions:
 
     CKANExtDataRequests:
       <<: *CKANExtDataRequests
-      version: "develop"
-
-    CKANExtHarvest:
-      <<: *CKANExtHarvest
       version: "develop"
 
     CKANExtHarvestDataQldGeoScience:

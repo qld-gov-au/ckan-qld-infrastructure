@@ -32,4 +32,5 @@ Feature: Data usability rating
         And I should see an element with xpath "//div[contains(@class, 'openness-4')]"
         When I take a debugging screenshot
         And I press "Test Resource"
-        Then I should see an element with xpath "//div[contains(@class, 'qa openness-4')]"
+        And I reload page every 3 seconds until I see an element with xpath "//div[contains(@class, 'qa') and contains(@class, 'openness-4')]" but not more than 10 times
+        Then I should not see an element with xpath "//div[contains(@class, 'openness-3')]"

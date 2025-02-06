@@ -6,9 +6,9 @@ Feature: Schema Generation
     Scenario: As a publisher, when I visit my resource, I can generate a validation schema for it
         Given "TestOrgEditor" as the persona
         When I log in
-        And I create a dataset and resource with key-value parameters "notes=package-with-csv-res::schema_json=default" and "upload=default::format=CSV"
+        And I create a dataset and resource with key-value parameters "notes=package-with-csv-res::schema_json=default" and "name=Resource for schema generation::upload=default::format=CSV"
         And I take a debugging screenshot
-        And I go to the first resource in the dataset
+        And I press "Resource for schema generation"
         And I take a debugging screenshot
         # Ensure that the datastore is active
         And I reload page every 3 seconds until I see an element with xpath "//*[string() = 'Data Dictionary']" but not more than 6 times
@@ -45,8 +45,8 @@ Feature: Schema Generation
     Scenario: System actions following the selection of the set as dataset default dropdown option on the manage data schema GUI page
         Given "TestOrgEditor" as the persona
         When I log in
-        And I create a dataset and resource with key-value parameters "notes=apply-for-dataset-schema::schema_json=default" and "upload=default::format=CSV"
-        And I go to the first resource in the dataset
+        And I create a dataset and resource with key-value parameters "notes=apply-for-dataset-schema::schema_json=default" and "name=Resource for schema generation::upload=default::format=CSV"
+        And I press "Resource for schema generation"
         And I reload page every 3 seconds until I see an element with xpath "//*[string() = 'Data Dictionary']" but not more than 6 times
         And I visit resource schema generation page
         Then I should see an element with xpath "//button[contains(string(), 'Generate JSON data schema') and contains(@class, 'btn-generate')]/following::table[contains(@class, 'table-schema')]"
@@ -61,8 +61,8 @@ Feature: Schema Generation
     Scenario: System actions following the selection of the validate only this resource dropdown option on the manage data schema GUI page
         Given "TestOrgEditor" as the persona
         When I log in
-        And I create a dataset and resource with key-value parameters "notes=apply-for-resource-schema::schema_json=default" and "upload=default::format=CSV"
-        And I go to the first resource in the dataset
+        And I create a dataset and resource with key-value parameters "notes=apply-for-resource-schema::schema_json=default" and "name=Resource for schema generation::upload=default::format=CSV"
+        And I press "Resource for schema generation"
         And I reload page every 3 seconds until I see an element with xpath "//*[string() = 'Data Dictionary']" but not more than 6 times
         And I visit resource schema generation page
         Then I should see an element with xpath "//button[contains(string(), 'Generate JSON data schema') and contains(@class, 'btn-generate')]/following::table[contains(@class, 'table-schema')]"
