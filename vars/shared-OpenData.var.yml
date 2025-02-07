@@ -115,7 +115,7 @@ extensions:
     CKANExtArchiver: &CKANExtArchiver
       name: "ckanext-archiver-{{ Environment }}"
       shortname: "ckanext-archiver"
-      description: "CKAN Extension for Archiving needed for ckanext-qa"
+      description: "CKAN Extension for Archiving needed to support QA checks"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-archiver.git"
       version: "2.1.1-qgov.19"
@@ -123,10 +123,10 @@ extensions:
     CKANExtQa: &CKANExtQa
       name: "ckanext-qa-{{ Environment }}"
       shortname: "ckanext-qa"
-      description: "CKAN Extension for Quality Assurance"
+      description: "CKAN Extension for Quality Assurance (data usability ratings)"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-qa.git"
-      version: "2.0.3-qgov.14"
+      version: "2.0.3-qgov.15"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"
