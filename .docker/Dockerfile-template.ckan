@@ -28,6 +28,7 @@ RUN chmod +x "${APP_DIR}"/bin/*.sh /usr/bin/ckan_cli
 
 RUN which ps || apt-get install -y procps
 RUN which psql || apt-get install -y postgresql-client
+RUN pip install uv
 
 # Install CKAN.
 
