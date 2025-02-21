@@ -8,6 +8,35 @@ public_tld: data.qld.gov.au
 
 extensions:
   default: &default_extensions
+
+    # Third-party
+
+    CKANExtHarvest: &CKANExtHarvest
+      name: "ckanext-harvest-{{ Environment }}"
+      shortname: "ckanext-harvest"
+      description: "CKAN Extension for Harvesting"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-harvest.git"
+      version: "v1.6.1"
+
+    CKANExtDCAT: &CKANExtDCAT
+      name: "ckanext-dcat-{{ Environment }}"
+      shortname: "ckanext-dcat"
+      description: "CKAN Extension for DCAT"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-dcat.git"
+      version: "v2.1.0"
+
+    CKANExtScheming: &CKANExtScheming
+      name: "ckanext-scheming-{{ Environment }}"
+      shortname: "ckanext-scheming"
+      description: "CKAN Extension for Scheming"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-scheming.git"
+      version: "release-3.0.0"
+
+    # Queensland Government
+
     CKANExtXLoader: &CKANExtXLoader
       name: "ckanext-xloader-{{ Environment }}"
       shortname: "ckanext-xloader"
@@ -40,22 +69,6 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
       version: "0.1.0"
 
-    CKANExtDCAT: &CKANExtDCAT
-      name: "ckanext-dcat-{{ Environment }}"
-      shortname: "ckanext-dcat"
-      description: "CKAN Extension for DCAT"
-      type: "git"
-      url: "https://github.com/ckan/ckanext-dcat.git"
-      version: "v2.1.0"
-
-    CKANExtScheming: &CKANExtScheming
-      name: "ckanext-scheming-{{ Environment }}"
-      shortname: "ckanext-scheming"
-      description: "CKAN Extension for Scheming"
-      type: "git"
-      url: "https://github.com/ckan/ckanext-scheming.git"
-      version: "release-3.0.0"
-
     CKANExtValidation: &CKANExtValidation
       name: "ckanext-validation-{{ Environment }}"
       shortname: "ckanext-validation"
@@ -87,14 +100,6 @@ extensions:
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
       version: "2.5.0"
-
-    CKANExtHarvest: &CKANExtHarvest
-      name: "ckanext-harvest-{{ Environment }}"
-      shortname: "ckanext-harvest"
-      description: "CKAN Extension for Harvesting"
-      type: "git"
-      url: "https://github.com/ckan/ckanext-harvest.git"
-      version: "v1.6.1"
 
     CKANExtHarvestDataQldGeoScience: &CKANExtHarvestDataQldGeoScience
       name: "ckanext-harvest-{{ Environment }}"
