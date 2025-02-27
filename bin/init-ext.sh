@@ -47,10 +47,6 @@ install_requirements_file "/tmp/requirements-ext.txt"
 for extension in . `ls -d $SRC_DIR/ckanext-*`; do
     TOOL=uv install_requirements $extension requirements pip-requirements
 done
-if [ "$CKAN_VERSION" = "2.9" ]; then
-  echo "CKAN 2.9 last supported Jinja2 is less than 3.1"
-  pip install "jinja2<3.1"
-fi
 
 install_requirements . dev-requirements requirements-dev
 
