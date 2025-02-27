@@ -8,6 +8,8 @@ Feature: Data Request
         Given "Unauthenticated" as the persona
         When I go to the data requests page
         Then the browser's URL should contain "/datarequest"
+        And I should see an element with xpath "//nav[@aria-label = 'State']"
+        And I should see an element with xpath "//span[contains(@class, 'item-label') and string() = 'Open']"
         And I should not see an element with xpath "//a[contains(translate(string(), 'DR', 'dr'), 'Add data request')]"
 
     @unauthenticated
@@ -17,6 +19,8 @@ Feature: Data Request
         And I click the link with text that contains "Test Organisation"
         And I press the element with xpath "//ul[contains(@class, 'nav-tabs')]//a[contains(string(), 'Data Requests')]"
         Then the browser's URL should contain "/organization/datarequest"
+        And I should see an element with xpath "//nav[@aria-label = 'State']"
+        And I should see an element with xpath "//span[contains(@class, 'item-label') and string() = 'Open']"
         And I should see an element with xpath "//input[contains(@aria-label, 'Search Data Requests')]"
         And I should see an element with xpath "//ol[contains(@class, 'breadcrumb')]//a[contains(@href, '/organization')]"
         And I should see an element with xpath "//ol[contains(@class, 'breadcrumb')]//a[contains(@href, '/organization/') and contains(string(), 'Test Organisation')]"
@@ -24,9 +28,12 @@ Feature: Data Request
     Scenario: User data request page is accessible via the user profile
         Given "CKANUser" as the persona
         When I log in
+        And I create a datarequest
         And I go to the "ckan_user" profile page
         And I press the element with xpath "//ul[contains(@class, 'nav-tabs')]//a[contains(string(), 'Data Requests')]"
         Then the browser's URL should contain "/user/datarequest"
+        And I should see an element with xpath "//nav[@aria-label = 'State']"
+        And I should see an element with xpath "//span[contains(@class, 'item-label') and string() = 'Open']"
         And I should see an element with xpath "//input[contains(@aria-label, 'Search Data Requests')]"
         And I should see an element with xpath "//ol[contains(@class, 'breadcrumb')]//a[contains(@href, '/user') and contains(string(), 'Users')]"
         And I should see an element with xpath "//ol[contains(@class, 'breadcrumb')]//a[contains(@href, '/user/') and contains(string(), 'CKAN User')]"

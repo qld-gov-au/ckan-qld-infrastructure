@@ -8,6 +8,35 @@ public_tld: data.qld.gov.au
 
 extensions:
   default: &default_extensions
+
+    # Third-party
+
+    CKANExtHarvest: &CKANExtHarvest
+      name: "ckanext-harvest-{{ Environment }}"
+      shortname: "ckanext-harvest"
+      description: "CKAN Extension for Harvesting"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-harvest.git"
+      version: "v1.6.1"
+
+    CKANExtDCAT: &CKANExtDCAT
+      name: "ckanext-dcat-{{ Environment }}"
+      shortname: "ckanext-dcat"
+      description: "CKAN Extension for DCAT"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-dcat.git"
+      version: "v2.1.0"
+
+    CKANExtScheming: &CKANExtScheming
+      name: "ckanext-scheming-{{ Environment }}"
+      shortname: "ckanext-scheming"
+      description: "CKAN Extension for Scheming"
+      type: "git"
+      url: "https://github.com/ckan/ckanext-scheming.git"
+      version: "release-3.0.0"
+
+    # Queensland Government
+
     CKANExtXLoader: &CKANExtXLoader
       name: "ckanext-xloader-{{ Environment }}"
       shortname: "ckanext-xloader"
@@ -40,22 +69,6 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
       version: "0.1.0"
 
-    CKANExtDCAT: &CKANExtDCAT
-      name: "ckanext-dcat-{{ Environment }}"
-      shortname: "ckanext-dcat"
-      description: "CKAN Extension for DCAT"
-      type: "git"
-      url: "https://github.com/ckan/ckanext-dcat.git"
-      version: "v2.1.0"
-
-    CKANExtScheming: &CKANExtScheming
-      name: "ckanext-scheming-{{ Environment }}"
-      shortname: "ckanext-scheming"
-      description: "CKAN Extension for Scheming"
-      type: "git"
-      url: "https://github.com/ckan/ckanext-scheming.git"
-      version: "release-3.0.0"
-
     CKANExtValidation: &CKANExtValidation
       name: "ckanext-validation-{{ Environment }}"
       shortname: "ckanext-validation"
@@ -70,7 +83,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "7.3.2"
+      version: "7.3.5"
 
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
@@ -78,7 +91,7 @@ extensions:
       description: "CKAN Extension for Data Requests"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-datarequests.git"
-      version: "2.2.1-qgov.14"
+      version: "2.2.1-qgov.15"
 
     CKANExtYTP: &CKANExtYTP
       name: "ckanext-ytp-comments-{{ Environment }}"
@@ -87,22 +100,6 @@ extensions:
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
       version: "2.5.0"
-
-    CKANExtHarvest: &CKANExtHarvest
-      name: "ckanext-harvest-{{ Environment }}"
-      shortname: "ckanext-harvest"
-      description: "CKAN Extension for Harvesting"
-      type: "git"
-      url: "https://github.com/ckan/ckanext-harvest.git"
-      version: "v1.6.1"
-
-    CKANExtHarvestDataQldGeoScience: &CKANExtHarvestDataQldGeoScience
-      name: "ckanext-harvest-{{ Environment }}"
-      shortname: "ckanext-harvester-data-qld-geoscience"
-      description: "CKAN Extension for Data Qld Harvesting Enhancements for Geoscience"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-harvester-data-qld-geoscience"
-      version: "v0.1.0"
 
     CKANExtReport: &CKANExtReport
       name: "ckanext-report-{{ Environment }}"
@@ -203,10 +200,6 @@ extensions:
       <<: *CKANExtDataRequests
       version: "master"
 
-    CKANExtHarvestDataQldGeoScience:
-      <<: *CKANExtHarvestDataQldGeoScience
-      version: "master"
-
     CKANExtYTP:
       <<: *CKANExtYTP
       version: "master"
@@ -261,4 +254,4 @@ basic_facts:
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "oss.squizedge.net"
-    CKANRevision: "ckan-2.11.1"
+    CKANRevision: "qgov-master-2.11.2"
