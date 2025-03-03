@@ -82,7 +82,7 @@ Feature: Re-identification risk governance acknowledgement or Resource visibilit
         Then I should see "HIDDEN"
         When I press "invisible-resource"
         Then I should see "HIDDEN"
-        When I press "Manage"
+        When I press the resource edit button
         Then I should not see an element with xpath "//label[@for="field-request_privacy_assessment"]//*[@class="control-required"]"
         And I should see an element with xpath "//select[@id="field-request_privacy_assessment"]//option[@value="" or @value="YES" or @value="NO"]"
         And I should see "Privacy risk assessment prior to public release might assist the publishing decision-making process"

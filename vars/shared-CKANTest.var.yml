@@ -8,37 +8,16 @@ public_tld: data.qld.gov.au
 
 extensions:
   default: &default_extensions
-    CKANExtXLoader: &CKANExtXLoader
-      name: "ckanext-xloader-{{ Environment }}"
-      shortname: "ckanext-xloader"
-      description: "CKAN Express Loader Extension"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-xloader.git"
-      version: "1.2.0-qgov.1"
 
-    CKANExtQGOV: &CKANExtQGOV
-      name: "ckanext-qgov-{{ Environment }}"
-      shortname: "ckanext-qgov"
-      description: "CKAN Extension for Queensland Government sites"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-qgov.git"
-      version: "7.0.0"
+    # Third-party
 
-    CKANExtS3Filestore: &CKANExtS3Filestore
-      name: "ckanext-s3filestore-{{ Environment }}"
-      shortname: "ckanext-s3filestore"
-      description: "CKAN Extension to keep uploaded files in S3"
+    CKANExtHarvest: &CKANExtHarvest
+      name: "ckanext-harvest-{{ Environment }}"
+      shortname: "ckanext-harvest"
+      description: "CKAN Extension for Harvesting"
       type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
-      version: "0.8.0"
-
-    CKANExtSSMConfig: &CKANExtSSMConfig
-      name: "ckanext-ssm-config-{{ Environment }}"
-      shortname: "ckanext-ssm-config"
-      description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
-      version: "0.1.0"
+      url: "https://github.com/ckan/ckanext-harvest.git"
+      version: "v1.6.1"
 
     CKANExtDCAT: &CKANExtDCAT
       name: "ckanext-dcat-{{ Environment }}"
@@ -56,13 +35,47 @@ extensions:
       url: "https://github.com/ckan/ckanext-scheming.git"
       version: "release-3.0.0"
 
+    # Queensland Government
+
+    CKANExtXLoader: &CKANExtXLoader
+      name: "ckanext-xloader-{{ Environment }}"
+      shortname: "ckanext-xloader"
+      description: "CKAN Express Loader Extension"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-xloader.git"
+      version: "1.2.0-qgov.1"
+
+    CKANExtQGOV: &CKANExtQGOV
+      name: "ckanext-qgov-{{ Environment }}"
+      shortname: "ckanext-qgov"
+      description: "CKAN Extension for Queensland Government sites"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-qgov.git"
+      version: "7.1.2"
+
+    CKANExtS3Filestore: &CKANExtS3Filestore
+      name: "ckanext-s3filestore-{{ Environment }}"
+      shortname: "ckanext-s3filestore"
+      description: "CKAN Extension to keep uploaded files in S3"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
+      version: "0.8.0"
+
+    CKANExtSSMConfig: &CKANExtSSMConfig
+      name: "ckanext-ssm-config-{{ Environment }}"
+      shortname: "ckanext-ssm-config"
+      description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
+      type: "git"
+      url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
+      version: "0.1.0"
+
     CKANExtValidation: &CKANExtValidation
       name: "ckanext-validation-{{ Environment }}"
       shortname: "ckanext-validation"
       description: "CKAN Extension for validating Data Packages"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation.git"
-      version: "v0.0.8-qgov.13"
+      version: "0.0.8-qgov.15"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
@@ -70,7 +83,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "7.3.1"
+      version: "7.3.5"
 
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
@@ -78,7 +91,7 @@ extensions:
       description: "CKAN Extension for Data Requests"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-datarequests.git"
-      version: "2.2.1-qgov.14"
+      version: "2.2.1-qgov.15"
 
     CKANExtYTP: &CKANExtYTP
       name: "ckanext-ytp-comments-{{ Environment }}"
@@ -88,34 +101,18 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
       version: "2.5.0"
 
-    CKANExtHarvest: &CKANExtHarvest
-      name: "ckanext-harvest-{{ Environment }}"
-      shortname: "ckanext-harvest"
-      description: "CKAN Extension for Harvesting"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-harvest.git"
-      version: "v1.4.2.a"
-
-    CKANExtHarvestDataQldGeoScience: &CKANExtHarvestDataQldGeoScience
-      name: "ckanext-harvest-{{ Environment }}"
-      shortname: "ckanext-harvester-data-qld-geoscience"
-      description: "CKAN Extension for Data Qld Harvesting Enhancements for Geoscience"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-harvester-data-qld-geoscience"
-      version: "v0.1.0"
-
     CKANExtReport: &CKANExtReport
       name: "ckanext-report-{{ Environment }}"
       shortname: "ckanext-report"
       description: "CKAN Extension for Reporting"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-report.git"
-      version: "0.3.1-qgov.4"
+      version: "0.3.1-qgov.5"
 
     CKANExtArchiver: &CKANExtArchiver
       name: "ckanext-archiver-{{ Environment }}"
       shortname: "ckanext-archiver"
-      description: "CKAN Extension for Archiving needed for ckanext-qa"
+      description: "CKAN Extension for Archiving needed to support QA checks"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-archiver.git"
       version: "2.1.1-qgov.19"
@@ -123,10 +120,10 @@ extensions:
     CKANExtQa: &CKANExtQa
       name: "ckanext-qa-{{ Environment }}"
       shortname: "ckanext-qa"
-      description: "CKAN Extension for Quality Assurance"
+      description: "CKAN Extension for Quality Assurance (data usability ratings)"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-qa.git"
-      version: "2.0.3-qgov.12"
+      version: "2.0.3-qgov.15"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"
@@ -150,7 +147,7 @@ extensions:
       description: "CKAN Extension for Schema Generation"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation-schema-generator.git"
-      version: "1.0.4"
+      version: "2.0.0"
 
     CKANExtResourceVisibility: &CKANExtResourceVisibility
       name: "ckanext-resource-visibility-{{ Environment }}"
@@ -158,7 +155,7 @@ extensions:
       description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-resource-visibility.git"
-      version: "2.1.1"
+      version: "2.1.2"
 
     CKANExtOIDC: &CKANExtOIDC
       name: "ckanext-oidc-pkce-{{ Environment }}"
@@ -201,14 +198,6 @@ extensions:
 
     CKANExtDataRequests:
       <<: *CKANExtDataRequests
-      version: "master"
-
-    CKANExtHarvest:
-      <<: *CKANExtHarvest
-      version: "master"
-
-    CKANExtHarvestDataQldGeoScience:
-      <<: *CKANExtHarvestDataQldGeoScience
       version: "master"
 
     CKANExtYTP:
@@ -265,4 +254,4 @@ basic_facts:
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "oss.squizedge.net"
-    CKANRevision: "ckan-2.11.1"
+    CKANRevision: "qgov-master-2.11.2"
