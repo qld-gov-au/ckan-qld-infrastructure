@@ -133,7 +133,7 @@ Resources:
 
 {% for layer in ['Batch', 'Web', 'Solr'] %}
 
-{% if layer == 'Solr' %}{% set disk_size = 100 %}{% set security_group = 'DatabaseSG' %}
+{% if layer == 'Solr' %}{% set disk_size = 100 %}{% set security_group = 'DatabaseSG' %}{% set instance_profile_prefix = '' %}
 {% else %}{% set disk_size = '32' %}{% set security_group = 'AppAsgSG' %}{% set instance_profile_prefix = 'Web' %}
 {% endif %}
 
@@ -157,7 +157,7 @@ Resources:
               VolumeType: "gp2"
         IamInstanceProfile:
           Name:
-            Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ instance_profile_prefix | default('') }}InstanceProfileName"
+            Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ instance_profile_prefix }}InstanceProfileName"
         ImageId: !Ref {{ layer }}ImageId
         InstanceType: !Ref {{ layer }}EC2Size
         KeyName: !Ref DefaultEC2Key

@@ -33,7 +33,6 @@ common_stack: &common_stack
     WebSubnets: "{{ Environment }}CKANWebSubnet"
     AdminSG: "{{ Environment }}CKANManagementSG"
     AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
-    CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
     DatabaseSG: "{{ Environment }}CKANDatabaseSG"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     SSMKey: "{{ SSMKey | default('') }}"
