@@ -132,7 +132,11 @@ Resources:
   # Autoscaling instances
 
 {% for layer in ['Batch', 'Web', 'Solr'] %}
-{% set disk_size = 100 if layer == 'Solr' else 32 %}
+
+{% if layer == 'Solr' %}{% set disk_size = 100 %}{% set security_group = 'DatabaseSG' %}{% set instance_profile_prefix = '' %}
+{% else %}{% set disk_size = '32' %}{% set security_group = 'AppAsgSG' %}{% set instance_profile_prefix = 'Web' %}
+{% endif %}
+
   {{ layer }}LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -153,13 +157,13 @@ Resources:
               VolumeType: "gp2"
         IamInstanceProfile:
           Name:
-            Fn::ImportValue: !Sub "${Environment}${ApplicationName}{% if layer != 'Solr' %}Web{% endif %}InstanceProfileName"
+            Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ instance_profile_prefix }}InstanceProfileName"
         ImageId: !Ref {{ layer }}ImageId
         InstanceType: !Ref {{ layer }}EC2Size
         KeyName: !Ref DefaultEC2Key
         SecurityGroupIds:
           - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
-          - Fn::ImportValue: !Sub "${Environment}CKAN{% if layer == 'Solr' %}Database{% else %}AppAsg{% endif %}SG"
+          - Fn::ImportValue: !Sub "${Environment}CKAN{{ security_group }}"
         UserData:
           Fn::Base64:
             Fn::Sub: |
