@@ -32,7 +32,7 @@ Feature: Resource align_default_schema field
         Then I should see an element with xpath "//th[@class="dataset-label" and string()="Default data schema"]/following::a[contains(string(), "View Schema File")]"
 
         When I open the new resource form for dataset "$last_generated_name"
-        Then I should see an element with xpath "//div[contains(@class,'schema-align')]/following-sibling::div[@class='image-upload']"
+        Then I should see an element with xpath "//div[contains(@class,'image-upload') and @data-module='resource-schema']"
         And I should see an element with xpath "//input[@type='checkbox' and @name='align_default_schema' and @checked]/following-sibling::label[@for='field-align_default_schema' and contains(string(), 'Align this data schema with the dataset default')]"
         And I should see an element with xpath "//div[@class="info-block " and contains(string(), "This data schema value is not aligned with a default data schema. Aligning this resource’s data schema with the dataset’s default data schema (and overwriting any pre-existing schema) ensures consistent validation of data structure.")]"
         And I should see an element with xpath "//div[@class="info-block " and contains(string(), "Alternatively, publishers can choose no alignment and may include a customised schema for this resource. Ticking this box and updating the resource will align the schemas, overwriting any existing data schema. The validation options, if any, will not be overwritten.")]"

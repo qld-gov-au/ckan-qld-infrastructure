@@ -7,7 +7,7 @@ Feature: Resource Privacy Assessment Result
         When I log in
         And I create a dataset and resource with key-value parameters "name=privacy-assessment-package" and "url=default"
         And I go to the first resource in the dataset
-        And I press the element with xpath "//a[contains(string(), 'Manage')]"
+        And I press the resource edit button
         Then I should see an element with xpath "//select[@name='request_privacy_assessment']/following::label[string()='Privacy assessment result']"
         And I should see an element with xpath "//input[@name='privacy_assessment_result' and @readonly]"
         And I should see an element with xpath "//label[string()='Privacy assessment result']/following::span[contains(translate(string(), 'PA', 'pa'),'privacy assessment')]"
@@ -24,7 +24,7 @@ Feature: Resource Privacy Assessment Result
 
         When I go to dataset "edit-privacy-assessment-package"
         And I go to the first resource in the dataset
-        And I press the element with xpath "//a[contains(string(), 'Manage')]"
+        And I press the resource edit button
         Then I should see an element with xpath "//input[@name='privacy_assessment_result']"
 
         When I fill in "privacy_assessment_result" with "New privacy_assessment_result"
@@ -36,7 +36,7 @@ Feature: Resource Privacy Assessment Result
         When I log in
         And I create a dataset and resource with key-value parameters "notes=Package with new privacy assessment::author_email=test@gmail.com" and "name=pending-assessment-resource::request_privacy_assessment=YES"
         And I go to the first resource in the dataset
-        And I press the element with xpath "//a[contains(string(), 'Manage')]"
+        And I press the resource edit button
         And I fill in "privacy_assessment_result" with "New privacy_assessment_result"
         And I press the element with xpath "//button[@name="save"]"
         And I trigger notification about updated privacy assessment results
