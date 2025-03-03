@@ -111,8 +111,11 @@ Parameters:
   AdminSG:
     Description: The exported name of the security group ID containing sysadmin inbound rules
     Type: String
-  LoadBalancerSG:
+  AppLBSG:
     Description: The exported name of the security group ID to attach to the application load balancer.
+    Type: String
+  CloudFrontSG:
+    Description: The exported name of the security group ID for resources that should be accessed by CloudFront.
     Type: String
   DatabaseSG:
     Description: The exported name of the security group ID to attach to the database layer.
@@ -544,7 +547,8 @@ Resources:
         - Key: access_logs.s3.enabled
           Value: false
       SecurityGroups:
-        - Fn::ImportValue: !Ref LoadBalancerSG
+        - Fn::ImportValue: !Ref AppLBSG
+        - Fn::ImportValue: !Ref CloudFrontSG
       Subnets:
         - Fn::ImportValue: !Sub "${WebSubnets}A"
         - Fn::ImportValue: !Sub "${WebSubnets}B"
