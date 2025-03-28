@@ -25,7 +25,7 @@ run-playbook () {
 
 run-shared-resource-playbooks () {
   run-playbook "vpc"
-  #run-playbook "security_groups"
+  run-playbook "security_groups"
   run-playbook "CloudFormation" "vars/hosted-zone.var.yml"
   run-playbook "CloudFormation" "vars/database.var.yml"
   run-playbook "CloudFormation" "vars/efs.var.yml"
