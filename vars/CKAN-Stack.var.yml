@@ -34,7 +34,7 @@ common_stack: &common_stack
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     AdminSG: "{{ Environment }}CKANManagementSG"
     AppLBSG: "{{ Environment }}CKANAppLoadBalancerSG"
-    CloudFrontSG: "{{ Environment }}CKANCloudfrontHTTPSSG"
+    CloudFrontSG: "{{ Environment }}CKANCloudFrontHttpsSG"
     AppSG: "{{ Environment }}CKANAppAsgSG"
     DatabaseSG: "{{ Environment }}CKANDatabaseSG"
     EnableDataStore: "{{ enable_datastore | default('no') }}"

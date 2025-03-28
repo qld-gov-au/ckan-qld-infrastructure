@@ -1,0 +1,54 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Creates HTTPS security group to allow ingress to CloudFront IP ranges.
+Parameters:
+  VPC:
+    Type: String
+    Description: Name of the VPC
+  Environment:
+    Type: String
+    Description: Platforms environment
+  Platform:
+    Type: String
+    Description: Name of the platform (e.g., GI, Services, Static)
+
+Resources:
+  CloudFrontHttps:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: CloudFront ranges HTTPS security group
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      SecurityGroupIngress:
+        # IPv4 Entries
+{% for entry in aws_ipv4_json %}
+{% if entry.service == "CLOUDFRONT" %}
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: {{ entry.ip_prefix }}
+{% endif %}
+{% endfor %}
+        # IPv6 Entries
+{% for entry in aws_ipv6_json %}
+{% if entry.service == "CLOUDFRONT" %}
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIpv6: {{ entry.ipv6_prefix }}
+{% endif %}
+{% endfor %}
+      Tags:
+        - Key: Name
+          Value: cloudfront-https
+        - Key: AutoUpdate
+          Value: true
+        - Key: Protocol
+          Value: https
+
+Outputs:
+  CloudFrontHttpsSG:
+    Description: CloudFront HTTPS security group
+    Value: !Ref CloudFrontHttps
+    Export:
+      Name: !Sub "${Environment}${Platform}CloudFrontHttpsSG"
