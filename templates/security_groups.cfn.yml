@@ -1,0 +1,187 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates security groups to allow communication between CKAN layers.
+Parameters:
+  BambooAgentIp:
+    Description: CIDR of the local Bamboo agent
+    Type: String
+  BambooAgentIp2:
+    Description: CIDR of the local Bamboo agent
+    Type: String
+  BambooAgentSecurityGroup:
+    Description: Security group containing bamboo agents.
+    Type: String
+  VPCPeeringCidr:
+    Description: CIDR for VPC Peering network
+    Type: String
+  VPC:
+    Type: String
+    Description: Name of the VPC
+  Environment:
+    Type: String
+    Description: Platforms environment
+  Platform:
+    Type: String
+    Description: Name of the platform ie GI, Services, Static
+
+Resources:
+  Management:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Monitoring & Management group
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !Ref BambooAgentIp
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !Ref BambooAgentIp2
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 8443
+        CidrIp: !Ref VPCPeeringCidr
+
+  AppLoadBalancer:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref WebAsg
+
+  AppAsg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref AppLoadBalancer
+
+  WebLoadBalancer:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      GroupDescription: allow connections from specified CIDR ranges
+
+  WebAsg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        SourceSecurityGroupId: !Ref WebLoadBalancer
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        SourceSecurityGroupId: !Ref WebLoadBalancer
+
+  Database:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for RDS DB Instance.
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 5432
+        ToPort: 5432 # PostgreSQL
+        SourceSecurityGroupId: !Ref AppAsg
+        Description: Application access to PostgreSQL
+      - IpProtocol: tcp
+        FromPort: 8983
+        ToPort: 8983 # Solr
+        SourceSecurityGroupId: !Ref AppAsg
+        Description: Application access to Solr
+      - IpProtocol: tcp
+        FromPort: 6379
+        ToPort: 6379 # Redis
+        SourceSecurityGroupId: !Ref AppAsg
+        Description: Application access to Redis
+      - IpProtocol: tcp
+        FromPort: 5432
+        ToPort: 5432
+        SourceSecurityGroupId: !Ref BambooAgentSecurityGroup
+        Description: Bamboo agent access to PostgreSQL
+
+Outputs:
+  ManagementSG:
+    Description: Shared services management group
+    Value: !Ref Management
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "ManagementSG"
+  WebAsgSG:
+    Description: Web auto-scaling group security group
+    Value: !Ref WebAsg
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "WebAsgSG"
+
+  WebLoadBalancerSG:
+    Description: Web load balancer security group
+    Value: !Ref WebLoadBalancer
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "WebLoadBalancerSG"
+
+  AppAsgSG:
+    Description: Application auto-scaling group security group
+    Value: !Ref AppAsg
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "AppAsgSG"
+
+  AppLoadBalancerSG:
+    Description: App load balancer security group
+    Value: !Ref AppLoadBalancer
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "AppLoadBalancerSG"
+
+  DatabaseSG:
+    Description: Database security group
+    Value: !Ref Database
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - !Ref Environment
+            - !Ref Platform
+            - "DatabaseSG"

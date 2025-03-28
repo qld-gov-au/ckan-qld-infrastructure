@@ -29,12 +29,5 @@
         src: cloudfront_security_group_https.cfn.yml.j2
         dest: templates/cloudfront_security_group_https.cfn.yml
 
-    # Delete once split HTTP and HTTPS security group templates are in use
-    # (this template no longer needs to be compiled).
-    - name: Compile Jinja2 Security Groups template
-      template:
-        src: security_groups.cfn.yml.j2
-        dest: templates/security_groups.cfn.yml
-
   roles:
     - ansible_cloudformation
