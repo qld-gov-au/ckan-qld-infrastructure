@@ -163,11 +163,7 @@ Resources:
     Properties:
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - '-'
-          - - Ref: Environment
-            - App_Tier
+        Value: !Sub "${Environment}-App_Tier"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::NetworkAcl
@@ -178,18 +174,10 @@ Resources:
         - 0
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 10.0/24
+      CidrBlock: !Sub "${VPCPrefix}.10.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - App-A
+        Value: !Sub "${Environment}: App-A"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -215,18 +203,10 @@ Resources:
         - 1
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 11.0/24
+      CidrBlock: !Sub "${VPCPrefix}.11.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - App-B
+        Value: !Sub "${Environment}: App-B"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -254,18 +234,10 @@ Resources:
         - 2
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 12.0/24
+      CidrBlock: !Sub "${VPCPrefix}.12.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - App-C
+        Value: !Sub "${Environment}: App-C"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -293,18 +265,10 @@ Resources:
         - 3
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 13.0/24
+      CidrBlock: !Sub "${VPCPrefix}.13.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - App-D
+        Value: !Sub "${Environment}: App-D"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -332,18 +296,10 @@ Resources:
         - 4
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 14.0/24
+      CidrBlock: !Sub "${VPCPrefix}.14.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - App-E
+        Value: !Sub "${Environment}: App-E"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -374,11 +330,7 @@ Resources:
     Properties:
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - '-'
-          - - Ref: Environment
-            - Data_Tier
+        Value: !Sub "${Environment}-Data_Tier"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::NetworkAcl
@@ -389,18 +341,10 @@ Resources:
         - 0
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 20.0/24
+      CidrBlock: !Sub "${VPCPrefix}.20.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - Data-A
+        Value: !Sub "${Environment}: Data-A"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -426,18 +370,10 @@ Resources:
         - 1
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 21.0/24
+      CidrBlock: !Sub "${VPCPrefix}.21.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - Data-B
+        Value: !Sub "${Environment}: Data-B"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -465,18 +401,10 @@ Resources:
         - 2
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 22.0/24
+      CidrBlock: !Sub "${VPCPrefix}.22.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - Data-C
+        Value: !Sub "${Environment}: Data-C"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -504,18 +432,10 @@ Resources:
         - 3
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 23.0/24
+      CidrBlock: !Sub "${VPCPrefix}.23.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - Data-D
+        Value: !Sub "${Environment}: Data-D"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -543,18 +463,10 @@ Resources:
         - 4
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 24.0/24
+      CidrBlock: !Sub "${VPCPrefix}.24.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - Data-E
+        Value: !Sub "${Environment}: Data-E"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -1371,11 +1283,7 @@ Resources:
     Properties:
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 0.0/16
+      CidrBlock: !Sub "${VPCPrefix}.0.0/16"
       Tags:
       - Key: Name
         Value: !Sub "${VPCNamePrefix}-${Environment}"
@@ -1384,11 +1292,7 @@ Resources:
     Properties:
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - '-'
-          - - Ref: Environment
-            - Web_Tier
+        Value: !Sub "${Environment}-Web_Tier"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::NetworkAcl
@@ -1399,18 +1303,10 @@ Resources:
         - 0
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 0.0/24
+      CidrBlock: !Sub "${VPCPrefix}.0.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - Web-A
+        Value: !Sub "${Environment}: Web-A"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -1436,18 +1332,10 @@ Resources:
         - 1
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 1.0/24
+      CidrBlock: !Sub "${VPCPrefix}.1.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - Web-B
+        Value: !Sub "${Environment}: Web-B"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -1475,18 +1363,10 @@ Resources:
         - 2
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 2.0/24
+      CidrBlock: !Sub "${VPCPrefix}.2.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - Web-C
+        Value: !Sub "${Environment}: Web-C"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -1514,18 +1394,10 @@ Resources:
         - 3
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 3.0/24
+      CidrBlock: !Sub "${VPCPrefix}.3.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - Web-D
+        Value: !Sub "${Environment}: Web-D"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
@@ -1553,18 +1425,10 @@ Resources:
         - 4
         - Fn::GetAZs:
             Ref: AWS::Region
-      CidrBlock:
-        Fn::Join:
-        - .
-        - - Ref: VPCPrefix
-          - 4.0/24
+      CidrBlock: !Sub "${VPCPrefix}.4.0/24"
       Tags:
       - Key: Name
-        Value:
-          Fn::Join:
-          - ': '
-          - - Ref: Environment
-            - Web-E
+        Value: !Sub "${Environment}: Web-E"
       VpcId:
         Ref: VPC
     Type: AWS::EC2::Subnet
