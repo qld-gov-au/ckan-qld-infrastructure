@@ -31,7 +31,7 @@ Parameters:
 Resources:
 
 {% for layer in ['Batch', 'Web', 'Solr'] %}
-{% if layer == 'Solr' %}{% set disk_size = 100 %}{% set security_group = 'DatabaseSG' %}
+{% if layer == 'Solr' %}{% set disk_size = 100 %}{% set security_group = 'DatabaseSG' %}{% set instance_profile_prefix = '' %}
 {% else %}{% set disk_size = '32' %}{% set security_group = 'AppAsgSG' %}{% set instance_profile_prefix = 'Web' %}
 {% endif %}
   {{ layer }}TemplateInstance:
