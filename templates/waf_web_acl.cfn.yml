@@ -101,9 +101,4 @@ Outputs:
     Value:
       Ref: WebACL
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "WebACLId"
+      Name: !Sub "${Environment}${Platform}WebACLId"

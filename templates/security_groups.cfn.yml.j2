@@ -25,6 +25,13 @@ Parameters:
     Description: Name of the platform ie GI, Services, Static
 
 Resources:
+  CloudfrontHTTPS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cloudfront Ranges HTTPS Security Group
+      VpcId:
+        Fn::ImportValue: !Ref VPC
+
   Management:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -52,10 +59,31 @@ Resources:
         Fn::ImportValue: !Ref VPC
       GroupDescription: allow connections from specified CIDR ranges
       SecurityGroupIngress:
+        # IPv4 Entries
+{% for entry in aws_ipv4_json %}
+{% if entry.service == "CLOUDFRONT" %}
         - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          SourceSecurityGroupId: !Ref WebAsg
+          FromPort: 443
+          ToPort: 443
+          CidrIp: {{ entry.ip_prefix }}
+{% endif %}
+{% endfor %}
+        # IPv6 Entries
+{% for entry in aws_ipv6_json %}
+{% if entry.service == "CLOUDFRONT" %}
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIpv6: {{ entry.ipv6_prefix }}
+{% endif %}
+{% endfor %}
+      Tags:
+        - Key: Name
+          Value: app-loadbalancer
+        - Key: AutoUpdate
+          Value: true
+        - Key: Protocol
+          Value: https
 
   AppAsg:
     Type: AWS::EC2::SecurityGroup
@@ -68,29 +96,6 @@ Resources:
           FromPort: 80
           ToPort: 80
           SourceSecurityGroupId: !Ref AppLoadBalancer
-
-  WebLoadBalancer:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      VpcId:
-        Fn::ImportValue: !Ref VPC
-      GroupDescription: allow connections from specified CIDR ranges
-
-  WebAsg:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      VpcId:
-        Fn::ImportValue: !Ref VPC
-      GroupDescription: allow connections from specified CIDR ranges
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        SourceSecurityGroupId: !Ref WebLoadBalancer
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
-        SourceSecurityGroupId: !Ref WebLoadBalancer
 
   Database:
     Type: AWS::EC2::SecurityGroup
@@ -125,63 +130,28 @@ Outputs:
     Description: Shared services management group
     Value: !Ref Management
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "ManagementSG"
-  WebAsgSG:
-    Description: Web auto-scaling group security group
-    Value: !Ref WebAsg
-    Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "WebAsgSG"
-
-  WebLoadBalancerSG:
-    Description: Web load balancer security group
-    Value: !Ref WebLoadBalancer
-    Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "WebLoadBalancerSG"
+      Name: !Sub "${Environment}${Platform}ManagementSG"
 
   AppAsgSG:
     Description: Application auto-scaling group security group
     Value: !Ref AppAsg
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "AppAsgSG"
+      Name: !Sub "${Environment}${Platform}AppAsgSG"
 
   AppLoadBalancerSG:
     Description: App load balancer security group
     Value: !Ref AppLoadBalancer
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "AppLoadBalancerSG"
+      Name: !Sub "${Environment}${Platform}AppLoadBalancerSG"
 
   DatabaseSG:
     Description: Database security group
     Value: !Ref Database
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "DatabaseSG"
+      Name: !Sub "${Environment}${Platform}DatabaseSG"
+
+  CloudfrontHTTPSSG:
+    Description: Cloudfront HTTPS Security Group
+    Value: !Ref CloudfrontHTTPS
+    Export:
+      Name: !Sub "${Environment}${Platform}CloudfrontHTTPSSG"
