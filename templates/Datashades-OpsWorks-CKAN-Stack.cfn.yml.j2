@@ -108,20 +108,11 @@ Parameters:
   WebSubnets:
     Type: String
     Description: The base name for the exported web layer subnet IDs, eg if the exports are 'PRODMyApplicationWebSubnetA' and 'PRODMyApplicationWebSubnetB', then this would be 'PRODMyApplicationWebSubnet'
-  AppSubnets:
-    Type: String
-    Description: The base name for the exported application layer subnet IDs, eg if the exports are 'PRODMyApplicationAppSubnetA' and 'PRODMyApplicationAppSubnetB', then this would be 'PRODMyApplicationAppSubnet'
   AdminSG:
     Description: The exported name of the security group ID containing sysadmin inbound rules
     Type: String
   AppLBSG:
     Description: The exported name of the security group ID to attach to the application load balancer.
-    Type: String
-  CloudFrontSG:
-    Description: The exported name of the security group ID for resources that should be accessed by CloudFront.
-    Type: String
-  AppSG:
-    Description: The exported name of the security group ID to attach to applications.
     Type: String
   DatabaseSG:
     Description: The exported name of the security group ID to attach to the database layer.
@@ -554,7 +545,6 @@ Resources:
           Value: false
       SecurityGroups:
         - Fn::ImportValue: !Ref AppLBSG
-        - Fn::ImportValue: !Ref CloudFrontSG
       Subnets:
         - Fn::ImportValue: !Sub "${WebSubnets}A"
         - Fn::ImportValue: !Sub "${WebSubnets}B"

@@ -31,7 +31,9 @@ Parameters:
 Resources:
 
 {% for layer in ['Batch', 'Web', 'Solr'] %}
-{% set disk_size = 100 if layer == 'Solr' else 32 %}
+{% if layer == 'Solr' %}{% set disk_size = 100 %}{% set security_group = 'DatabaseSG' %}{% set instance_profile_prefix = '' %}
+{% else %}{% set disk_size = '32' %}{% set security_group = 'AppAsgSG' %}{% set instance_profile_prefix = 'Web' %}
+{% endif %}
   {{ layer }}TemplateInstance:
     Type: AWS::EC2::Instance
     Properties:
@@ -49,7 +51,7 @@ Resources:
             VolumeSize: {{ disk_size }}
             VolumeType: "gp2"
       IamInstanceProfile:
-        Fn::ImportValue: !Sub "${Environment}${ApplicationName}{% if layer != 'Solr' %}Web{% endif %}InstanceProfileName"
+        Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ instance_profile_prefix | default('') }}InstanceProfileName"
       # Amazon Linux 2023: al2023-ami-2023.4.20240611.0-kernel-6.1-x86_64
       ImageId: "{{ base_ami }}"
       InstanceType: "t3a.small"
@@ -58,7 +60,7 @@ Resources:
         - DeviceIndex: 0
           GroupSet:
             - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
-            - Fn::ImportValue: !Sub "${Environment}CKAN{% if layer == 'Solr' %}Database{% else %}AppAsg{% endif %}SG"
+            - Fn::ImportValue: !Sub "${Environment}CKAN{{ security_group }}"
           SubnetId:
             Fn::ImportValue: !Sub "${AppSubnets}A"
       UserData:
