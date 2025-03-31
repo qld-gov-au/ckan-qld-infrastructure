@@ -5,8 +5,8 @@
   gather_facts: yes
   vars_files:
     - vars/security_groups.var.yml
-  pre_tasks:
 
+  pre_tasks:
     - name: Obtain list of AWS IPs
       uri:
         url: https://ip-ranges.amazonaws.com/ip-ranges.json
@@ -14,15 +14,20 @@
         force: yes
       register: aws_ips
 
-    - name: Convert list of AWS Ips to json object
+    - name: Convert list of AWS IPs to JSON object
       set_fact:
         aws_ipv4_json: "{{ aws_ips.json.prefixes }}"
-        aws_ipv6_json: "{{ aws_ips.json.ipv6_prefixes }} "
+        aws_ipv6_json: "{{ aws_ips.json.ipv6_prefixes }}"
 
-    - name: Compile Jinja2 Security Group template
+    - name: Compile Jinja2 CloudFront HTTP security group template
       template:
-        src: security_groups.cfn.yml.j2
-        dest: templates/security_groups.cfn.yml
+        src: cloudfront_security_group_http.cfn.yml.j2
+        dest: templates/cloudfront_security_group_http.cfn.yml
+
+    - name: Compile Jinja2 CloudFront HTTPS security group template
+      template:
+        src: cloudfront_security_group_https.cfn.yml.j2
+        dest: templates/cloudfront_security_group_https.cfn.yml
 
   roles:
     - ansible_cloudformation
