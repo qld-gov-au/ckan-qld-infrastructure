@@ -40,6 +40,18 @@ Parameters:
       - m5.4xlarge
       - m4.10xlarge
       - m5.12xlarge
+  SolrEC2SecondaryDiskSize:
+    Description: The size (in gigabytes) of the non-root disk to add to Solr instances.
+    Type: Number
+    Default: 100
+  SolrSecurityGroup:
+    Description: The security group to apply to Solr instances.
+    Type: String
+    Default: DatabaseSG
+  SolrInstanceProfileName:
+    Description: The IAM profile name to apply to Solr instances.
+    Type: String
+    Default: InstanceProfileName
   SolrEC2Count:
     Description: The number of EC2 instances to create in the service layer, solr.
     Type: Number
@@ -66,6 +78,18 @@ Parameters:
       - m5.4xlarge
       - m4.10xlarge
       - m5.12xlarge
+  WebEC2SecondaryDiskSize:
+    Description: The size (in gigabytes) of the non-root disk to add to web instances.
+    Type: Number
+    Default: 32
+  WebSecurityGroup:
+    Description: The security group to apply to web instances.
+    Type: String
+    Default: AppAsgSG
+  WebInstanceProfileName:
+    Description: The IAM profile name to apply to web instances.
+    Type: String
+    Default: WebInstanceProfileName
   BatchEC2Size:
     Description: Select EC2 Instance Size for background jobs.
     Type: String
@@ -87,6 +111,18 @@ Parameters:
       - m5.4xlarge
       - m4.10xlarge
       - m5.12xlarge
+  BatchEC2SecondaryDiskSize:
+    Description: The size (in gigabytes) of the non-root disk to add to batch instances.
+    Type: Number
+    Default: 32
+  BatchSecurityGroup:
+    Description: The security group to apply to batch instances.
+    Type: String
+    Default: AppAsgSG
+  BatchInstanceProfileName:
+    Description: The IAM profile name to apply to batch instances. Typically they have the same permissions as web instances.
+    Type: String
+    Default: WebInstanceProfileName
   BatchEC2Count:
     Description: The number of active EC2 instances to create in the batch layer, background jobs.
     Type: Number
@@ -133,10 +169,6 @@ Resources:
 
 {% for layer in ['Batch', 'Web', 'Solr'] %}
 
-{% if layer == 'Solr' %}{% set disk_size = 100 %}{% set security_group = 'DatabaseSG' %}{% set instance_profile_prefix = '' %}
-{% else %}{% set disk_size = '32' %}{% set security_group = 'AppAsgSG' %}{% set instance_profile_prefix = 'Web' %}
-{% endif %}
-
   {{ layer }}LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -153,17 +185,27 @@ Resources:
             Ebs:
               Encrypted: true
               DeleteOnTermination: true
-              VolumeSize: {{ disk_size }}
+              VolumeSize: !Ref {{ layer }}EC2SecondaryDiskSize
               VolumeType: "gp2"
         IamInstanceProfile:
           Name:
-            Fn::ImportValue: !Sub "${Environment}${ApplicationName}{{ instance_profile_prefix }}InstanceProfileName"
+            Fn::ImportValue:
+              Fn::Join:
+                - ""
+                - - !Ref Environment
+                  - !Ref ApplicationName
+                  - !Ref {{ layer }}InstanceProfileName
         ImageId: !Ref {{ layer }}ImageId
         InstanceType: !Ref {{ layer }}EC2Size
         KeyName: !Ref DefaultEC2Key
         SecurityGroupIds:
           - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
-          - Fn::ImportValue: !Sub "${Environment}CKAN{{ security_group }}"
+          - Fn::ImportValue:
+              Fn::Join:
+                - ""
+                - - !Ref Environment
+                  - CKAN
+                  - !Ref {{ layer }}SecurityGroup
         UserData:
           Fn::Base64:
             Fn::Sub: |
