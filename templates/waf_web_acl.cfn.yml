@@ -42,7 +42,7 @@ Resources:
             RateBasedStatement:
               AggregateKeyType: "IP"
               EvaluationWindowSec: 60
-              Limit: 60
+              Limit: 600
               ScopeDownStatement:
                 RegexMatchStatement:
                   FieldToMatch:
