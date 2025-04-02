@@ -48,7 +48,7 @@ Resources:
                   FieldToMatch:
                     UriPath: {}
                   RegexString:
-                    /api/
+                    /api/|/user/login
                   TextTransformations:
                     - Priority: 0
                       Type: NONE
