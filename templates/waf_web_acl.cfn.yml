@@ -48,7 +48,7 @@ Resources:
                   FieldToMatch:
                     UriPath: {}
                   RegexString:
-                    /api/|/user/login
+                    /api/([0-9]+/)?action/am_following_user|/user/login
                   TextTransformations:
                     - Priority: 0
                       Type: NONE
