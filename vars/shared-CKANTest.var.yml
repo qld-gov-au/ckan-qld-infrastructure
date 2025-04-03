@@ -240,6 +240,14 @@ extensions:
       <<: *CKANExtOIDC
       version: "master"
 
+    CKANExtClamAV:
+      name: "ckanext-clamav-{{ Environment }}"
+      shortname: "ckanext-clamav"
+      description: "CKAN Extension for scanning uploads with Clam Anti-Virus"
+      type: "git"
+      url: "https://github.com/DataShades/ckanext-clamav.git"
+      version: "v1.1.0"
+
 basic_facts:
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
