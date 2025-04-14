@@ -37,8 +37,6 @@ commands:
     cmd: |
       ahoy title "Building and starting Docker containers"
       sh bin/docker-compose.sh up -d "$@"
-      echo "Initialising database schema"
-      ahoy cli '"${APP_DIR}"/bin/init.sh'
       echo "Waiting for containers to start listening..."
       for i in `seq 1 60`; do
         if (ahoy cli "timeout 1 bash -c 'cat < /dev/null > /dev/tcp/ckan/5000'"); then
@@ -46,7 +44,7 @@ commands:
           break
         else
           echo "CKAN not yet ready, retrying (attempt $i)..."
-          sleep 1
+          sleep 5
         fi
       done
       if sh bin/docker-compose.sh logs | grep -q "\[Error\]"; then exit 1; fi
@@ -107,7 +105,7 @@ commands:
     cmd: |
       ahoy title "Installing a fresh site"
       ahoy start-ckan-job-workers
-      ahoy cli '"${APP_DIR}"/bin/init.sh && "${APP_DIR}"/bin/create-test-data.sh'
+      ahoy cli '"${APP_DIR}"/bin/create-test-data.sh'
       ahoy stop-ckan-job-workers
 
   clean:
