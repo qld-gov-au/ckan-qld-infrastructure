@@ -14,7 +14,7 @@ extensions:
       description: "CKAN Extension for Queensland Government sites"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-qgov.git"
-      version: "7.1.2"
+      version: "7.2.0"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       name: "ckanext-s3filestore-{{ Environment }}"
@@ -62,7 +62,7 @@ extensions:
       description: "CKAN Extension for single sign-on capability"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-oidc-pkce"
-      version: "0.4.0-qgov.2"
+      version: "0.4.0-qgov.3"
 
   PROD:
     <<: *default_extensions
