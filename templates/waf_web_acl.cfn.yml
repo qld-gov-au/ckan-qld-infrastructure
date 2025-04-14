@@ -33,8 +33,30 @@ Resources:
           VisibilityConfig:
             CloudWatchMetricsEnabled: true
             MetricName: "RateLimitRule"
-        - Name: !Sub "${Environment}-${Platform}-XSSRule"
+        - Name: !Sub "${Environment}-${Platform}-APIRateLimitRule"
+          # Throttle API requests more aggressively than general requests
           Priority: 2
+          Action:
+            Block: {}
+          Statement:
+            RateBasedStatement:
+              AggregateKeyType: "IP"
+              EvaluationWindowSec: 60
+              Limit: 60
+              ScopeDownStatement:
+                RegexMatchStatement:
+                  FieldToMatch:
+                    UriPath: {}
+                  RegexString:
+                    /api/([0-9]+/)?action/am_following_user|/user/login
+                  TextTransformations:
+                    - Priority: 0
+                      Type: NONE
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: "APIRateLimitRule"
+        - Name: !Sub "${Environment}-${Platform}-XSSRule"
+          Priority: 3
           Action:
             Block: {}
           Statement:
@@ -101,9 +123,4 @@ Outputs:
     Value:
       Ref: WebACL
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "WebACLId"
+      Name: !Sub "${Environment}${Platform}WebACLId"

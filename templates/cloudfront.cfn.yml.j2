@@ -352,22 +352,12 @@ Outputs:
       - DistributionConfig
       - DomainName
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "CloudfrontAliasDNSName"
+      Name: !Sub "${Environment}${Platform}CloudfrontAliasDNSName"
 
   CloudfrontAliasHostedZoneID:
     Value: "Z2FDTNDATAQYW2" # All CloudFront distributions are in this zone, see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
     Export:
-      Name:
-        Fn::Join:
-          - ""
-          - - !Ref Environment
-            - !Ref Platform
-            - "CloudfrontAliasHostedZoneID"
+      Name: !Sub "${Environment}${Platform}CloudfrontAliasHostedZoneID"
 
   AwsAccount:
     Value: !Ref "AWS::AccountId"
