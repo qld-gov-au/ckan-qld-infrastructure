@@ -45,12 +45,7 @@ Resources:
       FileSystemTags:
         -
           Key: Name
-          Value:
-            Fn::Join:
-              - "-"
-              - - !Ref Environment
-                - !Ref AWS::StackName
-                - "efs"
+          Value: !Sub "${Environment}-${AWS::StackName}-efs"
 
   MountTargetSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -106,9 +101,4 @@ Resources:
       HostedZoneId:
         Fn::ImportValue: !Ref StackZone
       ResourceRecords:
-        - Fn::Join:
-          - "."
-          - - !Ref SharedFileSystem
-            - "efs"
-            - !Ref AWS::Region
-            - amazonaws.com
+        - !Sub "${SharedFileSystem}.efs.${AWS::Region}.amazonaws.com"

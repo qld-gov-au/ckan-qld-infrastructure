@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 set -e
 
+. $APP_DIR/bin/init.sh
+
 . "${APP_DIR}"/bin/activate
 if (which ckan > /dev/null); then
     ckan -c ${CKAN_INI} run --disable-reloader --threaded

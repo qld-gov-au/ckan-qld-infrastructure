@@ -83,7 +83,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "7.3.5"
+      version: "7.3.7"
 
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
@@ -99,7 +99,7 @@ extensions:
       description: "CKAN Extension for YTP Comments"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
-      version: "2.5.0"
+      version: "2.5.1"
 
     CKANExtReport: &CKANExtReport
       name: "ckanext-report-{{ Environment }}"
@@ -112,7 +112,7 @@ extensions:
     CKANExtArchiver: &CKANExtArchiver
       name: "ckanext-archiver-{{ Environment }}"
       shortname: "ckanext-archiver"
-      description: "CKAN Extension for Archiving needed for ckanext-qa"
+      description: "CKAN Extension for Archiving needed to support QA checks"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-archiver.git"
       version: "2.1.1-qgov.19"
@@ -120,10 +120,10 @@ extensions:
     CKANExtQa: &CKANExtQa
       name: "ckanext-qa-{{ Environment }}"
       shortname: "ckanext-qa"
-      description: "CKAN Extension for Quality Assurance"
+      description: "CKAN Extension for Quality Assurance (data usability ratings)"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-qa.git"
-      version: "2.0.3-qgov.14"
+      version: "2.0.3-qgov.15"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"

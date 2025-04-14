@@ -29,3 +29,9 @@ if (ckan_cli datarequests --help); then
         ckan_cli datarequests update_db
     fi
 fi
+
+# Populate the XLoader job token
+ckan_cli user add xloader fullname="Express Loader" email="xloader@localhost" password="Password123!"
+ckan_cli sysadmin add xloader
+API_KEY=$(ckan_cli user token add xloader job_token |tail -1 | tr -d '[:space:]')
+ckan config-tool $CKAN_INI ckanext.xloader.api_token=$API_KEY
