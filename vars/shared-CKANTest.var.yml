@@ -33,7 +33,7 @@ extensions:
       description: "CKAN Extension for Scheming"
       type: "git"
       url: "https://github.com/ckan/ckanext-scheming.git"
-      version: "release-3.0.0"
+      version: "release-3.1.0"
 
     # Queensland Government
 
