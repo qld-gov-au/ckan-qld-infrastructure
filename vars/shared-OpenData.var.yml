@@ -240,6 +240,14 @@ extensions:
       <<: *CKANExtOIDC
       version: "develop"
 
+    CKANExtSelfInfo:
+      name: "ckanext-selfinfo-{{ Environment }}"
+      shortname: "ckanext-selfinfo"
+      description: "CKAN Extension for displaying information about a CKAN instance"
+      type: "git"
+      url: "https://github.com/DataShades/ckanext-selfinfo.git"
+      version: "v1.1.5"
+
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
