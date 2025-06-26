@@ -206,29 +206,9 @@ def confirm_dataset_deletion_dialog_if_present(context):
 @when(u'I open the new resource form for dataset "{name}"')
 def go_to_new_resource_form(context, name):
     context.execute_steps(u"""
-        When I edit the "{0}" dataset
+         When I go to dataset "{0}"
+        And I press "Add new resource"
     """.format(name))
-    if context.browser.is_element_present_by_xpath("//*[contains(@class, 'btn-primary') and contains(string(), 'Next:')]"):
-        # Draft dataset, proceed directly to resource form
-        context.execute_steps(u"""
-            When I press "Next:"
-        """)
-    elif context.browser.is_element_present_by_xpath("//*[contains(string(), 'Add new resource')]"):
-        # Existing dataset, browse to the resource form
-        context.execute_steps(u"""
-            When I press "Add new resource"
-        """)
-    else:
-        # Existing dataset, browse to the resource form
-        if context.browser.is_element_present_by_xpath(
-                "//a[contains(string(), 'Resources') and contains(@href, '/dataset/resources/')]"):
-            context.execute_steps(u"""
-                When I press "Resources"
-            """)
-        context.execute_steps(u"""
-            When I press "Add new resource"
-            And I take a debugging screenshot
-        """)
 
 
 @when(u'I fill in title with random text')
