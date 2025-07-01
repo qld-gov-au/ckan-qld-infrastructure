@@ -14,6 +14,12 @@ Feature: Theme customisations (Publications and OpenData)
         Then I should see "jQuery"
 
     @unauthenticated
+    Scenario: As a member of the public, when I go to api get urls, I can see a valid response
+        Given "Unauthenticated" as the persona
+        When I visit "/api/3/action/package_search?q=a"
+        Then I should see "/api/3/action/help_show?name=package_search", "success": true, "result":"
+
+    @unauthenticated
     Scenario: Lato font is implemented on homepage
         Given "Unauthenticated" as the persona
         When I go to homepage
