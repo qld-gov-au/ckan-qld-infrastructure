@@ -206,7 +206,7 @@ def confirm_dataset_deletion_dialog_if_present(context):
 @when(u'I open the new resource form for dataset "{name}"')
 def go_to_new_resource_form(context, name):
     context.execute_steps(u"""
-         When I go to dataset "{0}"
+        When I go to dataset "{0}"
         And I press "Add new resource"
     """.format(name))
 
