@@ -30,7 +30,7 @@ extensions:
       description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
-      version: "0.1.0"
+      version: "0.1.1"
 
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
       name: "ckanext-publications-qld-theme-{{ Environment }}"
@@ -46,7 +46,7 @@ extensions:
       description: "CKAN Extension for checking uploaded resource types"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-resource-type-validation.git"
-      version: "1.0.10"
+      version: "1.0.11"
 
     CKANExtCSRFFilter: &CKANExtCSRFFilter
       name: "ckanext-csrf-filter-{{ Environment }}"
