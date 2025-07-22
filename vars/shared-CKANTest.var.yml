@@ -67,7 +67,7 @@ extensions:
       description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
-      version: "0.1.0"
+      version: "0.1.1"
 
     CKANExtValidation: &CKANExtValidation
       name: "ckanext-validation-{{ Environment }}"
@@ -75,7 +75,7 @@ extensions:
       description: "CKAN Extension for validating Data Packages"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-validation.git"
-      version: "0.0.8-qgov.15"
+      version: "0.0.8-qgov.16"
 
     CKANExtDataQld: &CKANExtDataQld
       name: "ckanext-data-qld-{{ Environment }}"
@@ -83,7 +83,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "7.3.8"
+      version: "7.3.9"
 
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
@@ -131,7 +131,7 @@ extensions:
       description: "CKAN Extension for checking uploaded resource types"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-resource-type-validation.git"
-      version: "1.0.10"
+      version: "1.0.11"
 
     CKANExtCSRFFilter: &CKANExtCSRFFilter
       name: "ckanext-csrf-filter-{{ Environment }}"
