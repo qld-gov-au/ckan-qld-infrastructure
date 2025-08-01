@@ -5,7 +5,7 @@ NonProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdNonProduction'
 ProductionAnalyticsId: "{{ lookup('aws_ssm', '/config/CKAN/GaIdProduction', region=region) }}"
 
 solr_url: "https://archive.apache.org/dist/lucene/solr/8.11.2/solr-8.11.2.zip"
-ckan_tag: "ckan-2.11.3-qgov.1"
+ckan_tag: "ckan-2.11.3-qgov.2"
 ckan_qgov_branch: "qgov-master-2.11.3"
 
 common_stack: &common_stack
@@ -37,7 +37,7 @@ common_stack: &common_stack
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     SSMKey: "{{ SSMKey | default('') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
-    CookbookRevision: "{{ CookbookRevision | default('10.1.2') }}"
+    CookbookRevision: "{{ CookbookRevision | default('10.1.3') }}"
     LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
     AttachmentsBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}" #/config/CKAN/PROD/app/opendata/s3AttachmentBucket
     SolrSource: "{{ solr_url }}"
