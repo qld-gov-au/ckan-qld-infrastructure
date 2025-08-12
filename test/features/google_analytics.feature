@@ -59,7 +59,7 @@ Feature: GoogleAnalytics
 
     Scenario: When viewing the HTML source code of a resource, the appropriate metadata is visible
         Given "TestOrgEditor" as the persona
-        When I go to Dataset page
+        When I go to dataset page
         And I expand the browser height
         Then I should see an element with xpath "//meta[@name='DCTERMS.title' and @content='Datasets']"
         And I should see an element with xpath "//meta[@name='DCTERMS.publisher' and @content='corporateName=The State of Queensland; jurisdiction=Queensland' and @scheme='AGLSTERMS.AglsAgent']"
