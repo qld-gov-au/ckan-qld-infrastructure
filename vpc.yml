@@ -33,7 +33,7 @@
     - name: Get and set ansible fact
       set_fact:
         VPCId: "{{ vpc_pre_facts['cloudformation'][CFStackName].stack_outputs.VPCId }}"
-      when: vpc_pre_facts.ansible_facts is defined
+      when: vpc_pre_facts is defined
 
     - name: get vpc peering info
       ec2_vpc_peer_describe:
