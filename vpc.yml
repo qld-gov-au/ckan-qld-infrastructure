@@ -124,9 +124,11 @@
         peering_id: "{{ vpc_peer.peering_id }}"
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-        aws_session_token: "{{ assumed_role.sts_creds.session_token }}"
         state: accept
         tags:
           Name: "{{ ApplicationName }} {{ VpcId }} to Opps {{ opsVpcID }}"
           Environment: "{{ Environment }}"
           Service: "{{ ApplicationName }}"
+      environment:
+        AWS_SESSION_TOKEN: "{{ assumed_role.sts_creds.session_token }}"
+        AWS_SECURITY_TOKEN: "{{ assumed_role.sts_creds.session_token }}"
