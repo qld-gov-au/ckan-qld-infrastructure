@@ -79,7 +79,6 @@ EXAMPLES = '''
 '''
 
 from ansible.module_utils._text import to_native
-from ansible.module_utils.ec2 import HAS_BOTO3, boto3_tag_list_to_ansible_dict
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 
@@ -93,8 +92,18 @@ try:
     from botocore.exceptions import ClientError
     import botocore
     import boto3
-except ImportError:
-    pass  # will be captured by imported HAS_BOTO3
+    HAS_BOTO3 = True
+except ImportError as e:
+    HAS_BOTO3 = False
+
+
+def boto3_tag_list_to_ansible_dict(tags_list, tag_name_key_name='Name', tag_value_key_name='Value'):
+    tags_dict = {}
+    for tag in tags_list:
+        if tag_name_key_name in tag and not tag[tag_name_key_name].startswith('aws:'):
+            tags_dict[tag[tag_name_key_name]] = tag[tag_value_key_name]
+
+    return tags_dict
 
 
 def _boto3_conn(region, credentials):
@@ -136,7 +145,7 @@ class LookupModule(LookupBase):
         '''
 
         if not HAS_BOTO3:
-            raise AnsibleError('botocore and boto3 are required for aws_ssm lookup.')
+            raise AnsibleError('botocore and boto3 are required for aws_ssm lookup. Are they globally installed?')
 
         ret = []
         response = {}

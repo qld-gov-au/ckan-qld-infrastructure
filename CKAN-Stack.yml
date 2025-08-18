@@ -20,14 +20,14 @@
         acm_stack_name: "{{ service_name }}-{{ Environment }}-acm"
 
     - name: Describe acm cert cloudformation stack in default region
-      cloudformation_facts:
+      cloudformation_info:
         region: "{{ region }}"
         stack_name: "{{ acm_stack_name }}"
         stack_resources: true
       register: acm
 
     - set_fact:
-        ACMCertificateARNForDefaultRegion: "{{ acm.ansible_facts.cloudformation[acm_stack_name].stack_outputs.AcmCert }}"
+        ACMCertificateARNForDefaultRegion: "{{ acm['cloudformation'][acm_stack_name].stack_outputs.AcmCert }}"
 
     - name: kms alias fact
       aws_kms_facts:
@@ -63,7 +63,7 @@
       with_items: "{{ cloudformation_stacks }}"
 
     - name: Get current stack facts
-      cloudformation_facts:
+      cloudformation_info:
         region: "{{ region }}"
         stack_name: "{{ stack_name }}"
         stack_resources: true

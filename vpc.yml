@@ -20,7 +20,7 @@
         ApplicationName: "{{ common_stack.template_parameters.ApplicationName }}"
 
     - name: Get current web frontend stack facts
-      cloudformation_facts:
+      cloudformation_info:
         region: "{{ region }}"
         stack_name: "{{ CFStackName }}"
         stack_resources: true
@@ -32,7 +32,7 @@
 
     - name: Get and set ansible fact
       set_fact:
-        VPCId: "{{ vpc_pre_facts.ansible_facts.cloudformation[CFStackName].stack_outputs.VPCId }}"
+        VPCId: "{{ vpc_pre_facts['cloudformation'][CFStackName].stack_outputs.VPCId }}"
       when: vpc_pre_facts.ansible_facts is defined
 
     - name: get vpc peering info
@@ -86,7 +86,7 @@
 
     #learn what was created
     - name: Describe VPC cloudformation stack
-      cloudformation_facts:
+      cloudformation_info:
         region: "{{ region }}"
         stack_name: "{{ stack_name }}"
         stack_resources: true
@@ -95,7 +95,7 @@
     #get VPC ID from created VPC Stack
     - name: Set variable (facts) dependencies
       set_fact:
-        VpcId: "{{ vpc_stack.ansible_facts.cloudformation[stack_name].stack_outputs.VPCId }}"
+        VpcId: "{{ vpc_stack['cloudformation'][stack_name].stack_outputs.VPCId }}"
 
     # Setup VPC Peering
     - name: Create cross account VPC peering Connection
@@ -124,7 +124,7 @@
         peering_id: "{{ vpc_peer.peering_id }}"
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-        security_token: "{{ assumed_role.sts_creds.session_token }}"
+        session_token: "{{ assumed_role.sts_creds.session_token }}"
         state: accept
         tags:
           Name: "{{ ApplicationName }} {{ VpcId }} to Opps {{ opsVpcID }}"
