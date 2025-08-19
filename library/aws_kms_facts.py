@@ -223,6 +223,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.ec2 import boto3_conn, ec2_argument_spec, get_aws_connection_info
 from ansible.module_utils.ec2 import AWSRetry, camel_dict_to_snake_dict, HAS_BOTO3
 from ansible.module_utils.ec2 import boto3_tag_list_to_ansible_dict
+import os
 
 import traceback
 
@@ -411,6 +412,12 @@ def main():
         module.fail_json(msg='boto3 and botocore are required for this module')
 
     region, ec2_url, aws_connect_params = get_aws_connection_info(module)
+
+    # provide session token via environment so it's compatible with all versions
+    security_token = aws_connect_params.pop('security_token', None)
+    session_token = aws_connect_params.pop('session_token', None)
+    os.environ["AWS_SECURITY_TOKEN"] = security_token or session_token
+    os.environ["AWS_SESSION_TOKEN"] = session_token or security_token
 
     if region:
         connection = boto3_conn(module, conn_type='client', resource='kms', region=region, endpoint=ec2_url, **aws_connect_params)
