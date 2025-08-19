@@ -419,6 +419,9 @@ def main():
     os.environ["AWS_SECURITY_TOKEN"] = security_token or session_token
     os.environ["AWS_SESSION_TOKEN"] = session_token or security_token
 
+    # drop unnecessary parameters with cross-version incompatibilities
+    aws_connect_params.pop('validate_certs', None)
+
     if region:
         connection = boto3_conn(module, conn_type='client', resource='kms', region=region, endpoint=ec2_url, **aws_connect_params)
     else:
