@@ -26,7 +26,7 @@
       with_items: "{{ cloudformation_stacks }}"
 
     - name: Describe cloudformation stack
-      cloudformation_facts:
+      cloudformation_info:
         region: "{{ region }}"
         stack_name: "{{ Stack_Name }}"
         stack_resources: true
@@ -34,14 +34,14 @@
 
     - name: set facts to environment from stack parameters
       set_fact: "{{ item.key }}={{ item.value }}"
-      with_dict: "{{ stack.ansible_facts.cloudformation[Stack_Name].stack_parameters }}"
+      with_dict: "{{ stack['cloudformation'][Stack_Name].stack_parameters }}"
 
     - name: Identify hosted zone cloudformation stack
       set_fact:
         Zone_Stack_Name: "CKAN-{{ Environment }}-hosted-zone"
 
     - name: Describe hosted zone cloudformation stack
-      cloudformation_facts:
+      cloudformation_info:
         region: "{{ region }}"
         stack_name: "{{ Zone_Stack_Name }}"
         stack_resources: true

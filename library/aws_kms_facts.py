@@ -223,6 +223,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.ec2 import boto3_conn, ec2_argument_spec, get_aws_connection_info
 from ansible.module_utils.ec2 import AWSRetry, camel_dict_to_snake_dict, HAS_BOTO3
 from ansible.module_utils.ec2 import boto3_tag_list_to_ansible_dict
+import os
 
 import traceback
 
@@ -235,13 +236,13 @@ except ImportError:
 _aliases = dict()
 
 
-@AWSRetry.backoff(tries=5, delay=5, backoff=2.0)
+@AWSRetry.exponential_backoff(retries=5, delay=5, backoff=2.0)
 def get_kms_keys_with_backoff(connection):
     paginator = connection.get_paginator('list_keys')
     return paginator.paginate().build_full_result()
 
 
-@AWSRetry.backoff(tries=5, delay=5, backoff=2.0)
+@AWSRetry.exponential_backoff(retries=5, delay=5, backoff=2.0)
 def get_kms_aliases_with_backoff(connection):
     paginator = connection.get_paginator('list_aliases')
     return paginator.paginate().build_full_result()
@@ -260,12 +261,12 @@ def get_kms_aliases_lookup(connection):
     return _aliases
 
 
-@AWSRetry.backoff(tries=5, delay=5, backoff=2.0)
+@AWSRetry.exponential_backoff(retries=5, delay=5, backoff=2.0)
 def get_kms_tags_with_backoff(connection, key_id, **kwargs):
     return connection.list_resource_tags(KeyId=key_id, **kwargs)
 
 
-@AWSRetry.backoff(tries=5, delay=5, backoff=2.0)
+@AWSRetry.exponential_backoff(retries=5, delay=5, backoff=2.0)
 def get_kms_grants_with_backoff(connection, key_id, **kwargs):
     params = dict(KeyId=key_id)
     if kwargs.get('tokens'):
@@ -274,18 +275,18 @@ def get_kms_grants_with_backoff(connection, key_id, **kwargs):
     return paginator.paginate(**params).build_full_result()
 
 
-@AWSRetry.backoff(tries=5, delay=5, backoff=2.0)
+@AWSRetry.exponential_backoff(retries=5, delay=5, backoff=2.0)
 def get_kms_metadata_with_backoff(connection, key_id):
     return connection.describe_key(KeyId=key_id)
 
 
-@AWSRetry.backoff(tries=5, delay=5, backoff=2.0)
+@AWSRetry.exponential_backoff(retries=5, delay=5, backoff=2.0)
 def list_key_policies_with_backoff(connection, key_id):
     paginator = connection.get_paginator('list_key_policies')
     return paginator.paginate(KeyId=key_id).build_full_result()
 
 
-@AWSRetry.backoff(tries=5, delay=5, backoff=2.0)
+@AWSRetry.exponential_backoff(retries=5, delay=5, backoff=2.0)
 def get_key_policy_with_backoff(connection, key_id, policy_name):
     return connection.get_key_policy(KeyId=key_id, PolicyName=policy_name)
 
@@ -410,7 +411,16 @@ def main():
     if not HAS_BOTO3:
         module.fail_json(msg='boto3 and botocore are required for this module')
 
-    region, ec2_url, aws_connect_params = get_aws_connection_info(module, boto3=True)
+    region, ec2_url, aws_connect_params = get_aws_connection_info(module)
+
+    # provide session token via environment so it's compatible with all versions
+    security_token = aws_connect_params.pop('security_token', None)
+    session_token = aws_connect_params.pop('session_token', None)
+    os.environ["AWS_SECURITY_TOKEN"] = security_token or session_token
+    os.environ["AWS_SESSION_TOKEN"] = session_token or security_token
+
+    # drop unnecessary parameters with cross-version incompatibilities
+    aws_connect_params.pop('validate_certs', None)
 
     if region:
         connection = boto3_conn(module, conn_type='client', resource='kms', region=region, endpoint=ec2_url, **aws_connect_params)

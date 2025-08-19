@@ -209,7 +209,7 @@ def main():
         module.fail_json('Module parameter "vpc_id"')
 
     result = {}
-    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module, boto3=True)
+    region, ec2_url, aws_connect_kwargs = get_aws_connection_info(module)
 
     try:
         client = boto3_conn(module, conn_type='client', resource='ec2', region=region, endpoint=ec2_url, **aws_connect_kwargs)
@@ -227,9 +227,5 @@ def main():
 
     module.exit_json(**result)
 
-
-# import module snippets
-from ansible.module_utils.basic import *
-from ansible.module_utils.ec2 import *
 
 main()

@@ -25,7 +25,7 @@
       with_items: "{{ cloudformation_stacks }}"
 
     - name: Get current stack facts
-      cloudformation_facts:
+      cloudformation_info:
         region: "{{ region }}"
         stack_name: "{{ stack_name }}"
         stack_resources: true
@@ -33,7 +33,7 @@
 
     - name: Set new instance facts
       set_fact:
-        InstanceId: "{{ opsworks_facts.ansible_facts.cloudformation[stack_name].stack_outputs[layer + 'TemplateInstanceId'] }}"
+        InstanceId: "{{ opsworks_facts['cloudformation'][stack_name].stack_outputs[layer + 'TemplateInstanceId'] }}"
         InstanceName: "{{ Environment }}-{{ service_name_lower }}-{{ layer }}-image"
 
     - name: Wait for instance startup

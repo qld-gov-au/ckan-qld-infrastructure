@@ -16,13 +16,6 @@
       with_dict: "{{ basic_fact }}"
       when: basic_fact is defined
 
-    - name: kms alias fact
-      aws_kms_facts:
-        filters:
-          alias: "aws/ssm"
-        region: "{{ region }}"
-      register: ssmKeyFacts
-
     - include_vars: vars/AMI-template-instances.var.yml
 
   roles:

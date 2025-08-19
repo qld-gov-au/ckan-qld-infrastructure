@@ -20,7 +20,7 @@
         ApplicationName: "{{ common_stack.template_parameters.ApplicationName }}"
 
     - name: Get current web frontend stack facts
-      cloudformation_facts:
+      cloudformation_info:
         region: "{{ region }}"
         stack_name: "{{ CFStackName }}"
         stack_resources: true
@@ -32,16 +32,19 @@
 
     - name: Get and set ansible fact
       set_fact:
-        VPCId: "{{ vpc_pre_facts.ansible_facts.cloudformation[CFStackName].stack_outputs.VPCId }}"
-      when: vpc_pre_facts.ansible_facts is defined
+        VPCId: "{{ vpc_pre_facts['cloudformation'][CFStackName].stack_outputs.VPCId }}"
+      when: vpc_pre_facts is defined
 
     - name: get vpc peering info
-      ec2_vpc_peer_describe:
-        vpc_id: "{{ VPCId }}"
-        peer_vpc_id: "{{ opsVpcID }}"
-        region: "{{ region }}"
+      shell: |
+        CONNECTION_ID=$(aws ec2 describe-vpc-peering-connections --region "{{ region }}" --filters "Name=requester-vpc-info.vpc-id,Values={{ VPCId }}" "Name=accepter-vpc-info.vpc-id,Values={{ opsVpcID }}" "Name=status-code,Values=active" --query "VpcPeeringConnections[0].VpcPeeringConnectionId" --output text)
+        if [ "$CONNECTION_ID" = "None" ]; then
+          # check the opposite direction
+          CONNECTION_ID=$(aws ec2 describe-vpc-peering-connections --region "{{ region }}" --filters "Name=requester-vpc-info.vpc-id,Values={{ opsVpcID }}" "Name=accepter-vpc-info.vpc-id,Values={{ VPCId }}" "Name=status-code,Values=active" --query "VpcPeeringConnections[0].VpcPeeringConnectionId" --output text)
+        fi
+        echo $CONNECTION_ID
       when: VPCId is defined
-      register: vpcPeeringDescibed
+      register: vpcPeeringDescribedCmd
 
 #    - name: get vpc peering info
 #      command: "aws ec2  describe-vpc-peering-connections   --region ap-southeast-2 --filters Name=requester-vpc-info.vpc-id,Values={{ VPCId }} Name=accepter-vpc-info.vpc-id,Values={{ opsVpcID }}  Name=status-code,Values=active"
@@ -52,18 +55,14 @@
 #        msg: "{{ vpcPeeringDescribedCmd }}"
 #      when: vpcPeeringDescribedCmd is defined
 
-#    - set_fact:
-#        vpcPeeringDescibed: "{{ vpcPeeringDescribedCmd.stdout }}"
-
-    - debug:
-        msg: "vpc peer describe {{ vpcPeeringDescibed }}"
-      when: vpcPeeringDescibed is defined
+    - set_fact:
+        vpcPeeringDescribed: "{{ vpcPeeringDescribedCmd.stdout }}"
 
     - name: configure vpc peering
       set_fact:
-        VPCPeeringID: "{{ vpcPeeringDescibed.vpc_peer_connection.VpcPeeringConnectionId }}"
+        VPCPeeringID: "{{ vpcPeeringDescribed }}"
         VPCPeeringEnabled: "true "
-      when: vpcPeeringDescibed is defined and vpcPeeringDescibed.vpc_peer_connection is defined
+      when: vpcPeeringDescribed != "None"
 
     - include_vars: vars/vpc.var.yml
 
@@ -86,7 +85,7 @@
 
     #learn what was created
     - name: Describe VPC cloudformation stack
-      cloudformation_facts:
+      cloudformation_info:
         region: "{{ region }}"
         stack_name: "{{ stack_name }}"
         stack_resources: true
@@ -95,9 +94,9 @@
     #get VPC ID from created VPC Stack
     - name: Set variable (facts) dependencies
       set_fact:
-        VpcId: "{{ vpc_stack.ansible_facts.cloudformation[stack_name].stack_outputs.VPCId }}"
+        VpcId: "{{ vpc_stack['cloudformation'][stack_name].stack_outputs.VPCId }}"
 
-    # Setup VPC Peering
+    # Setup VPC Peering if not already done
     - name: Create cross account VPC peering Connection
       ec2_vpc_peer:
         region: "{{ region }}"
@@ -109,6 +108,7 @@
           Name: "{{ ApplicationName }} {{ VpcId }} to Opps {{ opsVpcID }}"
           Environment: "{{ Environment }}"
           Service: "{{ ApplicationName }}"
+      when: VPCPeeringID is not defined
       register: vpc_peer
 
     - name: Get VPC Peering STS Role Key
@@ -116,6 +116,7 @@
         region: "{{ region }}"
         role_arn: "arn:aws:iam::{{ opsAccount }}:role/{{ opsRole }}"
         role_session_name: "bamboo-vpc-gi"
+      when: VPCPeeringID is not defined
       register: assumed_role
 
     - name: Accept a cross account VPC peering connection request
@@ -124,9 +125,12 @@
         peering_id: "{{ vpc_peer.peering_id }}"
         aws_access_key: "{{ assumed_role.sts_creds.access_key }}"
         aws_secret_key: "{{ assumed_role.sts_creds.secret_key }}"
-        security_token: "{{ assumed_role.sts_creds.session_token }}"
         state: accept
         tags:
           Name: "{{ ApplicationName }} {{ VpcId }} to Opps {{ opsVpcID }}"
           Environment: "{{ Environment }}"
           Service: "{{ ApplicationName }}"
+      when: VPCPeeringID is not defined
+      environment:
+        AWS_SESSION_TOKEN: "{{ assumed_role.sts_creds.session_token }}"
+        AWS_SECURITY_TOKEN: "{{ assumed_role.sts_creds.session_token }}"
