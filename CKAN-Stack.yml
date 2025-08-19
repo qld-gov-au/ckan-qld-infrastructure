@@ -29,19 +29,16 @@
     - set_fact:
         ACMCertificateARNForDefaultRegion: "{{ acm['cloudformation'][acm_stack_name].stack_outputs.AcmCert }}"
 
-    - name: kms alias fact
-      aws_kms_facts:
-        filters:
-          alias: "aws/ssm"
-        region: "{{ region }}"
+    # 'list-aliases' doesn't offer server-side --filters so fall back to client-side --query
+    - name: Retrieve ARN for SSM encryption key
+      shell: |
+        KEY_ID=$(aws kms list-aliases --region "{{ region }}" --query "Aliases[?AliasName=='alias/aws/ssm'].TargetKeyId" --output text | head -1)
+        if [ "$KEY_ID" != "" ]; then
+          aws kms describe-key --region "{{ region }}" --key-id "$KEY_ID" --query "KeyMetadata.Arn" --output text
+        fi
       register: ssmKeyFacts
-
-    - debug:
-        msg: "{{ ssmKeyFacts }}"
-
-    - name: set KMS key from alias
-      set_fact:
-        SSMKey: "{{ ssmKeyFacts['keys'][0].key_arn }}"
+    - set_fact:
+        SSMKey: "{{ ssmKeyFacts.stdout }}"
 
     - name: Generate Lambda file hash
       shell: >
