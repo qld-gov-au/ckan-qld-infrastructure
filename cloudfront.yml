@@ -25,23 +25,23 @@
         acm_stack_name: "{{ service_name }}-{{ Environment }}-acm"
 
     - name: Describe Lambda@Edge cloudformation stack in us-east-1
-      cloudformation_facts:
+      cloudformation_info:
         region: "us-east-1"
         stack_name: "{{ lambdaAtEdgestack_name }}"
         stack_resources: true
       register: lambdaAtEdgeStack
 
     - name: Describe acm cert cloudformation stack in us-east-1
-      cloudformation_facts:
+      cloudformation_info:
         region: "us-east-1"
         stack_name: "{{ acm_stack_name }}"
         stack_resources: true
       register: acmUsEast1
 
     - set_fact:
-        LambdaAtEdgeViewerRequestVersion: "{{ lambdaAtEdgeStack.ansible_facts.cloudformation[lambdaAtEdgestack_name].stack_outputs.VersionedLambdaFunction48e660f32023b }}"
-        LambdaAtEdgeOriginRequestVersion: "{{ lambdaAtEdgeStack.ansible_facts.cloudformation[lambdaAtEdgestack_name].stack_outputs.LambdaEdgeOriginFunctionVersion9cd5bfa }}"
-        ACMCertificateARNForUsEast1: "{{ acmUsEast1.ansible_facts.cloudformation[acm_stack_name].stack_outputs.AcmCert }}"
+        LambdaAtEdgeViewerRequestVersion: "{{ lambdaAtEdgeStack['cloudformation'][lambdaAtEdgestack_name].stack_outputs.VersionedLambdaFunction48e660f32023b }}"
+        LambdaAtEdgeOriginRequestVersion: "{{ lambdaAtEdgeStack['cloudformation'][lambdaAtEdgestack_name].stack_outputs.LambdaEdgeOriginFunctionVersion9cd5bfa }}"
+        ACMCertificateARNForUsEast1: "{{ acmUsEast1['cloudformation'][acm_stack_name].stack_outputs.AcmCert }}"
 
     - include_vars: vars/cloudfront.var.yml
   roles:
