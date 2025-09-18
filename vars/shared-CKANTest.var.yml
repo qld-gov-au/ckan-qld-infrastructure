@@ -254,7 +254,7 @@ extensions:
       description: "CKAN Extension for displaying information about a CKAN instance"
       type: "git"
       url: "https://github.com/DataShades/ckanext-selfinfo.git"
-      version: "v1.1.5"
+      version: "v1.2.4"
 
 basic_facts:
   - Environment: TRAINING
