@@ -64,6 +64,14 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-oidc-pkce"
       version: "0.4.0-qgov.3"
 
+    CKANExtSelfInfo: &CKANExtSelfInfo
+      name: "ckanext-selfinfo-{{ Environment }}"
+      shortname: "ckanext-selfinfo"
+      description: "CKAN Extension for displaying information about a CKAN instance"
+      type: "git"
+      url: "https://github.com/DataShades/ckanext-selfinfo.git"
+      version: "v1.2.4"
+
   PROD:
     <<: *default_extensions
 
@@ -104,12 +112,7 @@ extensions:
       version: "develop"
 
     CKANExtSelfInfo:
-      name: "ckanext-selfinfo-{{ Environment }}"
-      shortname: "ckanext-selfinfo"
-      description: "CKAN Extension for displaying information about a CKAN instance"
-      type: "git"
-      url: "https://github.com/DataShades/ckanext-selfinfo.git"
-      version: "v1.1.5"
+      <<: *CKANExtSelfInfo
 
 basic_facts:
   - Environment: PROD
