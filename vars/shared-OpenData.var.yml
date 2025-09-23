@@ -43,7 +43,7 @@ extensions:
       description: "CKAN Express Loader Extension"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-xloader.git"
-      version: "2.1.1-qgov.1"
+      version: "2.1.1-qgov.2"
 
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
@@ -83,7 +83,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "7.4.0"
+      version: "7.4.1"
 
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
@@ -165,6 +165,14 @@ extensions:
       url: "https://github.com/qld-gov-au/ckanext-oidc-pkce"
       version: "0.4.0-qgov.3"
 
+    CKANExtSelfInfo: &CKANExtSelfInfo
+      name: "ckanext-selfinfo-{{ Environment }}"
+      shortname: "ckanext-selfinfo"
+      description: "CKAN Extension for displaying information about a CKAN instance"
+      type: "git"
+      url: "https://github.com/DataShades/ckanext-selfinfo.git"
+      version: "v1.2.4"
+
   PROD:
     <<: *default_extensions
 
@@ -241,12 +249,7 @@ extensions:
       version: "develop"
 
     CKANExtSelfInfo:
-      name: "ckanext-selfinfo-{{ Environment }}"
-      shortname: "ckanext-selfinfo"
-      description: "CKAN Extension for displaying information about a CKAN instance"
-      type: "git"
-      url: "https://github.com/DataShades/ckanext-selfinfo.git"
-      version: "v1.1.5"
+      <<: *CKANExtSelfInfo
 
 basic_facts:
   - Environment: PROD

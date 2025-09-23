@@ -38,7 +38,7 @@ extensions:
       type: "git"
       description: "CKAN Extension for Queensland Government Publications theme"
       url: "https://github.com/qld-gov-au/ckanext-publications-qld-theme.git"
-      version: "1.5.2"
+      version: "1.5.3"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"
@@ -63,6 +63,14 @@ extensions:
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-oidc-pkce"
       version: "0.4.0-qgov.3"
+
+    CKANExtSelfInfo: &CKANExtSelfInfo
+      name: "ckanext-selfinfo-{{ Environment }}"
+      shortname: "ckanext-selfinfo"
+      description: "CKAN Extension for displaying information about a CKAN instance"
+      type: "git"
+      url: "https://github.com/DataShades/ckanext-selfinfo.git"
+      version: "v1.2.4"
 
   PROD:
     <<: *default_extensions
@@ -104,12 +112,7 @@ extensions:
       version: "develop"
 
     CKANExtSelfInfo:
-      name: "ckanext-selfinfo-{{ Environment }}"
-      shortname: "ckanext-selfinfo"
-      description: "CKAN Extension for displaying information about a CKAN instance"
-      type: "git"
-      url: "https://github.com/DataShades/ckanext-selfinfo.git"
-      version: "v1.1.5"
+      <<: *CKANExtSelfInfo
 
 basic_facts:
   - Environment: PROD
