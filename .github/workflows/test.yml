@@ -28,6 +28,12 @@ jobs:
       - uses: actions/checkout@v4
         timeout-minutes: 2
 
+      - name: Install Ahoy
+        run: |
+          sudo wget https://github.com/ahoy-cli/ahoy/releases/download/v2.5.0/ahoy-bin-linux-amd64 -O /usr/local/bin/ahoy \
+            && sudo chown $USER /usr/local/bin/ahoy \
+            && chmod +x /usr/local/bin/ahoy
+
       - name: Build
         run: bin/build.sh
         timeout-minutes: 20
