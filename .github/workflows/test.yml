@@ -25,10 +25,6 @@ jobs:
       BEHAVE_TAG: ${{ matrix.behave-tag }}
 
     steps:
-      # Patch https://github.com/actions/runner/issues/863
-      - name: Preserve $HOME set in the container
-        run: echo HOME=/root >> "$GITHUB_ENV"
-
       - uses: actions/checkout@v4
         timeout-minutes: 2
 
