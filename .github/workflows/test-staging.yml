@@ -19,7 +19,6 @@ jobs:
 
     name: ${{ matrix.application }} ${{ matrix.target_environment }} ${{ matrix.python-version }} ${{ matrix.behave-tag }} infrastructure build
     runs-on: ubuntu-latest
-    container: drevops/ci-runner:23.12.0
     env:
       VARS_TYPE: ${{ matrix.application }}
       DEPLOY_ENV: ${{ matrix.target_environment }}
@@ -27,12 +26,16 @@ jobs:
       BEHAVE_TAG: ${{ matrix.behave-tag }}
 
     steps:
-      # Patch https://github.com/actions/runner/issues/863
-      - name: Preserve $HOME set in the container
-        run: echo HOME=/root >> "$GITHUB_ENV"
-
       - uses: actions/checkout@v4
         timeout-minutes: 2
+
+      - name: Install Ahoy and dependencies
+        run: |
+          sudo wget https://github.com/ahoy-cli/ahoy/releases/download/v2.5.0/ahoy-bin-linux-amd64 -O /usr/local/bin/ahoy \
+            && sudo chown $USER /usr/local/bin/ahoy \
+            && chmod +x /usr/local/bin/ahoy
+          sudo wget https://github.com/pygmystack/pygmy/releases/download/v0.14.0/pygmy_0.14.0_linux_amd64.tar.gz -O - | tar xvzf - -C /tmp/ \
+            && sudo mv /tmp/pygmy /usr/local/bin/pygmy
 
       - name: Build
         run: bin/build.sh

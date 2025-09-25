@@ -33,8 +33,8 @@ jobs:
           sudo wget https://github.com/ahoy-cli/ahoy/releases/download/v2.5.0/ahoy-bin-linux-amd64 -O /usr/local/bin/ahoy \
             && sudo chown $USER /usr/local/bin/ahoy \
             && chmod +x /usr/local/bin/ahoy
-          sudo wget https://github.com/pygmystack/pygmy/releases/download/v0.14.0/pygmy_0.14.0_linux_amd64.tar.gz -O - | tar xvzf - -C /tmp/
-          sudo mv /tmp/pygmy /usr/local/bin/pygmy
+          sudo wget https://github.com/pygmystack/pygmy/releases/download/v0.14.0/pygmy_0.14.0_linux_amd64.tar.gz -O - | tar xvzf - -C /tmp/ \
+            && sudo mv /tmp/pygmy /usr/local/bin/pygmy
 
       - name: Build
         run: bin/build.sh
