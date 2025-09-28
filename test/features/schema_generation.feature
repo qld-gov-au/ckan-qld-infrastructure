@@ -43,6 +43,47 @@ Feature: Schema Generation
         And I should see an element with xpath "//select[@id='field-apply_for']/option[string()='Dataset default' and not(@selected)]"
         And I should see an element with xpath "//select[@id='field-apply_for']/option[string()='Resource' and not(@selected)]"
 
+    Scenario: As a publisher, when I try to generate a schema for a resource that cannot be parsed into the datastore, I can see the resulting error
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I create a dataset and resource with key-value parameters "notes=package-with-txt-res" and "name=Resource without datastore::upload=txt_resource.txt::format=TXT"
+        And I take a debugging screenshot
+        And I press "Resource without datastore"
+        And I take a debugging screenshot
+        And I visit resource schema generation page
+        And I take a debugging screenshot
+        Then I should see an element with xpath "//button[contains(string(), 'Generate JSON data schema') and contains(@class, 'btn-generate')]/following::table[contains(@class, 'table-schema')]"
+        And I should see an element with xpath "//th[string()='Status']/following::td[string()='Not generated']"
+        And I should see an element with xpath "//th[string()='Last updated']/following::td[string()='Never']"
+
+        When I press "Generate JSON data schema"
+        Then I should see an element with xpath "//div[contains(@class, 'flash-messages')]/div[contains(string(), 'for this resource')]"
+        And I should see an element with xpath "//th[string()='Last updated']/following::td[string()='Never']"
+
+    # Test a file that the XLoader can handle but Frictionless can't
+    # The test data may need to change in future if Frictionless improves its handling of ISO-8859-1
+    Scenario: As a publisher, when I try to generate a schema for an invalid resource, I can see the resulting error
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I create a dataset and resource with key-value parameters "notes=package-with-csv-fails-generation::schema_json=default" and "name=Resource for schema generation::upload=latin1-encoding.csv::format=CSV"
+        And I take a debugging screenshot
+        And I press "Resource for schema generation"
+        And I take a debugging screenshot
+        # Ensure that the datastore is active
+        And I reload page every 3 seconds until I see an element with xpath "//*[string() = 'Data Dictionary']" but not more than 6 times
+        And I visit resource schema generation page
+        And I take a debugging screenshot
+        Then I should see an element with xpath "//button[contains(string(), 'Generate JSON data schema') and contains(@class, 'btn-generate')]/following::table[contains(@class, 'table-schema')]"
+        And I should see an element with xpath "//th[string()='Status']/following::td[string()='Not generated']"
+        And I should see an element with xpath "//th[string()='Last updated']/following::td[string()='Never']"
+
+        When I press "Generate JSON data schema"
+        And I take a debugging screenshot
+        And I reload page every 3 seconds until I see an element with xpath "//th[string()='Status']/following::td[string()='Pending']" but not more than 6 times
+        Then I should see an element with xpath "//th[string()='Last updated']/following::td/span[contains(@class, 'date')]"
+        When I reload page every 3 seconds until I see an element with xpath "//th[string()='Status']/following::td[string()='Failed']" but not more than 6 times
+        Then I should see an element with xpath "//div[contains(@class, 'alert-error') and contains(string(), 'encoding-error')]"
+
     Scenario: System actions following the selection of the set as dataset default dropdown option on the manage data schema GUI page
         Given "TestOrgEditor" as the persona
         When I log in
