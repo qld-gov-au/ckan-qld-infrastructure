@@ -25,7 +25,7 @@ extensions:
       description: "CKAN Extension for DCAT"
       type: "git"
       url: "https://github.com/ckan/ckanext-dcat.git"
-      version: "v2.1.0"
+      version: "v2.4.1"
 
     CKANExtScheming: &CKANExtScheming
       name: "ckanext-scheming-{{ Environment }}"
@@ -43,7 +43,7 @@ extensions:
       description: "CKAN Express Loader Extension"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-xloader.git"
-      version: "2.1.1-qgov.2"
+      version: "2.2.0-qgov.1"
 
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
@@ -99,7 +99,7 @@ extensions:
       description: "CKAN Extension for YTP Comments"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-ytp-comments.git"
-      version: "2.5.1"
+      version: "2.5.2"
 
     CKANExtReport: &CKANExtReport
       name: "ckanext-report-{{ Environment }}"
@@ -247,9 +247,6 @@ extensions:
     CKANExtOIDC:
       <<: *CKANExtOIDC
       version: "develop"
-
-    CKANExtSelfInfo:
-      <<: *CKANExtSelfInfo
 
 basic_facts:
   - Environment: PROD
