@@ -91,7 +91,6 @@ Resources:
             - - !Ref Environment
               - !Ref ApplicationName
               - !Ref {{ layer }}InstanceProfileName
-      # Amazon Linux 2023: al2023-ami-2023.6.20250317.2-kernel-6.1-x86_64
       ImageId: "{{ base_ami }}"
       InstanceType: "t3a.small"
       KeyName: !Ref DefaultEC2Key
