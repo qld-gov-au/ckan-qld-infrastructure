@@ -248,6 +248,10 @@ extensions:
       <<: *CKANExtOIDC
       version: "master"
 
+    CKANExtSelfInfo:
+      <<: *CKANExtSelfInfo
+      version: "master"
+
 basic_facts:
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
