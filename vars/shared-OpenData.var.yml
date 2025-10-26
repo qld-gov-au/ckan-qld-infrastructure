@@ -275,4 +275,4 @@ basic_facts:
     Domain: "www.dev.data.qld.gov.au,dev.data.qld.gov.au" #Cloudfront Alt Domains
     SiteDomain: "dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "cms.dev.data.qld.gov.au" #temp for now
