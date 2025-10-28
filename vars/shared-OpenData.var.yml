@@ -261,14 +261,14 @@ basic_facts:
     Domain: "www.staging.data.qld.gov.au,staging.data.qld.gov.au" #Cloudfront Alt Domains
     SiteDomain: "staging.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "staging.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.training.data.qld.gov.au,training.data.qld.gov.au" #Cloudfront Alt Domains
     SiteDomain: "training.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "training.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
