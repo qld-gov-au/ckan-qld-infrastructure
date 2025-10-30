@@ -258,11 +258,11 @@ basic_facts:
     Domain: "www.test.data.qld.gov.au,test.data.qld.gov.au"
     SiteDomain: "test.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.test-dev.data.qld.gov.au,test-dev.data.qld.gov.au"
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
