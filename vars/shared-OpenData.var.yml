@@ -254,7 +254,7 @@ basic_facts:
     Domain: "www.data.qld.gov.au,data.qld.gov.au" #Cloudfront Alt Domains
     SiteDomain: "www.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
