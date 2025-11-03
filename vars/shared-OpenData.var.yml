@@ -59,7 +59,7 @@ extensions:
       description: "CKAN Extension to keep uploaded files in S3"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
-      version: "0.8.0"
+      version: "0.9.0"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       name: "ckanext-ssm-config-{{ Environment }}"
@@ -131,7 +131,7 @@ extensions:
       description: "CKAN Extension for checking uploaded resource types"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-resource-type-validation.git"
-      version: "1.0.11"
+      version: "1.0.12"
 
     CKANExtCSRFFilter: &CKANExtCSRFFilter
       name: "ckanext-csrf-filter-{{ Environment }}"
@@ -254,25 +254,25 @@ basic_facts:
     Domain: "www.data.qld.gov.au,data.qld.gov.au" #Cloudfront Alt Domains
     SiteDomain: "www.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.staging.data.qld.gov.au,staging.data.qld.gov.au" #Cloudfront Alt Domains
     SiteDomain: "staging.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "staging.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.training.data.qld.gov.au,training.data.qld.gov.au" #Cloudfront Alt Domains
     SiteDomain: "training.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "training.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.dev.data.qld.gov.au,dev.data.qld.gov.au" #Cloudfront Alt Domains
     SiteDomain: "dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "oss.squizedge.net"
+    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
