@@ -4,7 +4,6 @@ templates/AMI-Template-Instances.cfn.yml
 templates/chef.json
 templates/chef-source.json
 templates/cloudfront.cfn.yml
-templates/security_groups.cfn.yml
 templates/Datashades-OpsWorks-CKAN-Extensions.cfn.yml
 templates/Datashades-OpsWorks-CKAN-Instances.cfn.yml
 templates/Datashades-OpsWorks-CKAN-Stack.cfn.yml
