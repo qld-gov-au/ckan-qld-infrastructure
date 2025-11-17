@@ -60,23 +60,15 @@ Resources:
       GroupDescription: allow connections from specified CIDR ranges
       SecurityGroupIngress:
         # IPv4 Entries
-{% for entry in aws_ipv4_json %}
-{% if entry.service == "CLOUDFRONT" %}
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: {{ entry.ip_prefix }}
-{% endif %}
-{% endfor %}
+          SourcePrefixListId: pl-b8a742d1  # com.amazonaws.global.cloudfront.origin-facing
         # IPv6 Entries
-{% for entry in aws_ipv6_json %}
-{% if entry.service == "CLOUDFRONT" %}
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIpv6: {{ entry.ipv6_prefix }}
-{% endif %}
-{% endfor %}
+          SourcePrefixListId: pl-033521892361c13a7  # com.amazonaws.global.ipv6.cloudfront.origin-facing
       Tags:
         - Key: Name
           Value: app-loadbalancer
