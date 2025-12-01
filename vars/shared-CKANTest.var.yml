@@ -139,7 +139,7 @@ extensions:
       description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
-      version: "2.0.0"
+      version: "2.0.1"
 
     CKANExtValidationSchemaGenerator: &CKANExtValidationSchemaGenerator
       name: "ckanext-validation-schema-generator-{{ Environment }}"
