@@ -171,7 +171,7 @@ extensions:
       description: "CKAN Extension for displaying information about a CKAN instance"
       type: "git"
       url: "https://github.com/DataShades/ckanext-selfinfo.git"
-      version: "v1.3.1"
+      version: "v1.3.6"
 
   PROD:
     <<: *default_extensions
@@ -246,10 +246,6 @@ extensions:
 
     CKANExtOIDC:
       <<: *CKANExtOIDC
-      version: "master"
-
-    CKANExtSelfInfo:
-      <<: *CKANExtSelfInfo
       version: "master"
 
 basic_facts:
