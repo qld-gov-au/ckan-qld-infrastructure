@@ -83,7 +83,7 @@ extensions:
       description: "CKAN Extension for Queensland Government Open Data"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-data-qld.git"
-      version: "7.4.2"
+      version: "8.0.0"
 
     CKANExtDataRequests: &CKANExtDataRequests
       name: "ckanext-datarequests-{{ Environment }}"
@@ -139,7 +139,7 @@ extensions:
       description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
-      version: "2.0.0"
+      version: "2.0.1"
 
     CKANExtValidationSchemaGenerator: &CKANExtValidationSchemaGenerator
       name: "ckanext-validation-schema-generator-{{ Environment }}"
