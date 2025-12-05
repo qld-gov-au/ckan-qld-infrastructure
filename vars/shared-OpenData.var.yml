@@ -43,7 +43,7 @@ extensions:
       description: "CKAN Express Loader Extension"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-xloader.git"
-      version: "2.2.0-qgov.1"
+      version: "2.2.0-qgov.2"
 
     CKANExtQGOV: &CKANExtQGOV
       name: "ckanext-qgov-{{ Environment }}"
@@ -171,7 +171,7 @@ extensions:
       description: "CKAN Extension for displaying information about a CKAN instance"
       type: "git"
       url: "https://github.com/DataShades/ckanext-selfinfo.git"
-      version: "v1.3.1"
+      version: "v1.3.3"
 
   PROD:
     <<: *default_extensions
