@@ -38,7 +38,7 @@ extensions:
       type: "git"
       description: "CKAN Extension for Queensland Government Publications theme"
       url: "https://github.com/qld-gov-au/ckanext-publications-qld-theme.git"
-      version: "1.5.3"
+      version: "1.5.4"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       name: "ckanext-resource-type-validation-{{ Environment }}"
@@ -62,7 +62,7 @@ extensions:
       description: "CKAN Extension for single sign-on capability"
       type: "git"
       url: "https://github.com/qld-gov-au/ckanext-oidc-pkce"
-      version: "0.4.1-qgov.1"
+      version: "0.4.1-qgov.2"
 
     CKANExtSelfInfo: &CKANExtSelfInfo
       name: "ckanext-selfinfo-{{ Environment }}"
