@@ -110,22 +110,19 @@ Resources:
         Fn::Base64:
           Fn::Sub: |
             #!/bin/sh
+            # add extra disk to mount table if not present
             if ! (grep '/mnt/local_data' /etc/fstab >/dev/null); then
               mkdir /mnt/local_data
               mkfs -t xfs /dev/sdi
               echo '/dev/sdi /mnt/local_data xfs defaults,nofail 0 2' >> /etc/fstab
               mount -a
             fi
-            if ! (yum install chef); then
-              for i in `seq 1 5`; do
-                yum install -y libxcrypt-compat "https://packages.chef.io/files/stable/chef/18.4.12/el/7/chef-18.4.12-1.el7.x86_64.rpm" && break
-                sleep 5
-              done
-            fi
             REGION="--region ${AWS::Region}"
             metadata_token=`curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 60" http://169.254.169.254/latest/api/token` && \
             INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $metadata_token" http://169.254.169.254/latest/meta-data/instance-id) && \
+            # Tag this instance
             aws ec2 create-tags $REGION --resources $INSTANCE_ID --tags "Key=Name,Value=${ApplicationName}_${Environment}-{{ layer }}-ami-template"
+            # Initiate IaC deployment on this server
             FUNCTION_NAME=$(aws ssm get-parameter $REGION --name "/config/CKAN/${Environment}/app/${ApplicationId}/cookbook/setup_function_name" --query "Parameter.Value" --output text)
             if (aws --version |grep -o 'aws-cli/[2-9]'); then
               PAYLOAD_FORMAT="--cli-binary-format raw-in-base64-out"
