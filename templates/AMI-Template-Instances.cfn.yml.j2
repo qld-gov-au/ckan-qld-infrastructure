@@ -77,13 +77,13 @@ Resources:
             Encrypted: true
             DeleteOnTermination: true
             VolumeSize: 100
-            VolumeType: "gp2"
+            VolumeType: "gp3"
         - DeviceName: "/dev/sdi"
           Ebs:
             Encrypted: true
             DeleteOnTermination: true
             VolumeSize: !Ref {{ layer }}EC2SecondaryDiskSize
-            VolumeType: "gp2"
+            VolumeType: "gp3"
       IamInstanceProfile:
         Fn::ImportValue:
           Fn::Join:
