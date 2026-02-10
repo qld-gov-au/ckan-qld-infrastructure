@@ -23,7 +23,30 @@ run-playbook () {
   ansible-playbook -i inventory/hosts "$PLAYBOOK" --extra-vars "@$VARS_FILE" $VARS_FILE_2 --extra-vars "$ANSIBLE_EXTRA_VARS" -vvv
 }
 
+# Switch off ELB health checks while changing core components like the database,
+# which can cause health check errors but the EC2 instances don't need replacement.
+set_health_checks () {
+  CHECK_TYPE=EC2
+  for truthy in `echo "y t true T 1" |xargs echo`; do
+    if [ "$1" = "$truthy" ]; then
+      CHECK_TYPE=ELB
+      break
+    fi
+  done
+
+  for APP_NAME in `echo "OpenData Publications CKANTest"`; do
+    # configure health checks for every app since components are shared,
+    # but skip any app that doesn't exist in this environment,
+    # ie CKANTest only exists up to TRAINING.
+    ASG_NAME="${ENVIRONMENT}-${APP_NAME}-Web-ASG"
+    aws autoscaling describe-auto-scaling-groups --region ap-southeast-2 --auto-scaling-group-names "$ASG_NAME" >/dev/null || continue
+    echo "Setting health check type for $ASG_NAME to ${CHECK_TYPE}..."
+    aws autoscaling update-auto-scaling-group --region ap-southeast-2 --auto-scaling-group-name "$ASG_NAME" --health-check-type "$CHECK_TYPE"
+  done
+}
+
 run-shared-resource-playbooks () {
+  set_health_checks false
   run-playbook "vpc"
   run-playbook "CloudFormation" "vars/security_groups.var.yml"
   run-playbook "CloudFormation" "vars/hosted-zone.var.yml"
@@ -31,6 +54,7 @@ run-shared-resource-playbooks () {
   run-playbook "CloudFormation" "vars/efs.var.yml"
   run-playbook "CloudFormation" "vars/cache.var.yml"
   run-playbook "CloudFormation" "vars/waf_web_acl.var.yml"
+  set_health_checks true
 }
 
 run-deployment () {
