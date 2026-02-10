@@ -8,7 +8,7 @@ common_stack: &common_stack
   template_parameters: &common_stack_template_parameters
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name_lower }}"
-    BatchEC2Size: t3.micro
+    BatchEC2Size: t4g.micro
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
@@ -28,9 +28,9 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: PROD
-      SolrEC2Size: t3a.small
-      WebEC2Size: t3a.small
-      BatchEC2Size: t3a.micro
+      SolrEC2Size: t4g.small
+      WebEC2Size: t4g.small
+      BatchEC2Size: t4g.micro
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
@@ -40,9 +40,9 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: STAGING
-      SolrEC2Size: t3a.small
-      WebEC2Size: t3a.small
-      BatchEC2Size: t3a.micro
+      SolrEC2Size: t4g.small
+      WebEC2Size: t4g.small
+      BatchEC2Size: t4g.micro
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -52,10 +52,10 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: TRAINING
-      SolrEC2Size: t3a.small
+      SolrEC2Size: t4g.small
       SolrEC2Count: 1
-      WebEC2Size: t3a.small
-      BatchEC2Size: t3a.micro
+      WebEC2Size: t4g.small
+      BatchEC2Size: t4g.micro
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -65,11 +65,11 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: DEV
-      SolrEC2Size: t3a.micro
+      SolrEC2Size: t4g.micro
       SolrEC2Count: 1
       WebEC2Count: 1
-      WebEC2Size: t3a.micro
-      BatchEC2Size: t3a.micro
+      WebEC2Size: t4g.micro
+      BatchEC2Size: t4g.micro
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
