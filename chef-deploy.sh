@@ -108,6 +108,7 @@ deploy () {
     if [ "$PARALLEL" = "$truthy" ]; then
       debug "$MESSAGE: Parallel enabled, will deploy to all target instances simultaneously"
       PARALLEL=true
+      break
     fi
   done
 

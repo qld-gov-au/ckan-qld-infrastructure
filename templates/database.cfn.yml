@@ -38,12 +38,12 @@ Parameters:
     Type: Number
   DBClass:
     AllowedValues:
-    - db.t2.medium
     - db.t3.medium
-    - db.t2.large
+    - db.t4g.medium
     - db.t3.large
-    - db.m4.large
+    - db.t4g.large
     - db.m5.large
+    - db.m6g.large
     ConstraintDescription: must select a valid database instance type.
     Description: Database instance class
     Type: String
