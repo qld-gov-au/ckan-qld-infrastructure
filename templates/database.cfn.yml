@@ -133,7 +133,7 @@ Resources:
     Properties:
       MultiAZ: !Ref MultiAZ
       StorageEncrypted: !Ref StorageEncrypted
-      StorageType: gp2
+      StorageType: gp3
       AllocatedStorage: !Ref DBAllocatedStorage
       DBInstanceClass: !Ref DBClass
       DBName: !Ref DBName
