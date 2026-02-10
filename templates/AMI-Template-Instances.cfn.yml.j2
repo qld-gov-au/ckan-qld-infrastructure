@@ -92,7 +92,7 @@ Resources:
               - !Ref ApplicationName
               - !Ref {{ layer }}InstanceProfileName
       ImageId: "{{ base_ami }}"
-      InstanceType: "t3a.small"
+      InstanceType: "t4g.small"
       KeyName: !Ref DefaultEC2Key
       NetworkInterfaces:
         - DeviceIndex: 0

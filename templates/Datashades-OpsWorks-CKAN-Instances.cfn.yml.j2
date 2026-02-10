@@ -23,23 +23,16 @@ Parameters:
   SolrEC2Size:
     Description: Select EC2 Instance Size for Solr
     Type: String
-    Default: t3.small
+    Default: t4g.small
     AllowedValues:
-      - t3.micro
-      - t3.small
-      - t3.medium
-      - t3.large
       - t3a.micro
       - t3a.small
       - t3a.medium
       - t3a.large
-      - m3.medium
-      - m5.large
-      - m5.xlarge
-      - m5.2xlarge
-      - m5.4xlarge
-      - m4.10xlarge
-      - m5.12xlarge
+      - t4g.micro
+      - t4g.small
+      - t4g.medium
+      - t4g.large
   SolrEC2SecondaryDiskSize:
     Description: The size (in gigabytes) of the non-root disk to add to Solr instances.
     Type: Number
@@ -61,23 +54,16 @@ Parameters:
   WebEC2Size:
     Description: Select EC2 Instance Size.
     Type: String
-    Default: t3.small
+    Default: t4g.small
     AllowedValues:
-      - t3.micro
-      - t3.small
-      - t3.medium
-      - t3.large
       - t3a.micro
       - t3a.small
       - t3a.medium
       - t3a.large
-      - m3.medium
-      - m5.large
-      - m5.xlarge
-      - m5.2xlarge
-      - m5.4xlarge
-      - m4.10xlarge
-      - m5.12xlarge
+      - t4g.micro
+      - t4g.small
+      - t4g.medium
+      - t4g.large
   WebEC2SecondaryDiskSize:
     Description: The size (in gigabytes) of the non-root disk to add to web instances.
     Type: Number
@@ -93,24 +79,17 @@ Parameters:
   BatchEC2Size:
     Description: Select EC2 Instance Size for background jobs.
     Type: String
-    Default: t3.small
+    Default: t4g.small
     AllowedValues:
       - none
-      - t3.micro
-      - t3.small
-      - t3.medium
-      - t3.large
       - t3a.micro
       - t3a.small
       - t3a.medium
       - t3a.large
-      - m3.medium
-      - m5.large
-      - m5.xlarge
-      - m5.2xlarge
-      - m5.4xlarge
-      - m4.10xlarge
-      - m5.12xlarge
+      - t4g.micro
+      - t4g.small
+      - t4g.medium
+      - t4g.large
   BatchEC2SecondaryDiskSize:
     Description: The size (in gigabytes) of the non-root disk to add to batch instances.
     Type: Number
