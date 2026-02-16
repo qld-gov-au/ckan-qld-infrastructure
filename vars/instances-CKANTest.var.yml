@@ -11,6 +11,10 @@ common_stack: &common_stack
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
+    WebEC2Size: t4g.micro
+    BatchEC2Size: t4g.micro
+    SolrEC2Size: t4g.micro
+    SolrEC2Count: 1
     BatchImageId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/BatchAmiId') | default(base_ami, True) }}"
     WebImageId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/WebAmiId') | default(base_ami, True) }}"
     SolrImageId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/SolrAmiId') | default(base_ami, True) }}"
@@ -45,9 +49,6 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: TRAINING
-      SolrEC2Size: t4g.micro
-      SolrEC2Count: 1
-      BatchEC2Size: t4g.micro
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
@@ -58,10 +59,6 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: DEV
       WebEC2Count: 1
-      SolrEC2Size: t4g.micro
-      SolrEC2Count: 1
-      WebEC2Size: t4g.micro
-      BatchEC2Size: t4g.micro
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
