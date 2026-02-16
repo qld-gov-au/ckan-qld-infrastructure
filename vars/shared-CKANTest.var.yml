@@ -17,7 +17,7 @@ extensions:
       description: "CKAN Extension for Harvesting"
       type: "git"
       url: "https://github.com/ckan/ckanext-harvest.git"
-      version: "v1.6.1"
+      version: "v1.6.2"
 
     CKANExtDCAT: &CKANExtDCAT
       name: "ckanext-dcat-{{ Environment }}"
