@@ -51,6 +51,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: TRAINING
+      WebEC2Size: t4g.small
       SolrEC2Size: t4g.small
       SolrEC2Count: 1
     tags:
@@ -63,6 +64,7 @@ cloudformation_stacks:
       <<: *common_stack_template_parameters
       Environment: DEV
       WebEC2Count: 1
+      WebEC2Size: t4g.small
       SolrEC2Size: t4g.small
       SolrEC2Count: 1
     tags:

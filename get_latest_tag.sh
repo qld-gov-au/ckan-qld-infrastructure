@@ -12,6 +12,7 @@ fi
 
 git --git-dir="$GIT_DIR" fetch >/dev/null
 git --git-dir="$GIT_DIR" fetch --tags >/dev/null
+git remote | grep upstream >/dev/null && git --git-dir="$GIT_DIR" fetch upstream --tags >/dev/null
 TAG=$(git --git-dir="$GIT_DIR" tag -l --sort=committerdate | tail -1)
 BRANCH="$2"
 if [ "$BRANCH" = "" ]; then
