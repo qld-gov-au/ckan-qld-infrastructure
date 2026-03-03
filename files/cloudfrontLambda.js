@@ -46,8 +46,6 @@ exports.handler = (event, context, callback) => {
      * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/QueryStringParameters.html
      */
 
-    //console.log('Query String: ', request.querystring);
-
     /* Parse request query string to get javascript object */
     const params = querystring.parse(request.querystring);
     const sortedParams = {};
@@ -85,7 +83,7 @@ exports.handler = (event, context, callback) => {
                 }]
             }
         };
-        //302 redirect
+        /* 302 redirect */
         callback(null, redirect);
     } else  if (request.headers.host[0].value.startsWith('www.') && request.method !== 'POST') {
         let alternativeHostname = request.headers.host[0].value.substring(4);
@@ -111,10 +109,10 @@ exports.handler = (event, context, callback) => {
                 }]
             }
         };
-        //302 redirect
+        /* 302 redirect */
         callback(null, redirect);
     } else {
-        //passthrough with normalized querystring params
+        /* passthrough with normalized querystring params */
         callback(null, request);
     }
 };

@@ -1,0 +1,34 @@
+---
+- name: Lambda@Edge Cloudformation Playbook
+  hosts: local
+  connection: local
+  vars_files:
+    - vars/cloudfront-lambda-at-edge.var.yml
+  pre_tasks:
+    - name: get basic_facts
+      set_fact:
+        basic_fact={{ item }}
+      when: item.Environment == Environment
+      with_items: "{{ basic_facts }}"
+
+    - name: set facts to environment from basic_fact
+      set_fact: "{{ item.key }}={{ item.value }}"
+      with_dict: "{{ basic_fact }}"
+      when: basic_fact is defined
+
+    - name: Generate Request Lambda file hash
+      shell: >
+        md5sum files/cloudfrontLambda.js | awk '{print substr($1, 1, 20)}'
+      register: hash_output
+    - set_fact:
+        request_lambda_source_hash: "{{ hash_output.stdout_lines[0] }}"
+
+    - name: Generate Origin Lambda file hash
+      shell: >
+        md5sum files/cloudfrontOriginLambda.js | awk '{print substr($1, 1, 20)}'
+      register: hash_output
+    - set_fact:
+        origin_lambda_source_hash: "{{ hash_output.stdout_lines[0] }}"
+
+  roles:
+    - ansible_cloudformation
