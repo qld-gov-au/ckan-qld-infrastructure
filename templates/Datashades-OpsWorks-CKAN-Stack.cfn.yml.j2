@@ -235,7 +235,7 @@ Resources:
         - arm64
       Description: Run Systems Manager commands to set up instances.
       FunctionName: !Sub "${ApplicationName}-${Environment}-setup-{{ instance_setup_source_hash }}"
-      Runtime: nodejs20.x
+      Runtime: nodejs24.x
       Code:
         ZipFile: >
           {{ instance_setup_source }}

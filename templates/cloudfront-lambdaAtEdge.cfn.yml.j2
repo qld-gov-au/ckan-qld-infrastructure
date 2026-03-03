@@ -24,7 +24,7 @@ Resources:
         ZipFile: >
           {{ request_lambda_source }}
       Role: !GetAtt LambdaEdgeFunctionRole.Arn
-      Runtime: nodejs16.x
+      Runtime: nodejs24.x
       Handler: index.handler
       Timeout: 5
 
@@ -35,7 +35,7 @@ Resources:
         ZipFile: >
           {{ origin_lambda_source }}
       Role: !GetAtt LambdaEdgeFunctionRole.Arn
-      Runtime: nodejs12.x
+      Runtime: nodejs24.x
       Handler: index.handler
       Timeout: 5
 
