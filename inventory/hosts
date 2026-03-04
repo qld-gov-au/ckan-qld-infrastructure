@@ -1,3 +1,15 @@
 [local]
 # ami-068ee98b7c68b44bf: Amazon Linux 2023 AMI 2023.10.20260202.2 arm64 HVM kernel-6.1 (built on ami-081c2a1c34031672c) with Chef 18
+# To generate a new custom AMI:
+# - Launch a new EC2 instance from the vanilla operating system AMI. (Browse to EC2-AMIs, select "Public images", search for the AMI ID, select the AMI and press "Launch instance from AMI".)
+# - Connect to the instance, eg via Session Manager.
+# - Download the latest Chef metadata from Omnitruck, eg to use the latest Chef 18.8.x on Amazon Linux 2023 (effectively RHEL 8) ARM64:
+#     curl "https://omnitruck.chef.io/stable/chef/metadata?v=18.8&p=el&pv=8&m=aarch64"
+# - Extract the RPM URL from the second last line of the metadata and install it, plus 'libxcrypt-compat', via the system package manager:
+#     sudo dnf install -y libxcrypt-compat "<RPM URL>"
+# - Shut down the instance, eg:
+#     sudo shutdown -P now
+# - On the AWS EC2 instance page, check the box next to the instance and select "Actions-Image and templates-Create image".
+# - Choose any name and description. Un-check "Reboot instance" since it is already shut down.
+# - Once the new AMI is created, copy its ID here.
 localhost region=ap-southeast-2 Owner="Development and Delivery" Division="Qld Online" base_ami="ami-068ee98b7c68b44bf"
