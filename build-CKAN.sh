@@ -83,6 +83,7 @@ create-amis () {
       IMAGE_ID=$(aws ec2 describe-images --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=$INSTANCE_NAME" "Name=tag:Version,Values=$IMAGE_VERSION" "Name=tag:Layer,Values=$lowercase_layer" --query "Images[].ImageId" --output text |tail -1 |tr -d '[:space:]')
       if [ "$IMAGE_ID" = "" ]; then
         AMI_NEEDED=1
+        echo "No $layer image found, will generate"
       else
         echo "Found existing image(s): $IMAGE_ID"
         aws ssm put-parameter --overwrite --type String --name "/config/CKAN/$ENVIRONMENT/app/$INSTANCE_SHORTNAME/${layer}AmiId" --value "$IMAGE_ID"
