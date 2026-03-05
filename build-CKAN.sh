@@ -6,8 +6,7 @@ set -ex
 
 VARS_FILE="$1"
 ENVIRONMENT="$2"
-VANILLA_AMI="ami-081c2a1c34031672c"
-ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS Environment=$ENVIRONMENT vanilla_ami=$VANILLA_AMI"
+ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS Environment=$ENVIRONMENT"
 
 run-playbook () {
   if [ -z "$2" ]; then
@@ -74,16 +73,22 @@ run-deployment () {
 }
 
 create-baseline-ami () {
+  VANILLA_IMAGE_ID="ami-081c2a1c34031672c"
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS vanilla_ami=$VANILLA_AMI"
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
   if [ "$BASELINE_IMAGE_ID" != "" ]; then
     # check if the image is still current
     PREVIOUS_VANILLA_AMI=$(aws ec2 describe-tags --filters "Name=resource-type,Values=image" "Name=resource-id,Values=$BASELINE_IMAGE_ID" --query "Tags[?Key=='Version']|[0].Value" --output text)
     if [ "$VANILLA_AMI" = "$PREVIOUS_VANILLA_AMI" ]; then
+      ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS base_ami=$BASELINE_IMAGE_ID"
       return 0
     fi
   fi
+  # ensure we have a clean stack to make the template
   ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent" run-playbook "CloudFormation" vars/AMI-Template-Baseline-Instance.var.yml
   run-playbook "create-baseline-AMI.yml"
+  BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS base_ami=$BASELINE_IMAGE_ID"
 }
 
 create-amis () {
@@ -141,7 +146,7 @@ run-all-playbooks () {
   run-playbook "CKAN-Stack"
   run-playbook "CloudFormation" "vars/CKAN-extensions.var.yml"
   if ! (create-amis); then
-    ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent" run-playbook "CloudFormation" "vars/AMI-template-instances.var.yml" || exit 1
+    echo "Failed to create machine images for $INSTANCE_NAME" >&2
     exit 1
   fi
   run-playbook "CloudFormation" "vars/instances-${INSTANCE_NAME}.var.yml"
