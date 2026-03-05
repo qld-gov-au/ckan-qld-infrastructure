@@ -74,6 +74,7 @@ run-deployment () {
 
 create-baseline-ami () {
   VANILLA_IMAGE_ID="ami-081c2a1c34031672c"
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS vanilla_ami=$VANILLA_IMAGE_ID"
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
   if [ "$BASELINE_IMAGE_ID" != "" ]; then
     # check if the image is still current
@@ -84,12 +85,12 @@ create-baseline-ami () {
     fi
   fi
   # ensure we have a clean stack to make the template
-  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent vanilla_ami=" run-playbook "CloudFormation" vars/AMI-Template-Baseline-Instance.var.yml
-  run-playbook "create-baseline-AMI.yml" "vanilla_ami=$VANILLA_IMAGE_ID"
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent" run-playbook "CloudFormation" vars/AMI-Template-Baseline-Instance.var.yml
+  run-playbook "create-baseline-AMI.yml"
 }
 
 create-amis () {
-  run-playbook "AMI-templates.yml" "state=absent base_ami="
+  run-playbook "AMI-templates.yml" "state=absent"
   # try to match an existing image instead of creating a new one
   if [ "$IMAGE_VERSION" = "" ]; then
     IMAGE_VERSION=`git rev-parse HEAD` || true
@@ -116,8 +117,6 @@ create-amis () {
     return 0
   fi
   echo "Generating custom machine image(s)..."
-  BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
-  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS base_ami=$BASELINE_IMAGE_ID"
   run-playbook "AMI-templates.yml" || exit 1
   ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS timestamp=`date -u +%Y-%m-%dT%H:%M:%SZ` image_version=$IMAGE_VERSION"
   for layer in Batch Web Solr; do
@@ -148,8 +147,6 @@ run-all-playbooks () {
     echo "Failed to create machine images for $INSTANCE_NAME" >&2
     exit 1
   fi
-  BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
-  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS base_ami=$BASELINE_IMAGE_ID"
   run-playbook "CloudFormation" "vars/instances-${INSTANCE_NAME}.var.yml"
   run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
   run-playbook "cloudfront"
