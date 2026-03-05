@@ -26,23 +26,16 @@
         InstanceId: "{{ opsworks_facts['cloudformation'][stack_name].stack_outputs['BaselineTemplateInstanceId'] }}"
         InstanceName: "{{ Environment }}-chef-preinstalled-image"
 
-    - name: Wait for instance to stop itself
-      shell: |
-        STATUS=$(aws ec2 describe-instances --region {{ region }} --instance-ids {{ InstanceId }} --query "Reservations[].Instances[].State.Name" --output text) || return 1
-        echo "Instance {{ InstanceId }} status: $STATUS" >&2
-        for retry in `seq 1 6`; do
-          if [ "$STATUS" = "pending" ]; then
-            sleep 10
-            $(aws ec2 describe-instances --region {{ region }} --instance-ids {{ InstanceId }} --query "Reservations[].Instances[].State.Name" --output text) || return 1
-            echo "Instance {{ InstanceId }} status: $STATUS" >&2
-          else
-            break
-          fi
-        done
-        if [ "$STATUS" != "stopped" ]; then
-          echo "Expected {{ InstanceId }} to automatically stop, but instead had status $STATUS - aborting" >&2
-          exit 2
-        fi
+    - name: Wait for instance startup
+      shell: aws ec2 wait instance-running --region {{ region }} --instance-ids {{ InstanceId }}
+
+    - name: Stop instance
+      ec2:
+        instance_ids:
+          - "{{ InstanceId }}"
+        region: "{{ region }}"
+        state: stopped
+        wait: True
 
     - name: Create new ami
       ec2_ami:
