@@ -51,11 +51,19 @@
           if [ "$DEPLOYMENT_ID" = "None" ]; then
             echo "Instance {{ InstanceId }} has no deployment yet..." >&2
           else
-            aws ssm wait command-executed --region {{ region }} --command-id $DEPLOYMENT_ID --instance-id {{ InstanceId }}
-            exit $?
+            STATUS=$(aws ssm list-commands --region {{ region }} --command-id $DEPLOYMENT_ID \
+              --query "Commands|[0].Status" --output text) || exit 1
+            echo "{{ layer }} Instance {{ InstanceId }} deployment [$DEPLOYMENT_ID] status: $STATUS" >&2
+            if [ "$STATUS" != "Pending" ] && [ "$STATUS" != "InProgress" ] && [ "$STATUS" != "None" ]; then
+              break
+            fi
           fi
           sleep 20
         done
+        if [ "$STATUS" != "Success" ]; then
+          echo "Failed to deploy to instance {{ InstanceId }}, status $STATUS - aborting" >&2
+          exit 2
+        fi
 
     - name: Stop instance
       ec2:
