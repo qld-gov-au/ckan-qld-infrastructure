@@ -75,7 +75,7 @@ run-deployment () {
 
 create-baseline-ami () {
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
-  if [ "$BASELINE_IMAGE_ID" != ""]; then
+  if [ "$BASELINE_IMAGE_ID" != "" ]; then
     # check if the image is still current
     PREVIOUS_VANILLA_AMI=$(aws ec2 describe-tags --filters "Name=resource-type,Values=image" "Name=resource-id,Values=$BASELINE_IMAGE_ID" --query "Tags[?Key=='Version']|[0].Value" --output text)
     if [ "$VANILLA_AMI" = "$PREVIOUS_VANILLA_AMI" ]; then
