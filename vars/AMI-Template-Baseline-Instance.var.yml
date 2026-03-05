@@ -1,0 +1,20 @@
+---
+
+cloudformation_stacks:
+  - name: "Baseline-{{ Environment }}-AMI-Template-Instance"
+    state: "{{ state | default('present')}}"
+    region: "{{ region }}"
+    disable_rollback: true
+    template: "templates/AMI-Template-Baseline-Instance.cfn.yml"
+    template_parameters:
+      AmiId: "{{ vanilla_ami }}"
+      # Red Hat Enterprise Linux 8
+      Platform: el
+      PlatformVersion: 8
+      ChefVersion: "18.8"
+    tags:
+      Environment: "{{ Environment }}"
+      Service: "{{ service_name }}"
+      Division: "{{ Division }}"
+      Owner: "{{ Owner }}"
+      Version: "{{ vanilla_ami }}"

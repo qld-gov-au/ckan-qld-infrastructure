@@ -1,0 +1,55 @@
+---
+- name: Create baseline Amazon Machine Image with preinstalled Chef
+  hosts: local
+  connection: local
+  vars_files:
+    - vars/AMI-Template-Baseline-Instance.var.yml
+
+  roles:
+    - ansible_cloudformation
+
+  tasks:
+    - name: Get stack name
+      set_fact:
+        stack_name: "{{ item.name }}"
+      with_items: "{{ cloudformation_stacks }}"
+
+    - name: Get current stack facts
+      cloudformation_info:
+        region: "{{ region }}"
+        stack_name: "{{ stack_name }}"
+        stack_resources: true
+      register: opsworks_facts
+
+    - name: Set new instance facts
+      set_fact:
+        InstanceId: "{{ opsworks_facts['cloudformation'][stack_name].stack_outputs['BaselineTemplateInstanceId'] }}"
+        InstanceName: "{{ Environment }}-chef-preinstalled-image"
+
+    - name: Wait for instance startup
+      shell: aws ec2 wait instance-running --region {{ region }} --instance-ids {{ InstanceId }}
+
+    - name: Stop instance
+      ec2:
+        instance_ids:
+          - "{{ InstanceId }}"
+        region: "{{ region }}"
+        state: stopped
+        wait: True
+
+    - name: Create new ami
+      ec2_ami:
+        instance_id: "{{ InstanceId }}"
+        region: "{{ region }}"
+        wait: yes
+        name: "{{ InstanceName }}-{{ timestamp | replace(':', '-') }}"
+        description: "Baseline AMI for CKAN instances, with preinstalled Chef"
+        tags:
+          Name: "{{ InstanceName }}-{{ timestamp | replace(':', '-') }}"
+          Division: "{{ Division }}"
+          Owner: "{{ Owner }}"
+      register: new_image
+
+    - name: Record AMI ID
+      shell: |
+        aws ssm put-parameter --overwrite --type String --name "/config/CKAN/{{ Environment }}/common/BaselineAmiId" --value "{{ new_image.image_id }}"

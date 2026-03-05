@@ -1,0 +1,43 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Creates archetype instance for generating a baseline AMI with Chef preinstalled.'
+
+Parameters:
+  AmiId:
+    Description: ID of the vanilla AMI to use as a starting point.
+    Type: String
+    Default: "ami-081c2a1c34031672c"
+  Platform:
+    Description: Operating system abbreviation, eg 'el' for Red Hat Enterprise Linux (including Amazon Linux)
+    Type: String
+    AllowedValues:
+      - el
+      - debian
+      - ubuntu
+      - windows
+  PlatformVersion:
+    Description: Major operating system version, eg '8' for RHEL 8.
+    Type: String
+  ChefVersion:
+    Description: Chef version to download, can be partial eg '18.8' for the latest 18.8.x.
+    Type: String
+# No parameter for the architecture since it is tied to the instance type
+
+Resources:
+
+  BaselineTemplateInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: "t4g.nano"
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/sh
+            OMNITRUCK_URL="https://omnitruck.chef.io/stable/chef/metadata?v=${ChefVersion}&p=${Platform}&pv=${PlatformVersion}&m=aarch64"
+            RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
+            dnf install -y libxcrypt-compat $RPM_URL
+
+Outputs:
+  BaselineTemplateInstanceId:
+    Value: !Ref BaselineTemplateInstance

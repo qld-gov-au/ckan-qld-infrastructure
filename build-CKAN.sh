@@ -6,7 +6,8 @@ set -ex
 
 VARS_FILE="$1"
 ENVIRONMENT="$2"
-ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS Environment=$ENVIRONMENT"
+VANILLA_AMI="ami-081c2a1c34031672c"
+ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS Environment=$ENVIRONMENT vanilla_ami=$VANILLA_AMI"
 
 run-playbook () {
   if [ -z "$2" ]; then
@@ -55,6 +56,10 @@ run-shared-resource-playbooks () {
   run-playbook "CloudFormation" "vars/cache.var.yml"
   run-playbook "CloudFormation" "vars/waf_web_acl.var.yml"
   set_health_checks true
+  if ! (create-baseline-ami); then
+    ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent" run-playbook "CloudFormation" "vars/AMI-Template-Baseline-Instance.var.yml" || exit 1
+    exit 1
+  fi
 }
 
 run-deployment () {
@@ -66,6 +71,19 @@ run-deployment () {
   wait $WEB_PID
   wait $BATCH_PID
   ./chef-deploy.sh datashades::solr-configure $INSTANCE_NAME $ENVIRONMENT solr || exit 1
+}
+
+create-baseline-ami () {
+  BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
+  if [ "$BASELINE_IMAGE_ID" != ""]; then
+    # check if the image is still current
+    PREVIOUS_VANILLA_AMI=$(aws ec2 describe-tags --filters "Name=resource-type,Values=image" "Name=resource-id,Values=$BASELINE_IMAGE_ID" --query "Tags[?Key=='Version']|[0].Value" --output text)
+    if [ "$VANILLA_AMI" = "$PREVIOUS_VANILLA_AMI" ]; then
+      return 0
+    fi
+  fi
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent" run-playbook "CloudFormation" vars/AMI-Template-Baseline-Instance.var.yml
+  run-playbook "create-baseline-AMI.yml"
 }
 
 create-amis () {
@@ -150,7 +168,7 @@ if [ $# -ge 3 ]; then
     wait $WEB_PID
     wait $BATCH_PID
   elif [ "$3" = "create-amis" ]; then
-    create-amis
+    create-baseline-ami && create-amis
   else
     # run custom playbook
     run-playbook "$3" "$4"
