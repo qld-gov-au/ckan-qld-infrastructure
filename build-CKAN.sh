@@ -74,12 +74,12 @@ run-deployment () {
 
 create-baseline-ami () {
   VANILLA_IMAGE_ID="ami-081c2a1c34031672c"
-  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS vanilla_ami=$VANILLA_AMI"
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS vanilla_ami=$VANILLA_IMAGE_ID"
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
   if [ "$BASELINE_IMAGE_ID" != "" ]; then
     # check if the image is still current
-    PREVIOUS_VANILLA_AMI=$(aws ec2 describe-tags --filters "Name=resource-type,Values=image" "Name=resource-id,Values=$BASELINE_IMAGE_ID" --query "Tags[?Key=='Version']|[0].Value" --output text)
-    if [ "$VANILLA_AMI" = "$PREVIOUS_VANILLA_AMI" ]; then
+    PREVIOUS_VANILLA_IMAGE=$(aws ec2 describe-tags --filters "Name=resource-type,Values=image" "Name=resource-id,Values=$BASELINE_IMAGE_ID" --query "Tags[?Key=='Version']|[0].Value" --output text)
+    if [ "$VANILLA_IMAGE_ID" = "$PREVIOUS_VANILLA_IMAGE" ]; then
       ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS base_ami=$BASELINE_IMAGE_ID"
       return 0
     fi
