@@ -42,10 +42,10 @@
         instance_id: "{{ InstanceId }}"
         region: "{{ region }}"
         wait: yes
-        name: "{{ InstanceName }}-{{ timestamp | replace(':', '-') }}"
-        description: "Baseline AMI for CKAN instances, with preinstalled Chef"
+        name: "{{ InstanceName }}-from-{{ vanilla_ami }}"
+        description: "Baseline AMI for CKAN instances, built from {{ vanilla_ami }} plus Chef"
         tags:
-          Name: "{{ InstanceName }}-{{ timestamp | replace(':', '-') }}"
+          Name: "{{ InstanceName }}-from-{{ vanilla_ami }}"
           Division: "{{ Division }}"
           Owner: "{{ Owner }}"
       register: new_image
