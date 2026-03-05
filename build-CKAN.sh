@@ -70,7 +70,6 @@ run-deployment () {
 
 create-baseline-ami () {
   VANILLA_IMAGE_ID="ami-081c2a1c34031672c"
-  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS vanilla_ami=$VANILLA_IMAGE_ID"
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
   if [ "$BASELINE_IMAGE_ID" != "" ]; then
     # check if the image is still current
@@ -80,9 +79,45 @@ create-baseline-ami () {
       return 0
     fi
   fi
-  # ensure we have a clean stack to make the template
-  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent" run-playbook "CloudFormation" vars/AMI-Template-Baseline-Instance.var.yml
-  run-playbook "create-baseline-AMI.yml"
+  SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
+    --query "SecurityGroups[0].GroupId" --output text)
+  INSTANCE_PROFILE_NAME=$(aws iam list-instance-profiles \
+    --query "InstanceProfiles[?contains(InstanceProfileName, 'WebInstanceRole')]|[0].InstanceProfileName" --output text)
+  SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
+    --query "Subnets[0].SubnetId" --output text)
+  USER_DATA=$(cat <<'PARAMETER_STRING'
+    #!/bin/sh
+    OMNITRUCK_URL="https://omnitruck.chef.io/stable/chef/metadata?v=18.8&p=el&pv=8&m=aarch64"
+    RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
+    dnf install -y libxcrypt-compat $RPM_URL
+  PARAMETER_STRING
+  )
+  INSTANCE_ID=$(aws ec2 run-instances --image-id="$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
+    --user-data "$USER_DATA"
+    --query "Instances[0].InstanceId" --output text)
+
+  echo "Launched template instance $INSTANCE_ID, waiting for successful start..."
+
+  aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
+
+  echo "Instance $INSTANCE_ID is ready, stopping in order to generate image..."
+
+  aws ec2 stop-instances --instance-ids "$INSTANCE_ID"
+  aws ec2 wait instance-stopped --instance-ids "$INSTANCE_ID"
+
+  echo "Generating image from $INSTANCE_ID..."
+
+  AMI_ID=$(aws ec2 create-image instance-id "$INSTANCE_ID" --no-reboot \
+    --name "${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}" \
+    --description "Baseline AMI for CKAN instances, built from $VANILLA_IMAGE_ID plus Chef" \
+    --tag-specifications "ResourceType=image,Tags=[{Key=Version,Value=${VANILLA_IMAGE_ID}}]" \
+    --query "ImageId" --output text
+  )
+  aws ec2 wait image-available --image-ids "$AMI_ID"
+
+  echo "Recording new baseline image ID: $AMI_ID"
+
+  aws ssm put-parameter --overwrite --type String --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --value "$AMI_ID"
 }
 
 create-amis () {
