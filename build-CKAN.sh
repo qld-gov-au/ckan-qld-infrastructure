@@ -74,7 +74,6 @@ run-deployment () {
 
 create-baseline-ami () {
   VANILLA_IMAGE_ID="ami-081c2a1c34031672c"
-  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS vanilla_ami=$VANILLA_IMAGE_ID"
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
   if [ "$BASELINE_IMAGE_ID" != "" ]; then
     # check if the image is still current
@@ -85,12 +84,12 @@ create-baseline-ami () {
     fi
   fi
   # ensure we have a clean stack to make the template
-  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent" run-playbook "CloudFormation" vars/AMI-Template-Baseline-Instance.var.yml
-  run-playbook "create-baseline-AMI.yml"
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent vanilla_ami=" run-playbook "CloudFormation" vars/AMI-Template-Baseline-Instance.var.yml
+  run-playbook "create-baseline-AMI.yml" "vanilla_ami=$VANILLA_IMAGE_ID"
 }
 
 create-amis () {
-  run-playbook "AMI-templates.yml" "state=absent"
+  run-playbook "AMI-templates.yml" "state=absent base_ami="
   # try to match an existing image instead of creating a new one
   if [ "$IMAGE_VERSION" = "" ]; then
     IMAGE_VERSION=`git rev-parse HEAD` || true
