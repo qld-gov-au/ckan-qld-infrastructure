@@ -37,7 +37,22 @@
         InstanceName: "{{ Environment }}-{{ service_name_lower }}-{{ layer }}-image"
 
     - name: Wait for instance startup
-      shell: aws ec2 wait instance-running --region {{ region }} --instance-ids {{ InstanceId }}
+      shell: |
+        STATUS=$(aws ec2 describe-instances --region {{ region }} --instance-ids {{ InstanceId }} --query "Reservations[].Instances[].State.Name" --output text) || return 1
+        echo "Instance {{ InstanceId }} status: $STATUS" >&2
+        for retry in `seq 1 6`; do
+          if [ "$STATUS" = "pending" ]; then
+            sleep 10
+            $(aws ec2 describe-instances --region {{ region }} --instance-ids {{ InstanceId }} --query "Reservations[].Instances[].State.Name" --output text) || return 1
+            echo "Instance {{ InstanceId }} status: $STATUS" >&2
+          else
+            break
+          fi
+        done
+        if [ "$STATUS" != "running" ]; then
+          echo "Failed to start {{ InstanceId }}, status $STATUS - aborting" >&2
+          exit 2
+        fi
 
     - name: Wait for instance configuration
       shell: |
