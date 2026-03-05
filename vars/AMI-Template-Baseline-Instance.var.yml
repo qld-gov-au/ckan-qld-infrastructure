@@ -7,6 +7,7 @@ cloudformation_stacks:
     disable_rollback: true
     template: "templates/AMI-Template-Baseline-Instance.cfn.yml"
     template_parameters:
+      Environment: "{{ Environment }}"
       AmiId: "{{ vanilla_ami }}"
       # Red Hat Enterprise Linux 8
       Platform: el
