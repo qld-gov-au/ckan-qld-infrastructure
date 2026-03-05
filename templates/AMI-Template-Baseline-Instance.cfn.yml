@@ -39,6 +39,9 @@ Resources:
     Properties:
       ImageId: !Ref AmiId
       InstanceType: "t4g.nano"
+      IamInstanceProfile:
+        # any profile will do
+        Fn::ImportValue: !Sub "${Environment}OpenDataInstanceProfile"
       SubnetId:
         # any subnet will do
         Fn::ImportValue: !Sub "${Environment}CKANAppSubnetA"

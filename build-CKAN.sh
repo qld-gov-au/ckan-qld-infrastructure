@@ -55,10 +55,6 @@ run-shared-resource-playbooks () {
   run-playbook "CloudFormation" "vars/cache.var.yml"
   run-playbook "CloudFormation" "vars/waf_web_acl.var.yml"
   set_health_checks true
-  if ! (create-baseline-ami); then
-    echo "Failed to create baseline AMI" >&2
-    exit 1
-  fi
 }
 
 run-deployment () {
@@ -142,6 +138,10 @@ run-all-playbooks () {
   fi
   run-playbook "CloudFormation" "vars/s3_buckets.var.yml"
   run-playbook "CKAN-Stack"
+  if ! (create-baseline-ami); then
+    echo "Failed to create baseline AMI" >&2
+    exit 1
+  fi
   run-playbook "CloudFormation" "vars/CKAN-extensions.var.yml"
   if ! (create-amis); then
     echo "Failed to create machine images for $INSTANCE_NAME" >&2
