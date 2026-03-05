@@ -81,15 +81,12 @@ create-baseline-ami () {
     PREVIOUS_VANILLA_IMAGE=$(aws ec2 describe-tags --filters "Name=resource-type,Values=image" "Name=resource-id,Values=$BASELINE_IMAGE_ID" --query "Tags[?Key=='Version']|[0].Value" --output text)
     if [ "$VANILLA_IMAGE_ID" = "$PREVIOUS_VANILLA_IMAGE" ]; then
       echo "Baseline image is unchanged"
-      export ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS base_ami=$BASELINE_IMAGE_ID"
       return 0
     fi
   fi
   # ensure we have a clean stack to make the template
   ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent" run-playbook "CloudFormation" vars/AMI-Template-Baseline-Instance.var.yml
   run-playbook "create-baseline-AMI.yml"
-  BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
-  export ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS base_ami=$BASELINE_IMAGE_ID"
 }
 
 create-amis () {
@@ -120,6 +117,8 @@ create-amis () {
     return 0
   fi
   echo "Generating custom machine image(s)..."
+  BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS base_ami=$BASELINE_IMAGE_ID"
   run-playbook "AMI-templates.yml" || exit 1
   ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS timestamp=`date -u +%Y-%m-%dT%H:%M:%SZ` image_version=$IMAGE_VERSION"
   for layer in Batch Web Solr; do
@@ -150,6 +149,8 @@ run-all-playbooks () {
     echo "Failed to create machine images for $INSTANCE_NAME" >&2
     exit 1
   fi
+  BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
+  ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS base_ami=$BASELINE_IMAGE_ID"
   run-playbook "CloudFormation" "vars/instances-${INSTANCE_NAME}.var.yml"
   run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
   run-playbook "cloudfront"
