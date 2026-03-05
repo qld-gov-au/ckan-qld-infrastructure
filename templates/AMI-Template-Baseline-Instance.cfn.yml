@@ -42,9 +42,13 @@ Resources:
       IamInstanceProfile:
         # any profile will do
         Fn::ImportValue: !Sub "${Environment}OpenDataInstanceProfile"
-      SubnetId:
-        # any subnet will do
-        Fn::ImportValue: !Sub "${Environment}CKANAppSubnetA"
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          GroupSet:
+            - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
+          SubnetId:
+            # any subnet will do
+            Fn::ImportValue: !Sub "${Environment}CKANAppSubnetA"
       Tags:
         - Key: Name
           Value: !Sub "${Environment}-baseline-ami-template"
