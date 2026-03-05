@@ -57,7 +57,7 @@ run-shared-resource-playbooks () {
   run-playbook "CloudFormation" "vars/waf_web_acl.var.yml"
   set_health_checks true
   if ! (create-baseline-ami); then
-    ANSIBLE_EXTRA_VARS="$ANSIBLE_EXTRA_VARS state=absent" run-playbook "CloudFormation" "vars/AMI-Template-Baseline-Instance.var.yml" || exit 1
+    echo "Failed to create baseline AMI" >&2
     exit 1
   fi
 }
