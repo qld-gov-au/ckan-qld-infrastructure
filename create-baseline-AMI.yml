@@ -48,6 +48,7 @@
           Name: "{{ InstanceName }}-from-{{ vanilla_ami }}"
           Division: "{{ Division }}"
           Owner: "{{ Owner }}"
+          Version: "{{ vanilla_ami }}"
       register: new_image
 
     - name: Record AMI ID
