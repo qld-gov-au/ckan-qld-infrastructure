@@ -48,7 +48,7 @@ Resources:
             #!/bin/sh
             OMNITRUCK_URL="https://omnitruck.chef.io/stable/chef/metadata?v=${ChefVersion}&p=${Platform}&pv=${PlatformVersion}&m=aarch64"
             RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
-            dnf install -y libxcrypt-compat $RPM_URL
+            dnf install -y libxcrypt-compat $RPM_URL && shutdown -P now
 
 Outputs:
   BaselineTemplateInstanceId:
