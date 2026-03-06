@@ -93,7 +93,7 @@ dnf install -y libxcrypt-compat $RPM_URL
 PARAMETER_STRING
   )
   INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
-    --user-data "$USER_DATA" \
+    --subnet-id "$SUBNET_ID" --user-data "$USER_DATA" \
     --query "Instances[0].InstanceId" --output text)
   if [ "$INSTANCE_ID" = "" ]; then
     echo "Failed to start template instance" >&2
