@@ -111,14 +111,14 @@ PARAMETER_STRING
 
   echo "Generating image from $INSTANCE_ID..." >&2
 
-  AMI_ID=$(aws ec2 create-image instance-id "$INSTANCE_ID" --no-reboot \
+  AMI_ID=$(aws ec2 create-image --instance-id "$INSTANCE_ID" --no-reboot \
     --name "${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}" \
     --description "Baseline AMI for CKAN instances, built from $VANILLA_IMAGE_ID plus Chef" \
     --tag-specifications "ResourceType=image,Tags=[{Key=Version,Value=${VANILLA_IMAGE_ID}}]" \
     --query "ImageId" --output text
   )
   if [ "$AMI_ID" = "" ]; then
-    echo "Failed to create image" >&2
+    echo "Failed to create image, you may wish to investigate $INSTANCE_ID and manually terminate it!" >&2
     return 1
   fi
   aws ec2 wait image-available --image-ids "$AMI_ID" || return 1
