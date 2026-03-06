@@ -16,6 +16,9 @@
       with_dict: "{{ basic_fact }}"
       when: basic_fact is defined
 
+    - name: Look up baseline machine image
+      set_fact: "base_ami={{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/common/BaselineAmiId') }}"
+
     - include_vars: vars/AMI-template-instances.var.yml
 
   roles:

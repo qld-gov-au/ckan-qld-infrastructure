@@ -43,7 +43,7 @@
         for retry in `seq 1 6`; do
           if [ "$STATUS" = "pending" ]; then
             sleep 10
-            $(aws ec2 describe-instances --region {{ region }} --instance-ids {{ InstanceId }} --query "Reservations[].Instances[].State.Name" --output text) || return 1
+            STATUS=$(aws ec2 describe-instances --region {{ region }} --instance-ids {{ InstanceId }} --query "Reservations[].Instances[].State.Name" --output text) || return 1
             echo "Instance {{ InstanceId }} status: $STATUS" >&2
           else
             break

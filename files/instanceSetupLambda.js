@@ -123,7 +123,7 @@ exports.handler = async (event) => {
       SourceType: [cookbookType],
       SourceInfo: [sourceInfo],
       RunList: [runList],
-      ChefClientVersion: ["18"],
+      ChefClientVersion: ["None"],
       WhyRun: ["False"],
       ComplianceSeverity: ["None"],
       ComplianceType: ["Custom:Chef"]
