@@ -89,7 +89,7 @@ create-baseline-ami () {
 #!/bin/sh
 OMNITRUCK_URL="https://omnitruck.chef.io/stable/chef/metadata?v=18.8&p=el&pv=8&m=aarch64"
 RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
-dnf install -y libxcrypt-compat $RPM_URL
+dnf install -y libxcrypt-compat $RPM_URL && shutdown -P now
 PARAMETER_STRING
   )
   INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
@@ -100,19 +100,11 @@ PARAMETER_STRING
     return 1
   fi
 
-  echo "Launched template instance $INSTANCE_ID, waiting for successful start..." >&2
+  echo "Launched template instance $INSTANCE_ID, waiting for successful configuration and self-shutdown..." >&2
 
-  aws ec2 wait instance-running --instance-ids "$INSTANCE_ID" || return 1
-
-  echo "Exit early for debugging"
-  return 1
-
-  echo "Instance $INSTANCE_ID is ready, stopping in order to generate image..." >&2
-
-  aws ec2 stop-instances --instance-ids "$INSTANCE_ID" || return 1
   aws ec2 wait instance-stopped --instance-ids "$INSTANCE_ID" || return 1
 
-  echo "Generating image from $INSTANCE_ID..." >&2
+  echo "Instance $INSTANCE_ID is ready, generating image..." >&2
 
   AMI_ID=$(aws ec2 create-image --instance-id "$INSTANCE_ID" --no-reboot \
     --name "${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}" \
