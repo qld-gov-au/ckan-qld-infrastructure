@@ -92,18 +92,22 @@ RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
 dnf install -y libxcrypt-compat $RPM_URL
 PARAMETER_STRING
   )
-  INSTANCE_ID=$(aws ec2 run-instances --image-id="$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
+  INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
     --user-data "$USER_DATA"
     --query "Instances[0].InstanceId" --output text)
+  if [ "$INSTANCE_ID" = "" ]; then
+    echo "Failed to start template instance" >&2
+    return 1
+  fi
 
   echo "Launched template instance $INSTANCE_ID, waiting for successful start..."
 
-  aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
+  aws ec2 wait instance-running --instance-ids "$INSTANCE_ID" || return 1
 
   echo "Instance $INSTANCE_ID is ready, stopping in order to generate image..."
 
-  aws ec2 stop-instances --instance-ids "$INSTANCE_ID"
-  aws ec2 wait instance-stopped --instance-ids "$INSTANCE_ID"
+  aws ec2 stop-instances --instance-ids "$INSTANCE_ID" || return 1
+  aws ec2 wait instance-stopped --instance-ids "$INSTANCE_ID" || return 1
 
   echo "Generating image from $INSTANCE_ID..."
 
@@ -113,7 +117,11 @@ PARAMETER_STRING
     --tag-specifications "ResourceType=image,Tags=[{Key=Version,Value=${VANILLA_IMAGE_ID}}]" \
     --query "ImageId" --output text
   )
-  aws ec2 wait image-available --image-ids "$AMI_ID"
+  if [ "$AMI_ID" = "" ]; then
+    echo "Failed to create image" >&2
+    return 1
+  fi
+  aws ec2 wait image-available --image-ids "$AMI_ID" || return 1
 
   echo "Recording new baseline image ID: $AMI_ID"
 
