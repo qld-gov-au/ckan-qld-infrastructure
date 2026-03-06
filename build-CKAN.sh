@@ -104,13 +104,13 @@ PARAMETER_STRING
 
   STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
   echo "Instance $INSTANCE_ID status: $STATUS" >&2
-  for retry in `seq 1 6`; do
-    if [ "$STATUS" != "stopped" ]; then
-      sleep 10
-      $(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
-      echo "Instance $INSTANCE_ID status: $STATUS" >&2
-    else
+  for retry in `seq 1 20`; do
+    if [ "$STATUS" = "stopped" ]; then
       break
+    else
+      sleep 10
+      STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
+      echo "Instance $INSTANCE_ID status: $STATUS" >&2
     fi
   done
   if [ "$STATUS" != "stopped" ]; then
