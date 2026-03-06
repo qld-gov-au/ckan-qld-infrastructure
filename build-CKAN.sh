@@ -100,16 +100,16 @@ PARAMETER_STRING
     return 1
   fi
 
-  echo "Launched template instance $INSTANCE_ID, waiting for successful start..."
+  echo "Launched template instance $INSTANCE_ID, waiting for successful start..." >&2
 
   aws ec2 wait instance-running --instance-ids "$INSTANCE_ID" || return 1
 
-  echo "Instance $INSTANCE_ID is ready, stopping in order to generate image..."
+  echo "Instance $INSTANCE_ID is ready, stopping in order to generate image..." >&2
 
   aws ec2 stop-instances --instance-ids "$INSTANCE_ID" || return 1
   aws ec2 wait instance-stopped --instance-ids "$INSTANCE_ID" || return 1
 
-  echo "Generating image from $INSTANCE_ID..."
+  echo "Generating image from $INSTANCE_ID..." >&2
 
   AMI_ID=$(aws ec2 create-image instance-id "$INSTANCE_ID" --no-reboot \
     --name "${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}" \
@@ -123,9 +123,16 @@ PARAMETER_STRING
   fi
   aws ec2 wait image-available --image-ids "$AMI_ID" || return 1
 
-  echo "Recording new baseline image ID: $AMI_ID"
+  echo "Recording new baseline image ID: $AMI_ID" >&2
 
-  aws ssm put-parameter --overwrite --type String --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --value "$AMI_ID"
+  aws ssm put-parameter --overwrite --type String --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --value "$AMI_ID" || return 1
+
+  echo "Cleaning up..." >&2
+
+  aws ec2 terminate-instances --instance-ids "$INSTANCE_ID" && return 0
+
+  echo "Failed to terminate ${INSTANCE_ID}! This may need manual intervention." >&2
+  return 1
 }
 
 create-amis () {
