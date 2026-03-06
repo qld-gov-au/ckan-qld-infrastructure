@@ -97,7 +97,7 @@ RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
 dnf install -y libxcrypt-compat $RPM_URL && shutdown -P now
 PARAMETER_STRING
   )
-  INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
+  INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.nano --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
     --subnet-id "$SUBNET_ID" --user-data "$USER_DATA" \
     --query "Instances[0].InstanceId" --output text)
   if [ "$INSTANCE_ID" = "" ]; then
