@@ -102,7 +102,21 @@ PARAMETER_STRING
 
   echo "Launched template instance $INSTANCE_ID, waiting for successful configuration and self-shutdown..." >&2
 
-  aws ec2 wait instance-stopped --instance-ids "$INSTANCE_ID" || return 1
+  STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
+  echo "Instance $INSTANCE_ID status: $STATUS" >&2
+  for retry in `seq 1 6`; do
+    if [ "$STATUS" != "stopped" ]; then
+      sleep 10
+      $(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
+      echo "Instance $INSTANCE_ID status: $STATUS" >&2
+    else
+      break
+    fi
+  done
+  if [ "$STATUS" != "stopped" ]; then
+    echo "$INSTANCE_ID failed to prepare and shut down, status $STATUS - aborting" >&2
+    exit 2
+  fi
 
   echo "Instance $INSTANCE_ID is ready, generating image..." >&2
 
