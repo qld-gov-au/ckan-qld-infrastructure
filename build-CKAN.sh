@@ -86,11 +86,11 @@ create-baseline-ami () {
   SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
     --query "Subnets[0].SubnetId" --output text)
   USER_DATA=$(cat <<'PARAMETER_STRING'
-    #!/bin/sh
-    OMNITRUCK_URL="https://omnitruck.chef.io/stable/chef/metadata?v=18.8&p=el&pv=8&m=aarch64"
-    RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
-    dnf install -y libxcrypt-compat $RPM_URL
-  PARAMETER_STRING
+#!/bin/sh
+OMNITRUCK_URL="https://omnitruck.chef.io/stable/chef/metadata?v=18.8&p=el&pv=8&m=aarch64"
+RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
+dnf install -y libxcrypt-compat $RPM_URL
+PARAMETER_STRING
   )
   INSTANCE_ID=$(aws ec2 run-instances --image-id="$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
     --user-data "$USER_DATA"
