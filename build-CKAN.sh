@@ -104,6 +104,9 @@ PARAMETER_STRING
 
   aws ec2 wait instance-running --instance-ids "$INSTANCE_ID" || return 1
 
+  echo "Exit early for debugging"
+  return 1
+
   echo "Instance $INSTANCE_ID is ready, stopping in order to generate image..." >&2
 
   aws ec2 stop-instances --instance-ids "$INSTANCE_ID" || return 1
