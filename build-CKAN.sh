@@ -39,9 +39,8 @@ set_health_checks () {
     # but skip any app that doesn't exist in this environment,
     # ie CKANTest only exists up to TRAINING.
     ASG_NAME="${ENVIRONMENT}-${APP_NAME}-Web-ASG"
-    aws autoscaling describe-auto-scaling-groups --region ap-southeast-2 --auto-scaling-group-names "$ASG_NAME" >/dev/null || continue
     echo "Setting health check type for $ASG_NAME to ${CHECK_TYPE}..."
-    aws autoscaling update-auto-scaling-group --region ap-southeast-2 --auto-scaling-group-name "$ASG_NAME" --health-check-type "$CHECK_TYPE"
+    aws autoscaling update-auto-scaling-group --region ap-southeast-2 --auto-scaling-group-name "$ASG_NAME" --health-check-type "$CHECK_TYPE" || continue
   done
 }
 
