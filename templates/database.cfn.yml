@@ -44,6 +44,7 @@ Parameters:
     - db.t4g.large
     - db.m5.large
     - db.m6g.large
+    - db.m6g.xlarge
     ConstraintDescription: must select a valid database instance type.
     Description: Database instance class
     Type: String
