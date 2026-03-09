@@ -69,8 +69,8 @@ run-deployment () {
 }
 
 create-baseline-ami () {
-  # Amazon Linux 2023 AMI 2023.10.20260202.2 arm64 HVM kernel-6.1
-  VANILLA_IMAGE_ID="ami-081c2a1c34031672c"
+  # Amazon Linux 2023 AMI 2023.10.20260216.1 arm64 HVM kernel-6.1
+  VANILLA_IMAGE_ID="ami-035deaeb0ffe4ca26"
   LATEST_VANILLA_IMAGE=$(aws ec2 describe-images --filters "Name=name,Values=al2023-ami-2023*-arm64" --query "Images[].[Name, ImageId]" --output text |sort |tail -1 |cut -f 2)
   if [ "$VANILLA_IMAGE_ID" != "LATEST_VANILLA_IMAGE" ]; then
     echo "Using $VANILLA_IMAGE_ID; howver, a newer operating system image exists, $LATEST_VANILLA_IMAGE"
