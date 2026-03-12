@@ -23,7 +23,7 @@ RUN_LIST="recipe[$(echo $COMMAND | sed 's/,/],recipe[/g')]"
 CHEF_SOURCE=$(cat templates/chef-source.json | tr -d '\n')
 REGION_SNIPPET="--region ap-southeast-2"
 CHEF_COMMAND="$(cat <<PARAMETER_STRING
-aws ssm send-command --document-name AWS-ApplyChefRecipes --document-version \$DEFAULT --parameters {$CHEF_SOURCE,"RunList":[$RUN_LIST],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["None"],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]} --timeout-seconds 3600 --max-concurrency 50 --max-errors 0 --output-s3-bucket-name osssio-ckan-web-logs --output-s3-key-prefix run_command $REGION_SNIPPET --query Command.CommandId --output text
+aws ssm send-command --document-name AWS-ApplyChefRecipes --document-version \$DEFAULT --parameters {$CHEF_SOURCE,"RunList":["$RUN_LIST"],"JsonAttributesSources":[""],"JsonAttributesContent":[""],"ChefClientVersion":["None"],"WhyRun":["False"],"ComplianceSeverity":["None"],"ComplianceType":["Custom:Chef"],"ComplianceReportBucket":[""]} --timeout-seconds 3600 --max-concurrency 50 --max-errors 0 --output-s3-bucket-name osssio-ckan-web-logs --output-s3-key-prefix run_command $REGION_SNIPPET --query Command.CommandId --output text
 PARAMETER_STRING
 )"
 
