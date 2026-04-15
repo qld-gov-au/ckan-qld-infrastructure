@@ -1,3 +1,2 @@
 [local]
-# ami-081c2a1c34031672c: Amazon Linux 2023 AMI 2023.10.20260202.2 arm64 HVM kernel-6.1
-localhost region=ap-southeast-2 Owner="Development and Delivery" Division="Qld Online" base_ami="ami-081c2a1c34031672c"
+localhost region=ap-southeast-2 Owner="Development and Delivery" Division="Qld Online"

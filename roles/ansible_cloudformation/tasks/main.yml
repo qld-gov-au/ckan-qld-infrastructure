@@ -14,7 +14,7 @@
   template:
     src: "{{ item.template_jinja }}"
     dest: "{{ item.template }}"
-  when: item.template_parameters is defined and item.template_parameters.Environment == Environment and item.template_jinja is defined
+  when: (item.template_parameters.Environment | default(Environment)) == Environment and item.template_jinja is defined
   with_items: "{{ cloudformation_stacks }}"
 
 ##TODO do cfn check on template
@@ -30,5 +30,5 @@
     template: "{{ item.template | default(common_stack.template) }}"
     template_parameters: "{{ common_stack.template_parameters | combine(item.template_parameters | default({})) }}"
     tags: "{{ common_stack.tags | combine(item.tags | default({})) }}"
-  when: item.template_parameters is undefined or item.template_parameters.Environment == Environment
+  when: (item.template_parameters.Environment | default(Environment)) == Environment
   with_items: "{{ cloudformation_stacks }}"

@@ -6,6 +6,9 @@ if [ "$#" -lt 1 ]; then
 fi
 GIT_DIR=../$1/.git
 if ! [ -e "$GIT_DIR" ]; then
+    GIT_DIR=$HOME/projects/$1/.git
+fi
+if ! [ -e "$GIT_DIR" ]; then
     echo "$GIT_DIR not found" >&2
     exit 1
 fi
