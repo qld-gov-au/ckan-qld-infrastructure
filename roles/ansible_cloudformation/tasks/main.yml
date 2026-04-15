@@ -19,7 +19,7 @@
 
 ##TODO do cfn check on template
 
-- name: "{{'Delete' if state == 'absent' else 'Run'}} CloudFormation stack"
+- name: Ensuring CloudFormation stack is {{ state }}
   cloudformation:
     stack_name: "{{ item.name | default(common_stack.name) }}"
     # 'profile' is optional so we default to empty string, this is to change aws keys
