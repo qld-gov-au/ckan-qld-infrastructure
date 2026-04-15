@@ -19,7 +19,7 @@
 
 ##TODO do cfn check on template
 
-- name: Ensuring CloudFormation stack is {{ state }}
+- name: Run CloudFormation stack
   cloudformation:
     stack_name: "{{ item.name | default(common_stack.name) }}"
     # 'profile' is optional so we default to empty string, this is to change aws keys
