@@ -71,7 +71,7 @@ create-baseline-ami () {
   # Amazon Linux 2023 AMI 2023.11.20260413.0 arm64 HVM kernel-6.1
   VANILLA_IMAGE_ID="ami-0b1336cc21eaf94c5"
   LATEST_VANILLA_IMAGE=$(aws ec2 describe-images --filters "Name=name,Values=al2023-ami-2023*-arm64" --query "Images[].[Name, ImageId]" --output text |sort |tail -1 |cut -f 2)
-  if [ "$VANILLA_IMAGE_ID" != "LATEST_VANILLA_IMAGE" ]; then
+  if [ "$VANILLA_IMAGE_ID" != "$LATEST_VANILLA_IMAGE" ]; then
     echo "Using $VANILLA_IMAGE_ID; however, a newer operating system image exists, $LATEST_VANILLA_IMAGE"
   fi
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
