@@ -23,8 +23,7 @@ Feature: Resource validation
         When I upload schema file "test_schema2.json" to resource
         And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
         Then I should see "Test validation schema"
-        When I click the link with text that contains "Test validation schema"
-        And I press the resource edit button
+        When I click the link with text that contains "View Schema File"
         Then I should see text containing quotes `"fields": [`
         And I should see text containing quotes `"name": "field1"`
         And I should see text containing quotes `"name": "field2"`
