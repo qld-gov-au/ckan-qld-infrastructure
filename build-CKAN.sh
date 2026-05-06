@@ -108,7 +108,7 @@ PARAMETER_STRING
 
   STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
   echo "Instance $INSTANCE_ID status: $STATUS" >&2
-  for retry in `seq 1 20`; do
+  for retry in `seq 1 30`; do
     if [ "$STATUS" = "stopped" ]; then
       break
     else
