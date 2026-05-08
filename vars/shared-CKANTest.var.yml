@@ -29,6 +29,12 @@ extensions:
       url: "https://github.com/ckan/ckanext-scheming.git"
       version: "release-3.1.0"
 
+    CKANExtSelfInfo: &CKANExtSelfInfo
+      shortname: "ckanext-selfinfo"
+      description: "CKAN Extension for displaying information about a CKAN instance"
+      url: "https://github.com/DataShades/ckanext-selfinfo.git"
+      version: "v2.0.2"
+
     # Queensland Government
 
     CKANExtXLoader: &CKANExtXLoader
@@ -110,12 +116,6 @@ extensions:
       shortname: "ckanext-oidc-pkce"
       description: "CKAN Extension for single sign-on capability"
       version: "0.4.1-qgov.2"
-
-    CKANExtSelfInfo: &CKANExtSelfInfo
-      shortname: "ckanext-selfinfo"
-      description: "CKAN Extension for displaying information about a CKAN instance"
-      url: "https://github.com/DataShades/ckanext-selfinfo.git"
-      version: "v2.0.2"
 
   PROD:
     <<: *default_extensions

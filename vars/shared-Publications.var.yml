@@ -8,69 +8,51 @@ public_tld: publications.qld.gov.au
 
 extensions:
   default: &default_extensions
+
+    # Third-party
+
+    CKANExtSelfInfo: &CKANExtSelfInfo
+      shortname: "ckanext-selfinfo"
+      description: "CKAN Extension for displaying information about a CKAN instance"
+      url: "https://github.com/DataShades/ckanext-selfinfo.git"
+      version: "v2.0.2"
+
+    # Queensland Government
+
     CKANExtQGOV: &CKANExtQGOV
-      name: "ckanext-qgov-{{ Environment }}"
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government sites"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-qgov.git"
       version: "7.2.1"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
-      name: "ckanext-s3filestore-{{ Environment }}"
       shortname: "ckanext-s3filestore"
       description: "CKAN Extension to keep uploaded files in S3"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-s3filestore.git"
       version: "0.9.0"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
-      name: "ckanext-ssm-config-{{ Environment }}"
       shortname: "ckanext-ssm-config"
       description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-ssm-config.git"
       version: "0.1.1"
 
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
-      name: "ckanext-publications-qld-theme-{{ Environment }}"
       shortname: "ckanext-publications-qld-theme"
-      type: "git"
       description: "CKAN Extension for Queensland Government Publications theme"
-      url: "https://github.com/qld-gov-au/ckanext-publications-qld-theme.git"
       version: "1.5.4"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
-      name: "ckanext-resource-type-validation-{{ Environment }}"
       shortname: "ckanext-resource-type-validation"
       description: "CKAN Extension for checking uploaded resource types"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-resource-type-validation.git"
       version: "1.0.12"
 
     CKANExtCSRFFilter: &CKANExtCSRFFilter
-      name: "ckanext-csrf-filter-{{ Environment }}"
       shortname: "ckanext-csrf-filter"
       description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-csrf-filter.git"
       version: "2.0.1"
 
     CKANExtOIDC: &CKANExtOIDC
-      name: "ckanext-oidc-pkce-{{ Environment }}"
       shortname: "ckanext-oidc-pkce"
       description: "CKAN Extension for single sign-on capability"
-      type: "git"
-      url: "https://github.com/qld-gov-au/ckanext-oidc-pkce"
       version: "0.4.1-qgov.2"
-
-    CKANExtSelfInfo: &CKANExtSelfInfo
-      name: "ckanext-selfinfo-{{ Environment }}"
-      shortname: "ckanext-selfinfo"
-      description: "CKAN Extension for displaying information about a CKAN instance"
-      type: "git"
-      url: "https://github.com/DataShades/ckanext-selfinfo.git"
-      version: "v2.0.2"
 
   PROD:
     <<: *default_extensions
