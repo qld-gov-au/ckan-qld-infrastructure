@@ -26,6 +26,8 @@ Feature: XLoader
         When I press "Upload to DataStore"
         Then I should see "Status"
         And I should see "Pending"
+        When I reload page every 3 seconds until I see an element with xpath "//*[contains(string(), 'Express Load completed')]" but not more than 6 times
+        Then I should see "Express Load completed"
         And I should see "Delete from DataStore"
 
         When I press "Delete from DataStore"
