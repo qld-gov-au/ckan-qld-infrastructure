@@ -31,33 +31,35 @@ Resources:
       Value: "{{ extensions[Environment] | join(',') }}"
 
 {% for plugin in extensions[Environment] %}
+  {% set shortname = extensions[Environment][plugin].shortname %}
+
   {{ plugin }}AppNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/name"
       Type: String
-      Value: "{{ extensions[Environment][plugin].name }}"
+      Value: "{{ extensions[Environment][plugin].name | default(shortname + '-' + Environment) }}"
 
   {{ plugin }}AppShortNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/shortname"
       Type: String
-      Value: "{{ extensions[Environment][plugin].shortname }}"
+      Value: "{{ shortname }}"
 
   {{ plugin }}AppSourceTypeParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/type"
       Type: String
-      Value: git
+      Value: "{{ extensions[Environment][plugin].type | default('git') }}"
 
   {{ plugin }}AppSourceURLParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub "/config/CKAN/${Environment}/app/${ApplicationId}/plugin_apps/{{ plugin }}/app_source/url"
       Type: String
-      Value: "{{ extensions[Environment][plugin].url }}"
+      Value: "{{ extensions[Environment][plugin].url | default('https://github.com/qld-gov-au/' + shortname + '.git') }}"
 
   {{ plugin }}AppSourceRevisionParameter:
     Type: AWS::SSM::Parameter
