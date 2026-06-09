@@ -146,7 +146,7 @@ extensions:
 
     CKANExtDataQld:
       <<: *CKANExtDataQld
-      version: "master"
+      version: "QOLDEV-2051-qgds-uplift"
 
     CKANExtDataRequests:
       <<: *CKANExtDataRequests
