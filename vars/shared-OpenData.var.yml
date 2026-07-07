@@ -6,6 +6,8 @@ enable_datastore: "yes"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: data.qld.gov.au
 
+# By default, extensions are installed as:
+# pip install -e 'git+https://github.com/qld-gov-au/<shortname>.git@<version>#egg=<shortname>'
 extensions:
   default: &default_extensions
 
@@ -192,6 +194,7 @@ extensions:
       <<: *CKANExtOIDC
       version: "develop"
 
+# Global variables to apply to this app's CloudFormation templates
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
