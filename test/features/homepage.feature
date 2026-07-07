@@ -15,3 +15,8 @@ Feature: Homepage
         Given "Unauthenticated" as the persona
         When I go to homepage
         Then I should see an element with xpath "//a[@href='https://www.forgov.qld.gov.au/information-and-communication-technology/communication-and-publishing/website-and-digital-publishing/queensland-government-gazette/publish-in-the-gazette' and string()='Publish in the Gazettes']"
+        And I should see an element with xpath "//a[@href='https://www.forgov.qld.gov.au/information-and-communication-technology/communication-and-publishing/website-and-digital-publishing/queensland-government-gazette/publish-in-the-gazette' and string()='Publish in the Gazettes']"
+        And I should see the current year gazette link
+        And I should see the year "2016" gazette link
+        And I should not see the year "2015" gazette link
+

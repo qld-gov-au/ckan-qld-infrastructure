@@ -47,7 +47,7 @@ Feature: Group APIs
         And I click the link to "/group/new"
         And I fill in title with random text starting with "Group name more than 35 characters"
         And I set "group_title" to "$last_generated_title"
-        And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
+        And I submit the main form
         And I take a debugging screenshot
         # Breadcrumb should be truncated but preserve full name in a tooltip
         Then I should see an element with xpath "//ol[contains(@class, 'breadcrumb')]//a[contains(string(), 'Group name more') and contains(string(), '...') and @title = '$group_title']"
@@ -56,7 +56,7 @@ Feature: Group APIs
         When I create a dataset and resource with key-value parameters "notes=Testing long group name" and "name=Test"
         And I press "Groups"
         When I select by text " $group_title" from "group_added"
-        And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
+        And I submit the main form
         Then I should see an element with xpath "//form//a[normalize-space() = '$group_title']"
         When I press "$group_title"
 
