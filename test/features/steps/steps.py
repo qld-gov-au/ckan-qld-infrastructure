@@ -93,6 +93,12 @@ def expand_height(context):
     context.browser.driver.set_window_rect(x=0, y=0, width=1366, height=3072)
 
 
+@when(u'I narrow the browser to mobile width')
+def narrow_width(context):
+    # Work around x=null bug in Selenium set_window_size
+    context.browser.driver.set_window_rect(x=0, y=0, width=900, height=3072)
+
+
 @when(u'I log in directly')
 def log_in_directly(context):
     """
@@ -124,6 +130,25 @@ def login_link_visible(context):
     context.execute_steps(u"""
         Then I should see an element with xpath "//h1[contains(string(), 'Login')]"
     """)
+
+
+@then(u'I should see the current year gazette link')
+def current_gazette_link_visible(context):
+    gazette_link_visible(context, datetime.datetime.now().strftime("%Y"))
+
+
+@then(u'I should see the year "{year}" gazette link')
+def gazette_link_visible(context, year):
+    context.execute_steps(u"""
+        Then I should see an element with xpath "//a[@href = '/group/gazettes-{0}' and string() = 'Gazettes {0}']"
+    """.format(year))
+
+
+@then(u'I should not see the year "{year}" gazette link')
+def gazette_link_not_visible(context, year):
+    context.execute_steps(u"""
+        Then I should not see an element with xpath "//a[@href = '/group/gazettes-{0}']"
+    """.format(year))
 
 
 @when(u'I request a password reset')
@@ -177,7 +202,7 @@ def confirm_dialog_if_present(context, text):
     if context.browser.is_element_present_by_xpath(dialog_xpath):
         parent_xpath = dialog_xpath
     elif context.browser.is_text_present(text):
-        parent_xpath = "//div[contains(string(), '{0}')]/..".format(text)
+        parent_xpath = "//div[contains(string(), '{0}')]".format(text)
     else:
         return
     button_xpath = parent_xpath + "//button[contains(@class, 'btn-primary')]"
@@ -198,7 +223,7 @@ def confirm_dataset_deletion_dialog_if_present(context):
         """)
     # Press the Confirm button whether it is in a dialog or a page
     context.execute_steps(u"""
-        When I press the element with xpath "//button[contains(@class, 'btn-primary') and contains(string(), 'Confirm') ]"
+        When I press the element with xpath "//div[@id='content']//button[contains(@class, 'btn-primary') and contains(string(), 'Confirm') ]"
         Then I should see "Dataset has been deleted"
     """)
 
@@ -652,6 +677,13 @@ def reload_page_every_n_until_find(context, xpath, seconds=5, reload_times=5):
     assert False, 'Element with xpath "{}" was not found'.format(xpath)
 
 
+@when(u'I submit the main form')
+def submit_form(context):
+    context.execute_steps("""
+        When I press the element with xpath "//div[@id='content']//button[contains(@class, 'btn-primary')]"
+    """)
+
+
 # ckanext-validation-schema-generator
 
 
@@ -820,7 +852,7 @@ def create_datarequest_for_org(context, organisation_name):
         And I fill in "description" with "Test description"
         And I execute the script "$('#field-organizations option:contains("{0}")').attr('selected', true)"
         And I take a debugging screenshot
-        And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
+        And I submit the main form
         And I take a debugging screenshot
     """.format(organisation_name))
 
