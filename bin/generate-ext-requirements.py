@@ -8,7 +8,7 @@ target_environment = os.environ.get('DEPLOY_ENV', 'DEV')
 requirement_list = ''
 extensions = yaml.safe_load(open(extensions_file))['extensions'][target_environment]
 for key, value in six.iteritems(extensions):
-    requirement_list += '-e git+{}@{}#egg={}\n'.format(value['url'], value['version'], value['shortname'])
+    requirement_list += '-e git+{}@{}#egg={}\n'.format(value.get('url', 'https://github.com/qld-gov-au/' + value['shortname'] + '.git'), value['version'], value['shortname'])
 
 requirement_file = open('/tmp/requirements-ext.txt', 'w')
 requirement_file.write(requirement_list)

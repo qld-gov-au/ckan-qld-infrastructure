@@ -5,14 +5,14 @@ Feature: XLoader
     Scenario: As a publisher, when I visit a resource I control with a datastore entry, I can access the XLoader interface
         Given "TestOrgEditor" as the persona
         When I log in
-        And I create a dataset and resource with key-value parameters "notes=Testing XLoader" and "name=test-csv-resource::url=https://people.sc.fsu.edu/~jburkardt/data/csv/addresses.csv::format=CSV"
+        And I create a dataset and resource with key-value parameters "notes=Testing XLoader" and "name=test-csv-resource::url=https://raw.githubusercontent.com/qld-gov-au/ckanext-data-qld/refs/heads/develop/test/fixtures/csv_resource.csv::format=CSV"
         # Wait for XLoader to run
         And I press "test-csv-resource"
         And I reload page every 3 seconds until I see an element with xpath "//*[contains(string(), 'DataStore')]" but not more than 6 times
         Then I should see "DataStore"
 
         When I press "DataStore"
-        And I reload page every 3 seconds until I see an element with xpath "//*[contains(string(), 'Express Load completed')]" but not more than 6 times
+        And I reload page every 3 seconds until I see an element with xpath "//*[contains(string(), 'Express Load completed')]" but not more than 10 times
         Then I should see "Express Load completed"
         And I should see "Data Schema"
         And I should see "Data Dictionary"

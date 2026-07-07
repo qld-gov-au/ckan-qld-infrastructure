@@ -56,7 +56,7 @@ Feature: Data Request
         And I go to the data requests page
         And I press "Add data request"
         And I fill in "title" with "Test data request"
-        And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
+        And I submit the main form
         Then I should see an element with the css selector "div.error-explanation.alert.alert-error" within 2 seconds
         And I should see "The form contains invalid entries" within 1 seconds
         And I should see an element with the css selector "span.error-block" within 1 seconds
@@ -152,7 +152,7 @@ Feature: Data Request
         And I press "Add data request"
         And I fill in title with random text
         And I fill in "description" with "Test throttling"
-        And I press the element with xpath "//button[contains(@class, 'btn-primary')]"
+        And I submit the main form
         Then I should see "Too many requests submitted, please wait"
 
     Scenario: As an org admin I can re-open a closed data request
