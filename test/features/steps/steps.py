@@ -186,7 +186,7 @@ def press_search_facet(context, title):
 def fill_in_field_if_present(context, name, value):
     context.execute_steps(u"""
         When I execute the script "field = $('#{0}'); if (!field.length) field = $('[name={0}]'); if (!field.length) field = $('#field-{0}'); field.val('{1}'); field.keyup();"
-    """.format(name, value))
+    """.format(name, value.replace("'", r"\'")))
 
 
 @when(u'I clear the URL field')
