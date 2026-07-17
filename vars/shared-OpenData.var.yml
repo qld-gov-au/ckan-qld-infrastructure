@@ -47,7 +47,7 @@ extensions:
     CKANExtQGOV: &CKANExtQGOV
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government sites"
-      version: "7.2.1"
+      version: "7.3.0"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       shortname: "ckanext-s3filestore"
@@ -67,7 +67,7 @@ extensions:
     CKANExtDataQld: &CKANExtDataQld
       shortname: "ckanext-data-qld"
       description: "CKAN Extension for Queensland Government Open Data"
-      version: "8.0.1"
+      version: "8.1.0"
 
     CKANExtDataRequests: &CKANExtDataRequests
       shortname: "ckanext-datarequests"

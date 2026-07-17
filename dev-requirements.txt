@@ -1,9 +1,9 @@
-behaving==3.1.5
 Appium-Python-Client==2.10.1
-ckanapi>=4.3
+behaving==3.3.*
+ckanapi>=4.7
 ckantoolkit>=0.0.4
 factory-boy
-flake8==6.0.0
+flake8==7.3.*
 mock
 # update this for ckanext-harvest
 pyOpenSSL>=23.0.0
