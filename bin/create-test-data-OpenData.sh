@@ -64,7 +64,7 @@ api_call '{"id": "'"${DR_ORG_ID}"'", "object": "dr_editor", "object_type": "user
 echo "Creating test dataset for data request organisation:"
 
 api_call '{"name": "data_request_dataset", "title": "Dataset for data requests", "owner_org": "'"${DR_ORG_ID}"'",
-"update_frequency": "near-realtime", "author_email": "dr_admin@localhost", "version": "1.0", "license_id": "cc-by-4",
+"update_frequency": "near-realtime", "author_email": "dr_admin@localhost", "version": "1.0", "license_id": "CC-BY-4.0",
 "data_driven_application": "NO", "security_classification": "PUBLIC", "notes": "test", "de_identified_data": "NO"}' package_create
 
 echo "Creating test Data Request:"
