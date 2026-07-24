@@ -13,3 +13,4 @@ templates/*.sql
 
 # generated from template
 Dockerfile.ckan
+docker-compose.yml
