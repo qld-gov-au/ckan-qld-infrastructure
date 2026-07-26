@@ -130,5 +130,17 @@ exports.handler = async (event) => {
     }
   }));
 
+  await ssm.send(new SendCommandCommand({
+    Comment: `Applying security patches to ${service} ${environment} instance ${instanceId}`,
+    DocumentName: "AWS-RunPatchBaseline",
+    DocumentVersion: '\$DEFAULT',
+    InstanceIds: [ instanceId ],
+    OutputS3BucketName: "osssio-ckan-web-logs",
+    OutputS3KeyPrefix: "run_command",
+    Parameters: {
+      Operation: "Install"
+    }
+  }));
+
   return recordCompletion(event, true);
 };
