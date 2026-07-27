@@ -101,7 +101,7 @@ exports.handler = async (event) => {
   } else {
     recipePrefix = `datashades::${layer}`;
   }
-  var runList = "recipe[apply-patch-baseline]";
+  var runList = "recipe[datashades::apply-patch-baseline]";
   if (deployPhase !== 'deploy') {
     runList = `recipe[${recipePrefix}-configure],${runList}`;
   }
