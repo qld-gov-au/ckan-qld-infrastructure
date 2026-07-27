@@ -101,15 +101,12 @@ exports.handler = async (event) => {
   } else {
     recipePrefix = `datashades::${layer}`;
   }
-  var runList = "";
+  var runList = "recipe[apply-patch-baseline]";
   if (deployPhase !== 'deploy') {
-    runList = `recipe[${recipePrefix}-configure]`;
-  }
-  if (deployPhase === 'setup') {
-    runList = `,${runList}`;
+    runList = `recipe[${recipePrefix}-configure],${runList}`;
   }
   if (deployPhase !== 'configure') {
-    runList = `recipe[${recipePrefix}-setup],recipe[${recipePrefix}-deploy]${runList}`;
+    runList = `recipe[${recipePrefix}-setup],recipe[${recipePrefix}-deploy],${runList}`;
   }
 
   await ssm.send(new SendCommandCommand({
@@ -127,18 +124,6 @@ exports.handler = async (event) => {
       WhyRun: ["False"],
       ComplianceSeverity: ["None"],
       ComplianceType: ["Custom:Chef"]
-    }
-  }));
-
-  await ssm.send(new SendCommandCommand({
-    Comment: `Applying security patches to ${service} ${environment} instance ${instanceId}`,
-    DocumentName: "AWS-RunPatchBaseline",
-    DocumentVersion: '\$DEFAULT',
-    InstanceIds: [ instanceId ],
-    OutputS3BucketName: "osssio-ckan-web-logs",
-    OutputS3KeyPrefix: "run_command",
-    Parameters: {
-      Operation: "Install"
     }
   }));
 
