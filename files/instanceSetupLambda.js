@@ -101,12 +101,15 @@ exports.handler = async (event) => {
   } else {
     recipePrefix = `datashades::${layer}`;
   }
-  var runList = "recipe[datashades::apply-patch-baseline]";
+  var runList = "";
   if (deployPhase !== 'deploy') {
-    runList = `recipe[${recipePrefix}-configure],${runList}`;
+    runList = `recipe[${recipePrefix}-configure],recipe[datashades::apply-patch-baseline]`;
+  }
+  if (deployPhase === 'setup') {
+    runList = `,${runList}`;
   }
   if (deployPhase !== 'configure') {
-    runList = `recipe[${recipePrefix}-setup],recipe[${recipePrefix}-deploy],${runList}`;
+    runList = `recipe[${recipePrefix}-setup],recipe[${recipePrefix}-deploy]${runList}`;
   }
 
   await ssm.send(new SendCommandCommand({
