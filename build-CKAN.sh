@@ -77,6 +77,7 @@ create-baseline-ami () {
     LATEST_VANILLA_CREATION_DATE \
     LATEST_VANILLA_DESCRIPTION < <(
       aws ec2 describe-images \
+        --owners amazon \
         --filters "Name=name,Values=al2023-ami-2023*-arm64" \
         --query 'sort_by(Images,&CreationDate)[-1].[Name,ImageId,CreationDate,Description]' \
         --output text
