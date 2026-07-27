@@ -69,11 +69,30 @@ run-deployment () {
 
 create-baseline-ami () {
   # https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html
-  # Amazon Linux 2023 AMI 2023.12.20260724.0 arm64 HVM kernel-6.1  (al2023-ami-2023.12.20260724.0-kernel-6.1-arm64)
-  VANILLA_IMAGE_ID="ami-0263e54f0becbac65"
-  LATEST_VANILLA_IMAGE=$(aws ec2 describe-images --filters "Name=name,Values=al2023-ami-2023*-arm64" --query "Images[].[Name, ImageId]" --output text |sort |tail -1 |cut -f 2)
+  # Amazon Linux 2023 AMI 2023.12.20260727.0 arm64 HVM kernel-6.1 (al2023-ami-2023.12.20260727.0-kernel-6.1-arm64) - 2026-07-25T00:03:18.000Z
+  VANILLA_IMAGE_ID="ami-0f707e657d81da75d"
+  read -r \
+    LATEST_IMAGE_NAME \
+    LATEST_VANILLA_IMAGE \
+    LATEST_VANILLA_CREATION_DATE \
+    LATEST_VANILLA_DESCRIPTION < <(
+      aws ec2 describe-images \
+        --filters "Name=name,Values=al2023-ami-2023*-arm64" \
+        --query 'sort_by(Images,&CreationDate)[-1].[Name,ImageId,CreationDate,Description]' \
+        --output text
+  )
   if [ "$VANILLA_IMAGE_ID" != "$LATEST_VANILLA_IMAGE" ]; then
     echo "Using $VANILLA_IMAGE_ID; however, a newer operating system image exists, $LATEST_VANILLA_IMAGE"
+    echo ""
+    echo "Please update the comment and VANILLA_IMAGE_ID to:"
+    echo "  # $LATEST_VANILLA_DESCRIPTION ($LATEST_IMAGE_NAME) - $LATEST_VANILLA_CREATION_DATE"
+    echo "  VANILLA_IMAGE_ID=\"$LATEST_VANILLA_IMAGE\" "
+    echo ""
+    if [[ "$ENVIRONMENT" == "DEV" || "$ENVIRONMENT" == "TEST" ]]; then
+      echo "In Lower environment: $ENVIRONMENT. "
+      echo "Stopping build."
+      exit 1
+    fi
   fi
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
   if [ "$BASELINE_IMAGE_ID" != "" ]; then
