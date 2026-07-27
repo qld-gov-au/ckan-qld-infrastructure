@@ -103,7 +103,7 @@ exports.handler = async (event) => {
   }
   var runList = "";
   if (deployPhase !== 'deploy') {
-    runList = `recipe[${recipePrefix}-configure]`;
+    runList = `recipe[${recipePrefix}-configure],recipe[datashades::apply-patch-baseline]`;
   }
   if (deployPhase === 'setup') {
     runList = `,${runList}`;
