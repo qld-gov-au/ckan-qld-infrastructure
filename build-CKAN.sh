@@ -89,7 +89,7 @@ create-baseline-ami () {
     echo "  # $LATEST_VANILLA_DESCRIPTION ($LATEST_IMAGE_NAME) - $LATEST_VANILLA_CREATION_DATE"
     echo "  VANILLA_IMAGE_ID=\"$LATEST_VANILLA_IMAGE\""
     echo ""
-    if [[ "$ENVIRONMENT" == "DEV" || "$ENVIRONMENT" == "TEST" ]]; then
+    if [ "$ENVIRONMENT" = "DEV" ]; then
       echo "In Lower environment: $ENVIRONMENT. "
       echo "Stopping build."
       exit 1
