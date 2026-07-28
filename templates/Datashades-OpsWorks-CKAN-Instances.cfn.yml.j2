@@ -195,9 +195,9 @@ Resources:
                 echo '/dev/sdi /mnt/local_data xfs defaults,nofail 0 2' >> /etc/fstab
                 mount -a
               fi
-              if ! (yum install chef); then
+              if ! (dnf install chef); then
                 for i in `seq 1 5`; do
-                  yum install -y libxcrypt-compat "https://packages.chef.io/files/stable/chef/18.4.12/el/7/chef-18.4.12-1.el7.x86_64.rpm" && break
+                  dnf install -y libxcrypt-compat "https://packages.chef.io/files/stable/chef/18.4.12/el/7/chef-18.4.12-1.el7.x86_64.rpm" && break
                   sleep 5
                 done
               fi
