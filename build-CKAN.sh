@@ -119,6 +119,7 @@ PARAMETER_STRING
   )
   INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
     --subnet-id "$SUBNET_ID" --user-data "$USER_DATA" \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=AMI_Chef_Setup_${ENVIRONMENT}},{Key=Environment,Value=$ENVIRONMENT},{Key=Service,Value=CKAN}]" \
     --query "Instances[0].InstanceId" --output text)
   if [ "$INSTANCE_ID" = "" ]; then
     echo "Failed to start template instance" >&2
@@ -129,7 +130,7 @@ PARAMETER_STRING
 
   STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
   echo "Instance $INSTANCE_ID status: $STATUS" >&2
-  for retry in `seq 1 20`; do
+  for retry in `seq 1 40`; do
     if [ "$STATUS" = "stopped" ]; then
       break
     else
