@@ -44,7 +44,7 @@ extensions:
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
       shortname: "ckanext-publications-qld-theme"
       description: "CKAN Extension for Queensland Government Publications theme"
-      version: "2.0.0"
+      version: "2.0.1"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       shortname: "ckanext-resource-type-validation"
