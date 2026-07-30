@@ -130,13 +130,13 @@ PARAMETER_STRING
 
   STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
   echo "Instance $INSTANCE_ID status: $STATUS" >&2
-  for retry in `seq 1 40`; do
+  for retry in `seq 1 60`; do
     if [ "$STATUS" = "stopped" ]; then
       break
     else
       sleep 10
       STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
-      echo "Instance $INSTANCE_ID status: $STATUS" >&2
+      echo "Instance $INSTANCE_ID status: $STATUS check $retry" >&2
     fi
   done
   if [ "$STATUS" != "stopped" ]; then
@@ -154,6 +154,7 @@ PARAMETER_STRING
   )
   if [ "$AMI_ID" = "" ]; then
     echo "Failed to create image, you may wish to investigate $INSTANCE_ID and manually terminate it!" >&2
+    echo "If this a higher environment, please copy ami from /config/CKAN/DEV/common/BaselineAmiId into param store /config/CKAN/$ENVIRONMENT/common/BaselineAmiId and restart the deployment"
     return 1
   fi
   aws ec2 wait image-available --image-ids "$AMI_ID" || return 1
