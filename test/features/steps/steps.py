@@ -129,6 +129,8 @@ def attempt_login(context, password):
 def login_link_visible(context):
     context.execute_steps(u"""
         Then I should see an element with xpath "//h1[contains(string(), 'Login')]"
+        And I should see "Sign in with your Digital ID"
+        And I should see "Register via your Digital ID"
     """)
 
 
@@ -232,6 +234,7 @@ def confirm_dataset_deletion_dialog_if_present(context):
 def go_to_new_resource_form(context, name):
     context.execute_steps(u"""
         When I go to dataset "{0}"
+        And I take a debugging screenshot
         And I press "Add new resource"
     """.format(name))
 
@@ -310,7 +313,7 @@ def press_edit_resource(context):
 def select_licence(context, licence_id):
     # Licence requires special interaction due to fancy JavaScript
     context.execute_steps(u"""
-        When I execute the script "$('#field-license_id').val('{0}').trigger('change')"
+        When I execute the script "element = document.getElementsByName('license_id')[0]; element.value = '{0}'; element.dispatchEvent(new Event('change'));"
     """.format(licence_id))
 
 
@@ -467,7 +470,7 @@ def _parse_params(param_string):
     for param in param_string.split("::"):
         entry = param.split("=", 1)
         params[entry[0]] = entry[1] if len(entry) > 1 else ""
-    return six.iteritems(params)
+    return params.items()
 
 
 @when(u'I show the non-JavaScript schema fields')
