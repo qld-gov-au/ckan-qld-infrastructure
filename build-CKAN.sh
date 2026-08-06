@@ -69,8 +69,8 @@ run-deployment () {
 
 create-baseline-ami () {
   # https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html
-  # Amazon Linux 2023 AMI 2023.12.20260727.0 arm64 HVM kernel-6.1 (al2023-ami-2023.12.20260727.0-kernel-6.1-arm64) - 2026-07-25T00:03:18.000Z
-  VANILLA_IMAGE_ID="ami-0f707e657d81da75d"
+  # Amazon Linux 2023 AMI 2023.12.20260803.3 arm64 HVM kernel-6.12 (al2023-ami-2023.12.20260803.3-kernel-6.12-arm64) - 2026-08-03T17:37:49.000Z
+  VANILLA_IMAGE_ID="ami-0d2316cef187452bf"
   read -r \
     LATEST_IMAGE_NAME \
     LATEST_VANILLA_IMAGE \
@@ -127,6 +127,7 @@ PARAMETER_STRING
   )
   INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
     --subnet-id "$SUBNET_ID" --user-data "$USER_DATA" \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=AMI_Chef_Setup_${ENVIRONMENT}},{Key=Environment,Value=$ENVIRONMENT},{Key=Service,Value=CKAN}]" \
     --query "Instances[0].InstanceId" --output text)
   if [ "$INSTANCE_ID" = "" ]; then
     echo "Failed to start template instance" >&2
@@ -137,13 +138,13 @@ PARAMETER_STRING
 
   STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
   echo "Instance $INSTANCE_ID status: $STATUS" >&2
-  for retry in `seq 1 20`; do
+  for retry in `seq 1 60`; do
     if [ "$STATUS" = "stopped" ]; then
       break
     else
       sleep 10
       STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
-      echo "Instance $INSTANCE_ID status: $STATUS" >&2
+      echo "Instance $INSTANCE_ID status: $STATUS check $retry" >&2
     fi
   done
   if [ "$STATUS" != "stopped" ]; then
@@ -161,6 +162,7 @@ PARAMETER_STRING
   )
   if [ "$AMI_ID" = "" ]; then
     echo "Failed to create image, you may wish to investigate $INSTANCE_ID and manually terminate it!" >&2
+    echo "If this a higher environment, please copy ami from /config/CKAN/DEV/common/BaselineAmiId into param store /config/CKAN/$ENVIRONMENT/common/BaselineAmiId and restart the deployment"
     return 1
   fi
   aws ec2 wait image-available --image-ids "$AMI_ID" || return 1
