@@ -68,11 +68,32 @@ run-deployment () {
 }
 
 create-baseline-ami () {
-  # Amazon Linux 2023 AMI 2023.11.20260413.0 arm64 HVM kernel-6.1
-  VANILLA_IMAGE_ID="ami-0b1336cc21eaf94c5"
-  LATEST_VANILLA_IMAGE=$(aws ec2 describe-images --filters "Name=name,Values=al2023-ami-2023*-arm64" --query "Images[].[Name, ImageId]" --output text |sort |tail -1 |cut -f 2)
+  # https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html
+  # Amazon Linux 2023 AMI 2023.12.20260803.3 arm64 HVM kernel-6.12 (al2023-ami-2023.12.20260803.3-kernel-6.12-arm64) - 2026-08-03T17:37:49.000Z
+  VANILLA_IMAGE_ID="ami-0d2316cef187452bf"
+  read -r \
+    LATEST_IMAGE_NAME \
+    LATEST_VANILLA_IMAGE \
+    LATEST_VANILLA_CREATION_DATE \
+    LATEST_VANILLA_DESCRIPTION < <(
+      aws ec2 describe-images \
+        --owners amazon \
+        --filters "Name=name,Values=al2023-ami-2023*-arm64" \
+        --query 'sort_by(Images,&CreationDate)[-1].[Name,ImageId,CreationDate,Description]' \
+        --output text
+  )
   if [ "$VANILLA_IMAGE_ID" != "$LATEST_VANILLA_IMAGE" ]; then
     echo "Using $VANILLA_IMAGE_ID; however, a newer operating system image exists, $LATEST_VANILLA_IMAGE"
+    echo ""
+    echo "Please update the comment and VANILLA_IMAGE_ID to:"
+    echo "  # $LATEST_VANILLA_DESCRIPTION ($LATEST_IMAGE_NAME) - $LATEST_VANILLA_CREATION_DATE"
+    echo "  VANILLA_IMAGE_ID=\"$LATEST_VANILLA_IMAGE\""
+    echo ""
+    if [ "$ENVIRONMENT" = "DEV" ]; then
+      echo "In Lower environment: $ENVIRONMENT. "
+      echo "Stopping build."
+      exit 1
+    fi
   fi
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
   if [ "$BASELINE_IMAGE_ID" != "" ]; then
@@ -96,8 +117,9 @@ RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
 dnf install -y libxcrypt-compat $RPM_URL && shutdown -P now
 PARAMETER_STRING
   )
-  INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.nano --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
+  INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
     --subnet-id "$SUBNET_ID" --user-data "$USER_DATA" \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=AMI_Chef_Setup_${ENVIRONMENT}},{Key=Environment,Value=$ENVIRONMENT},{Key=Service,Value=CKAN}]" \
     --query "Instances[0].InstanceId" --output text)
   if [ "$INSTANCE_ID" = "" ]; then
     echo "Failed to start template instance" >&2
@@ -108,13 +130,13 @@ PARAMETER_STRING
 
   STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
   echo "Instance $INSTANCE_ID status: $STATUS" >&2
-  for retry in `seq 1 20`; do
+  for retry in `seq 1 60`; do
     if [ "$STATUS" = "stopped" ]; then
       break
     else
       sleep 10
       STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
-      echo "Instance $INSTANCE_ID status: $STATUS" >&2
+      echo "Instance $INSTANCE_ID status: $STATUS check $retry" >&2
     fi
   done
   if [ "$STATUS" != "stopped" ]; then
@@ -132,6 +154,7 @@ PARAMETER_STRING
   )
   if [ "$AMI_ID" = "" ]; then
     echo "Failed to create image, you may wish to investigate $INSTANCE_ID and manually terminate it!" >&2
+    echo "If this a higher environment, please copy ami from /config/CKAN/DEV/common/BaselineAmiId into param store /config/CKAN/$ENVIRONMENT/common/BaselineAmiId and restart the deployment"
     return 1
   fi
   aws ec2 wait image-available --image-ids "$AMI_ID" || return 1

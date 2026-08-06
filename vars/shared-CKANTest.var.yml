@@ -6,6 +6,8 @@ enable_datastore: "yes"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: data.qld.gov.au
 
+# By default, extensions are installed as:
+# pip install -e 'git+https://github.com/qld-gov-au/<shortname>.git@<version>#egg=<shortname>'
 extensions:
   default: &default_extensions
 
@@ -37,6 +39,11 @@ extensions:
 
     # Queensland Government
 
+    CKANExtAuth: &CKANExtAuth
+      shortname: "ckanext-auth"
+      description: "CKAN Auth Extension"
+      version: "v0.5.1-qgov.2"
+
     CKANExtXLoader: &CKANExtXLoader
       shortname: "ckanext-xloader"
       description: "CKAN Express Loader Extension"
@@ -45,7 +52,7 @@ extensions:
     CKANExtQGOV: &CKANExtQGOV
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government sites"
-      version: "7.2.1"
+      version: "7.4.0"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       shortname: "ckanext-s3filestore"
@@ -65,7 +72,7 @@ extensions:
     CKANExtDataQld: &CKANExtDataQld
       shortname: "ckanext-data-qld"
       description: "CKAN Extension for Queensland Government Open Data"
-      version: "8.0.1"
+      version: "8.1.0"
 
     CKANExtDataRequests: &CKANExtDataRequests
       shortname: "ckanext-datarequests"
@@ -132,6 +139,10 @@ extensions:
       <<: *CKANExtXLoader
       version: "master"
 
+    CKANExtAuth:
+      <<: *CKANExtAuth
+      version: "develop"
+
     CKANExtQGOV:
       <<: *CKANExtQGOV
       version: "master"
@@ -192,6 +203,7 @@ extensions:
       <<: *CKANExtOIDC
       version: "master"
 
+# Global variables to apply to this app's CloudFormation templates
 basic_facts:
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
@@ -206,3 +218,4 @@ basic_facts:
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "ssqld-1854.saas.squiz.cloud"
+    CKANRevision: "dev-v2.12"

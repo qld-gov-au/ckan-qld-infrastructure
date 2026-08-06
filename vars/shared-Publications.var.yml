@@ -6,6 +6,8 @@ enable_datastore: "no"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: publications.qld.gov.au
 
+# By default, extensions are installed as:
+# pip install -e 'git+https://github.com/qld-gov-au/<shortname>.git@<version>#egg=<shortname>'
 extensions:
   default: &default_extensions
 
@@ -19,10 +21,15 @@ extensions:
 
     # Queensland Government
 
+#    CKANExtAuth: &CKANExtAuth
+#      shortname: "ckanext-auth"
+#      description: "CKAN Auth Extension"
+#      version: "v0.5.1-qgov.2"
+
     CKANExtQGOV: &CKANExtQGOV
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government sites"
-      version: "7.2.1"
+      version: "7.4.0"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       shortname: "ckanext-s3filestore"
@@ -37,7 +44,7 @@ extensions:
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
       shortname: "ckanext-publications-qld-theme"
       description: "CKAN Extension for Queensland Government Publications theme"
-      version: "1.5.4"
+      version: "2.0.2"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       shortname: "ckanext-resource-type-validation"
@@ -59,12 +66,23 @@ extensions:
 
   STAGING:
     <<: *default_extensions
+    #Remove once we are going to prod
+    CKANExtAuth:
+      shortname: "ckanext-auth"
+      description: "CKAN Auth Extension"
+      version: "v0.5.1-qgov.2"
 
   TRAINING:
     <<: *default_extensions
 
   DEV:
     <<: *default_extensions
+    CKANExtAuth:
+      #<<: *CKANExtAuth
+      shortname: "ckanext-auth"
+      description: "CKAN Auth Extension"
+      version: "develop"
+
     CKANExtQGOV:
       <<: *CKANExtQGOV
       version: "develop"
@@ -96,6 +114,7 @@ extensions:
     CKANExtSelfInfo:
       <<: *CKANExtSelfInfo
 
+# Global variables to apply to this app's CloudFormation templates
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
