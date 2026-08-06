@@ -132,6 +132,10 @@ extensions:
 
   TRAINING:
     <<: *default_extensions
+    CKANExtDataQld:
+      <<: *CKANExtDataQld
+      version: "develop"
+
 
   DEV:
     <<: *default_extensions
@@ -157,7 +161,7 @@ extensions:
 
     CKANExtDataQld:
       <<: *CKANExtDataQld
-      version: "QOLDEV-2051-qgds-uplift"
+      version: "develop"
 
     CKANExtDataRequests:
       <<: *CKANExtDataRequests
