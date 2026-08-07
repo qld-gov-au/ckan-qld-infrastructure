@@ -234,7 +234,7 @@ run-all-playbooks () {
     exit 1
   fi
   run-playbook "instances.yml"
-  run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
+  run-playbook "cloudfront-lambda"
   run-playbook "cloudfront"
   run-deployment
 }

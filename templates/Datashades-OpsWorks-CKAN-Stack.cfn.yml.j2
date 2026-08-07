@@ -228,6 +228,8 @@ Resources:
 
   {% set instance_setup_source = lookup('file', 'files/instanceSetupLambda.js') | replace('\n', '\n          ') %}
 
+  # Including the script hash in the resource name ensures that
+  # we update the resource if script contents change.
   InstanceSetupLambda{{ instance_setup_source_hash }}:
     Type: AWS::Lambda::Function
     Properties:
