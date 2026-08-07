@@ -27,6 +27,11 @@ exports.handler = (event, context, callback) => {
   const params = querystring.parse(request.querystring);
   const sortedParams = {};
 
+  /* Ensure that the search parameter is 'q' not 'query' */
+  if (params.has('query') && !params.has('q')) {
+    params['q'] = params['query'];
+  }
+
   /* Sort param keys */
   Object.keys(params).sort().forEach(key => {
     sortedParams[key] = params[key];
