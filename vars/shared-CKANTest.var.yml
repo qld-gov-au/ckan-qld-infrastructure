@@ -157,7 +157,7 @@ extensions:
 
     CKANExtDataQld:
       <<: *CKANExtDataQld
-      version: "master"
+      version: "develop"
 
     CKANExtDataRequests:
       <<: *CKANExtDataRequests
@@ -165,7 +165,7 @@ extensions:
 
     CKANExtYTP:
       <<: *CKANExtYTP
-      version: "master"
+      version: "develop"
 
     CKANExtSSMConfig:
       <<: *CKANExtSSMConfig
