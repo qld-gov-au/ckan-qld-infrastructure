@@ -80,10 +80,8 @@ Resources:
                 - "edgelambda.amazonaws.com"
 
 Outputs:
-  #current version as of 6/9/2023
   VersionedLambdaFunction{{ lambda_request_source_hash }}:
     Value: !Ref VersionedLambdaFunction{{ lambda_request_source_hash }}
-  #don't forget add the new version to output the value for cross region referencing. Note cfn import's don't work cross region so we can't lock it sadly
 
   LambdaEdgeOriginFunctionVersion{{ lambda_origin_source_hash }}:
-    Value: !Ref LambdaOriginFunctionVersion9cd5bfa
+    Value: !Ref LambdaOriginFunctionVersion{{ lambda_origin_source_hash }}
