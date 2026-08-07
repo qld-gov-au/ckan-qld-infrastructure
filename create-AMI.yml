@@ -6,16 +6,8 @@
     - vars/AMI-template-instances.var.yml
 
   pre_tasks:
-    - name: get basic_facts
-      set_fact:
-        basic_fact={{ item }}
-      when: item.Environment == Environment
-      with_items: "{{ basic_facts }}"
-
-    - name: set facts to environment from basic_fact
-      set_fact: "{{ item.key }}={{ item.value }}"
-      with_dict: "{{ basic_fact }}"
-      when: basic_fact is defined
+    - name: Set basic facts
+      import_tasks: basic_facts.yml
 
   tasks:
     - name: Get stack name
