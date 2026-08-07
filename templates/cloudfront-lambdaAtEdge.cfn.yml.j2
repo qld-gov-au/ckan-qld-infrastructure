@@ -80,8 +80,8 @@ Resources:
                 - "edgelambda.amazonaws.com"
 
 Outputs:
-  VersionedLambdaFunction{{ lambda_request_source_hash }}:
+  LambdaEdgeRequestFunctionVersion:
     Value: !Ref VersionedLambdaFunction{{ lambda_request_source_hash }}
 
-  LambdaEdgeOriginFunctionVersion{{ lambda_origin_source_hash }}:
+  LambdaEdgeOriginFunctionVersion:
     Value: !Ref LambdaOriginFunctionVersion{{ lambda_origin_source_hash }}
