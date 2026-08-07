@@ -104,6 +104,14 @@ create-baseline-ami () {
       return 0
     fi
   fi
+  # check if the image was previously generated
+  TARGET_IMAGE_NAME="${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}"
+  EXISTING_IMAGE_ID=$(aws ec2 describe-images --filters "Name=name,Values=$TARGET_IMAGE_NAME" --query "ImageId" --output text)
+  if [ "$EXISTING_IMAGE_ID" != "" ]; then
+    echo "Found existing image $EXISTING_IMAGE_ID installing Chef on desired platform $VANILLA_IMAGE_ID"
+    aws ssm put-parameter --overwrite --type String --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --value "$EXISTING_IMAGE_ID" || return 1
+    return 0
+  fi
   SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
     --query "SecurityGroups[0].GroupId" --output text)
   INSTANCE_PROFILE_NAME=$(aws iam list-instance-profiles \
@@ -147,7 +155,7 @@ PARAMETER_STRING
   echo "Instance $INSTANCE_ID is ready, generating image..." >&2
 
   AMI_ID=$(aws ec2 create-image --instance-id "$INSTANCE_ID" --no-reboot \
-    --name "${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}" \
+    --name "$TARGET_IMAGE_NAME" \
     --description "Baseline AMI for CKAN instances, built from $VANILLA_IMAGE_ID plus Chef" \
     --tag-specifications "ResourceType=image,Tags=[{Key=Version,Value=${VANILLA_IMAGE_ID}}]" \
     --query "ImageId" --output text
