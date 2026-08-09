@@ -55,7 +55,7 @@ Resources:
               }
           };
       Role: !GetAtt LambdaEdgeFunctionRole.Arn
-      Runtime: nodejs24.x
+      Runtime: nodejs22.x
       Handler: index.handler
       Timeout: 5
 
@@ -79,7 +79,7 @@ Resources:
               callback( null, request );
           };
       Role: !GetAtt LambdaEdgeFunctionRole.Arn
-      Runtime: nodejs24.x
+      Runtime: nodejs22.x
       Handler: index.handler
       Timeout: 5
 
