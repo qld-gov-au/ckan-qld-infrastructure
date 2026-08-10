@@ -24,21 +24,18 @@ exports.handler = async (event, context) => {
   /*console.log('Query String: ', request.querystring);*/
 
   /* Parse request query string to get javascript object */
-  const params = querystring.parse(request.querystring);
-  const sortedParams = {};
+  const params = new URLSearchParams(request.querystring);
 
   /* Ensure that the search parameter is 'q' not 'query' */
   if (params.has('query') && !params.has('q')) {
-    params['q'] = params['query'];
+    params.set('q', params.get('query'));
   }
 
   /* Sort param keys */
-  Object.keys(params).sort().forEach(key => {
-    sortedParams[key] = params[key];
-  });
+  params.sort();
 
-  /* Update request querystring with normalized  */
-  request.querystring = querystring.stringify(sortedParams);
+  /* Update request query string with normalized  */
+  request.querystring = params.toString();
 
   /* redirect root domain to www for prod */
   let queryStringOutput = request.querystring ? '?' + request.querystring : ''
@@ -56,7 +53,7 @@ exports.handler = async (event, context) => {
     };
     return redirect;
   } else {
-    /* passthrough with normalized querystring params */
+    /* passthrough with normalized query string params */
     return request;
   }
 };
