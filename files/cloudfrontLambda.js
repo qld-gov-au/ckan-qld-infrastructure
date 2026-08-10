@@ -29,6 +29,7 @@ exports.handler = async (event, context) => {
   /* Ensure that the search parameter is 'q' not 'query' */
   if (params.has('query') && !params.has('q')) {
     params.set('q', params.get('query'));
+    params.delete('query');
   }
 
   /* Sort param keys */
