@@ -7,7 +7,7 @@ without removing capital case
 
 const querystring = require('querystring');
 
-exports.handler = (event, context, callback) => {
+exports.handler = async (event, context) => {
   const request = event.Records[0].cf.request;
   /* When you configure a distribution to forward query strings to the origin and
    * to cache based on a whitelist of query string parameters, we recommend
@@ -54,9 +54,9 @@ exports.handler = (event, context, callback) => {
         "access-control-allow-headers": [{ key: "Access-Control-Allow-Headers", value: "X-CKAN-API-KEY, Authorization, Content-Type" }]
       }
     };
-    callback(null, redirect);
+    return redirect;
   } else {
     /* passthrough with normalized querystring params */
-    callback(null, request);
+    return request;
   }
 };
