@@ -1,0 +1,26 @@
+---
+- name: Cloudformation Playbook
+  hosts: local
+  connection: local
+
+  pre_tasks:
+    - name: Generate Lambda request file hash
+      shell: >
+        md5sum files/cloudfrontLambda.js | awk '{print substr($1, 1, 20)}'
+      register: hash_output
+    - set_fact:
+        lambda_request_source_hash: "{{ hash_output.stdout_lines[0] }}"
+
+    - name: Generate Lambda origin file hash
+      shell: >
+        md5sum files/cloudfrontOriginLambda.js | awk '{print substr($1, 1, 20)}'
+      register: hash_output
+    - set_fact:
+        lambda_origin_source_hash: "{{ hash_output.stdout_lines[0] }}"
+
+    - name: Set basic facts
+      import_tasks: basic_facts.yml
+
+    - include_vars: vars/cloudfront-lambda-at-edge.var.yml
+  roles:
+    - ansible_cloudformation

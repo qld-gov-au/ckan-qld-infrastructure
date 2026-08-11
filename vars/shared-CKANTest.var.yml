@@ -132,6 +132,10 @@ extensions:
 
   TRAINING:
     <<: *default_extensions
+    CKANExtDataQld:
+      <<: *CKANExtDataQld
+      version: "develop"
+
 
   DEV:
     <<: *default_extensions

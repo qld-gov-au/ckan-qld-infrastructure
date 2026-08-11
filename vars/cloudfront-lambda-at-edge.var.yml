@@ -7,6 +7,7 @@ cloudformation_stacks:
     region: "us-east-1"
     disable_rollback: 'true'
     template: "{{ template }}"
+    template_jinja: "{{ template }}.j2"
     template_parameters:
       Environment: "{{ Environment }}"
       SiteDomain: "{{ SiteDomain }}"

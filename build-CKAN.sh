@@ -241,8 +241,8 @@ run-all-playbooks () {
     echo "Failed to create machine images for $INSTANCE_NAME" >&2
     exit 1
   fi
-  run-playbook "CloudFormation" "vars/instances-${INSTANCE_NAME}.var.yml"
-  run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
+  run-playbook "instances.yml"
+  run-playbook "cloudfront-lambda"
   run-playbook "cloudfront"
   run-deployment
 }
