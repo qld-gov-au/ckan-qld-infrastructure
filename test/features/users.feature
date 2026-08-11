@@ -145,10 +145,12 @@ Feature: User APIs
     @email
     Scenario: As a registered user, when I have locked my account with too many failed logins, I can reset my password to unlock it
         Given "CKANUser" as the persona
-        When I lock my account
+        When I expand the browser height
+        And I lock my account
         And I go to "/user/login"
         And I attempt to log in with password "$password"
         Then I should see "Login failed"
+
         When I request a password reset
         Then I should see an element with xpath "//div[contains(string(), 'A reset link has been emailed to you')]"
         When I wait for 3 seconds
