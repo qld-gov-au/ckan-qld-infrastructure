@@ -69,8 +69,8 @@ run-deployment () {
 
 create-baseline-ami () {
   # https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html
-  # Amazon Linux 2023 AMI 2023.12.20260727.0 arm64 HVM kernel-6.1 (al2023-ami-2023.12.20260727.0-kernel-6.1-arm64) - 2026-07-25T00:03:18.000Z
-  VANILLA_IMAGE_ID="ami-0f707e657d81da75d"
+  # Amazon Linux 2023 AMI 2023.12.20260803.3 arm64 HVM kernel-6.12 (al2023-ami-2023.12.20260803.3-kernel-6.12-arm64) - 2026-08-03T17:37:49.000Z
+  VANILLA_IMAGE_ID="ami-0d2316cef187452bf"
   read -r \
     LATEST_IMAGE_NAME \
     LATEST_VANILLA_IMAGE \
@@ -104,6 +104,14 @@ create-baseline-ami () {
       return 0
     fi
   fi
+  # check if the image was previously generated
+  TARGET_IMAGE_NAME="${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}"
+  EXISTING_IMAGE_ID=$(aws ec2 describe-images --filters "Name=name,Values=$TARGET_IMAGE_NAME" --query "ImageId" --output text)
+  if [ "$EXISTING_IMAGE_ID" != "" ]; then
+    echo "Found existing image $EXISTING_IMAGE_ID installing Chef on desired platform $VANILLA_IMAGE_ID"
+    aws ssm put-parameter --overwrite --type String --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --value "$EXISTING_IMAGE_ID" || return 1
+    return 0
+  fi
   SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
     --query "SecurityGroups[0].GroupId" --output text)
   INSTANCE_PROFILE_NAME=$(aws iam list-instance-profiles \
@@ -119,6 +127,7 @@ PARAMETER_STRING
   )
   INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
     --subnet-id "$SUBNET_ID" --user-data "$USER_DATA" \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=AMI_Chef_Setup_${ENVIRONMENT}},{Key=Environment,Value=$ENVIRONMENT},{Key=Service,Value=CKAN}]" \
     --query "Instances[0].InstanceId" --output text)
   if [ "$INSTANCE_ID" = "" ]; then
     echo "Failed to start template instance" >&2
@@ -129,13 +138,13 @@ PARAMETER_STRING
 
   STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
   echo "Instance $INSTANCE_ID status: $STATUS" >&2
-  for retry in `seq 1 20`; do
+  for retry in `seq 1 60`; do
     if [ "$STATUS" = "stopped" ]; then
       break
     else
       sleep 10
       STATUS=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[].Instances[].State.Name" --output text) || return 1
-      echo "Instance $INSTANCE_ID status: $STATUS" >&2
+      echo "Instance $INSTANCE_ID status: $STATUS check $retry" >&2
     fi
   done
   if [ "$STATUS" != "stopped" ]; then
@@ -146,13 +155,14 @@ PARAMETER_STRING
   echo "Instance $INSTANCE_ID is ready, generating image..." >&2
 
   AMI_ID=$(aws ec2 create-image --instance-id "$INSTANCE_ID" --no-reboot \
-    --name "${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}" \
+    --name "$TARGET_IMAGE_NAME" \
     --description "Baseline AMI for CKAN instances, built from $VANILLA_IMAGE_ID plus Chef" \
     --tag-specifications "ResourceType=image,Tags=[{Key=Version,Value=${VANILLA_IMAGE_ID}}]" \
     --query "ImageId" --output text
   )
   if [ "$AMI_ID" = "" ]; then
     echo "Failed to create image, you may wish to investigate $INSTANCE_ID and manually terminate it!" >&2
+    echo "If this a higher environment, please copy ami from /config/CKAN/DEV/common/BaselineAmiId into param store /config/CKAN/$ENVIRONMENT/common/BaselineAmiId and restart the deployment"
     return 1
   fi
   aws ec2 wait image-available --image-ids "$AMI_ID" || return 1
@@ -231,8 +241,8 @@ run-all-playbooks () {
     echo "Failed to create machine images for $INSTANCE_NAME" >&2
     exit 1
   fi
-  run-playbook "CloudFormation" "vars/instances-${INSTANCE_NAME}.var.yml"
-  run-playbook "CloudFormation" "vars/cloudfront-lambda-at-edge.var.yml"
+  run-playbook "instances.yml"
+  run-playbook "cloudfront-lambda"
   run-playbook "cloudfront"
   run-deployment
 }

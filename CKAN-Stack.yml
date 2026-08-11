@@ -1,20 +1,11 @@
 ---
-- name: Cloudformation Playbook
+- name: Set up CKAN stack parameters
   hosts: local
   connection: local
 
   pre_tasks:
-    - name: get basic_facts
-      set_fact:
-        basic_fact={{ item }}
-#        CKANSource={{ item.CKANSource }}
-      when: item.Environment == Environment
-      with_items: "{{ basic_facts }}"
-
-    - name: set facts to environment from basic_fact
-      set_fact: "{{ item.key }}={{ item.value }}"
-      with_dict: "{{ basic_fact }}"
-      when: basic_fact is defined
+    - name: Set basic facts
+      import_tasks: basic_facts.yml
 
     - set_fact:
         acm_stack_name: "{{ service_name }}-{{ Environment }}-acm"

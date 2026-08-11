@@ -7,114 +7,54 @@ without removing capital case
 
 const querystring = require('querystring');
 
-exports.redirectGen = (alternativeHostname, request ) => {
-    return {
-        status: '301',
-        statusDescription: `Redirecting to apex domain`,
-        headers: {
-            location: [{
-                key: 'Location',
-                value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}`
-            }],
-            "access-control-allow-origin": [{
-                key: "Access-Control-Allow-Origin",
-                value: "*"
-            }],
-            "access-control-allow-methods": [{
-                key: "Access-Control-Allow-Methods'",
-                value: "POST, PUT, GET, DELETE, OPTIONS"
-            }],
-            "access-control-allow-headers": [{
-                key: "Access-Control-Allow-Headers",
-                value: "X-CKAN-API-KEY, Authorization, Content-Type"
-            }]
-        }
+exports.handler = async (event, context) => {
+  const request = event.Records[0].cf.request;
+  /* When you configure a distribution to forward query strings to the origin and
+   * to cache based on a whitelist of query string parameters, we recommend
+   * the following to improve the cache-hit ratio:
+   * - Always list parameters in the same order.
+   *
+   * This function normalizes query strings so that parameter names and values
+   * are lowercase and parameter names are in alphabetical order.
+   *
+   * For more information, see:
+   * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/QueryStringParameters.html
+   */
+
+  /*console.log('Query String: ', request.querystring);*/
+
+  /* Parse request query string to get javascript object */
+  const params = new URLSearchParams(request.querystring);
+
+  /* Ensure that the search parameter is 'q' not 'query' */
+  if (params.has('query') && !params.has('q')) {
+    params.set('q', params.get('query'));
+    params.delete('query');
+  }
+
+  /* Sort param keys */
+  params.sort();
+
+  /* Update request query string with normalized  */
+  request.querystring = params.toString();
+
+  /* redirect root domain to www for prod */
+  let queryStringOutput = request.querystring ? '?' + request.querystring : ''
+  let siteDomain = '${SiteDomain}'
+  if (request.headers.host[0].value !== siteDomain) {
+    let redirect = {
+      status: '301',
+      statusDescription: `Redirecting to site domain`,
+      headers: {
+        location: [{ key: 'Location', value: 'https://' + siteDomain + request.uri + queryStringOutput }],
+        "access-control-allow-origin": [{ key: "Access-Control-Allow-Origin", value: "*" }],
+        "access-control-allow-methods": [{ key: "Access-Control-Allow-Methods", value: "POST, PUT, GET, DELETE, OPTIONS" }],
+        "access-control-allow-headers": [{ key: "Access-Control-Allow-Headers", value: "X-CKAN-API-KEY, Authorization, Content-Type" }]
+      }
     };
-};
-
-exports.handler = (event, context, callback) => {
-    const request = event.Records[0].cf.request;
-    /* When you configure a distribution to forward query strings to the origin and
-     * to cache based on a whitelist of query string parameters, we recommend
-     * the following to improve the cache-hit ratio:
-     * - Always list parameters in the same order.
-     *
-     * This function normalizes query strings so that parameter names and values
-     * are lowercase and parameter names are in alphabetical order.
-     *
-     * For more information, see:
-     * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/QueryStringParameters.html
-     */
-
-    //console.log('Query String: ', request.querystring);
-
-    /* Parse request query string to get javascript object */
-    const params = querystring.parse(request.querystring);
-    const sortedParams = {};
-
-    /* Sort param keys */
-    Object.keys(params).sort().forEach(key => {
-        sortedParams[key] = params[key];
-    });
-
-    /* Update request querystring with normalized  */
-    request.querystring = querystring.stringify(sortedParams);
-
-    /* redirect root domain to www for prod*/
-    if ((request.headers.host[0].value === 'data.qld.gov.au' || request.headers.host[0].value === 'publications.qld.gov.au' ) && request.method !== 'POST') {
-        let alternativeHostname = 'www.' + request.headers.host[0].value;
-        let redirect = {
-            status: '301',
-            statusDescription: `Redirecting to apex domain`,
-            headers: {
-                location: [{
-                    key: 'Location',
-                    value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}`
-                }],
-                "access-control-allow-origin": [{
-                    key: "Access-Control-Allow-Origin",
-                    value: "*"
-                }],
-                "access-control-allow-methods": [{
-                    key: "Access-Control-Allow-Methods'",
-                    value: "POST, PUT, GET, DELETE, OPTIONS"
-                }],
-                "access-control-allow-headers": [{
-                    key: "Access-Control-Allow-Headers",
-                    value: "X-CKAN-API-KEY, Authorization, Content-Type"
-                }]
-            }
-        };
-        //302 redirect
-        callback(null, redirect);
-    } else  if (request.headers.host[0].value.startsWith('www.') && request.method !== 'POST') {
-        let alternativeHostname = request.headers.host[0].value.substring(4);
-        let redirect = {
-            status: '301',
-            statusDescription: `Redirecting to apex domain`,
-            headers: {
-                location: [{
-                    key: 'Location',
-                    value: `https://${alternativeHostname}${request.uri}${request.querystring ? '?' + request.querystring : ''}`
-                }],
-                "access-control-allow-origin": [{
-                    key: "Access-Control-Allow-Origin",
-                    value: "*"
-                }],
-                "access-control-allow-methods": [{
-                    key: "Access-Control-Allow-Methods'",
-                    value: "POST, PUT, GET, DELETE, OPTIONS"
-                }],
-                "access-control-allow-headers": [{
-                    key: "Access-Control-Allow-Headers",
-                    value: "X-CKAN-API-KEY, Authorization, Content-Type"
-                }]
-            }
-        };
-        //302 redirect
-        callback(null, redirect);
-    } else {
-        //passthrough with normalized querystring params
-        callback(null, request);
-    }
+    return redirect;
+  } else {
+    /* passthrough with normalized query string params */
+    return request;
+  }
 };
