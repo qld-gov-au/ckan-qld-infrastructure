@@ -57,7 +57,7 @@ extensions:
     CKANExtS3Filestore: &CKANExtS3Filestore
       shortname: "ckanext-s3filestore"
       description: "CKAN Extension to keep uploaded files in S3"
-      version: "0.9.0"
+      version: "0.10.0"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       shortname: "ckanext-ssm-config"
@@ -169,7 +169,7 @@ extensions:
 
     CKANExtYTP:
       <<: *CKANExtYTP
-      version: "master"
+      version: "develop"
 
     CKANExtSSMConfig:
       <<: *CKANExtSSMConfig
