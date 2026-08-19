@@ -106,7 +106,7 @@ create-baseline-ami () {
   fi
   # check if the image was previously generated
   TARGET_IMAGE_NAME="${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}"
-  EXISTING_IMAGE_ID=$(aws ec2 describe-images --filters "Name=name,Values=$TARGET_IMAGE_NAME" --query "ImageId" --output text)
+  EXISTING_IMAGE_ID=$(aws ec2 describe-images --filters "Name=name,Values=$TARGET_IMAGE_NAME" --query "ImageId" --output text |grep -vi '^None$')
   if [ "$EXISTING_IMAGE_ID" != "" ]; then
     echo "Found existing image $EXISTING_IMAGE_ID installing Chef on desired platform $VANILLA_IMAGE_ID"
     aws ssm put-parameter --overwrite --type String --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --value "$EXISTING_IMAGE_ID" || return 1
