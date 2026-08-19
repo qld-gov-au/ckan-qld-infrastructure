@@ -69,8 +69,8 @@ run-deployment () {
 
 create-baseline-ami () {
   # https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html
-  # Amazon Linux 2023 AMI 2023.12.20260803.3 arm64 HVM kernel-6.12 (al2023-ami-2023.12.20260803.3-kernel-6.12-arm64) - 2026-08-03T17:37:49.000Z
-  VANILLA_IMAGE_ID="ami-0d2316cef187452bf"
+  # Amazon Linux 2023 AMI 2023.12.20260817.0 arm64 HVM kernel-6.12 (al2023-ami-2023.12.20260817.0-kernel-6.12-arm64) - 2026-08-12T23:49:31.000Z
+  VANILLA_IMAGE_ID="ami-0fe99bfb009b02407"
   read -r \
     LATEST_IMAGE_NAME \
     LATEST_VANILLA_IMAGE \
@@ -106,7 +106,7 @@ create-baseline-ami () {
   fi
   # check if the image was previously generated
   TARGET_IMAGE_NAME="${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}"
-  EXISTING_IMAGE_ID=$(aws ec2 describe-images --filters "Name=name,Values=$TARGET_IMAGE_NAME" --query "ImageId" --output text)
+  EXISTING_IMAGE_ID=$(aws ec2 describe-images --filters "Name=name,Values=$TARGET_IMAGE_NAME" --query "ImageId" --output text |grep -vi '^None$')
   if [ "$EXISTING_IMAGE_ID" != "" ]; then
     echo "Found existing image $EXISTING_IMAGE_ID installing Chef on desired platform $VANILLA_IMAGE_ID"
     aws ssm put-parameter --overwrite --type String --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --value "$EXISTING_IMAGE_ID" || return 1
