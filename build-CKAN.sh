@@ -121,8 +121,16 @@ create-baseline-ami () {
   USER_DATA=$(cat <<'PARAMETER_STRING'
 #!/bin/sh
 OMNITRUCK_URL="https://omnitruck.chef.io/stable/chef/metadata?v=18.8&p=el&pv=8&m=aarch64"
-RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
-dnf install -y libxcrypt-compat $RPM_URL && shutdown -P now
+MAX_ATTEMPTS=5
+attempt=1
+while [ $attempt -le $MAX_ATTEMPTS ]; do
+  attempt=$((attempt + 1))
+  RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
+  if [ "$RPM_URL" != "" ]; then
+    dnf install -y libxcrypt-compat $RPM_URL && shutdown -P now
+    exit $?
+  fi
+done
 PARAMETER_STRING
   )
   INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
