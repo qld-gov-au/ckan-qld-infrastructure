@@ -5,6 +5,7 @@ title: Publications
 enable_datastore: "no"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: publications.qld.gov.au
+public_subdomain: "{{ Environment | lower }}.{{ public_tld }}"
 squiz_domain: ""
 
 # By default, extensions are installed as:
@@ -119,21 +120,21 @@ basic_facts:
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.{{ Environment }}.{{ public_tld }},{{ Environment }}.{{ public_tld }}" #Cloudfront Alt Domains
-    SiteDomain: "{{ Environment }}.{{ public_tld }}" #CKAN SiteDomain
-    RootDomain: "{{ Environment }}.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    Domain: "www.{{ public_subdomain }},{{ public_subdomain }}" #Cloudfront Alt Domains
+    SiteDomain: "{{ public_subdomain }}" #CKAN SiteDomain
+    RootDomain: "{{ public_subdomain }}" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.{{ Environment }}.{{ public_tld }},{{ Environment }}.{{ public_tld }}" #Cloudfront Alt Domains
-    SiteDomain: "{{ Environment }}.{{ public_tld }}" #CKAN SiteDomain
-    RootDomain: "{{ Environment }}.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    Domain: "www.{{ public_subdomain }},{{ public_subdomain }}" #Cloudfront Alt Domains
+    SiteDomain: "{{ public_subdomain }}" #CKAN SiteDomain
+    RootDomain: "{{ public_subdomain }}" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.{{ Environment }}.{{ public_tld }},{{ Environment }}.{{ public_tld }}" #Cloudfront Alt Domains
-    SiteDomain: "{{ Environment }}.{{ public_tld }}" #CKAN SiteDomain
-    RootDomain: "{{ Environment }}.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    Domain: "www.{{ public_subdomain }},{{ public_subdomain }}" #Cloudfront Alt Domains
+    SiteDomain: "{{ public_subdomain }}" #CKAN SiteDomain
+    RootDomain: "{{ public_subdomain }}" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "{{ squiz_domain }}"
