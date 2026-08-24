@@ -39,10 +39,10 @@ extensions:
 
     # Queensland Government
 
-#    CKANExtAuth: &CKANExtAuth
-#      shortname: "ckanext-auth"
-#      description: "CKAN Auth Extension"
-#      version: "v0.5.1-qgov.2"
+    CKANExtAuth: &CKANExtAuth
+      shortname: "ckanext-auth"
+      description: "CKAN Auth Extension"
+      version: "v0.5.1-qgov.2"
 
     CKANExtXLoader: &CKANExtXLoader
       shortname: "ckanext-xloader"
@@ -129,11 +129,6 @@ extensions:
 
   STAGING:
     <<: *default_extensions
-    #Remove once we are going to prod
-    CKANExtAuth:
-      shortname: "ckanext-auth"
-      description: "CKAN Auth Extension"
-      version: "v0.5.1-qgov.2"
 
   TRAINING:
     <<: *default_extensions
@@ -145,9 +140,7 @@ extensions:
       version: "develop"
 
     CKANExtAuth:
-      #<<: *CKANExtAuth
-      shortname: "ckanext-auth"
-      description: "CKAN Auth Extension"
+      <<: *CKANExtAuth
       version: "develop"
 
     CKANExtQGOV:
