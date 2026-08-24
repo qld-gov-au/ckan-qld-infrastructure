@@ -8,7 +8,6 @@ common_stack: &common_stack
   template_parameters: &common_stack_template_parameters
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name_lower }}"
-    BatchEC2Size: t4g.micro
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
@@ -32,6 +31,9 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: PROD
+      WebEC2Size: t4g.medium
+      SolrEC2Size: t4g.medium
+      WebEC2Count: 4
     tags:
       <<: *common_stack_tags
       PowerManaged: "No"
@@ -60,10 +62,11 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: DEV
+      WebEC2Size: t4g.micro
       SolrEC2Size: t4g.micro
       SolrEC2Count: 1
       WebEC2Count: 1
-      WebEC2Size: t4g.micro
+
     tags:
       <<: *common_stack_tags
       PowerManaged: "Yes"
