@@ -120,21 +120,21 @@ basic_facts:
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.{{ public_subdomain }},{{ public_subdomain }}" #Cloudfront Alt Domains
+    Domain: "{{ public_subdomain }}" #Cloudfront Alt Domains
     SiteDomain: "{{ public_subdomain }}" #CKAN SiteDomain
     RootDomain: "{{ public_subdomain }}" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.{{ public_subdomain }},{{ public_subdomain }}" #Cloudfront Alt Domains
+    Domain: "{{ public_subdomain }}" #Cloudfront Alt Domains
     SiteDomain: "{{ public_subdomain }}" #CKAN SiteDomain
     RootDomain: "{{ public_subdomain }}" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.{{ public_subdomain }},{{ public_subdomain }}" #Cloudfront Alt Domains
+    Domain: "{{ public_subdomain }}" #Cloudfront Alt Domains
     SiteDomain: "{{ public_subdomain }}" #CKAN SiteDomain
     RootDomain: "{{ public_subdomain }}" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "{{ squiz_domain }}"
