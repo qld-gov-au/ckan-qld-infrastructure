@@ -5,6 +5,7 @@ title: Data
 enable_datastore: "yes"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: data.qld.gov.au
+squiz_domain: "ssqld-1854.saas.squiz.cloud"
 
 # By default, extensions are installed as:
 # pip install -e 'git+https://github.com/qld-gov-au/<shortname>.git@<version>#egg=<shortname>'
@@ -207,28 +208,28 @@ extensions:
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.data.qld.gov.au,data.qld.gov.au" #Cloudfront Alt Domains
-    SiteDomain: "www.data.qld.gov.au" #CKAN SiteDomain
-    RootDomain: "data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
+    Domain: "www.{{ public_tld }},{{ public_tld }}" #Cloudfront Alt Domains
+    SiteDomain: "www.{{ public_tld }}" #CKAN SiteDomain
+    RootDomain: "{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.staging.data.qld.gov.au,staging.data.qld.gov.au" #Cloudfront Alt Domains
-    SiteDomain: "staging.data.qld.gov.au" #CKAN SiteDomain
-    RootDomain: "staging.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
+    Domain: "www.{{ Environment }}.{{ public_tld }},{{ Environment }}.{{ public_tld }}" #Cloudfront Alt Domains
+    SiteDomain: "{{ Environment }}.{{ public_tld }}" #CKAN SiteDomain
+    RootDomain: "{{ Environment }}.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.training.data.qld.gov.au,training.data.qld.gov.au" #Cloudfront Alt Domains
-    SiteDomain: "training.data.qld.gov.au" #CKAN SiteDomain
-    RootDomain: "training.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
+    Domain: "www.{{ Environment }}.{{ public_tld }},{{ Environment }}.{{ public_tld }}" #Cloudfront Alt Domains
+    SiteDomain: "{{ Environment }}.{{ public_tld }}" #CKAN SiteDomain
+    RootDomain: "{{ Environment }}.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.dev.data.qld.gov.au,dev.data.qld.gov.au" #Cloudfront Alt Domains
-    SiteDomain: "dev.data.qld.gov.au" #CKAN SiteDomain
-    RootDomain: "dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
+    Domain: "www.{{ Environment }}.{{ public_tld }},{{ Environment }}.{{ public_tld }}" #Cloudfront Alt Domains
+    SiteDomain: "{{ Environment }}.{{ public_tld }}" #CKAN SiteDomain
+    RootDomain: "{{ Environment }}.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "{{ squiz_domain }}"
