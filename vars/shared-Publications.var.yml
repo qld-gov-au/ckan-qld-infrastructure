@@ -5,6 +5,7 @@ title: Publications
 enable_datastore: "no"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: publications.qld.gov.au
+squiz_domain: ""
 
 # By default, extensions are installed as:
 # pip install -e 'git+https://github.com/qld-gov-au/<shortname>.git@<version>#egg=<shortname>'
@@ -111,28 +112,28 @@ extensions:
 basic_facts:
   - Environment: PROD
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.publications.qld.gov.au,publications.qld.gov.au"
-    SiteDomain: "www.publications.qld.gov.au" #CKAN SiteDomain
-    RootDomain: "publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: ""
+    Domain: "www.{{ public_tld }},{{ public_tld }}" #Cloudfront Alt Domains
+    SiteDomain: "www.{{ public_tld }}" #CKAN SiteDomain
+    RootDomain: "{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: STAGING
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "staging.publications.qld.gov.au" #Cloudfront Alt Domains
-    SiteDomain: "staging.publications.qld.gov.au" #CKAN SiteDomain
-    RootDomain: "staging.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: ""
+    Domain: "www.{{ Environment }}.{{ public_tld }},{{ Environment }}.{{ public_tld }}" #Cloudfront Alt Domains
+    SiteDomain: "{{ Environment }}.{{ public_tld }}" #CKAN SiteDomain
+    RootDomain: "{{ Environment }}.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "training.publications.qld.gov.au" #Cloudfront Alt Domains
-    SiteDomain: "training.publications.qld.gov.au" #CKAN SiteDomain
-    RootDomain: "training.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: ""
+    Domain: "www.{{ Environment }}.{{ public_tld }},{{ Environment }}.{{ public_tld }}" #Cloudfront Alt Domains
+    SiteDomain: "{{ Environment }}.{{ public_tld }}" #CKAN SiteDomain
+    RootDomain: "{{ Environment }}.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "dev.publications.qld.gov.au" #Cloudfront Alt Domains
-    SiteDomain: "dev.publications.qld.gov.au" #CKAN SiteDomain
-    RootDomain: "dev.publications.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: ""
+    Domain: "www.{{ Environment }}.{{ public_tld }},{{ Environment }}.{{ public_tld }}" #Cloudfront Alt Domains
+    SiteDomain: "{{ Environment }}.{{ public_tld }}" #CKAN SiteDomain
+    RootDomain: "{{ Environment }}.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    CmsOrigin: "{{ squiz_domain }}"
