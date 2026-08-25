@@ -42,7 +42,7 @@ extensions:
     CKANExtAuth: &CKANExtAuth
       shortname: "ckanext-auth"
       description: "CKAN Auth Extension"
-      version: "v0.5.1-qgov.3"
+      version: "v0.5.1-qgov.4"
 
     CKANExtXLoader: &CKANExtXLoader
       shortname: "ckanext-xloader"
@@ -52,7 +52,7 @@ extensions:
     CKANExtQGOV: &CKANExtQGOV
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government sites"
-      version: "7.4.1"
+      version: "7.4.2"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       shortname: "ckanext-s3filestore"
