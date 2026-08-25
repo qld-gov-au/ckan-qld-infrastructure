@@ -62,11 +62,11 @@ Feature: Group APIs
         Then I should see an element with xpath "//form//a[normalize-space() = '$group_title']"
 
         When I go to dataset page
-        Then I should see a search facet for "$group_title" truncated to "Group name more"
-        When I press the search facet pointing to "$group_title"
-        Then I should see an active search facet for "$group_title" truncated to "Group name more"
+        Then I should see a search facet for "Group name more than 35 characters" truncated to "Group name more"
+        When I press the search facet pointing to "Group name more than 35 characters"
+        Then I should see an active search facet for "Group name more than 35 characters" truncated to "Group name more"
 
         When I go to dataset page
-        Then I should see a search facet for "$group_title" truncated to "Group name more"
-        When I press the search facet pointing to "$group_title"
-        Then I should see an active search facet for "$group_title" truncated to "Group name more"
+        Then I should see a search facet for "Group name more than 35 characters" truncated to "Group name more"
+        When I press the search facet pointing to "Group name more than 35 characters"
+        Then I should see an active search facet for "Group name more than 35 characters" truncated to "Group name more"
