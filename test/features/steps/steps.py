@@ -127,6 +127,7 @@ def attempt_login(context, password):
 @then(u'I should see the login form')
 def login_link_visible(context):
     context.execute_steps(u"""
+        When I expand the browser height
         Then I should see an element with xpath "//h1[contains(string(), 'Log')]"
         And I should see an element with xpath "//a[contains(@href, '/oidc-pkce') and (contains(string(), 'Sign in') or contains(string(), 'Log in'))]"
         And I should see an element with xpath "//a[contains(@href, '/oidc-pkce') and contains(string(), 'Register')]"
