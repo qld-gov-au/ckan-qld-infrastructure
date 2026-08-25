@@ -24,7 +24,7 @@ extensions:
     CKANExtAuth: &CKANExtAuth
       shortname: "ckanext-auth"
       description: "CKAN Auth Extension"
-      version: "v0.5.1-qgov.2"
+      version: "v0.5.1-qgov.3"
 
     CKANExtQGOV: &CKANExtQGOV
       shortname: "ckanext-qgov"
