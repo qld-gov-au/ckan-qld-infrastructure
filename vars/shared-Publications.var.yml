@@ -21,15 +21,15 @@ extensions:
 
     # Queensland Government
 
-#    CKANExtAuth: &CKANExtAuth
-#      shortname: "ckanext-auth"
-#      description: "CKAN Auth Extension"
-#      version: "v0.5.1-qgov.2"
+    CKANExtAuth: &CKANExtAuth
+      shortname: "ckanext-auth"
+      description: "CKAN Auth Extension"
+      version: "v0.5.1-qgov.4"
 
     CKANExtQGOV: &CKANExtQGOV
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government sites"
-      version: "7.4.1"
+      version: "7.4.3"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       shortname: "ckanext-s3filestore"
@@ -44,7 +44,7 @@ extensions:
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
       shortname: "ckanext-publications-qld-theme"
       description: "CKAN Extension for Queensland Government Publications theme"
-      version: "2.1.0"
+      version: "2.1.1"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       shortname: "ckanext-resource-type-validation"
@@ -66,11 +66,6 @@ extensions:
 
   STAGING:
     <<: *default_extensions
-    #Remove once we are going to prod
-    CKANExtAuth:
-      shortname: "ckanext-auth"
-      description: "CKAN Auth Extension"
-      version: "v0.5.1-qgov.2"
 
   TRAINING:
     <<: *default_extensions
@@ -78,9 +73,7 @@ extensions:
   DEV:
     <<: *default_extensions
     CKANExtAuth:
-      #<<: *CKANExtAuth
-      shortname: "ckanext-auth"
-      description: "CKAN Auth Extension"
+      <<: *CKANExtAuth
       version: "develop"
 
     CKANExtQGOV:
