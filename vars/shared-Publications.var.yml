@@ -104,9 +104,6 @@ extensions:
       <<: *CKANExtOIDC
       version: "develop"
 
-    CKANExtSelfInfo:
-      <<: *CKANExtSelfInfo
-
 # Global variables to apply to this app's CloudFormation templates
 basic_facts:
   - Environment: PROD
