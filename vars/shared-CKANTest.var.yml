@@ -87,7 +87,7 @@ extensions:
     CKANExtReport: &CKANExtReport
       shortname: "ckanext-report"
       description: "CKAN Extension for Reporting"
-      version: "0.3.1-qgov.5"
+      version: "0.3.1-qgov.6"
 
     CKANExtArchiver: &CKANExtArchiver
       shortname: "ckanext-archiver"
