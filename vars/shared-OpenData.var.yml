@@ -92,7 +92,7 @@ extensions:
     CKANExtArchiver: &CKANExtArchiver
       shortname: "ckanext-archiver"
       description: "CKAN Extension for Archiving needed to support QA checks"
-      version: "2.1.1-qgov.19"
+      version: "2.1.1-qgov.20"
 
     CKANExtQa: &CKANExtQa
       shortname: "ckanext-qa"
