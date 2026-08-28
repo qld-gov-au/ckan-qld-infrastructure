@@ -77,7 +77,7 @@ extensions:
     CKANExtDataRequests: &CKANExtDataRequests
       shortname: "ckanext-datarequests"
       description: "CKAN Extension for Data Requests"
-      version: "2.2.1-qgov.15"
+      version: "2.2.1-qgov.16"
 
     CKANExtYTP: &CKANExtYTP
       shortname: "ckanext-ytp-comments"
