@@ -82,7 +82,7 @@ extensions:
     CKANExtYTP: &CKANExtYTP
       shortname: "ckanext-ytp-comments"
       description: "CKAN Extension for YTP Comments"
-      version: "2.5.4"
+      version: "2.5.5"
 
     CKANExtReport: &CKANExtReport
       shortname: "ckanext-report"
