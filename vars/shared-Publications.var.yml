@@ -39,7 +39,7 @@ extensions:
     CKANExtSSMConfig: &CKANExtSSMConfig
       shortname: "ckanext-ssm-config"
       description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
-      version: "0.1.1"
+      version: "0.1.2"
 
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
       shortname: "ckanext-publications-qld-theme"
