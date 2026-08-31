@@ -39,7 +39,7 @@ extensions:
     CKANExtSSMConfig: &CKANExtSSMConfig
       shortname: "ckanext-ssm-config"
       description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
-      version: "0.1.1"
+      version: "0.1.2"
 
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
       shortname: "ckanext-publications-qld-theme"
@@ -49,7 +49,7 @@ extensions:
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       shortname: "ckanext-resource-type-validation"
       description: "CKAN Extension for checking uploaded resource types"
-      version: "1.0.12"
+      version: "1.0.14"
 
     CKANExtCSRFFilter: &CKANExtCSRFFilter
       shortname: "ckanext-csrf-filter"
