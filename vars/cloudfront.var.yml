@@ -1,5 +1,10 @@
 ---
 template: "templates/cloudfront.cfn.yml"
+cloudfront_ssm_keys:
+  - "{{ ssm_app_prefix }}/web_loadbalancer_dns_name"
+  - /config/CKAN/s3LogsBucket
+  - "{{ ssm_app_prefix }}/s3AttachmentBucket"
+cloudfront_ssm_params: "{{ lookup('aws_ssm', cloudfront_ssm_keys, region=region) }}"
 
 cloudformation_stacks:
   - name: "{{ service_name }}-{{ Environment }}-CLOUDFRONT"
@@ -11,15 +16,15 @@ cloudformation_stacks:
     template_jinja: "{{ template }}.j2"
     template_parameters:
       OriginReadTimeout: 180 #service increase requested, we now have 3 min wait available
-      WebOrigin: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/web_loadbalancer_dns_name') }}"
+      WebOrigin: "{{ cloudfront_ssm_params['/config/CKAN/' + Environment + '/app/' + service_name_lower + '/web_loadbalancer_dns_name'] }}"
       CmsOrigin: "{{ CmsOrigin }}"
       WebACLId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/common/waf_acl_id', region='us-east-1') }}"
       Environment: "{{ Environment }}"
       Platform: "{{ service_name }}"
       ACMCertificateARN: "{{ ACMCertificateARNForUsEast1 }}"
       Domain: "{{ Domain }}"
-      LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
-      AttachmentBucketName: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket', region=region) }}"
+      LogBucketName: "{{ cloudfront_ssm_params['/config/CKAN/s3LogsBucket'] }}"
+      AttachmentBucketName: "{{ cloudfront_ssm_params['/config/CKAN/' + Environment + '/app/' + service_name_lower + '/s3AttachmentBucket'] }}"
       Region: "{{ region }}"
       Service: "{{ service_name }}"
       Division: "{{ Division }}"

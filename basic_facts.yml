@@ -8,3 +8,7 @@
   set_fact: "{{ item.key }}={{ item.value }}"
   with_dict: "{{ basic_fact }}"
   when: basic_fact is defined
+
+- name: set SSM prefix
+  set_fact:
+    ssm_app_prefix: "/config/CKAN/{{ Environment }}/app/{{ service_name_lower }}"

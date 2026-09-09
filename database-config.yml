@@ -28,15 +28,25 @@
         UserKey: "/config/CKAN/{{ Environment }}/db/{{ service_name_lower }}_user"
         PassKey: "/config/CKAN/{{ Environment }}/db/{{ service_name_lower }}_password"
 
+    - name: Look up parameter store values
+      set_fact:
+        db_ssm_params: "{{ lookup('aws_ssm', ssm_names, region=region) }}"
+      vars:
+        ssm_names:
+          - "{{ MasterUserKey }}"
+          - "{{ MasterPassKey }}"
+          - "{{ UserKey }}"
+          - "{{ PassKey }}"
+
     - name: Set variable (facts) dependencies
       set_fact:
         DBEndpoint: "{{ database['cloudformation'][Stack_Name].stack_outputs.DBEndpoint }}"
-        DBMasterPass: "{{ lookup('aws_ssm', MasterPassKey, region=region) }}"
-        DBMasterUser: "{{ lookup('aws_ssm', MasterUserKey, region=region) }}"
+        DBMasterPass: "{{ db_ssm_params[MasterPassKey] }}"
+        DBMasterUser: "{{ db_ssm_params[MasterUserKey] }}"
         DBName: "{{ service_name }}"
-        DBPass: "{{ lookup('aws_ssm', PassKey, region=region) }}"
+        DBPass: "{{ db_ssm_params[PassKey] }}"
         DBPort: "{{ database['cloudformation'][Stack_Name].stack_outputs.DBPort }}"
-        DBUser: "{{ lookup('aws_ssm', UserKey, region=region) }}"
+        DBUser: "{{ db_ssm_params[UserKey] }}"
 
   roles:
     - ansible-linux-postgres

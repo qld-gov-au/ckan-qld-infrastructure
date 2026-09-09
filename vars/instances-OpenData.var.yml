@@ -1,5 +1,10 @@
 ---
-# Amazon Linux 2023: al2023-ami-2023.4.20240611.0-kernel-6.1-x86_64
+ami_id_keys:
+  - "{{ ssm_app_prefix }}/BatchAmiId"
+  - "{{ ssm_app_prefix }}/WebAmiId"
+  - "{{ ssm_app_prefix }}/SolrAmiId"
+ami_ids: "{{ lookup('aws_ssm', ami_id_keys) }}"
+
 common_stack: &common_stack
   state: "{{ state | default('present')}}"
   region: "{{ region }}"
@@ -9,14 +14,14 @@ common_stack: &common_stack
   template_parameters: &common_stack_template_parameters
     ApplicationName: "{{ service_name }}"
     ApplicationId: "{{ service_name_lower }}"
-    WebEC2Size: t4g.medium
-    BatchEC2Size: t4g.medium
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
-    BatchImageId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/BatchAmiId') | default(base_ami, True) }}"
-    WebImageId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/WebAmiId') | default(base_ami, True) }}"
-    SolrImageId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/SolrAmiId') | default(base_ami, True) }}"
+    WebEC2Size: t4g.medium
+    BatchEC2Size: t4g.medium
+    BatchImageId: "{{ ami_ids[ssm_app_prefix + '/BatchAmiId'] | default(base_ami, True) }}"
+    WebImageId: "{{ ami_ids[ssm_app_prefix + '/WebAmiId'] | default(base_ami, True) }}"
+    SolrImageId: "{{ ami_ids[ssm_app_prefix + '/SolrAmiId'] | default(base_ami, True) }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"
