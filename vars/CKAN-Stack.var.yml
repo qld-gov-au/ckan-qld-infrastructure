@@ -1,13 +1,6 @@
 ---
-GtmSsmKey: "/config/CKAN/GtmId{{ Environment == 'PROD' | ternary('Production', 'NonProduction') }}
-GaSsmKey: "/config/CKAN/GaId{{ Environment == 'PROD' | ternary('Production', 'NonProduction') }}
-stack_ssm_keys:
-  - /config/CKAN/ec2KeyPair
-  - /config/CKAN/s3LogsBucket
-  - "{{ ssm_app_prefix }}/s3AttachmentBucket"
-  - "{{ GtmSsmKey }}"
-  - "{{ GaSsmKey }}"
-stack_ssm_params: "{{ lookup('aws_ssm', stack_ssm_keys, region=region) }}"
+GtmSsmKey: "/config/CKAN/GtmId{{ 'Production' if Environment == 'PROD' else 'NonProduction' }}"
+GaSsmKey: "/config/CKAN/GaId{{ 'Production' if Environment == 'PROD' else 'NonProduction' }}"
 
 # move to https://downloads.apache.org/solr/solr/9.10.1/solr-9.10.1.tgz required, but major opsworks chef rework on how this occurs needs to happen prior
 # https://github.com/ckan/ckan-solr
@@ -43,14 +36,14 @@ common_stack: &common_stack
     DatabaseSG: "{{ Environment }}CKANDatabaseSG"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
     SSMKey: "{{ SSMKey | default('') }}"
-    DefaultEC2Key: "{{ stack_ssm_params['/config/CKAN/ec2KeyPair'] }}"
+    DefaultEC2Key: "{{ global_ssm_vars['/config/CKAN/ec2KeyPair'] }}"
     CookbookRevision: "{{ CookbookRevision | default('10.8.3') }}"
-    LogBucketName: "{{ stack_ssm_params['/config/CKAN/s3LogsBucket'] }}"
-    AttachmentsBucketName: "{{ stack_ssm_params[ssm_app_prefix + '/s3AttachmentBucket'] }}"
+    LogBucketName: "{{ global_ssm_vars['/config/CKAN/s3LogsBucket'] }}"
+    AttachmentsBucketName: "{{ environment_ssm_vars[ssm_app_prefix + '/s3AttachmentBucket'] }}"
     SolrSource: "{{ solr_url }}"
     PurlEndpoint: "https://test.smartservice.qld.gov.au/services/url/translate/v3.json?sourceurl={source}"
-    GTMContainerId: "{{ stack_ssm_params[GtmSsmKey] }}"
-    AnalyticsId: "{{ stack_ssm_params[GaSsmKey] }}"
+    GTMContainerId: "{{ global_ssm_vars[GtmSsmKey] }}"
+    AnalyticsId: "{{ global_ssm_vars[GaSsmKey] }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"

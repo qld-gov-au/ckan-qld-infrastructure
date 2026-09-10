@@ -1,16 +1,7 @@
 ---
-vpc_ssm_keys:
-  - /config/CKAN/opsVpcAccount
-  - /config/CKAN/opsVpcRole
-  - /config/CKAN/opsVpcId
-  - /config/CKAN/cicdIpA
-  - /config/CKAN/cicdIpB
-  - /config/CKAN/opsVpcCidr
-
-vpc_ssm_params: "{{ lookup('aws_ssm', vpc_ssm_keys, region=region) }}"
-opsAccount: "{{ vpc_ssm_params['/config/CKAN/opsVpcAccount'] }}"
-opsRole: "{{ vpc_ssm_params['/config/CKAN/opsVpcRole'] }}"
-opsVpcID:  "{{ vpc_ssm_params['/config/CKAN/opsVpcId'] }}"
+opsAccount: "{{ global_ssm_vars['/config/CKAN/opsVpcAccount'] }}"
+opsRole: "{{ global_ssm_vars['/config/CKAN/opsVpcRole'] }}"
+opsVpcID:  "{{ global_ssm_vars['/config/CKAN/opsVpcId'] }}"
 
 common_stack: &common_stack
   # VPC stacks cannot be properly torn down via Ansible
@@ -21,13 +12,13 @@ common_stack: &common_stack
   template_parameters: &common_stack_template_parameters
     ApplicationName: "CKAN"
     AZCount: '3'
-    BambooAgentIp: "{{ vpc_ssm_params['/config/CKAN/cicdIpA'] }}"
-    BambooAgentIp2: "{{ vpc_ssm_params['/config/CKAN/cicdIpB'] }}"
+    BambooAgentIp: "{{ global_ssm_vars['/config/CKAN/cicdIpA'] }}"
+    BambooAgentIp2: "{{ global_ssm_vars['/config/CKAN/cicdIpB'] }}"
     NatGateways: 'true'
     VPCNamePrefix: CKAN
     VPCPeeringEnabled: "{{ VPCPeeringEnabled | default('false') }} "
     VPCPeeringID: "{{ VPCPeeringID| default('') }}"
-    VPCPeeringCidr: "{{ vpc_ssm_params['/config/CKAN/opsVpcCidr'] }}"
+    VPCPeeringCidr: "{{ global_ssm_vars['/config/CKAN/opsVpcCidr'] }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "CKAN"

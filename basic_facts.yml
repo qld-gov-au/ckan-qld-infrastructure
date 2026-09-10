@@ -9,6 +9,25 @@
   with_dict: "{{ basic_fact }}"
   when: basic_fact is defined
 
-- name: set SSM prefix
+- name: get global SSM parameters
+  shell: |
+    aws ssm get-parameters-by-path --path "/config/CKAN/" --no-recursive --with-decryption --region "{{ region }}"
+  register: aws_cli_response
+
+- name: set global facts from parameter store
   set_fact:
+    global_ssm_vars: "{{ (aws_cli_response.stdout | from_json).Parameters | items2dict(key_name='Name', value_name='Value') }}"
+
+- name: set prefixes for SSM keys
+  set_fact:
+    ssm_env_prefix: "/config/CKAN/{{ Environment }}"
     ssm_app_prefix: "/config/CKAN/{{ Environment }}/app/{{ service_name_lower }}"
+
+- name: get SSM parameters for environment
+  shell: |
+    aws ssm get-parameters-by-path --path "/config/CKAN/{{ Environment }}" --recursive --with-decryption --region "{{ region }}"
+  register: aws_cli_response
+
+- name: set environment facts from parameter store
+  set_fact:
+    environment_ssm_vars: "{{ (aws_cli_response.stdout | from_json).Parameters | items2dict(key_name='Name', value_name='Value') }}"
