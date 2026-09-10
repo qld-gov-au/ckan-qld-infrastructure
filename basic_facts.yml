@@ -11,13 +11,14 @@
 
 - name: get global SSM parameters
   shell: |
-    aws ssm get-parameters-by-path --path "/config/CKAN/" --no-recursive --with-decryption --region "{{ region }}"
+    aws ssm get-parameters-by-path --path "/config/CKAN/" --no-recursive --with-decryption --region "{{ region }}" --output json
   register: aws_cli_response
   no_log: true
 
 - name: set global facts from parameter store
   set_fact:
     global_ssm_vars: "{{ (aws_cli_response.stdout | from_json).Parameters | items2dict(key_name='Name', value_name='Value') }}"
+  no_log: true
 
 - name: set prefixes for SSM keys
   set_fact:
@@ -26,10 +27,11 @@
 
 - name: get SSM parameters for environment
   shell: |
-    aws ssm get-parameters-by-path --path "/config/CKAN/{{ Environment }}" --recursive --with-decryption --region "{{ region }}"
+    aws ssm get-parameters-by-path --path "/config/CKAN/{{ Environment }}" --recursive --with-decryption --region "{{ region }}" --output json
   register: aws_cli_response
   no_log: true
 
 - name: set environment facts from parameter store
   set_fact:
     environment_ssm_vars: "{{ (aws_cli_response.stdout | from_json).Parameters | items2dict(key_name='Name', value_name='Value') }}"
+  no_log: true
