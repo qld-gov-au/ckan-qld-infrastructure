@@ -6,10 +6,10 @@ cloudformation_stacks:
     disable_rollback: true
     template: "templates/security_groups.cfn.yml"
     template_parameters:
-      BambooAgentIp: "{{ lookup('aws_ssm', '/config/CKAN/cicdIpA', region=region) }}"
-      BambooAgentIp2: "{{ lookup('aws_ssm', '/config/CKAN/cicdIpB', region=region) }}"
-      BambooAgentSecurityGroup: "{{ lookup('aws_ssm', '/config/CKAN/cicdSecurityGroup', region=region) }}"
-      VPCPeeringCidr: "{{ lookup('aws_ssm', '/config/CKAN/opsVpcCidr', region=region) }}"
+      BambooAgentIp: "{{ global_ssm_vars['/config/CKAN/cicdIpA'] }}"
+      BambooAgentIp2: "{{ global_ssm_vars['/config/CKAN/cicdIpB'] }}"
+      BambooAgentSecurityGroup: "{{ global_ssm_vars['/config/CKAN/cicdSecurityGroup'] }}"
+      VPCPeeringCidr: "{{ global_ssm_vars['/config/CKAN/opsVpcCidr'] }}"
       Environment: "{{ Environment }}"
       Platform: CKAN
       VPC: "CKANVpc-{{ Environment }}"
