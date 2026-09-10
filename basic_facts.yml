@@ -13,6 +13,7 @@
   shell: |
     aws ssm get-parameters-by-path --path "/config/CKAN/" --no-recursive --with-decryption --region "{{ region }}"
   register: aws_cli_response
+  no_log: true
 
 - name: set global facts from parameter store
   set_fact:
@@ -27,6 +28,7 @@
   shell: |
     aws ssm get-parameters-by-path --path "/config/CKAN/{{ Environment }}" --recursive --with-decryption --region "{{ region }}"
   register: aws_cli_response
+  no_log: true
 
 - name: set environment facts from parameter store
   set_fact:
