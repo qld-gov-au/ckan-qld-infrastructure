@@ -5,6 +5,7 @@ title: CKAN Test
 enable_datastore: "yes"
 #public_tld is the route53 domain which it uses to update as well as set ckan sitename domain unless cloudfront points at another domain 0_0
 public_tld: data.qld.gov.au
+squiz_domain: "ssqld-1854.saas.squiz.cloud"
 
 # By default, extensions are installed as:
 # pip install -e 'git+https://github.com/qld-gov-au/<shortname>.git@<version>#egg=<shortname>'
@@ -214,12 +215,12 @@ basic_facts:
     Domain: "www.test.data.qld.gov.au,test.data.qld.gov.au"
     SiteDomain: "test.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
+    CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
     Domain: "www.test-dev.data.qld.gov.au,test-dev.data.qld.gov.au"
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
-    CmsOrigin: "ssqld-1854.saas.squiz.cloud"
+    CmsOrigin: "{{ squiz_domain }}"
     CKANRevision: "qgov-master-2.12.0"
