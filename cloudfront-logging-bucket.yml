@@ -2,7 +2,11 @@
 - name: Cloudformation Playbook
   hosts: local
   connection: local
-  vars_files:
-    - vars/cloudfront-logging-bucket.var.yml
+  pre_tasks:
+    - name: Set basic facts
+      import_tasks: basic_facts.yml
+
+    - include_vars:
+        file: vars/cloudfront-logging-bucket.var.yml
   roles:
     - ansible_cloudformation

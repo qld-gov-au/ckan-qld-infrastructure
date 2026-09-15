@@ -6,7 +6,7 @@ cloudformation_stacks:
     disable_rollback: 'true'
     template: "templates/cloudfront-logging-bucket.cfn.yml"
     template_parameters:
-      LogBucketName: "{{ lookup('aws_ssm', '/config/CKAN/s3LogsBucket', region=region) }}"
+      LogBucketName: "{{ global_ssm_vars['/config/CKAN/s3LogsBucket'] }}"
     tags:
       Service: "CKAN"
       Division: "{{ Division }}"

@@ -11,7 +11,7 @@ common_stack: &common_stack
     ApplicationId: "{{ service_name_lower }}"
     Environment: "{{ Environment }}"
     AppSubnets: "{{ Environment }}CKANAppSubnet"
-    DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
+    DefaultEC2Key: "{{ global_ssm_vars['/config/CKAN/ec2KeyPair'] }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"

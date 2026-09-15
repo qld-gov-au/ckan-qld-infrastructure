@@ -2,13 +2,13 @@
 - name: Create Amazon Machine Images
   hosts: local
   connection: local
-  vars_files:
-    - vars/AMI-template-instances.var.yml
 
   pre_tasks:
     - name: Set basic facts
       import_tasks: basic_facts.yml
 
+    - include_vars:
+        file: vars/AMI-template-instances.var.yml
   tasks:
     - name: Get stack name
       set_fact:

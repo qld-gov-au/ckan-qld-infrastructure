@@ -2,9 +2,13 @@
 - name: Configure RDS Database Playbook
   hosts: localhost
   connection: local
-  vars_files:
-    - vars/database.var.yml
   pre_tasks:
+
+    - name: Set basic facts
+      import_tasks: basic_facts.yml
+
+    - include_vars:
+        file: vars/database.var.yml
 
     - name: Identify database (RDS) cloudformation stack
       set_fact:
@@ -23,20 +27,20 @@
 
     - name: Set parameter store keys for lookup
       set_fact:
-        MasterUserKey: "/config/CKAN/{{ Environment }}/db/master_user"
-        MasterPassKey: "/config/CKAN/{{ Environment }}/db/master_password"
-        UserKey: "/config/CKAN/{{ Environment }}/db/{{ service_name_lower }}_user"
-        PassKey: "/config/CKAN/{{ Environment }}/db/{{ service_name_lower }}_password"
+        MasterUserKey: "{{ ssm_env_prefix }}/db/master_user"
+        MasterPassKey: "{{ ssm_env_prefix }}/db/master_password"
+        UserKey: "{{ ssm_env_prefix }}/db/{{ service_name_lower }}_user"
+        PassKey: "{{ ssm_env_prefix }}/db/{{ service_name_lower }}_password"
 
     - name: Set variable (facts) dependencies
       set_fact:
         DBEndpoint: "{{ database['cloudformation'][Stack_Name].stack_outputs.DBEndpoint }}"
-        DBMasterPass: "{{ lookup('aws_ssm', MasterPassKey, region=region) }}"
-        DBMasterUser: "{{ lookup('aws_ssm', MasterUserKey, region=region) }}"
+        DBMasterPass: "{{ environment_ssm_vars[MasterPassKey] }}"
+        DBMasterUser: "{{ environment_ssm_vars[MasterUserKey] }}"
         DBName: "{{ service_name }}"
-        DBPass: "{{ lookup('aws_ssm', PassKey, region=region) }}"
+        DBPass: "{{ environment_ssm_vars[PassKey] }}"
         DBPort: "{{ database['cloudformation'][Stack_Name].stack_outputs.DBPort }}"
-        DBUser: "{{ lookup('aws_ssm', UserKey, region=region) }}"
+        DBUser: "{{ environment_ssm_vars[UserKey] }}"
 
   roles:
     - ansible-linux-postgres

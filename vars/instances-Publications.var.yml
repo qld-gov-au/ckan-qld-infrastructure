@@ -10,14 +10,14 @@ common_stack: &common_stack
     ApplicationId: "{{ service_name_lower }}"
     AppSubnets: "{{ Environment }}CKANAppSubnet"
     EnableDataStore: "{{ enable_datastore | default('no') }}"
-    DefaultEC2Key: "{{ lookup('aws_ssm', '/config/CKAN/ec2KeyPair', region=region) }}"
+    DefaultEC2Key: "{{ global_ssm_vars['/config/CKAN/ec2KeyPair'] }}"
     # Publications doesn't have many datasets or need much processing
     WebEC2Size: t4g.small
     BatchEC2Size: t4g.micro
     SolrEC2Size: t4g.small
-    BatchImageId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/BatchAmiId') | default(base_ami, True) }}"
-    WebImageId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/WebAmiId') | default(base_ami, True) }}"
-    SolrImageId: "{{ lookup('aws_ssm', '/config/CKAN/' + Environment + '/app/' + service_name_lower + '/SolrAmiId') | default(base_ami, True) }}"
+    BatchImageId: "{{ environment_ssm_vars[ssm_app_prefix + '/BatchAmiId'] | default(base_ami, True) }}"
+    WebImageId: "{{ environment_ssm_vars[ssm_app_prefix + '/WebAmiId'] | default(base_ami, True) }}"
+    SolrImageId: "{{ environment_ssm_vars[ssm_app_prefix + '/SolrAmiId'] | default(base_ami, True) }}"
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: "{{ service_name }}"

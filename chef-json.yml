@@ -2,11 +2,12 @@
 - name: Generate Chef custom JSON
   hosts: localhost
   connection: local
-  vars_files:
-    - vars/CKAN-Stack.var.yml
   pre_tasks:
     - name: Set basic facts
       import_tasks: basic_facts.yml
+
+    - include_vars:
+        file: vars/CKAN-Stack.var.yml
 
     - name: Identify cloudformation stack
       set_fact:
