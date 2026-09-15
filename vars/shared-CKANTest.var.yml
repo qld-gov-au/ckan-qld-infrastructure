@@ -212,15 +212,15 @@ extensions:
 basic_facts:
   - Environment: TRAINING
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.test.{{ public_tld }},test.{{ public_tld }}"
-    SiteDomain: "test.{{ public_tld }}" #CKAN SiteDomain
-    RootDomain: "test.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    Domain: "www.test.data.qld.gov.au,test.data.qld.gov.au"
+    SiteDomain: "test.data.qld.gov.au" #CKAN SiteDomain
+    RootDomain: "test.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "{{ squiz_domain }}"
 
   - Environment: DEV
     PublicStackZoneTLD: "{{ public_tld }}"
-    Domain: "www.test-dev.{{ public_tld }},test-dev.{{ public_tld }}"
-    SiteDomain: "test-dev.{{ public_tld }}" #CKAN SiteDomain
-    RootDomain: "test-dev.{{ public_tld }}" #ACM cert creation which also gets *.RootDomain
+    Domain: "www.test-dev.data.qld.gov.au,test-dev.data.qld.gov.au"
+    SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
+    RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "{{ squiz_domain }}"
     CKANRevision: "qgov-master-2.12.0"
