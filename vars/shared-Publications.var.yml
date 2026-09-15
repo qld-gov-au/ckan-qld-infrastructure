@@ -26,32 +26,32 @@ extensions:
     CKANExtAuth: &CKANExtAuth
       shortname: "ckanext-auth"
       description: "CKAN Auth Extension"
-      version: "v0.5.1-qgov.2"
+      version: "v0.5.1-qgov.4"
 
     CKANExtQGOV: &CKANExtQGOV
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government sites"
-      version: "7.4.1"
+      version: "7.4.4"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       shortname: "ckanext-s3filestore"
       description: "CKAN Extension to keep uploaded files in S3"
-      version: "0.10.0"
+      version: "0.10.1"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       shortname: "ckanext-ssm-config"
       description: "CKAN Extension for retrieving config values from Amazon SSM Parameter Store"
-      version: "0.1.1"
+      version: "0.1.2"
 
     CKANExtPublicationsTheme: &CKANExtPublicationsTheme
       shortname: "ckanext-publications-qld-theme"
       description: "CKAN Extension for Queensland Government Publications theme"
-      version: "2.1.0"
+      version: "2.1.1"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       shortname: "ckanext-resource-type-validation"
       description: "CKAN Extension for checking uploaded resource types"
-      version: "1.0.12"
+      version: "1.0.14"
 
     CKANExtCSRFFilter: &CKANExtCSRFFilter
       shortname: "ckanext-csrf-filter"
@@ -105,9 +105,6 @@ extensions:
     CKANExtOIDC:
       <<: *CKANExtOIDC
       version: "develop"
-
-    CKANExtSelfInfo:
-      <<: *CKANExtSelfInfo
 
 # Global variables to apply to this app's CloudFormation templates
 basic_facts:
