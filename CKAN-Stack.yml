@@ -30,6 +30,7 @@
       register: ssmKeyFacts
     - set_fact:
         SSMKey: "{{ ssmKeyFacts.stdout }}"
+      no_log: true
 
     - name: Generate Lambda file hash
       shell: >

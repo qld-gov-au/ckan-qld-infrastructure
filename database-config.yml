@@ -17,6 +17,7 @@
         template_parameters: "{{ common_stack.template_parameters | combine(item.template_parameters) }}"
       when: item.template_parameters.Environment == Environment
       with_items: "{{ cloudformation_stacks }}"
+      no_log: true
 
     - name: Describe database (RDS) cloudformation stack
       cloudformation_info:
@@ -31,6 +32,7 @@
         MasterPassKey: "{{ ssm_env_prefix }}/db/master_password"
         UserKey: "{{ ssm_env_prefix }}/db/{{ service_name_lower }}_user"
         PassKey: "{{ ssm_env_prefix }}/db/{{ service_name_lower }}_password"
+      no_log: true
 
     - name: Set variable (facts) dependencies
       set_fact:
@@ -41,6 +43,7 @@
         DBPass: "{{ environment_ssm_vars[PassKey] }}"
         DBPort: "{{ database['cloudformation'][Stack_Name].stack_outputs.DBPort }}"
         DBUser: "{{ environment_ssm_vars[UserKey] }}"
+      no_log: true
 
   roles:
     - ansible-linux-postgres
@@ -53,3 +56,4 @@
 
     - name: Set DataStore permissions
       shell: "psql 'postgresql://{{ DBMasterUser }}:{{ DBMasterPass }}@{{ DBEndpoint }}:{{ DBPort }}/{{ DBName }}_datastore' -f templates/datastore-set-permissions.sql"
+      no_log: true
