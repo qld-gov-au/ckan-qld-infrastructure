@@ -51,6 +51,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
+          role-external-id: ${{ secrets.AWS_EXTERNAL_ID }}
           aws-region: ap-southeast-2
 
       - name: Save root directory
