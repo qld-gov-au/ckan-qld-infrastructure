@@ -1,0 +1,84 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Creates jumpbox instance for running deployments.'
+
+Parameters:
+  Environment:
+    Description: The target production vs non-production environment.
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - TRAINING
+      - STAGING
+      - PROD
+  ApplicationName:
+    Description: Name of the application (ie. OpenData or Publications)
+    Type: String
+    AllowedValues:
+      - OpenData
+      - Publications
+      - CKANTest
+  DefaultEC2Key:
+    Description: The SSH key that can connect to this instance.
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: '/config/CKAN/ec2KeyPair'
+  InfrastructureURL:
+    Description: The source URL to retrieve the infrastructure project from.
+    Type: String
+    Default: https://github.com/qld-gov-au/ckan-qld-infrastructure.git
+  InfrastructureRevision:
+    Description: The infrastructure revision to deploy.
+    Type: String
+    Default: master
+  ImageId:
+    Description: The AMI ID to use as a baseline for running deployments.
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64'
+
+Resources:
+
+  DeploymentInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: "/dev/xvda"
+          Ebs:
+            Encrypted: true
+            DeleteOnTermination: true
+            VolumeSize: 8
+            VolumeType: "gp3"
+      IamInstanceProfile: bamboo-agent
+      ImageId: !Ref ImageId
+      InstanceType: "t4g.small"
+      KeyName: !Ref DefaultEC2Key
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          GroupSet:
+            - Fn::ImportValue: !Sub "${Environment}CKANManagementSG"
+          SubnetId:
+            Fn::ImportValue: !Sub "${Environment}CKANAppSubnetA"
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/sh
+            LOG_FILE="/var/log/deploy-${ApplicationName}-${Environment}.log"
+            (dnf upgrade-minimal --security -y --refresh \
+            && dnf install -y git python3.14 postgresql18 python3.14-pip \
+            && cd /usr/local/src \
+            && python3.14 -m venv ckan-deploy \
+            && . ckan-deploy/bin/activate \
+            && pip install ansible boto3 psycopg2-binary \
+            && git clone "${InfrastructureURL}" ckan-qld-infrastructure \
+            && cd ckan-qld-infrastructure \
+            && git checkout "${InfrastructureRevision}" \
+            && bamboo_deploy_environment=${Environment} ./build-${ApplicationName}.sh) 2>&1 | tee "$LOG_FILE"
+            aws s3 cp "$LOG_FILE" s3://osssio-ckan-web-logs/${ApplicationName}_${Environment}/deploy/$(date -Iseconds).log \
+              && aws cloudformation delete-stack --stack-name ${ApplicationName}-${Environment}-DEPLOYMENT
+      Tags:
+        - Key: Name
+          Value: !Sub "${ApplicationName} ${Environment} deployment base"
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Service
+          Value: !Ref ApplicationName
