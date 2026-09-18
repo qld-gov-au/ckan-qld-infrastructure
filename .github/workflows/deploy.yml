@@ -62,8 +62,17 @@ jobs:
           aws iam list-account-aliases | grep osssio-ckan
           greprc=$?
           if [ $greprc -eq 0 ]; then
-            echo "Dry-run, deployment not yet implemented"
-            #./build-${{ github.event.inputs.application }}.sh
+            if [ "${{ github.event.inputs.dryRun }}" = "true" ]; then
+              echo "'dryRun' flag is set, skipping deployment"
+            else
+              aws cloudformation create-stack --region ap-southeast-2 \
+                --stack-name "${{ github.event.inputs.application }}-${{ github.event.inputs.environment }}-DEPLOYMENT" \
+                --template-body file://templates/deployment-instance.cfn.yml \
+                --parameters "ParameterKey=ApplicationName,ParameterValue=${{ github.event.inputs.application }}" \
+                "ParameterKey=Environment,ParameterValue=${{ github.event.inputs.environment }}" \
+                "ParameterKey=InfrastructureURL,ParameterValue=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+                "ParameterKey=InfrastructureRevision,ParameterValue=${{ github.sha }}"
+            fi
           else
             echo "we are not in ckan account, we did not run script";
             exit 1;
