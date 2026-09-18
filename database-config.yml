@@ -53,3 +53,4 @@
 
     - name: Set DataStore permissions
       shell: "psql 'postgresql://{{ DBMasterUser }}:{{ DBMasterPass }}@{{ DBEndpoint }}:{{ DBPort }}/{{ DBName }}_datastore' -f templates/datastore-set-permissions.sql"
+      no_log: true

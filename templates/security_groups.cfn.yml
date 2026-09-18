@@ -116,6 +116,11 @@ Resources:
         ToPort: 5432
         SourceSecurityGroupId: !Ref BambooAgentSecurityGroup
         Description: Bamboo agent access to PostgreSQL
+      - IpProtocol: tcp
+        FromPort: 5432
+        ToPort: 5432
+        SourceSecurityGroupId: !Ref Management
+        Description: Management access to PostgreSQL
 
 Outputs:
   ManagementSG:
