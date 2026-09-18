@@ -73,7 +73,8 @@ Resources:
             && cd ckan-qld-infrastructure \
             && git checkout "${InfrastructureRevision}" \
             && bamboo_deploy_environment=${Environment} ./build-${ApplicationName}.sh) 2>&1 | tee "$LOG_FILE"
-            aws s3 cp "$LOG_FILE" s3://osssio-ckan-web-logs/${ApplicationName}_${Environment}/deploy/$(date -Iseconds).log \
+            gzip $LOG_FILE
+            aws s3 cp "${LOG_FILE}.gz" s3://osssio-ckan-web-logs/${ApplicationName}_${Environment}/deploy/$(date -Iseconds).log.gz \
               && aws cloudformation delete-stack --stack-name ${ApplicationName}-${Environment}-DEPLOYMENT
       Tags:
         - Key: Name
