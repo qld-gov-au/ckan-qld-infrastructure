@@ -62,7 +62,8 @@ jobs:
           aws iam list-account-aliases | grep osssio-ckan
           greprc=$?
           if [ $greprc -eq 0 ]; then
-            ./build-${{ github.event.inputs.application }}.sh
+            echo "Dry-run, deployment not yet implemented"
+            #./build-${{ github.event.inputs.application }}.sh
           else
             echo "we are not in ckan account, we did not run script";
             exit 1;
