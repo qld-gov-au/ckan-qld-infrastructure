@@ -16,7 +16,6 @@
     dest: "{{ item.template }}"
   when: (item.template_parameters.Environment | default(Environment)) == Environment and item.template_jinja is defined
   with_items: "{{ cloudformation_stacks }}"
-  no_log: true
 
 ##TODO do cfn check on template
 
@@ -33,4 +32,3 @@
     tags: "{{ common_stack.tags | combine(item.tags | default({})) }}"
   when: (item.template_parameters.Environment | default(Environment)) == Environment
   with_items: "{{ cloudformation_stacks }}"
-  no_log: true
