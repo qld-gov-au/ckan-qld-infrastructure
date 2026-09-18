@@ -165,7 +165,7 @@ PARAMETER_STRING
   AMI_ID=$(aws ec2 create-image --instance-id "$INSTANCE_ID" --no-reboot \
     --name "$TARGET_IMAGE_NAME" \
     --description "Baseline AMI for CKAN instances, built from $VANILLA_IMAGE_ID plus Chef" \
-    --tag-specifications "ResourceType=image,Tags=[{Key=Version,Value=${VANILLA_IMAGE_ID}}]" \
+    --tag-specifications "ResourceType=image,Tags=[{Key=Name,Value=${TARGET_IMAGE_NAME}},{Key=Version,Value=${VANILLA_IMAGE_ID}}]" \
     --query "ImageId" --output text
   )
   if [ "$AMI_ID" = "" ]; then
