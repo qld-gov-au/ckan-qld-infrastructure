@@ -36,7 +36,6 @@
     encrypted: yes
     no_password_changes: yes
     state: "{{ state | default('present') }}"
-    priv: "{{ template_parameters.DBPrivileges }}"
     role_attr_flags: "CREATEDB,LOGIN"
 
 - name: Grant database owner role to DBA
@@ -73,6 +72,30 @@
   when: state is defined and state == "present"
   run_once: true
 
+- name: Grant all main privileges to database owner
+  postgresql_privs:
+    db: "{{ DBName }}"
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBMasterUser }}"
+    login_password: "{{ DBMasterPass }}"
+    port: "{{ DBPort }}"
+    roles: "{{ DBUser }}"
+    type: "database"
+    privs: "ALL"
+    state: "{{ state | default('present') }}"
+
+- name: Grant all datastore privileges to database owner
+  postgresql_privs:
+    db: "{{ DBName }}_datastore"
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBMasterUser }}"
+    login_password: "{{ DBMasterPass }}"
+    port: "{{ DBPort }}"
+    roles: "{{ DBUser }}"
+    type: "database"
+    privs: "ALL"
+    state: "{{ state | default('present') }}"
+
 - name: Create DataStore user
   postgresql_user:
     db: "{{ DBName }}_datastore"
@@ -85,8 +108,19 @@
     encrypted: yes
     no_password_changes: yes
     state: "{{ state | default('present') }}"
-    priv: "CONNECT"
     role_attr_flags: "LOGIN"
+
+- name: Grant connect to DataStore user
+  postgresql_privs:
+    db: "{{ DBName }}_datastore"
+    login_host: "{{ DBEndpoint }}"
+    login_user: "{{ DBMasterUser }}"
+    login_password: "{{ DBMasterPass }}"
+    port: "{{ DBPort }}"
+    roles: "{{ DBUser }}_datastore"
+    type: "database"
+    privs: "CONNECT"
+    state: "{{ state | default('present') }}"
 
 - name: Grant read-only access to DataStore user
   postgresql_privs:
