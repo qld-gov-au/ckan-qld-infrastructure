@@ -69,8 +69,8 @@ run-deployment () {
 
 create-baseline-ami () {
   # https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html
-  # Amazon Linux 2023 AMI 2023.12.20260918.0 arm64 HVM kernel-6.18 (al2023-ami-2023.12.20260918.0-kernel-6.18-arm64) - 2026-09-18T04:41:07.000Z
-  VANILLA_IMAGE_ID="ami-03f010f33dadbdb73"
+  # Amazon Linux 2023 AMI 2023.12.20260918.0 arm64 HVM kernel-6.12 (al2023-ami-2023.12.20260918.0-kernel-6.12-arm64) - 2026-09-18T04:41:07.000Z
+  VANILLA_IMAGE_ID="ami-03c2f396cb3a1b239"
   read -r \
     LATEST_IMAGE_NAME \
     LATEST_VANILLA_IMAGE \
