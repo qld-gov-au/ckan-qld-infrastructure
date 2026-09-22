@@ -69,8 +69,9 @@ run-deployment () {
 
 create-baseline-ami () {
   # https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html
-  # Amazon Linux 2023 AMI 2023.12.20260917.1 arm64 HVM kernel-6.18 (al2023-ami-2023.12.20260917.1-kernel-6.18-arm64) - 2026-09-17T00:56:48.000Z
-  VANILLA_IMAGE_ID="ami-0ade0d969018b4ee3"
+  # Amazon Linux 2023 AMI 2023.12.20260918.0 arm64 HVM kernel-6.18 (al2023-ami-2023.12.20260918.0-kernel-6.18-arm64) - 2026-09-18T04:41:07.000Z
+  VANILLA_IMAGE_ID="ami-03f010f33dadbdb73"
+
   read -r LATEST_VANILLA_IMAGE < <(
     aws ssm get-parameter --name '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64' \
       --query 'Parameter.Value' --output text
