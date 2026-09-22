@@ -50,7 +50,7 @@ Resources:
             VolumeType: "gp3"
       IamInstanceProfile: bamboo-agent
       ImageId: !Ref ImageId
-      InstanceType: "t4g.small"
+      InstanceType: "t4g.nano"
       KeyName: !Ref DefaultEC2Key
       NetworkInterfaces:
         - DeviceIndex: 0
