@@ -68,35 +68,12 @@ run-deployment () {
 }
 
 create-baseline-ami () {
-  # https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html
-  # Amazon Linux 2023 AMI 2023.12.20260918.0 arm64 HVM kernel-6.18 (al2023-ami-2023.12.20260918.0-kernel-6.18-arm64) - 2026-09-18T04:41:07.000Z
-  VANILLA_IMAGE_ID="ami-03f010f33dadbdb73"
-
-  read -r LATEST_VANILLA_IMAGE < <(
-    aws ssm get-parameter --name '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64' \
-      --query 'Parameter.Value' --output text
-  )
-  read -r \
-    LATEST_IMAGE_NAME \
-    LATEST_VANILLA_CREATION_DATE \
-    LATEST_VANILLA_DESCRIPTION < <(
-      aws ec2 describe-images \
-        --image-ids "$LATEST_VANILLA_IMAGE" \
-        --query 'Images[0].[Name,CreationDate,Description]' \
-        --output text
-  )
-  if [ "$VANILLA_IMAGE_ID" != "$LATEST_VANILLA_IMAGE" ]; then
-    echo "Using $VANILLA_IMAGE_ID; however, a newer operating system image exists, $LATEST_VANILLA_IMAGE"
-    echo ""
-    echo "Please update the comment and VANILLA_IMAGE_ID to:"
-    echo "  # $LATEST_VANILLA_DESCRIPTION ($LATEST_IMAGE_NAME) - $LATEST_VANILLA_CREATION_DATE"
-    echo "  VANILLA_IMAGE_ID=\"$LATEST_VANILLA_IMAGE\""
-    echo ""
-    if [ "$ENVIRONMENT" = "DEV" ]; then
-      echo "In Lower environment: $ENVIRONMENT. "
-      echo "Stopping build."
-      exit 1
-    fi
+  # retrieve pinned operating system AMI if any, otherwise use latest
+  VANILLA_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/VanillaAmiId" \
+      --query 'Parameter.Value' --output text)
+  if [ "$VANILLA_IMAGE_ID" = "" ]; then
+    LATEST_VANILLA_IMAGE=$(aws ssm get-parameter --name '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64' \
+        --query 'Parameter.Value' --output text)
   fi
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
   if [ "$BASELINE_IMAGE_ID" != "" ]; then
