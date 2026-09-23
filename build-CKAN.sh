@@ -72,9 +72,13 @@ create-baseline-ami () {
   VANILLA_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/VanillaAmiId" \
       --query 'Parameter.Value' --output text)
   if [ "$VANILLA_IMAGE_ID" = "" ]; then
+    echo "No pinned operating system image, retrieving latest..."
     VANILLA_IMAGE_ID=$(aws ssm get-parameter --name '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64' \
         --query 'Parameter.Value' --output text)
   fi
+  echo "Selected operating system image is $VANILLA_IMAGE_ID"
+
+  # retrieve or assemble an image that has Chef client preinstalled
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
   if [ "$BASELINE_IMAGE_ID" != "" ]; then
     # check if the image is still current
@@ -84,7 +88,7 @@ create-baseline-ami () {
       return 0
     fi
   fi
-  # check if the image was previously generated
+  # check if a matching image was previously generated
   TARGET_IMAGE_NAME="${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}"
   EXISTING_IMAGE_ID=$(aws ec2 describe-images --filters "Name=name,Values=$TARGET_IMAGE_NAME" --query "ImageId" --output text |grep -vi '^None$')
   if [ "$EXISTING_IMAGE_ID" != "" ]; then
