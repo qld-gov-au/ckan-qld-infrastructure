@@ -35,6 +35,10 @@ Parameters:
     Description: The AMI ID to use as a baseline for running deployments.
     Type: 'AWS::SSM::Parameter::Value<String>'
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64'
+  LogBucket:
+    Description: The S3 bucket for storing deployment logs.
+    Type: String
+    Default: osssio-ckan-web-logs
 
 Resources:
 
@@ -82,8 +86,10 @@ Resources:
             && git checkout "${InfrastructureRevision}" \
             && bamboo_deploy_environment=${Environment} ./build-${ApplicationName}.sh) 2>&1 | tee "$LOG_FILE"
             gzip "$LOG_FILE"
-            aws s3 cp "$LOG_FILE".gz s3://osssio-ckan-web-logs/${ApplicationName}_${Environment}/deploy/$(date -Iseconds).log.gz \
-              && aws cloudformation delete-stack --stack-name ${ApplicationName}-${Environment}-DEPLOYMENT
+            if [ -n "${LogBucket}" ]; then
+              aws s3 cp "$LOG_FILE".gz s3://${LogBucket}/${ApplicationName}_${Environment}/deploy/$(date -Iseconds).log.gz || exit 1
+            fi
+            aws cloudformation delete-stack --stack-name ${ApplicationName}-${Environment}-DEPLOYMENT
       Tags:
         - Key: Name
           Value: !Sub "${ApplicationName} ${Environment} deployment base"
