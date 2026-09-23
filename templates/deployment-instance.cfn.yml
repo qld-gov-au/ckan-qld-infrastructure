@@ -62,6 +62,14 @@ Resources:
         Fn::Base64:
           Fn::Sub: |
             #!/bin/sh
+            # Configure 1GB swap
+            SWAPFILE=/var/swapfile
+            dd if=/dev/zero of=$SWAPFILE bs=1024 count=1048576
+            mkswap $SWAPFILE
+            chown root:root $SWAPFILE
+            chmod 0600 $SWAPFILE
+            swapon $SWAPFILE
+            # Run deployment
             LOG_FILE="/var/log/deploy-${ApplicationName}-${Environment}.log"
             (dnf upgrade-minimal --security -y --refresh \
             && dnf install -y git python3.14 postgresql18 python3.14-pip \
