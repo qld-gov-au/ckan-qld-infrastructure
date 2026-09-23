@@ -72,7 +72,7 @@ create-baseline-ami () {
   VANILLA_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/VanillaAmiId" \
       --query 'Parameter.Value' --output text)
   if [ "$VANILLA_IMAGE_ID" = "" ]; then
-    LATEST_VANILLA_IMAGE=$(aws ssm get-parameter --name '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64' \
+    VANILLA_IMAGE_ID=$(aws ssm get-parameter --name '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64' \
         --query 'Parameter.Value' --output text)
   fi
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
