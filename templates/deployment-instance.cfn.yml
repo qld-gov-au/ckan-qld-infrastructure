@@ -65,9 +65,9 @@ Resources:
         Fn::Base64:
           Fn::Sub: |
             #!/bin/sh
-            # Configure 1GB swap
+            # Configure 2GB swap
             SWAPFILE=/var/swapfile
-            dd if=/dev/zero of=$SWAPFILE bs=1024 count=1048576
+            dd if=/dev/zero of=$SWAPFILE bs=1024 count=2097152
             mkswap $SWAPFILE
             chown root:root $SWAPFILE
             chmod 0600 $SWAPFILE
