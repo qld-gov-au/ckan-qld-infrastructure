@@ -71,8 +71,8 @@ jobs:
                 --parameters "ParameterKey=ApplicationName,ParameterValue=${{ github.event.inputs.application }}" \
                 "ParameterKey=Environment,ParameterValue=${{ github.event.inputs.environment }}" \
                 "ParameterKey=InfrastructureURL,ParameterValue=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
-                "ParameterKey=InfrastructureRevision,ParameterValue=${{ github.sha }}"
-                "ParameterKey=LogBucket,ParameterValue=osssio-ckan-web-logs"
+                "ParameterKey=InfrastructureRevision,ParameterValue=${{ github.sha }}" \
+                "ParameterKey=LogBucket,ParameterValue=${{ vars.LOG_BUCKET }}"
             fi
           else
             echo "we are not in ckan account, we did not run script";
