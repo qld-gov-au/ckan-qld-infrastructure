@@ -26,6 +26,11 @@ on:
         required: true
         type: boolean
         default: true
+      branch:
+        description: 'Infrastructure branch to deploy from'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   deploy:
@@ -46,6 +51,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
+          ref: ${{ github.event.inputs.branch }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd  # v6.3.0
