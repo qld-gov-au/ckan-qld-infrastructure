@@ -38,7 +38,6 @@ Parameters:
   LogBucket:
     Description: The S3 bucket for storing deployment logs.
     Type: String
-    Default: osssio-ckan-web-logs
 
 Resources:
 
