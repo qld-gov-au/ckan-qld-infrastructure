@@ -237,6 +237,7 @@ run-all-playbooks () {
   run-playbook "cloudfront-lambda"
   run-playbook "cloudfront"
   run-deployment
+  echo "Deployment successful"
 }
 
 if [ $# -ge 3 ]; then
