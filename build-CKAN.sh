@@ -76,7 +76,16 @@ create-baseline-ami () {
     VANILLA_IMAGE_ID=$(aws ssm get-parameter --name '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64' \
         --query 'Parameter.Value' --output text)
   fi
-  echo "Selected operating system image is $VANILLA_IMAGE_ID"
+  read -r \
+    VANILLA_IMAGE_NAME \
+    VANILLA_CREATION_DATE \
+    VANILLA_DESCRIPTION < <(
+      aws ec2 describe-images \
+        --image-ids "$VANILLA_IMAGE_ID" \
+        --query 'Images[0].[Name,CreationDate,Description]' \
+        --output text
+    )
+  echo "Selected operating system image is $VANILLA_IMAGE_ID $VANILLA_DESCRIPTION ($VANILLA_IMAGE_NAME) - $VANILLA_CREATION_DATE"
 
   # retrieve or assemble an image that has Chef client preinstalled
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
