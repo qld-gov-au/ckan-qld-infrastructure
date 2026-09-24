@@ -15,3 +15,4 @@ jobs:
       environment: DEV
       application: ${{ matrix.application }}
       branch: develop
+      dryRun: false
