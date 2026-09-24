@@ -35,6 +35,9 @@ Parameters:
     Description: The AMI ID to use as a baseline for running deployments.
     Type: 'AWS::SSM::Parameter::Value<String>'
     Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64'
+  LogBucket:
+    Description: The S3 bucket for storing deployment logs.
+    Type: String
 
 Resources:
 
@@ -50,7 +53,7 @@ Resources:
             VolumeType: "gp3"
       IamInstanceProfile: bamboo-agent
       ImageId: !Ref ImageId
-      InstanceType: "t4g.small"
+      InstanceType: "t4g.nano"
       KeyName: !Ref DefaultEC2Key
       NetworkInterfaces:
         - DeviceIndex: 0
@@ -62,6 +65,14 @@ Resources:
         Fn::Base64:
           Fn::Sub: |
             #!/bin/sh
+            # Configure 2GB swap
+            SWAPFILE=/var/swapfile
+            dd if=/dev/zero of=$SWAPFILE bs=1024 count=2097152
+            mkswap $SWAPFILE
+            chown root:root $SWAPFILE
+            chmod 0600 $SWAPFILE
+            swapon $SWAPFILE
+            # Run deployment
             LOG_FILE="/var/log/deploy-${ApplicationName}-${Environment}.log"
             (dnf upgrade-minimal --security -y --refresh \
             && dnf install -y git python3.14 postgresql18 python3.14-pip \
@@ -73,9 +84,11 @@ Resources:
             && cd ckan-qld-infrastructure \
             && git checkout "${InfrastructureRevision}" \
             && bamboo_deploy_environment=${Environment} ./build-${ApplicationName}.sh) 2>&1 | tee "$LOG_FILE"
-            gzip $LOG_FILE
-            aws s3 cp "${LOG_FILE}.gz" s3://osssio-ckan-web-logs/${ApplicationName}_${Environment}/deploy/$(date -Iseconds).log.gz \
-              && aws cloudformation delete-stack --stack-name ${ApplicationName}-${Environment}-DEPLOYMENT
+            gzip "$LOG_FILE"
+            if [ -n "${LogBucket}" ]; then
+              aws s3 cp "$LOG_FILE".gz s3://${LogBucket}/${ApplicationName}_${Environment}/deploy/$(date -Iseconds).log.gz || exit 1
+            fi
+            aws cloudformation delete-stack --stack-name ${ApplicationName}-${Environment}-DEPLOYMENT
       Tags:
         - Key: Name
           Value: !Sub "${ApplicationName} ${Environment} deployment base"
