@@ -21,11 +21,6 @@ on:
           - OpenData
           - Publications
           - CKANTest
-      dryRun:
-        description: 'Dry Run deployment (set to false to deploy)'
-        required: true
-        type: boolean
-        default: true
       branch:
         description: 'Infrastructure branch to deploy from'
         required: false
@@ -68,18 +63,14 @@ jobs:
           aws iam list-account-aliases | grep osssio-ckan
           greprc=$?
           if [ $greprc -eq 0 ]; then
-            if [ "${{ github.event.inputs.dryRun }}" = "true" ]; then
-              echo "'dryRun' flag is set, skipping deployment"
-            else
-              aws cloudformation create-stack --region ap-southeast-2 \
-                --stack-name "${{ github.event.inputs.application }}-${{ github.event.inputs.environment }}-DEPLOYMENT" \
-                --template-body file://templates/deployment-instance.cfn.yml \
-                --parameters "ParameterKey=ApplicationName,ParameterValue=${{ github.event.inputs.application }}" \
-                "ParameterKey=Environment,ParameterValue=${{ github.event.inputs.environment }}" \
-                "ParameterKey=InfrastructureURL,ParameterValue=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
-                "ParameterKey=InfrastructureRevision,ParameterValue=${{ github.sha }}" \
-                "ParameterKey=LogBucket,ParameterValue=${{ vars.LOG_BUCKET }}"
-            fi
+            aws cloudformation create-stack --region ap-southeast-2 \
+              --stack-name "${{ github.event.inputs.application }}-${{ github.event.inputs.environment }}-DEPLOYMENT" \
+              --template-body file://templates/deployment-instance.cfn.yml \
+              --parameters "ParameterKey=ApplicationName,ParameterValue=${{ github.event.inputs.application }}" \
+              "ParameterKey=Environment,ParameterValue=${{ github.event.inputs.environment }}" \
+              "ParameterKey=InfrastructureURL,ParameterValue=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+              "ParameterKey=InfrastructureRevision,ParameterValue=${{ github.sha }}" \
+              "ParameterKey=LogBucket,ParameterValue=${{ vars.LOG_BUCKET }}"
           else
             echo "we are not in ckan account, we did not run script";
             exit 1;
