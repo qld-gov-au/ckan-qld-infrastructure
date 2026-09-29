@@ -117,7 +117,7 @@ create-baseline-ami () {
 # Install Chef client
 LOG_FILE="/var/log/install-chef.log"
 MAX_ATTEMPTS=5
-RPM_URL="https://downloads.cinc.sh/files/stable/cinc/19.3.14/el/9/cinc-19.3.14-1.el9.x86_64.rpm"
+RPM_URL="https://downloads.cinc.sh/files/stable/cinc/19.3.14/el/9/cinc-19.3.14-1.el9.$(uname -m).rpm"
 attempt=1
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
