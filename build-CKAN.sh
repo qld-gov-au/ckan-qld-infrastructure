@@ -118,7 +118,7 @@ MAX_ATTEMPTS=5
 attempt=1
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
-  RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
+  RPM_URL="https://downloads.cinc.sh/files/stable/cinc/19.3.14/el/9/cinc-19.3.14-1.el9.x86_64.rpm"
   if [ "$RPM_URL" != "" ]; then
     dnf install -y libxcrypt-compat $RPM_URL && shutdown -P now
     exit $?
