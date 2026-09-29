@@ -113,20 +113,22 @@ create-baseline-ami () {
     --query "Subnets[0].SubnetId" --output text)
   USER_DATA=$(cat <<'PARAMETER_STRING'
 #!/bin/sh
-OMNITRUCK_URL="https://omnitruck.chef.io/stable/chef/metadata?v=18.8&p=el&pv=8&m=aarch64"
+
+# Install Chef client
+LOG_FILE="/var/log/install-chef.log"
 MAX_ATTEMPTS=5
+RPM_URL="https://downloads.cinc.sh/files/stable/cinc/19.3.14/el/9/cinc-19.3.14-1.el9.x86_64.rpm"
 attempt=1
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
-  RPM_URL="https://downloads.cinc.sh/files/stable/cinc/19.3.14/el/9/cinc-19.3.14-1.el9.x86_64.rpm"
   if [ "$RPM_URL" != "" ]; then
-    dnf install -y libxcrypt-compat $RPM_URL && shutdown -P now
+    (dnf install -y libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1) && shutdown -P now
     exit $?
   fi
 done
 PARAMETER_STRING
   )
-  INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
+  INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.small --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
     --subnet-id "$SUBNET_ID" --user-data "$USER_DATA" \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=AMI_Chef_Setup_${ENVIRONMENT}},{Key=Environment,Value=$ENVIRONMENT},{Key=Service,Value=CKAN}]" \
     --query "Instances[0].InstanceId" --output text)
