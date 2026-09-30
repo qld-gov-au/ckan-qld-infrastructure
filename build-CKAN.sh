@@ -117,7 +117,8 @@ create-baseline-ami () {
 # Install Chef client
 LOG_FILE="/var/log/install-chef.log"
 MAX_ATTEMPTS=5
-RPM_URL="https://downloads.cinc.sh/files/stable/cinc/19.3.14/el/9/cinc-19.3.14-1.el9.$(uname -m).rpm"
+CHEF_VERSION=18.11.11
+RPM_URL="https://downloads.cinc.sh/files/stable/cinc/${CHEF_VERSION}/el/9/cinc-${CHEF_VERSION}-1.el9.$(uname -m).rpm"
 attempt=1
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
@@ -128,7 +129,7 @@ while [ $attempt -le $MAX_ATTEMPTS ]; do
 done
 PARAMETER_STRING
   )
-  INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.small --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
+  INSTANCE_ID=$(aws ec2 run-instances --image-id "$VANILLA_IMAGE_ID" --instance-type t4g.micro --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" --security-group-ids "$SECURITY_GROUP_ID" \
     --subnet-id "$SUBNET_ID" --user-data "$USER_DATA" \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=AMI_Chef_Setup_${ENVIRONMENT}},{Key=Environment,Value=$ENVIRONMENT},{Key=Service,Value=CKAN}]" \
     --query "Instances[0].InstanceId" --output text)
