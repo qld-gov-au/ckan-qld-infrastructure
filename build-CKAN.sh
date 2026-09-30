@@ -105,6 +105,8 @@ create-baseline-ami () {
     aws ssm put-parameter --overwrite --type String --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --value "$EXISTING_IMAGE_ID" || return 1
     return 0
   fi
+  # Pre-install Cinc 18.x, which imitates Chef 18.
+  # NB AWS Systems Manager will not currently allow 19+.
   SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
     --query "SecurityGroups[0].GroupId" --output text)
   INSTANCE_PROFILE_NAME=$(aws iam list-instance-profiles \
@@ -113,14 +115,16 @@ create-baseline-ami () {
     --query "Subnets[0].SubnetId" --output text)
   USER_DATA=$(cat <<'PARAMETER_STRING'
 #!/bin/sh
-OMNITRUCK_URL="https://omnitruck.chef.io/stable/chef/metadata?v=18.8&p=el&pv=8&m=aarch64"
+# Install Chef client
+LOG_FILE="/var/log/install-chef.log"
 MAX_ATTEMPTS=5
+CINC_VERSION=18.11.11
+RPM_URL="https://downloads.cinc.sh/files/stable/cinc/${CINC_VERSION}/el/9/cinc-${CINC_VERSION}-1.el9.$(uname -m).rpm"
 attempt=1
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
-  RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
   if [ "$RPM_URL" != "" ]; then
-    dnf install -y libxcrypt-compat $RPM_URL && shutdown -P now
+    (dnf install -y libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1) && shutdown -P now
     exit $?
   fi
 done
