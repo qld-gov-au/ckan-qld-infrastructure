@@ -90,7 +90,7 @@ exports.handler = async (event) => {
     } else {
       refType = 'remotes/origin';
     }
-    downloadCommands.push(`git clone --branch "refs/${refType}/${cookbookRevision}" "${cookbookURL}" ${cookbookBase}/datashades`);
+    downloadCommands.push('which git || dnf install -y git', `git clone --branch "refs/${refType}/${cookbookRevision}" "${cookbookURL}" ${cookbookBase}/datashades`);
   } else if (cookbookType == 's3') {
     downloadCommands.push(
       `mkdir -p ${cookbookBase}/datashades`,
@@ -104,12 +104,15 @@ exports.handler = async (event) => {
   } else {
     recipePrefix = `datashades::${layer}`;
   }
-  var runList = [];
+  /*
+   * Always install security patches, but only reboot if
+   * we're starting a live instance, not just prepping.
+   */
+  var runList = ['dnf upgrade-minimal --security -y'];
   if (deployPhase !== 'configure') {
     runList.push(`recipe[${recipePrefix}-setup]`, `recipe[${recipePrefix}-deploy]`);
   }
   if (deployPhase !== 'deploy') {
-    /* Do patching last as it may require a reboot. */
     runList.push(`recipe[${recipePrefix}-configure]`, "recipe[datashades::apply-patch-baseline]");
   }
 

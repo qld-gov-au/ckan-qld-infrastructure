@@ -124,7 +124,7 @@ attempt=1
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
   if [ "$RPM_URL" != "" ]; then
-    (dnf install -y libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1) && shutdown -P now
+    (dnf install -y git libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1) && shutdown -P now
     exit $?
   fi
 done
