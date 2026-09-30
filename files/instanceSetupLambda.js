@@ -77,7 +77,8 @@ exports.handler = async (event) => {
     console.log("Missing cookbook URL");
     return recordCompletion(event, false);
   }
-  var sourceInfo;
+  const cookbookBase = '/var/chef/cookbooks';
+  var downloadCommands = [`mkdir -p ${cookbookBase}`, `rm -rf ${cookbookBase}/datashades`];
   if (cookbookType == 'git') {
     if (!cookbookRevision) {
       console.log("Missing cookbook revision");
@@ -89,11 +90,13 @@ exports.handler = async (event) => {
     } else {
       refType = 'remotes/origin';
     }
-    cookbookType = 'Git';
-    sourceInfo = {"repository": cookbookURL, "getOptions": `branch:refs/${refType}/${cookbookRevision}`};
+    downloadCommands.push(`git clone --branch "refs/${refType}/${cookbookRevision}" "${cookbookURL}" ${cookbookBase}/datashades`);
   } else if (cookbookType == 's3') {
-    cookbookType = 'S3';
-    sourceInfo ={"path": cookbookURL};
+    downloadCommands.push(
+      `mkdir -p ${cookbookBase}/datashades`,
+      `aws s3 cp "${cookbookURL}" ${cookbookBase}/datashades.tgz`,
+      `tar -xzf ${cookbookBase}/datashades.tgz -C ${cookbookBase}/datashades`
+    );
   }
   var recipePrefix;
   if (layer == 'web' || layer == 'batch') {
@@ -103,30 +106,26 @@ exports.handler = async (event) => {
   }
   var runList = [];
   if (deployPhase !== 'configure') {
-    runList.push(`recipe[${recipePrefix}-setup]`);
-    runList.push(`recipe[${recipePrefix}-deploy]`);
+    runList.push(`recipe[${recipePrefix}-setup]`, `recipe[${recipePrefix}-deploy]`);
   }
   if (deployPhase !== 'deploy') {
-    runList.push(`recipe[${recipePrefix}-configure]`);
-    /* Do this last as it may require a reboot. */
-    runList.push("recipe[datashades::apply-patch-baseline]");
+    /* Do patching last as it may require a reboot. */
+    runList.push(`recipe[${recipePrefix}-configure]`, "recipe[datashades::apply-patch-baseline]");
   }
 
   await ssm.send(new SendCommandCommand({
     Comment: `Running '${deployPhase}' on ${service} ${environment} instance ${instanceId}`,
-    DocumentName: "AWS-ApplyChefRecipes",
+    DocumentName: "AWS-RunShellScript",
     DocumentVersion: '\$DEFAULT',
     InstanceIds: [ instanceId ],
     OutputS3BucketName: "osssio-ckan-web-logs",
     OutputS3KeyPrefix: "run_command",
     Parameters: {
-      SourceType: [cookbookType],
-      SourceInfo: [JSON.stringify(sourceInfo)],
-      RunList: [runList.join(',')],
-      ChefClientVersion: ["None"],
-      WhyRun: ["False"],
-      ComplianceSeverity: ["None"],
-      ComplianceType: ["Custom:Chef"]
+      commands: [
+        /* Manually download our cookbook, then run Chef Zero */
+        ...downloadCommands,
+        `chef-client -z -o "${runList.join(',')}"`
+      ]
     }
   }));
 
