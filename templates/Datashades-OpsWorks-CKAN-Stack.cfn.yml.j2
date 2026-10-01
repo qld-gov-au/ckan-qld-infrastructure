@@ -185,7 +185,6 @@ Resources:
               - ssm:SendCommand
             Resource:
               - !Sub "arn:aws:ssm:${AWS::Region}:*:document/AWS-ApplyChefRecipes"
-              - !Sub "arn:aws:ssm:${AWS::Region}:*:document/AWS-RunShellScript"
           - Effect: Allow
             Action:
               - ec2:DescribeTags

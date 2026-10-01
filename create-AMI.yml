@@ -52,7 +52,7 @@
         for retry in `seq 1 180`; do
           if [ "$DEPLOYMENT_ID" = "None" ]; then
             DEPLOYMENT_ID=$(aws ssm list-commands --region {{ region }} --instance-id {{ InstanceId }} \
-              --filters "key=DocumentName,value=AWS-RunShellScript" "key=InvokedAfter,value={{ timestamp }}" \
+              --filters "key=DocumentName,value=AWS-ApplyChefRecipes" "key=InvokedAfter,value={{ timestamp }}" \
               --query "Commands|[0].CommandId" --output text) || exit 1
           fi
           if [ "$DEPLOYMENT_ID" = "None" ]; then
