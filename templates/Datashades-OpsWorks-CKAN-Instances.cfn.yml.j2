@@ -196,8 +196,7 @@ Resources:
                 mount -a
               fi
               if ! (which chef-client); then
-                CINC_VERSION=18.11.11
-                RPM_URL="https://downloads.cinc.sh/files/stable/cinc/${CINC_VERSION}/el/9/cinc-${CINC_VERSION}-1.el9.$(uname -m).rpm"
+                RPM_URL="https://downloads.cinc.sh/files/stable/cinc/18.11.11/el/9/cinc-18.11.11-1.el9.$(uname -m).rpm"
                 for i in `seq 1 5`; do
                   dnf install -y libxcrypt-compat "$RPM_URL" && break
                   sleep 5
