@@ -78,7 +78,11 @@ exports.handler = async (event) => {
     return recordCompletion(event, false);
   }
   const cookbookBase = '/var/chef/cookbooks';
-  var downloadCommands = [`mkdir -p ${cookbookBase}`, `rm -rf ${cookbookBase}/datashades`];
+  var downloadCommands = [
+    'dnf upgrade-minimal --security -y',
+    `mkdir -p ${cookbookBase}`,
+    `rm -rf ${cookbookBase}/datashades`
+  ];
   if (cookbookType == 'git') {
     if (!cookbookRevision) {
       console.log("Missing cookbook revision");
@@ -108,7 +112,7 @@ exports.handler = async (event) => {
    * Always install security patches, but only reboot if
    * we're starting a live instance, not just prepping.
    */
-  var runList = ['dnf upgrade-minimal --security -y'];
+  var runList = [];
   if (deployPhase !== 'configure') {
     runList.push(`recipe[${recipePrefix}-setup]`, `recipe[${recipePrefix}-deploy]`);
   }
