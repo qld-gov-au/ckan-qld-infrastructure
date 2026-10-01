@@ -125,7 +125,7 @@ exports.handler = async (event) => {
       commands: [
         /* Manually download our cookbook, then run Chef Zero */
         ...downloadCommands,
-        `chef-client -z -o "${runList.join(',')}"`
+        `chef-client -z --config-option cookbook_path="${cookbookBase}" -o "${runList.join(',')}"`
       ]
     }
   }));
