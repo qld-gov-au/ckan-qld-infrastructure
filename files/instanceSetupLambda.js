@@ -88,13 +88,7 @@ exports.handler = async (event) => {
       console.log("Missing cookbook revision");
       return recordCompletion(event, false);
     }
-    var refType;
-    if (/^[0-9.]{5}/.test(cookbookRevision)) {
-      refType = 'tags';
-    } else {
-      refType = 'remotes/origin';
-    }
-    downloadCommands.push('which git || dnf install -y git', `git clone --branch "refs/${refType}/${cookbookRevision}" "${cookbookURL}" ${cookbookBase}/datashades`);
+    downloadCommands.push('which git || dnf install -y git', `git clone --branch "${cookbookRevision}" "${cookbookURL}" ${cookbookBase}/datashades`);
   } else if (cookbookType == 's3') {
     downloadCommands.push(
       `mkdir -p ${cookbookBase}/datashades`,
