@@ -1,0 +1,17 @@
+name: Daily update
+on:
+  schedule:
+    - cron: '0 7 * * *'
+      timezone: 'Australia/Brisbane'
+
+jobs:
+  deploy:
+    strategy:
+      fail-fast: false
+      matrix:
+        application: [OpenData, Publications]
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: DEV
+      application: ${{ matrix.application }}
+      branch: develop

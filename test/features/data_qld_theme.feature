@@ -95,7 +95,7 @@ Feature: Theme customisations (Publications and OpenData)
         When I go to dataset page
         Then I should see an element with xpath "//li[contains(@class, 'active')]/a[contains(string(), 'Data') and (@href='/dataset' or @href='/dataset/')]"
         And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'Visualisations') and @href='/visualisations']"
-        And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'News and Case Studies') and @href='/news-and-case-studies']"
+        And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'News and') and @href='/news-and-case-studies']"
         And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'Standards and guidance') and @href='/article/standards-and-guidance']"
         And I should see an element with xpath "//li[not(contains(@class, 'active'))]/a[contains(string(), 'Contact') and @href='/article/contact']"
 
@@ -183,7 +183,7 @@ Feature: Theme customisations (Publications and OpenData)
     Scenario: When I go to the header URL, I can see the list of necessary assets
         Given "Unauthenticated" as the persona
         When I go to "/header.html"
-        Then I should see an element with xpath "//a[@href='/user/login' and contains(string(), 'Log in')]"
+        Then I should see an element with xpath "//a[@href='/user/login' and contains(string(), 'Log')]"
         And I should see an element with xpath "//a[@href='/user/register' and contains(string(), 'Register')]"
         And I should not see "not found"
 

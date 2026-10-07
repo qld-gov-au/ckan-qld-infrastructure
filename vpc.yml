@@ -2,9 +2,13 @@
 - name: Cloudformation Playbook
   hosts: local
   connection: local
-  vars_files:
-    - vars/vpc.var.yml
   pre_tasks:
+
+    - name: Set basic facts
+      import_tasks: basic_facts.yml
+
+    - include_vars:
+        file: vars/vpc.var.yml
 
     # Get index which will allow collecting correct cloudformation details from the app_deploy file
     - name: get index for environment

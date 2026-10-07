@@ -68,33 +68,26 @@ run-deployment () {
 }
 
 create-baseline-ami () {
-  # https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes.html
-  # Amazon Linux 2023 AMI 2023.12.20260817.0 arm64 HVM kernel-6.12 (al2023-ami-2023.12.20260817.0-kernel-6.12-arm64) - 2026-08-12T23:49:31.000Z
-  VANILLA_IMAGE_ID="ami-0fe99bfb009b02407"
-  read -r \
-    LATEST_IMAGE_NAME \
-    LATEST_VANILLA_IMAGE \
-    LATEST_VANILLA_CREATION_DATE \
-    LATEST_VANILLA_DESCRIPTION < <(
-      aws ec2 describe-images \
-        --owners amazon \
-        --filters "Name=name,Values=al2023-ami-2023*-arm64" \
-        --query 'sort_by(Images,&CreationDate)[-1].[Name,ImageId,CreationDate,Description]' \
-        --output text
-  )
-  if [ "$VANILLA_IMAGE_ID" != "$LATEST_VANILLA_IMAGE" ]; then
-    echo "Using $VANILLA_IMAGE_ID; however, a newer operating system image exists, $LATEST_VANILLA_IMAGE"
-    echo ""
-    echo "Please update the comment and VANILLA_IMAGE_ID to:"
-    echo "  # $LATEST_VANILLA_DESCRIPTION ($LATEST_IMAGE_NAME) - $LATEST_VANILLA_CREATION_DATE"
-    echo "  VANILLA_IMAGE_ID=\"$LATEST_VANILLA_IMAGE\""
-    echo ""
-    if [ "$ENVIRONMENT" = "DEV" ]; then
-      echo "In Lower environment: $ENVIRONMENT. "
-      echo "Stopping build."
-      exit 1
-    fi
+  # retrieve pinned operating system AMI if any, otherwise use latest
+  VANILLA_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/VanillaAmiId" \
+      --query 'Parameter.Value' --output text)
+  if [ "$VANILLA_IMAGE_ID" = "" ]; then
+    echo "No pinned operating system image, retrieving latest..."
+    VANILLA_IMAGE_ID=$(aws ssm get-parameter --name '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64' \
+        --query 'Parameter.Value' --output text)
   fi
+  read -r \
+    VANILLA_IMAGE_NAME \
+    VANILLA_CREATION_DATE \
+    VANILLA_DESCRIPTION < <(
+      aws ec2 describe-images \
+        --image-ids "$VANILLA_IMAGE_ID" \
+        --query 'Images[0].[Name,CreationDate,Description]' \
+        --output text
+    )
+  echo "Selected operating system image is $VANILLA_IMAGE_ID $VANILLA_DESCRIPTION ($VANILLA_IMAGE_NAME) - $VANILLA_CREATION_DATE"
+
+  # retrieve or assemble an image that has Chef client preinstalled
   BASELINE_IMAGE_ID=$(aws ssm get-parameter --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --query "Parameter.Value" --output text)
   if [ "$BASELINE_IMAGE_ID" != "" ]; then
     # check if the image is still current
@@ -104,7 +97,7 @@ create-baseline-ami () {
       return 0
     fi
   fi
-  # check if the image was previously generated
+  # check if a matching image was previously generated
   TARGET_IMAGE_NAME="${ENVIRONMENT}-chef-preinstalled-image-from-${VANILLA_IMAGE_ID}"
   EXISTING_IMAGE_ID=$(aws ec2 describe-images --filters "Name=name,Values=$TARGET_IMAGE_NAME" --query "ImageId" --output text |grep -vi '^None$')
   if [ "$EXISTING_IMAGE_ID" != "" ]; then
@@ -112,6 +105,8 @@ create-baseline-ami () {
     aws ssm put-parameter --overwrite --type String --name "/config/CKAN/$ENVIRONMENT/common/BaselineAmiId" --value "$EXISTING_IMAGE_ID" || return 1
     return 0
   fi
+  # Pre-install Cinc 18.x, which imitates Chef 18.
+  # NB AWS Systems Manager will not currently allow 19+.
   SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
     --query "SecurityGroups[0].GroupId" --output text)
   INSTANCE_PROFILE_NAME=$(aws iam list-instance-profiles \
@@ -120,14 +115,16 @@ create-baseline-ami () {
     --query "Subnets[0].SubnetId" --output text)
   USER_DATA=$(cat <<'PARAMETER_STRING'
 #!/bin/sh
-OMNITRUCK_URL="https://omnitruck.chef.io/stable/chef/metadata?v=18.8&p=el&pv=8&m=aarch64"
+# Install Chef client
+LOG_FILE="/var/log/install-chef.log"
 MAX_ATTEMPTS=5
+CINC_VERSION=18.11.11
+RPM_URL="https://downloads.cinc.sh/files/stable/cinc/${CINC_VERSION}/el/9/cinc-${CINC_VERSION}-1.el9.$(uname -m).rpm"
 attempt=1
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
-  RPM_URL=$(curl "$OMNITRUCK_URL" |tail -2 |head -1 |awk '{print $2}')
   if [ "$RPM_URL" != "" ]; then
-    dnf install -y libxcrypt-compat $RPM_URL && shutdown -P now
+    (dnf install -y libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1) && shutdown -P now
     exit $?
   fi
 done
@@ -165,7 +162,7 @@ PARAMETER_STRING
   AMI_ID=$(aws ec2 create-image --instance-id "$INSTANCE_ID" --no-reboot \
     --name "$TARGET_IMAGE_NAME" \
     --description "Baseline AMI for CKAN instances, built from $VANILLA_IMAGE_ID plus Chef" \
-    --tag-specifications "ResourceType=image,Tags=[{Key=Version,Value=${VANILLA_IMAGE_ID}}]" \
+    --tag-specifications "ResourceType=image,Tags=[{Key=Name,Value=${TARGET_IMAGE_NAME}},{Key=Version,Value=${VANILLA_IMAGE_ID}}]" \
     --query "ImageId" --output text
   )
   if [ "$AMI_ID" = "" ]; then
@@ -253,6 +250,7 @@ run-all-playbooks () {
   run-playbook "cloudfront-lambda"
   run-playbook "cloudfront"
   run-deployment
+  echo "Deployment successful"
 }
 
 if [ $# -ge 3 ]; then

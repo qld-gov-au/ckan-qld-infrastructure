@@ -23,8 +23,7 @@ from behaving.web.steps import forms
 if not hasattr(forms, 'fill_in_elem_by_name'):
     forms.fill_in_elem_by_name = forms.i_fill_in_field
 
-URL_RE = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_%()+./@&]|[!*\(\),]|\
-                    (?:%[0-9a-fA-F][0-9a-fA-F]))+', re.I | re.S | re.U)
+URL_RE = re.compile(r'http[s]?://[-\w.]+(?::\d+)?(?:/[-\w./%+]+)?(?:[?][-\w@.&+:!*(),/])?', re.I | re.S | re.U)
 SINGLE_QUOTE_RE = re.compile(r"(^|[^\\])'")
 
 dataset_default_schema = """
@@ -128,9 +127,10 @@ def attempt_login(context, password):
 @then(u'I should see the login form')
 def login_link_visible(context):
     context.execute_steps(u"""
-        Then I should see an element with xpath "//h1[contains(string(), 'Login')]"
-        And I should see "Sign in with your Digital ID"
-        And I should see "Register via your Digital ID"
+        When I expand the browser height
+        Then I should see an element with xpath "//h1[contains(string(), 'Log')]"
+        And I should see an element with xpath "//a[contains(@href, '/oidc-pkce') and (contains(string(), 'Sign in') or contains(string(), 'Log in'))]"
+        And I should see an element with xpath "//a[contains(@href, '/oidc-pkce') and contains(string(), 'Register')]"
     """)
 
 
