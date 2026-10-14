@@ -14,13 +14,13 @@ Parameters:
   CacheNodeType:
     Description: Select instance size for Redis cache.
     Type: String
-    Default: cache.t2.micro
+    Default: cache.t4g.micro
     AllowedValues:
-      - cache.t2.micro
-      - cache.t2.small
-      - cache.t2.medium
-      - cache.m5.large
-      - cache.r5.large
+      - cache.t4g.micro
+      - cache.t4g.small
+      - cache.t4g.medium
+      - cache.m6g.large
+      - cache.r6g.large
   NumCacheNodes:
     Description: The number of cache nodes that the cluster should have. NB This directly affects cost.
     Type: Number
