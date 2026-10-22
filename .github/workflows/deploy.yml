@@ -7,20 +7,11 @@ on:
         description: 'Deployment environment'
         required: true
         default: 'DEV'
-        type: choice
-        options:
-          - DEV
-          - TEST
-          - STAGING
-          - PROD
+        type: string
       application:
         description: 'Application to deploy'
         required: true
-        type: choice
-        options:
-          - OpenData
-          - Publications
-          - CKANTest
+        type: string
       branch:
         description: 'Infrastructure branch to deploy from'
         required: false
