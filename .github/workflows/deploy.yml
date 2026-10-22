@@ -1,6 +1,31 @@
 name: "Deploy to AWS"
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'DEV'
+        type: choice
+        options:
+          - DEV
+          - TEST
+          - STAGING
+          - PROD
+      application:
+        description: 'Application to deploy'
+        required: true
+        type: choice
+        options:
+          - OpenData
+          - Publications
+          - CKANTest
+      branch:
+        description: 'Infrastructure branch to deploy from'
+        required: false
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       environment:
