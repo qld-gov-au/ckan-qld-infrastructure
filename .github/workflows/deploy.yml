@@ -86,7 +86,7 @@ jobs:
               --parameters "ParameterKey=ApplicationName,ParameterValue=${{ inputs.application }}" \
               "ParameterKey=Environment,ParameterValue=${{ inputs.environment }}" \
               "ParameterKey=InfrastructureURL,ParameterValue=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
-              "ParameterKey=InfrastructureRevision,ParameterValue=${{ inputs.branch }}" \
+              "ParameterKey=InfrastructureRevision,ParameterValue=$(git rev-parse HEAD)" \
               "ParameterKey=LogBucket,ParameterValue=${{ vars.LOG_BUCKET }}"
             aws cloudformation wait stack-delete-complete --stack-name "$STACK_NAME"
           else
