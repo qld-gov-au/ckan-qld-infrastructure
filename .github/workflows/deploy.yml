@@ -88,7 +88,7 @@ jobs:
               "ParameterKey=InfrastructureURL,ParameterValue=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
               "ParameterKey=InfrastructureRevision,ParameterValue=${{ inputs.branch }}" \
               "ParameterKey=LogBucket,ParameterValue=${{ vars.LOG_BUCKET }}"
-            aws cloudformation wait stack-delete-complete "$STACK_NAME"
+            aws cloudformation wait stack-delete-complete --stack-name "$STACK_NAME"
           else
             echo "we are not in ckan account, we did not run script";
             exit 1;
