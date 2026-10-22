@@ -10,18 +10,17 @@ permissions:
 
 jobs:
   # Can't just deploy both apps in parallel as they can conflict on shared stacks
-  deploy:
-    steps:
-      - name: OpenData
-        uses: ./.github/workflows/deploy.yml
-        with:
-          environment: DEV
-          application: OpenData
-          branch: develop
+  deploy_OpenData:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: DEV
+      application: OpenData
+      branch: develop
 
-      - name: Publications:
-        uses: ./.github/workflows/deploy.yml
-        with:
-          environment: DEV
-          application: Publications
-          branch: develop
+  deploy_Publications:
+    needs: deploy_OpenData
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: DEV
+      application: Publications
+      branch: develop
