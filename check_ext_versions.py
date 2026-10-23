@@ -2,7 +2,6 @@
 
 import os
 import re
-import six
 import yaml
 
 
@@ -18,7 +17,7 @@ target_environment = os.environ.get('DEPLOY_ENV', 'STAGING')
 for app in ['OpenData', 'Publications', 'CKANTest']:
     extensions_file = os.environ.get('EXTENSIONS_FILE', 'vars/shared-{}.var.yml'.format(app))
     extensions = yaml.safe_load(open(extensions_file))['extensions'][target_environment]
-    for key, value in six.iteritems(extensions):
+    for key, value in extensions.items():
         check_version(value['version'], value['shortname'], 'develop' if app == 'CKANTest' and 'qld-gov-au' in value.get('url', 'qld-gov-au') else '')
 
 stack_vars = yaml.safe_load(open('vars/CKAN-Stack.var.yml'))
