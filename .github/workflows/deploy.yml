@@ -1,6 +1,22 @@
 name: "Deploy to AWS"
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'DEV'
+        type: string
+      application:
+        description: 'Application to deploy'
+        required: true
+        type: string
+      branch:
+        description: 'Infrastructure branch to deploy from'
+        required: false
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       environment:
@@ -21,21 +37,21 @@ on:
           - OpenData
           - Publications
           - CKANTest
-      dryRun:
-        description: 'Dry Run deployment (set to false to deploy)'
-        required: true
-        type: boolean
-        default: true
+      branch:
+        description: 'Infrastructure branch to deploy from'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   deploy:
-    name: Deploy to ${{ github.event.inputs.application }} ${{ github.event.inputs.environment }} Environment
+    name: Deploy to ${{ inputs.application }} ${{ inputs.environment }} Environment
     runs-on: ubuntu-latest
     environment: OpenData-DEV
     env:
-      bamboo_deploy_environment: ${{ github.event.inputs.environment }}
+      bamboo_deploy_environment: ${{ inputs.environment }}
     concurrency:
-      group: ${{ github.event.inputs.application }}-${{ github.event.inputs.environment }}-deployments
+      group: ${{ inputs.application }}-${{ inputs.environment }}-deployments
       cancel-in-progress: false
 
     permissions:
@@ -43,12 +59,13 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
+          ref: ${{ inputs.branch }}
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd  # v6.3.0
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
           role-external-id: ${{ secrets.AWS_EXTERNAL_ID }}
@@ -57,12 +74,21 @@ jobs:
       - name: Save root directory
         run: echo "REPO_ROOT=$(pwd)" >> $GITHUB_ENV
 
-      - name: "Deploy ${{ github.event.inputs.application }} to ${{ github.event.inputs.environment }}"
+      - name: "Deploy ${{ inputs.application }} to ${{ inputs.environment }}"
         run: |
           aws iam list-account-aliases | grep osssio-ckan
           greprc=$?
+          STACK_NAME="${{ inputs.application }}-${{ inputs.environment }}-DEPLOYMENT"
           if [ $greprc -eq 0 ]; then
-            ./build-${{ github.event.inputs.application }}.sh
+            aws cloudformation create-stack --region ap-southeast-2 \
+              --stack-name "$STACK_NAME" \
+              --template-body file://templates/deployment-instance.cfn.yml \
+              --parameters "ParameterKey=ApplicationName,ParameterValue=${{ inputs.application }}" \
+              "ParameterKey=Environment,ParameterValue=${{ inputs.environment }}" \
+              "ParameterKey=InfrastructureURL,ParameterValue=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+              "ParameterKey=InfrastructureRevision,ParameterValue=$(git rev-parse HEAD)" \
+              "ParameterKey=LogBucket,ParameterValue=${{ vars.LOG_BUCKET }}"
+            aws cloudformation wait stack-delete-complete --stack-name "$STACK_NAME"
           else
             echo "we are not in ckan account, we did not run script";
             exit 1;

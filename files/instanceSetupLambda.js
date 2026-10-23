@@ -90,10 +90,10 @@ exports.handler = async (event) => {
       refType = 'remotes/origin';
     }
     cookbookType = 'Git';
-    sourceInfo = `{\"repository\":\"${cookbookURL}\",\"getOptions\":\"branch:refs/${refType}/${cookbookRevision}\"}`;
+    sourceInfo = {"repository": cookbookURL, "getOptions": `branch:refs/${refType}/${cookbookRevision}`};
   } else if (cookbookType == 's3') {
     cookbookType = 'S3';
-    sourceInfo =`{\"path\":\"${cookbookURL}\"}`;
+    sourceInfo ={"path": cookbookURL};
   }
   var recipePrefix;
   if (layer == 'web' || layer == 'batch') {
@@ -101,15 +101,17 @@ exports.handler = async (event) => {
   } else {
     recipePrefix = `datashades::${layer}`;
   }
-  var runList = "";
-  if (deployPhase !== 'deploy') {
-    runList = `recipe[${recipePrefix}-configure],recipe[datashades::apply-patch-baseline]`;
-  }
-  if (deployPhase === 'setup') {
-    runList = `,${runList}`;
-  }
+  /*
+   * Install security patches only if we're starting
+   * a live instance, not just prepping,
+   * since they might require reboot.
+   */
+  var runList = [];
   if (deployPhase !== 'configure') {
-    runList = `recipe[${recipePrefix}-setup],recipe[${recipePrefix}-deploy]${runList}`;
+    runList.push(`recipe[${recipePrefix}-setup]`, `recipe[${recipePrefix}-deploy]`);
+  }
+  if (deployPhase !== 'deploy') {
+    runList.push(`recipe[${recipePrefix}-configure]`, "recipe[datashades::apply-patch-baseline]");
   }
 
   await ssm.send(new SendCommandCommand({
@@ -121,8 +123,8 @@ exports.handler = async (event) => {
     OutputS3KeyPrefix: "run_command",
     Parameters: {
       SourceType: [cookbookType],
-      SourceInfo: [sourceInfo],
-      RunList: [runList],
+      SourceInfo: [JSON.stringify(sourceInfo)],
+      RunList: [runList.join(',')],
       ChefClientVersion: ["None"],
       WhyRun: ["False"],
       ComplianceSeverity: ["None"],

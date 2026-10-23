@@ -73,7 +73,7 @@
         fi
 
     - name: Stop instance
-      ec2:
+      ec2_instance:
         instance_ids:
           - "{{ InstanceId }}"
         region: "{{ region }}"

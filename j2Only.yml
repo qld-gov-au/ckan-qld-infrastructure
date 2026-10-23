@@ -1,9 +1,0 @@
----
-- name: Cloudformation Playbook
-  hosts: local
-  connection: local
-  pre_tasks:
-    - name: Set basic facts
-      import_tasks: basic_facts.yml
-  roles:
-    - ansible_cloudformation_jinja_only

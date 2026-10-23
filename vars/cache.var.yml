@@ -7,6 +7,7 @@ common_stack: &common_stack
   template_parameters: &common_stack_template_parameters
     Platform: CKAN
     Subnets: "{{ Environment }}CKANDBSubnet"
+    CacheNodeType: cache.t4g.micro
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: CKAN

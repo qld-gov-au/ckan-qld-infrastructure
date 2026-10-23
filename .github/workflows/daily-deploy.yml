@@ -1,0 +1,26 @@
+name: Daily update
+on:
+  schedule:
+    - cron: '0 7 * * *'
+      timezone: 'Australia/Brisbane'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  # Can't just deploy both apps in parallel as they can conflict on shared stacks
+  deploy_OpenData:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: DEV
+      application: OpenData
+      branch: develop
+
+  deploy_Publications:
+    needs: deploy_OpenData
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: DEV
+      application: Publications
+      branch: develop
