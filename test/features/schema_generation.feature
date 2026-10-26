@@ -38,10 +38,12 @@ Feature: Schema Generation
         And I should see an element with xpath "//div/following::p[contains(string(), 'Once applied to only this "Resource", saved edits will be validated against this data schema unless otherwise overwritten (e.g. Dataset default set).')]"
         And I should see an element with xpath "//button[string()='Apply']"
 
-        When I press the element with xpath "//button[string()='Apply']"
+        When I select "resource" from "apply_for"
+        And I press the element with xpath "//button[string()='Apply']"
         Then I should see an element with xpath "//select[@id='field-apply_for']/option[@value=''][1]"
         And I should see an element with xpath "//select[@id='field-apply_for']/option[string()='Dataset default' and not(@selected)]"
-        And I should see an element with xpath "//select[@id='field-apply_for']/option[string()='Resource' and not(@selected)]"
+        And I should see an element with xpath "//select[@id='field-apply_for']/option[string()='Resource' and @selected]"
+        And I should see "The schema has been applied for resource"
 
     Scenario: As a publisher, when I try to generate a schema for a resource that cannot be parsed into the datastore, I can see the resulting error
         Given "TestOrgEditor" as the persona
@@ -96,7 +98,8 @@ Feature: Schema Generation
         And I reload page every 3 seconds until I see an element with xpath "//button[string()='Apply']" but not more than 6 times
         And I select "dataset" from "apply_for"
         And I press the element with xpath "//button[string()='Apply']"
-        And I go to dataset "$last_generated_name"
+        Then I should see "The schema has been applied for dataset"
+        When I go to dataset "$last_generated_name"
         And I show all the fields
         Then I should see an element with xpath "//th[@class="dataset-label" and string()="Default data schema"]/following::a[string()="View Schema File"]"
 
@@ -112,6 +115,7 @@ Feature: Schema Generation
         And I reload page every 3 seconds until I see an element with xpath "//button[string()='Apply']" but not more than 6 times
         And I select "resource" from "apply_for"
         And I press the element with xpath "//button[string()='Apply']"
-        And I press the element with xpath "//a[contains(string(), 'View resource')]"
+        Then I should see "The schema has been applied for resource"
+        When I press the element with xpath "//a[contains(string(), 'View resource')]"
         And I show all the fields
         Then I should see an element with xpath "//th[string()="Data Schema"]/following::a[string()="View Schema File"]"

@@ -48,7 +48,7 @@ extensions:
     CKANExtXLoader: &CKANExtXLoader
       shortname: "ckanext-xloader"
       description: "CKAN Express Loader Extension"
-      version: "2.2.0-qgov.2"
+      version: "2.4.0"
 
     CKANExtQGOV: &CKANExtQGOV
       shortname: "ckanext-qgov"
@@ -98,12 +98,12 @@ extensions:
     CKANExtQa: &CKANExtQa
       shortname: "ckanext-qa"
       description: "CKAN Extension for Quality Assurance (data usability ratings)"
-      version: "2.0.3-qgov.15"
+      version: "2.0.3+qgov.16"
 
     CKANExtResourceTypeValidation: &CKANExtResourceTypeValidation
       shortname: "ckanext-resource-type-validation"
       description: "CKAN Extension for checking uploaded resource types"
-      version: "1.0.14"
+      version: "1.0.15"
 
     CKANExtCSRFFilter: &CKANExtCSRFFilter
       shortname: "ckanext-csrf-filter"
@@ -113,7 +113,7 @@ extensions:
     CKANExtValidationSchemaGenerator: &CKANExtValidationSchemaGenerator
       shortname: "ckanext-validation-schema-generator"
       description: "CKAN Extension for Schema Generation"
-      version: "2.0.2"
+      version: "2.0.3"
 
     CKANExtResourceVisibility: &CKANExtResourceVisibility
       shortname: "ckanext-resource-visibility"
