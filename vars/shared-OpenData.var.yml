@@ -113,7 +113,7 @@ extensions:
     CKANExtValidationSchemaGenerator: &CKANExtValidationSchemaGenerator
       shortname: "ckanext-validation-schema-generator"
       description: "CKAN Extension for Schema Generation"
-      version: "2.0.2"
+      version: "2.0.3"
 
     CKANExtResourceVisibility: &CKANExtResourceVisibility
       shortname: "ckanext-resource-visibility"
