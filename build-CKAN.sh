@@ -131,10 +131,10 @@ done
 exit $RESULT
 PARAMETER_STRING
   )
-  INSTANCE_ID=$(aws ec2 run-instances
-    --image-id "$VANILLA_IMAGE_ID"
-    --instance-type t4g.micro
-    --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME"
+  INSTANCE_ID=$(aws ec2 run-instances \
+    --image-id "$VANILLA_IMAGE_ID" \
+    --instance-type t4g.micro \
+    --iam-instance-profile "Name=$INSTANCE_PROFILE_NAME" \
     --security-group-ids "$SECURITY_GROUP_ID" \
     --subnet-id "$SUBNET_ID" --user-data "$USER_DATA" \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=AMI_Chef_Setup_${ENVIRONMENT}},{Key=Environment,Value=$ENVIRONMENT},{Key=Service,Value=CKAN}]" \
