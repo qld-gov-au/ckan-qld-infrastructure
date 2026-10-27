@@ -118,7 +118,7 @@ extensions:
     CKANExtResourceVisibility: &CKANExtResourceVisibility
       shortname: "ckanext-resource-visibility"
       description: "CKAN Extension for preventing Cross-Site Request Forgery attacks"
-      version: "2.1.2"
+      version: "2.2.0"
 
     CKANExtOIDC: &CKANExtOIDC
       shortname: "ckanext-oidc-pkce"
