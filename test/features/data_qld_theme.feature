@@ -190,6 +190,12 @@ Feature: Theme customisations (Publications and OpenData)
 
     @unauthenticated
     @OpenData
+    Scenario: When I go to the header URL, I can see the data request link
+        Given "Unauthenticated" as the persona
+        When I go to "/header.html"
+        Then I should see an element with xpath "//a[@href='/datarequest' and contains(string(), 'Request data')]"
+
+    @OpenData
     Scenario: When I go to the header URL as a logged-in user, I can see the mobile account menu
         Given "SysAdmin" as the persona
         When I log in
