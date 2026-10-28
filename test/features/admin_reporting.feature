@@ -63,7 +63,8 @@ Feature: AdminReporting
         When I go to my reports page
         And I press "Admin Report"
         And I press the element with xpath "//button[contains(string(), 'Show')]"
-        And I press "Datasets with no tags"
+        Then I should see "Datasets with no tags" within 2 seconds
+        When I press "Datasets with no tags"
         Then I should see "Admin Report: Datasets with no tags: Reporting Organisation"
         And I should see "Dataset for admin reporting"
         When I press "Dataset for admin reporting"
