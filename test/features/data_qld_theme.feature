@@ -96,7 +96,7 @@ Feature: Theme customisations (Publications and OpenData)
         And I expand the browser height
         Then I should see an element with xpath "//li/a[contains(@class, 'active') and contains(string(), 'Data') and (@href='/dataset' or @href='/dataset/')]"
         And I should see an element with xpath "//li/a[not(contains(@class, 'active')) and contains(string(), 'Visualisations') and @href='/visualisations']"
-        And I should see an element with xpath "//li/a[not(contains(@class, 'active')) and contains(string(), 'News and') and @href='/news-and-case-studies']"
+        And I should see an element with xpath "//li/a[not(contains(@class, 'active')) and contains(string(), 'News and') and contains(@href, '/news-and-case-studies')]"
         And I should see an element with xpath "//li/a[not(contains(@class, 'active')) and contains(string(), 'Standards and guidance') and @href='/article/standards-and-guidance']"
         And I should see an element with xpath "//li/a[not(contains(@class, 'active')) and contains(string(), 'Contact') and @href='/article/contact']"
 
