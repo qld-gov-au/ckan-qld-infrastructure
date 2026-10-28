@@ -52,7 +52,8 @@ Feature: Engagement Reporting
         And I submit a comment with subject "Test subject" and comment "This is a test comment"
         And I create a data request in the "Reporting Organisation" organisation
         And I go to data request "Reporting Request"
-        And I press the element with xpath "//a[contains(string(), 'Close')]"
+        Then I should see "Reporting Request" within 2 seconds
+        When I press the element with xpath "//a[contains(string(), 'Close')]"
         And I select "To be released as open data at a later date" from "close_circumstance"
         And I fill in "approx_publishing_date" with "01/01/1970"
         And I press the element with xpath "//button[contains(@class, 'btn-danger') and @name='close' and contains(string(), 'Close data request')]"

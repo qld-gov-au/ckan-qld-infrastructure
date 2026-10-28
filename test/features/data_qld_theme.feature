@@ -80,9 +80,9 @@ Feature: Theme customisations (Publications and OpenData)
         And I press "Test Resource"
         And I reload page every 3 seconds until I see an element with xpath "//a[contains(string(), 'Data API')]" but not more than 10 times
         Then I should see an element with xpath "//a[contains(string(), 'Data API')]"
-        And I should see an element with xpath "//button[contains(@class, 'dropdown-toggle')]"
+        And I should see an element with xpath "//button[@id='dropdownDownloadFormat']"
         And I should see an element with xpath "//a[contains(@class, 'resource-btn') and contains(@href, '/download/csv_resource.csv') and contains(string(), '(CSV)')]"
-        When I press the element with xpath "//button[contains(@class, 'dropdown-toggle')]"
+        When I press the element with xpath "//button[@id='dropdownDownloadFormat']"
         Then I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(string(), 'CSV')]"
         And I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=tsv') and contains(string(), 'TSV')]"
         And I should see an element with xpath "//a[contains(@href, '/datastore/dump/') and contains(@href, 'format=json') and contains(string(), 'JSON')]"
@@ -190,10 +190,14 @@ Feature: Theme customisations (Publications and OpenData)
 
     @unauthenticated
     @OpenData
-    Scenario: When I go to the header URL, I can see the data request link
-        Given "Unauthenticated" as the persona
-        When I go to "/header.html"
-        Then I should see an element with xpath "//a[@href='/datarequest' and contains(string(), 'Request data')]"
+    Scenario: When I go to the header URL as a logged-in user, I can see the mobile account menu
+        Given "SysAdmin" as the persona
+        When I log in
+        And I go to "/header.html"
+        Then I should see an element with xpath "//ul[contains(@class, 'navbar-nav')]//a[contains(@href, '/dashboard') and contains(string(), 'Dashboard')]"
+        And I should see an element with xpath "//ul[contains(@class, 'navbar-nav')]//a[contains(@href, '/user/edit/') and contains(string(), 'Profile settings')]"
+        And I should see an element with xpath "//ul[contains(@class, 'navbar-nav')]//button[contains(string(), 'Log out')]"
+        And I should not see "not found"
 
     @unauthenticated
     Scenario: When I go to the robots file, I can see a custom disallow block
