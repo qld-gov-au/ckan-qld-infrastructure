@@ -73,7 +73,7 @@ extensions:
     CKANExtDataQld: &CKANExtDataQld
       shortname: "ckanext-data-qld"
       description: "CKAN Extension for Queensland Government Open Data"
-      version: "8.2.3"
+      version: "9.0.0"
 
     CKANExtDataRequests: &CKANExtDataRequests
       shortname: "ckanext-datarequests"

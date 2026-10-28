@@ -30,7 +30,8 @@ Feature: Data Request
         When I log in
         And I create a datarequest
         And I go to the "ckan_user" profile page
-        And I press the element with xpath "//ul[contains(@class, 'nav-tabs')]//a[contains(string(), 'Data Requests')]"
+        Then I should see "Data Requests" within 2 seconds
+        When I press the element with xpath "//ul[contains(@class, 'nav-tabs')]//a[contains(string(), 'Data Requests')]"
         Then the browser's URL should contain "/user/datarequest"
         And I should see an element with xpath "//nav[@aria-label = 'State']"
         And I should see an element with xpath "//span[contains(@class, 'item-label') and string() = 'Open']"
