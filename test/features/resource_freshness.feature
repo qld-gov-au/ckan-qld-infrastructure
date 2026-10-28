@@ -30,6 +30,7 @@ Feature: Resource freshness
     Scenario Outline: As a user with editing privileges, when I set a 'monthly' update frequently, I should still be able to update the dataset via the API
         Given "<User>" as the persona
         When I log in
+        And I expand the browser height
         Then I should be able to patch dataset "test-dataset" via the API
         When I edit the "test-dataset" dataset
         And I select "monthly" from "update_frequency"
