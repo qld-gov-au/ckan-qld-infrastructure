@@ -68,7 +68,7 @@ extensions:
     CKANExtValidation: &CKANExtValidation
       shortname: "ckanext-validation"
       description: "CKAN Extension for validating Data Packages"
-      version: "0.0.8+qgov.17"
+      version: "2.2.0+qgov.1"
 
     CKANExtDataQld: &CKANExtDataQld
       shortname: "ckanext-data-qld"
