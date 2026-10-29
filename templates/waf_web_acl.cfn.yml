@@ -70,6 +70,29 @@ Resources:
             CloudWatchMetricsEnabled: true
             MetricName: "XSSRule"
             SampledRequestsEnabled: true
+        - Name: AllowAutomatedAPIAccess
+          Priority: 4
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesBotControlRuleSet
+              ScopeDownStatement:
+                NotStatement:
+                  Statement:
+                    ByteMatchStatement:
+                      SearchString: "/api/"
+                      FieldToMatch:
+                        UriPath: {}
+                      TextTransformations:
+                        - Type: NONE
+                          Priority: 0
+                      PositionalConstraint: STARTS_WITH
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: "BotAPIRule"
+            SampledRequestsEnabled: true
 
   WebACL:
     Type: "AWS::WAF::WebACL"
