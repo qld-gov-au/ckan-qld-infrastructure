@@ -59,7 +59,7 @@ extensions:
     CKANExtOIDC: &CKANExtOIDC
       shortname: "ckanext-oidc-pkce"
       description: "CKAN Extension for single sign-on capability"
-      version: "0.4.1-qgov.2"
+      version: "0.4.1+qgov.3"
 
   PROD:
     <<: *default_extensions
