@@ -58,7 +58,7 @@ extensions:
     CKANExtS3Filestore: &CKANExtS3Filestore
       shortname: "ckanext-s3filestore"
       description: "CKAN Extension to keep uploaded files in S3"
-      version: "0.11.0"
+      version: "0.11.1"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       shortname: "ckanext-ssm-config"
@@ -68,7 +68,7 @@ extensions:
     CKANExtValidation: &CKANExtValidation
       shortname: "ckanext-validation"
       description: "CKAN Extension for validating Data Packages"
-      version: "0.0.8+qgov.17"
+      version: "2.2.0+qgov.1"
 
     CKANExtDataQld: &CKANExtDataQld
       shortname: "ckanext-data-qld"
@@ -123,7 +123,7 @@ extensions:
     CKANExtOIDC: &CKANExtOIDC
       shortname: "ckanext-oidc-pkce"
       description: "CKAN Extension for single sign-on capability"
-      version: "0.4.1-qgov.2"
+      version: "0.4.1+qgov.3"
 
   PROD:
     <<: *default_extensions
