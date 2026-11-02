@@ -24,7 +24,7 @@ stack_vars = yaml.safe_load(open('vars/CKAN-Stack.var.yml'))
 template_parameters = stack_vars['cloudformation_stacks'][0]['template_parameters']
 match = re.search("[^']'([-a-z0-9.]+)'[^']", template_parameters['CookbookRevision'])
 if match:
-    check_version(match.group(1), 'ckan_cookbook')
+    check_version(match.group(1), 'opswx-ckan-cookbook')
 else:
     print("Unable to locate cookbook version in " + template_parameters['CookbookRevision'])
 check_version(stack_vars['ckan_tag'], 'ckan', stack_vars['ckan_qgov_branch'])
