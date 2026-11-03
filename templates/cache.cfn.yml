@@ -41,6 +41,9 @@ Parameters:
       - TRAINING
       - STAGING
       - PROD
+  EngineVersion:
+    Description: Redis engine version
+    Type: String
   Platform:
     Description: Name of the platform ie GI, Services, Static
     Type: String
@@ -65,6 +68,7 @@ Resources:
       CacheNodeType: !Ref CacheNodeType
       CacheSubnetGroupName: !Ref CacheSubnetGroup
       Engine: redis
+      EngineVersion: !Ref EngineVersion
       NumCacheNodes: !Ref NumCacheNodes
       VpcSecurityGroupIds:
         - Fn::ImportValue: !Sub "${Environment}${Platform}DatabaseSG"
