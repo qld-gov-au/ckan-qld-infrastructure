@@ -30,6 +30,17 @@ Feature: Resource UI
         # Sidebar resource nav truncates but preserves full name in a tooltip
         And I should see an element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'More than 30') and contains(string(), '...') and @title = 'More than 30 characters bbbbbbbbbbbb']"
 
+    Scenario: As a publisher, when I delete a resource, it should disappear from the dataset
+        Given "TestOrgEditor" as the persona
+        When I log in
+        And I expand the browser height
+        And I create a dataset and resource with key-value parameters "notes=Testing resource deletion" and "name=Deletion candidate"
+        And I press "Deletion candidate"
+        And I press "Manage"
+        And I press "Delete"
+        And I confirm the dialog containing "sure you want to delete" if present
+        Then I should see "was deleted"
+
     @OpenData
     Scenario Outline: Add new resource metadata field on the create and edit resource GUI pages
         Given "<Persona>" as the persona
