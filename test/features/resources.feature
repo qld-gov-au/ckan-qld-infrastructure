@@ -36,7 +36,7 @@ Feature: Resource UI
         And I expand the browser height
         And I create a dataset and resource with key-value parameters "notes=Testing resource deletion" and "name=Deletion candidate"
         And I press "Deletion candidate"
-        And I press "Manage"
+        And I press "Edit resource"
         And I press "Delete"
         And I confirm the dialog containing "sure you want to delete" if present
         Then I should see "was deleted"
