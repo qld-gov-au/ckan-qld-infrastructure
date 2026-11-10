@@ -8,6 +8,7 @@ common_stack: &common_stack
     Platform: CKAN
     Subnets: "{{ Environment }}CKANDBSubnet"
     CacheNodeType: cache.t4g.micro
+    EngineVersion: 7.1
   tags: &common_stack_tags
     Environment: "{{ Environment }}"
     Service: CKAN
@@ -21,6 +22,7 @@ cloudformation_stacks:
     template_parameters:
       <<: *common_stack_template_parameters
       Environment: PROD
+
   - <<: *common_stack
     name: CKAN-STAGING-Cache
     template_parameters:

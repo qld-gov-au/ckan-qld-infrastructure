@@ -124,10 +124,16 @@ attempt=1
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
   if [ "$RPM_URL" != "" ]; then
-    (dnf install -y libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1) && shutdown -P now && exit 0
+    dnf install -y libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1
     RESULT=$?
+    if [ "$RESULT" = "0" ]; then
+      shutdown -P now
+      exit 0
+    fi
   fi
 done
+gzip $LOG_FILE
+aws s3 cp "$LOG_FILE".gz s3://osssio-ckan-web-logs/AMI-baseline/$(date -Iseconds).log.gz || exit 1
 exit $RESULT
 PARAMETER_STRING
   )

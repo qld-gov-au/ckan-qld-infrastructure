@@ -58,7 +58,7 @@ extensions:
     CKANExtS3Filestore: &CKANExtS3Filestore
       shortname: "ckanext-s3filestore"
       description: "CKAN Extension to keep uploaded files in S3"
-      version: "0.11.1"
+      version: "0.11.3"
 
     CKANExtSSMConfig: &CKANExtSSMConfig
       shortname: "ckanext-ssm-config"
@@ -73,7 +73,7 @@ extensions:
     CKANExtDataQld: &CKANExtDataQld
       shortname: "ckanext-data-qld"
       description: "CKAN Extension for Queensland Government Open Data"
-      version: "9.0.0"
+      version: "9.0.1"
 
     CKANExtDataRequests: &CKANExtDataRequests
       shortname: "ckanext-datarequests"
@@ -93,7 +93,7 @@ extensions:
     CKANExtArchiver: &CKANExtArchiver
       shortname: "ckanext-archiver"
       description: "CKAN Extension for Archiving needed to support QA checks"
-      version: "2.1.1-qgov.20"
+      version: "2.1.1+qgov.21"
 
     CKANExtQa: &CKANExtQa
       shortname: "ckanext-qa"
@@ -133,10 +133,6 @@ extensions:
 
   TRAINING:
     <<: *default_extensions
-    CKANExtDataQld:
-      <<: *CKANExtDataQld
-      version: "develop"
-
 
   DEV:
     <<: *default_extensions
@@ -223,4 +219,4 @@ basic_facts:
     SiteDomain: "test-dev.data.qld.gov.au" #CKAN SiteDomain
     RootDomain: "test-dev.data.qld.gov.au" #ACM cert creation which also gets *.RootDomain
     CmsOrigin: "{{ squiz_domain }}"
-    CKANRevision: "qgov-master-2.12.0"
+    CKANRevision: "qgov-master-2.12.1"
