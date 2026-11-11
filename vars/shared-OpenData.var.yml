@@ -123,7 +123,8 @@ extensions:
     CKANExtOIDC: &CKANExtOIDC
       shortname: "ckanext-oidc-pkce"
       description: "CKAN Extension for single sign-on capability"
-      version: "0.4.1+qgov.3"
+      url: "https://github.com/DataShades/ckanext-oidc-pkce.git"
+      version: "0.4.2"
 
   PROD:
     <<: *default_extensions
