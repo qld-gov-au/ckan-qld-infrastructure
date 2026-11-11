@@ -101,10 +101,6 @@ extensions:
       <<: *CKANExtCSRFFilter
       version: "develop"
 
-    CKANExtOIDC:
-      <<: *CKANExtOIDC
-      version: "develop"
-
 # Global variables to apply to this app's CloudFormation templates
 basic_facts:
   - Environment: PROD

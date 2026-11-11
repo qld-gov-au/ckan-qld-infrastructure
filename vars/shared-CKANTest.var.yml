@@ -201,10 +201,6 @@ extensions:
       <<: *CKANExtResourceVisibility
       version: "master"
 
-    CKANExtOIDC:
-      <<: *CKANExtOIDC
-      version: "master"
-
 # Global variables to apply to this app's CloudFormation templates
 basic_facts:
   - Environment: TRAINING
