@@ -124,7 +124,7 @@ extensions:
       shortname: "ckanext-oidc-pkce"
       description: "CKAN Extension for single sign-on capability"
       url: "https://github.com/DataShades/ckanext-oidc-pkce.git"
-      version: "0.4.2"
+      version: "v0.4.2"
 
   PROD:
     <<: *default_extensions
