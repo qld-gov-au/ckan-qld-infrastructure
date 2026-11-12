@@ -128,13 +128,11 @@ while [ $attempt -le $MAX_ATTEMPTS ]; do
     RESULT=$?
     if [ "$RESULT" = "0" ]; then
       shutdown -P now
-      exit 0
+      break
     fi
   fi
 done
-gzip $LOG_FILE
-aws s3 cp "$LOG_FILE".gz s3://osssio-ckan-web-logs/AMI-baseline/$(date -Iseconds).log.gz || exit 1
-exit $RESULT
+gzip $LOG_FILE && aws s3 cp "$LOG_FILE".gz s3://osssio-ckan-web-logs/AMI-baseline/$(date -Iseconds).log.gz && exit $RESULT
 PARAMETER_STRING
   )
   INSTANCE_ID=$(aws ec2 run-instances \
