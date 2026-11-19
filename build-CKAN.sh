@@ -110,8 +110,12 @@ create-baseline-ami () {
   SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
     --query "SecurityGroups[0].GroupId" --output text)
   INSTANCE_PROFILE_NAME=$(aws iam list-instance-profiles \
-    --query "InstanceProfiles[?contains(InstanceProfileName, 'WebInstanceRole')]|[0].InstanceProfileName" --output text)
-  SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
+    --query "InstanceProfiles[?contains(InstanceProfileName, 'WebInstanceRole') && contains(InstanceProfileName, '${ENVIRONMENT}-OpsWorks-stack')]|[0].InstanceProfileName" --output text)
+  # ensure we select an App subnet to avoid routing complications
+  SUBNET_ID=$(aws ec2 describe-subnets --filters \
+    "Name=tag:Environment,Values=$ENVIRONMENT" \
+    "Name=tag:Service,Values=CKAN" \
+    "Name=tag:Name,Values=${ENVIRONMENT}: App-*" \
     --query "Subnets[0].SubnetId" --output text)
   USER_DATA=$(cat <<'PARAMETER_STRING'
 #!/bin/sh
