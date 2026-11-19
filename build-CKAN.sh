@@ -110,8 +110,12 @@ create-baseline-ami () {
   SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
     --query "SecurityGroups[0].GroupId" --output text)
   INSTANCE_PROFILE_NAME=$(aws iam list-instance-profiles \
-    --query "InstanceProfiles[?contains(InstanceProfileName, 'WebInstanceRole')]|[0].InstanceProfileName" --output text)
-  SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=tag:Environment,Values=$ENVIRONMENT" "Name=tag:Service,Values=CKAN" \
+    --query "InstanceProfiles[?contains(InstanceProfileName, 'WebInstanceRole') && contains(InstanceProfileName, '${ENVIRONMENT}-OpsWorks-stack')]|[0].InstanceProfileName" --output text)
+  # ensure we select an App subnet to avoid routing complications
+  SUBNET_ID=$(aws ec2 describe-subnets --filters \
+    "Name=tag:Environment,Values=$ENVIRONMENT" \
+    "Name=tag:Service,Values=CKAN" \
+    "Name=tag:Name,Values=${ENVIRONMENT}: App-*" \
     --query "Subnets[0].SubnetId" --output text)
   USER_DATA=$(cat <<'PARAMETER_STRING'
 #!/bin/sh
@@ -123,17 +127,16 @@ RPM_URL="https://downloads.cinc.sh/files/stable/cinc/${CINC_VERSION}/el/9/cinc-$
 attempt=1
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
-  if [ "$RPM_URL" != "" ]; then
-    dnf install -y libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1
-    RESULT=$?
-    if [ "$RESULT" = "0" ]; then
-      shutdown -P now
-      exit 0
-    fi
+  dnf install -y libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1
+  RESULT=$?
+  if [ "$RESULT" = "0" ]; then
+    break
   fi
 done
-gzip $LOG_FILE
-aws s3 cp "$LOG_FILE".gz s3://osssio-ckan-web-logs/AMI-baseline/$(date -Iseconds).log.gz || exit 1
+gzip $LOG_FILE && aws s3 cp "$LOG_FILE".gz s3://osssio-ckan-web-logs/AMI-baseline/$(date -Iseconds).log.gz
+if [ "$RESULT" = "0" ]; then
+  shutdown -P now
+fi
 exit $RESULT
 PARAMETER_STRING
   )
