@@ -127,16 +127,17 @@ RPM_URL="https://downloads.cinc.sh/files/stable/cinc/${CINC_VERSION}/el/9/cinc-$
 attempt=1
 while [ $attempt -le $MAX_ATTEMPTS ]; do
   attempt=$((attempt + 1))
-  if [ "$RPM_URL" != "" ]; then
-    dnf install -y libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1
-    RESULT=$?
-    if [ "$RESULT" = "0" ]; then
-      shutdown -P now
-      break
-    fi
+  dnf install -y libxcrypt-compat $RPM_URL >> "$LOG_FILE" 2>&1
+  RESULT=$?
+  if [ "$RESULT" = "0" ]; then
+    break
   fi
 done
-gzip $LOG_FILE && aws s3 cp "$LOG_FILE".gz s3://osssio-ckan-web-logs/AMI-baseline/$(date -Iseconds).log.gz && exit $RESULT
+gzip $LOG_FILE && aws s3 cp "$LOG_FILE".gz s3://osssio-ckan-web-logs/AMI-baseline/$(date -Iseconds).log.gz
+if [ "$RESULT" = "0" ]; then
+  shutdown -P now
+fi
+exit $RESULT
 PARAMETER_STRING
   )
   INSTANCE_ID=$(aws ec2 run-instances \
