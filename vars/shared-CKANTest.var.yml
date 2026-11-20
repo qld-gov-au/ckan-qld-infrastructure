@@ -53,7 +53,7 @@ extensions:
     CKANExtQGOV: &CKANExtQGOV
       shortname: "ckanext-qgov"
       description: "CKAN Extension for Queensland Government sites"
-      version: "7.4.4"
+      version: "7.4.7"
 
     CKANExtS3Filestore: &CKANExtS3Filestore
       shortname: "ckanext-s3filestore"
@@ -123,7 +123,8 @@ extensions:
     CKANExtOIDC: &CKANExtOIDC
       shortname: "ckanext-oidc-pkce"
       description: "CKAN Extension for single sign-on capability"
-      version: "0.4.1+qgov.3"
+      url: "https://github.com/DataShades/ckanext-oidc-pkce.git"
+      version: "v0.4.2"
 
   PROD:
     <<: *default_extensions
@@ -198,10 +199,6 @@ extensions:
 
     CKANExtResourceVisibility:
       <<: *CKANExtResourceVisibility
-      version: "master"
-
-    CKANExtOIDC:
-      <<: *CKANExtOIDC
       version: "master"
 
 # Global variables to apply to this app's CloudFormation templates
