@@ -22,11 +22,11 @@ Feature: Resource UI
         When I log in
         And I create a dataset and resource with key-value parameters "title=More than 30 characters aaaaaaaaaaaa" and "name=More than 30 characters bbbbbbbbbbbb"
         # Breadcrumbs should not be truncated
-        Then I should see an element with xpath "//ol[contains(@class, 'breadcrumb')]//a[contains(string(), 'More than 30 characters aaaaaaaaaaaa')]"
+        Then I should see "More than 30 characters aaaaaaaaaaaa"
         And I should see "More than 30 characters bbbbbbbbbbbb"
         When I press "More than 30 characters bbbbbbbbbbbb"
         Then I should see an element with xpath "//ol[contains(@class, 'breadcrumb')]//a[contains(string(), 'More than 30 characters aaaaaaaaaaaa')]"
-        And I should see an element with xpath "//ol[contains(@class, 'breadcrumb')]//a[contains(string(), 'More than 30 characters bbbbbbbbbbbb')]"
+        And I should see an element with xpath "//ol[contains(@class, 'breadcrumb')]//li[contains(string(), 'More than 30 characters bbbbbbbbbbbb')]"
         # Sidebar resource nav truncates but preserves full name in a tooltip
         And I should see an element with xpath "//li[contains(@class, 'nav-item')]//a[contains(string(), 'More than 30') and contains(string(), '...') and @title = 'More than 30 characters bbbbbbbbbbbb']"
 
