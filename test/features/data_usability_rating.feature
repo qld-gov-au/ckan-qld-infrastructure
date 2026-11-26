@@ -7,8 +7,8 @@ Feature: Data usability rating
         Given "TestOrgEditor" as the persona
         When I log in
         And I create a dataset and resource with key-value parameters "license=other-open" and "format=<Format>::upload=<Filename>"
-        And I press the element with xpath "//ol[contains(@class, 'breadcrumb')]//a[starts-with(@href, '/dataset/')]"
-        And I reload page every 3 seconds until I see an element with xpath "//div[contains(@class, 'qa') and contains(@class, 'openness-')]" but not more than 10 times
+        Then I should see an element with xpath "//h2[contains(string(), 'Data and Resources')]"
+        When I reload page every 3 seconds until I see an element with xpath "//div[contains(@class, 'qa') and contains(@class, 'openness-')]" but not more than 10 times
         Then I should see data usability rating <Score>
         When I press "Test Resource"
         Then I should see data usability rating <Score>
@@ -26,8 +26,8 @@ Feature: Data usability rating
         Given "TestOrgEditor" as the persona
         When I log in
         And I create a dataset and resource with key-value parameters "license=other-open" and "format=CSV::upload=test_game_data.csv::schema=default"
-        And I press the element with xpath "//ol[contains(@class, 'breadcrumb')]//a[starts-with(@href, '/dataset/')]"
-        And I reload page every 3 seconds until I see an element with xpath "//div[contains(@class, 'qa') and contains(@class, 'openness-4')]" but not more than 10 times
+        Then I should see an element with xpath "//h2[contains(string(), 'Data and Resources')]"
+        When I reload page every 3 seconds until I see an element with xpath "//div[contains(@class, 'qa') and contains(@class, 'openness-4')]" but not more than 10 times
         Then I should not see an element with xpath "//div[contains(@class, 'openness-3')]"
         And I should see an element with xpath "//div[contains(@class, 'openness-4')]"
         When I take a debugging screenshot
